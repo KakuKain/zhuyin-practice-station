@@ -8,36 +8,35 @@ type ListenPhase = "ready" | "active" | "review" | "choice" | "retry";
 type ParentResult = "correct" | "needs_review" | null;
 type CardDrag = { pointerId: number; optionIndex: number; startX: number; startY: number; moved: boolean };
 
-const lessonItems = [
-  { character: "小", zhuyin: "ㄒㄧㄠˇ" },
-  { character: "明", zhuyin: "ㄇㄧㄥˊ" },
-  { character: "是", zhuyin: "ㄕˋ" },
-  { character: "個", zhuyin: "ㄍㄜˋ" },
-  { character: "好", zhuyin: "ㄏㄠˇ" },
-  { character: "學", zhuyin: "ㄒㄩㄝˊ" },
-  { character: "生", zhuyin: "ㄕㄥ" },
+const lessonLines = [
+  [{ character: "貓", zhuyin: "ㄇㄠ" }, { character: "咪", zhuyin: "ㄇㄧ" }],
+  [{ character: "咪", zhuyin: "ㄇㄧ" }, { character: "咪", zhuyin: "ㄇㄧ" }, { character: "咪", zhuyin: "ㄇㄧ" }],
+  [{ character: "咪", zhuyin: "ㄇㄧ" }, { character: "咪", zhuyin: "ㄇㄧ" }, { character: "咪", zhuyin: "ㄇㄧ" }],
+  [{ character: "逼", zhuyin: "ㄅㄧ" }],
+  [{ character: "貓", zhuyin: "ㄇㄠ" }, { character: "咪", zhuyin: "ㄇㄧ" }, { character: "弟", zhuyin: "ㄉㄧˋ" }, { character: "弟", zhuyin: "ㄉㄧˋ" }, { character: "跑", zhuyin: "ㄆㄠˇ" }, { character: "第", zhuyin: "ㄉㄧˋ" }, { character: "一", zhuyin: "ㄧ" }],
 ] as const;
+const lessonItems = lessonLines.flat();
 
 const listeningQuestions = [
-  { answer: "ㄇㄧㄥˊ", audioText: "明", distractors: ["ㄇㄧㄣˊ", "ㄇㄧㄥˇ"] },
-  { answer: "ㄒㄩㄝˊ", audioText: "學", distractors: ["ㄒㄩㄝˇ", "ㄒㄩㄢˊ"] },
-  { answer: "ㄕㄥ", audioText: "生", distractors: ["ㄕㄣ", "ㄕㄥˇ"] },
+  { answer: "ㄇㄠ", audioText: "貓", distractors: ["ㄇㄠˊ", "ㄇㄠˇ"] },
+  { answer: "ㄇㄧ", audioText: "咪", distractors: ["ㄇㄧˊ", "ㄇㄧˇ"] },
+  { answer: "ㄆㄠˇ", audioText: "跑", distractors: ["ㄆㄠˊ", "ㄆㄠˋ"] },
 ] as const;
 
-const blankIndexes = [1, 4, 6];
-const fillOptions = [lessonItems[4], lessonItems[1], lessonItems[6]];
+const blankIndexes = [0, 8, 13];
+const fillOptions = [lessonItems[13], lessonItems[0], lessonItems[8]];
 
 // This font draws the complete vertical syllable (including its tone) from a
 // representative Han character. Rendering individual Bopomofo characters would
 // discard the font's built-in tone placement.
 const syllableGlyphs: Record<string, string> = {
   ...Object.fromEntries(lessonItems.map(({ character, zhuyin }) => [zhuyin, character])),
-  "ㄇㄧㄣˊ": "民",
-  "ㄇㄧㄥˇ": "酩",
-  "ㄒㄩㄝˇ": "雪",
-  "ㄒㄩㄢˊ": "旋",
-  "ㄕㄣ": "申",
-  "ㄕㄥˇ": "省",
+  "ㄇㄠˊ": "毛",
+  "ㄇㄠˇ": "卯",
+  "ㄇㄧˊ": "迷",
+  "ㄇㄧˇ": "米",
+  "ㄆㄠˊ": "袍",
+  "ㄆㄠˋ": "泡",
 };
 
 function ZhuyinStack({ text, empty = false }: { text: string; empty?: boolean }) {
@@ -393,12 +392,12 @@ export default function Page() {
       <section className="content-section">
         <div className="section-title-row"><div><span className="eyebrow">Pick up where you left off</span><h2>最近練習</h2></div><button className="text-button" type="button" onClick={() => setView("courses")}>看全部課程 <span>→</span></button></div>
         <button className="recent-card" type="button" onClick={() => setView("lesson")}>
-          <span className="lesson-number"><Notebook size={25} weight="duotone" /></span><span className="recent-copy"><small>第一課</small><strong>小明是個好學生</strong><span>課文默寫・聽寫</span></span><span className="progress-ring"><b>2/5</b><small>進度</small></span><span className="card-arrow"><ArrowRight size={21} /></span>
+          <span className="lesson-number"><Notebook size={25} weight="duotone" /></span><span className="recent-copy"><small>第一課</small><strong>貓咪</strong><span>課文默寫・聽寫</span></span><span className="progress-ring"><b>2/5</b><small>進度</small></span><span className="card-arrow"><ArrowRight size={21} /></span>
         </button>
       </section>
 
       <section className="tip-card"><span className="tip-icon"><Lightbulb size={20} weight="duotone" /></span><span><strong>給陪練的大人</strong><small>聽寫時會先播放兩次，時間到才會請你幫忙判定，孩子可以安心慢慢寫。</small></span><button type="button" onClick={() => setView("more")} aria-label="查看陪練說明"><ArrowRight size={20} /></button></section>
-      <section className="quick-courses"><div className="section-title-row"><div><span className="eyebrow">CHOOSE A LESSON</span><h2>選擇課程</h2></div><button className="text-button" type="button" onClick={() => setView("courses")}>看全部 <ArrowRight size={15} /></button></div><div className="quick-course-grid"><button type="button" onClick={() => setView("lesson")}><Sun size={27} weight="duotone" /><strong>第一課</strong><small>小明是個好學生</small></button><button type="button" onClick={() => setFillMessage("這一課正在準備中，先來完成第一課吧！ ")}><House size={27} weight="duotone" /><strong>第二課</strong><small>我有一個家。</small></button><button type="button" onClick={() => setFillMessage("這一課正在準備中，先來完成第一課吧！ ")}><Tree size={27} weight="duotone" /><strong>第三課</strong><small>美麗的校園</small></button></div></section>
+      <section className="quick-courses"><div className="section-title-row"><div><span className="eyebrow">CHOOSE A LESSON</span><h2>選擇課程</h2></div><button className="text-button" type="button" onClick={() => setView("courses")}>看全部 <ArrowRight size={15} /></button></div><div className="quick-course-grid"><button type="button" onClick={() => setView("lesson")}><Sun size={27} weight="duotone" /><strong>第一課</strong><small>貓咪</small></button><button type="button" onClick={() => setFillMessage("這一課正在準備中，先來完成第一課吧！ ")}><House size={27} weight="duotone" /><strong>第二課</strong><small>我有一個家。</small></button><button type="button" onClick={() => setFillMessage("這一課正在準備中，先來完成第一課吧！ ")}><Tree size={27} weight="duotone" /><strong>第三課</strong><small>美麗的校園</small></button></div></section>
     </>
   );
 
@@ -406,7 +405,7 @@ export default function Page() {
     <section className="page-section">
       <SectionHeading eyebrow="COURSES" title="選擇課程" description="每一課都從一小段注音開始，按自己的步調練習就好。" />
       <div className="course-grid">
-        <button className="course-tile featured" type="button" onClick={() => setView("lesson")}><span className="course-badge">現在練習</span><span className="course-tile-number">01</span><strong>第一課</strong><b>小明是個好學生</b><small>默寫 · 聽寫</small><span className="tile-arrow">→</span></button>
+        <button className="course-tile featured" type="button" onClick={() => setView("lesson")}><span className="course-badge">現在練習</span><span className="course-tile-number">01</span><strong>第一課</strong><b>貓咪</b><small>默寫 · 聽寫</small><span className="tile-arrow">→</span></button>
         {[
           ["02", "第二課", "快樂上學去"],
           ["03", "第三課", "我的好朋友"],
@@ -420,26 +419,33 @@ export default function Page() {
   const renderLesson = () => (
     <section className="page-section lesson-page">
       <button className="back-link" type="button" onClick={() => setView("courses")}>← 回到課程</button>
-      <div className="lesson-heading"><div><span className="eyebrow">LESSON 01</span><h1>小明是個好學生</h1><p>第一課 · 兩種方式，自己選一個開始。</p></div><span className="lesson-stamp">先看<br />再寫</span></div>
+      <div className="lesson-heading"><div><span className="eyebrow">LESSON 01</span><h1>貓咪</h1><p>第一課 · 兩種方式，自己選一個開始。</p></div><span className="lesson-stamp">先看<br />再寫</span></div>
       <div className="mode-grid">
         <button className="mode-card fill-mode" type="button" onClick={() => setView("fill")}><span className="mode-icon"><PencilLine size={30} weight="duotone" /></span><span className="mode-copy"><small>第一關</small><strong>課文默寫</strong><p>看直式注音格，把缺少的音節拖回去。</p><b>開始練習 <ArrowRight size={17} /> </b></span></button>
         <button className="mode-card listen-mode" type="button" onClick={openListening}><span className="mode-icon"><Headphones size={30} weight="duotone" /></span><span className="mode-copy"><small>第二關</small><strong>聽寫</strong><p>聽聲音、自由手寫，最後交給家長判定。</p><b>開始練習 <ArrowRight size={17} /> </b></span></button>
       </div>
-      <div className="lesson-rule"><span>小提醒</span><p>課文默寫裡看到的是<strong>注音，不是國字</strong>。每一格代表完整的一個音節。</p></div>
+      <div className="lesson-rule"><span>小提醒</span><p>課文默寫裡看到的是<strong>注音，不是國字</strong>。從右邊第一行開始，由上往下、由右往左讀。</p></div>
     </section>
   );
 
   const renderFillBlank = () => (
-    <section className="page-section fill-page">
+    <section className={`page-section fill-page ${fillComplete ? "is-complete" : ""}`}>
       <button className="back-link" type="button" onClick={() => setView("lesson")}>← 回到第一課</button>
-      <div className="practice-title"><div><span className="eyebrow">第一關 · 課文默寫</span><h1>把音節放回課文裡</h1><p>整篇課文用直式注音呈現。試著讀一讀，再把下方卡片拖進空格。</p></div><span className="step-pill">1 / 2</span></div>
+      <div className="practice-title"><div><span className="eyebrow">第一關 · 課文默寫</span><h1>把音節放回課文裡</h1><p>從右上角開始，先往下讀，再往左讀下一行；把下方卡片拖進空格。</p></div><span className="step-pill">1 / 2</span></div>
       <div className="fill-progress"><span className="progress-label">完成度</span><span className="progress-track"><i style={{ width: `${(Object.keys(fillAnswers).length / blankIndexes.length) * 100}%` }} /></span><strong>{Object.keys(fillAnswers).length} / {blankIndexes.length}</strong></div>
       <div className="zhuyin-sheet">
-        <div className="sheet-top"><span>第一課</span><small>一個空格 = 一個完整音節</small></div>
-        <div className="syllable-row">
-          {lessonItems.map((item, index) => <div className={`syllable-cell ${blankIndexes.includes(index) ? "is-target" : ""} ${fillAnswers[index] ? "is-filled" : ""} ${hoveredSlot === index ? "is-drop-hover" : ""}`} key={item.character} data-syllable-slot={index} role={blankIndexes.includes(index) && !fillAnswers[index] ? "button" : undefined} tabIndex={blankIndexes.includes(index) && !fillAnswers[index] ? 0 : undefined} aria-label={blankIndexes.includes(index) && !fillAnswers[index] ? `第 ${index + 1} 格，放入音節` : undefined} onClick={() => selectedCard !== null && placeFillAnswer(selectedCard, index)} onKeyDown={(event) => { if (selectedCard !== null && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); placeFillAnswer(selectedCard, index); } }}>{fillAnswers[index] ? <><span className="filled-check">✓</span><ZhuyinStack text={fillAnswers[index]} /></> : blankIndexes.includes(index) ? <ZhuyinStack text="" empty /> : <ZhuyinStack text={item.zhuyin} />}<small className="cell-position">{index + 1}</small></div>)}
+        <div className="sheet-top"><span>第一課・貓咪</span><small>右 → 左，每格一個完整音節</small></div>
+        <div className="syllable-row" dir="rtl" aria-label="課文直排注音，從右向左閱讀">
+          {lessonLines.map((line, lineIndex) => {
+            const lineStart = lessonLines.slice(0, lineIndex).reduce((count, previous) => count + previous.length, 0);
+            return <div className="syllable-column" role="group" aria-label={`第 ${lineIndex + 1} 行`} key={lineIndex}>
+              {line.map((item, itemIndex) => {
+                const index = lineStart + itemIndex;
+                return <div className={`syllable-cell ${blankIndexes.includes(index) ? "is-target" : ""} ${fillAnswers[index] ? "is-filled" : ""} ${hoveredSlot === index ? "is-drop-hover" : ""}`} key={index} data-syllable-slot={index} role={blankIndexes.includes(index) && !fillAnswers[index] ? "button" : undefined} tabIndex={blankIndexes.includes(index) && !fillAnswers[index] ? 0 : undefined} aria-label={blankIndexes.includes(index) && !fillAnswers[index] ? `第 ${lineIndex + 1} 行第 ${itemIndex + 1} 格，放入音節` : undefined} onClick={() => selectedCard !== null && placeFillAnswer(selectedCard, index)} onKeyDown={(event) => { if (selectedCard !== null && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); placeFillAnswer(selectedCard, index); } }}>{fillAnswers[index] ? <><span className="filled-check">✓</span><ZhuyinStack text={fillAnswers[index]} /></> : blankIndexes.includes(index) ? <ZhuyinStack text="" empty /> : <ZhuyinStack text={item.zhuyin} />}<small className="cell-position">{index + 1}</small></div>;
+              })}
+            </div>;
+          })}
         </div>
-        <div className="sheet-hint"><span>讀法提示</span><strong>ㄒㄧㄠˇ　ㄇㄧㄥˊ　ㄕˋ　ㄍㄜˋ　ㄏㄠˇ　ㄒㄩㄝˊ　ㄕㄥ</strong></div>
       </div>
       <div className="fill-options"><div className="options-heading"><div><span className="eyebrow">音節卡片</span><h2>拖曳完整音節</h2></div><small>支援觸控、滑鼠與 iPad</small></div><div className="option-row">{fillOptions.map((option, index) => { const used = Object.values(fillAnswers).includes(option.zhuyin); return <button key={option.zhuyin} type="button" disabled={used} aria-pressed={selectedCard === index} className={`syllable-card ${dragging === index ? "is-dragging" : ""} ${selectedCard === index ? "is-selected" : ""} ${used ? "is-used" : ""}`} onPointerDown={(event) => beginCardDrag(event, index)} onPointerMove={moveCardDrag} onPointerUp={endCardDrag} onPointerCancel={cancelCardDrag} onClick={(event) => { if (event.detail === 0) setSelectedCard(index); }}><ZhuyinStack text={option.zhuyin} /><span>{option.character}</span></button>; })}</div><p className="feedback-line" aria-live="polite"><span className={fillMessage.startsWith("答對") ? "good" : ""}>{fillMessage}</span></p></div>
       {dragging !== null && dragPosition && <div className="drag-preview" style={{ left: dragPosition.x, top: dragPosition.y }} aria-hidden="true"><ZhuyinStack text={fillOptions[dragging].zhuyin} /></div>}
@@ -451,7 +457,7 @@ export default function Page() {
     <section className="page-section">
       <SectionHeading eyebrow="YOUR PRACTICE" title="練習紀錄" description="把需要再看一次的音節留下來，下次從這裡繼續。" />
       <div className="practice-summary"><div className="summary-score"><span>本週練習</span><strong>1</strong><small>次</small></div><div className="summary-copy"><span className="eyebrow">KEEP GOING</span><h2>每天 5 分鐘，慢慢變熟悉。</h2><p>完成一個小練習，就是很棒的進度。</p></div><span className="summary-doodle">✦</span></div>
-      <div className="practice-list"><div className="section-title-row"><div><span className="eyebrow">RECENT</span><h2>最近練習</h2></div><span className="list-count">1 個紀錄</span></div><button className="practice-row" type="button" onClick={() => setView("lesson")}><span className="practice-row-icon">01</span><span><strong>第一課・小明是個好學生</strong><small>課文默寫 · 尚未完成聽寫</small></span><b>繼續 <span>→</span></b></button></div>
+      <div className="practice-list"><div className="section-title-row"><div><span className="eyebrow">RECENT</span><h2>最近練習</h2></div><span className="list-count">1 個紀錄</span></div><button className="practice-row" type="button" onClick={() => setView("lesson")}><span className="practice-row-icon">01</span><span><strong>第一課・貓咪</strong><small>課文默寫 · 尚未完成聽寫</small></span><b>繼續 <span>→</span></b></button></div>
       <div className="empty-reinforce"><span>☼</span><strong>目前沒有需要補強的題目</strong><small>完成聽寫後，家長標記需要補強的題目會出現在這裡。</small></div>
     </section>
   );

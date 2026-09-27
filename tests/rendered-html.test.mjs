@@ -22,7 +22,7 @@ test("server-renders the public zhuyin practice station", async () => {
   assert.match(html, /<title>一年級注音練習站｜注音小練習<\/title>/);
   assert.match(html, /注音小練習/);
   assert.match(html, /開心練習/);
-  assert.match(html, /小明是個好學生/);
+  assert.match(html, /貓咪/);
   assert.match(html, /不用登入也能練/);
 });
 
@@ -33,4 +33,6 @@ test("the source keeps the handoff interaction vocabulary", async () => {
   assert.match(page, /需要補強/);
   assert.match(page, /touch-action: none/);
   assert.match(page, /ㄧ/);
+  assert.match(page, /dir="rtl"/);
+  assert.match(page, /貓咪弟弟跑第一|character: "跑"/);
 });
