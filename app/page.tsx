@@ -8,6 +8,9 @@ type ListenPhase = "ready" | "active" | "review" | "choice" | "retry";
 type ParentResult = "correct" | "needs_review" | null;
 type PreviewMode = "annotated" | "zhuyin";
 type CardDrag = { pointerId: number; optionIndex: number; startX: number; startY: number; moved: boolean };
+type SyllableItem = { character: string; zhuyin: string };
+type ListeningQuestion = { answer: string; audioText: string; distractors: readonly string[] };
+type LessonExercise = { lines: readonly (readonly SyllableItem[])[]; blanks: readonly number[]; optionOrder: readonly number[]; questions: readonly ListeningQuestion[] };
 
 const lessons = [
   { title: "貓咪", lines: ["咪咪咪", "咪咪咪", "逼", "貓咪弟弟", "跑第一"], symbols: ["ㄅ", "ㄆ", "ㄇ", "ㄉ", "ㄧ", "ㄠ"] },
@@ -21,35 +24,54 @@ const previewPronunciationVariants: Record<number, Record<number, Record<number,
   1: { 5: { 4: "\u{E01E1}" } }, // 五隻鵝寶寶：第二個「寶」依課本讀輕聲
 };
 
-const lessonLines = [
+const firstLessonLines = [
   [{ character: "咪", zhuyin: "ㄇㄧ" }, { character: "咪", zhuyin: "ㄇㄧ" }, { character: "咪", zhuyin: "ㄇㄧ" }],
   [{ character: "咪", zhuyin: "ㄇㄧ" }, { character: "咪", zhuyin: "ㄇㄧ" }, { character: "咪", zhuyin: "ㄇㄧ" }],
   [{ character: "逼", zhuyin: "ㄅㄧ" }],
   [{ character: "貓", zhuyin: "ㄇㄠ" }, { character: "咪", zhuyin: "ㄇㄧ" }, { character: "弟", zhuyin: "ㄉㄧˋ" }, { character: "弟", zhuyin: "˙ㄉㄧ" }],
   [{ character: "跑", zhuyin: "ㄆㄠˇ" }, { character: "第", zhuyin: "ㄉㄧˋ" }, { character: "一", zhuyin: "ㄧ" }],
 ] as const;
-const lessonItems = lessonLines.flat();
+const thirdLessonLines = [
+  [{ character: "河", zhuyin: "ㄏㄜˊ" }, { character: "馬", zhuyin: "ㄇㄚˇ" }, { character: "要", zhuyin: "ㄧㄠˋ" }, { character: "去", zhuyin: "ㄑㄩˋ" }, { character: "泡", zhuyin: "ㄆㄠˋ" }, { character: "澡", zhuyin: "ㄗㄠˇ" }],
+  [{ character: "半", zhuyin: "ㄅㄢˋ" }, { character: "路", zhuyin: "ㄌㄨˋ" }, { character: "遇", zhuyin: "ㄩˋ" }, { character: "到", zhuyin: "ㄉㄠˋ" }, { character: "河", zhuyin: "ㄏㄜˊ" }, { character: "狸", zhuyin: "ㄌㄧˊ" }],
+  [{ character: "喔", zhuyin: "ㄛ" }],
+  [{ character: "河", zhuyin: "ㄏㄜˊ" }, { character: "狸", zhuyin: "ㄌㄧˊ" }],
+  [{ character: "忙", zhuyin: "ㄇㄤˊ" }, { character: "著", zhuyin: "˙ㄓㄜ" }, { character: "築", zhuyin: "ㄓㄨˊ" }, { character: "巢", zhuyin: "ㄔㄠˊ" }],
+] as const;
 
-const listeningQuestions = [
+const firstListeningQuestions = [
   { answer: "ㄇㄠ", audioText: "貓", distractors: ["ㄇㄠˊ", "ㄇㄠˇ"] },
   { answer: "ㄇㄧ", audioText: "咪", distractors: ["ㄇㄧˊ", "ㄇㄧˇ"] },
   { answer: "ㄆㄠˇ", audioText: "跑", distractors: ["ㄆㄠˊ", "ㄆㄠˋ"] },
 ] as const;
+const thirdListeningQuestions = [
+  { answer: "ㄑㄩˋ", audioText: "去", distractors: ["ㄑㄩ", "ㄑㄩˇ"] },
+  { answer: "ㄗㄠˇ", audioText: "澡", distractors: ["ㄗㄠ", "ㄗㄠˋ"] },
+  { answer: "ㄔㄠˊ", audioText: "巢", distractors: ["ㄔㄠ", "ㄔㄠˇ"] },
+] as const;
 
-const blankIndexes = [6, 7, 11];
-const fillOptions = [lessonItems[11], lessonItems[7], lessonItems[6]];
+const exercises: Record<number, LessonExercise> = {
+  0: { lines: firstLessonLines, blanks: [6, 7, 11], optionOrder: [11, 7, 6], questions: firstListeningQuestions },
+  2: { lines: thirdLessonLines, blanks: [0, 12, 15], optionOrder: [15, 0, 12], questions: thirdListeningQuestions },
+};
 
 // This font draws the complete vertical syllable (including its tone) from a
 // representative Han character. Rendering individual Bopomofo characters would
 // discard the font's built-in tone placement.
 const syllableGlyphs: Record<string, string> = {
-  ...Object.fromEntries(lessonItems.map(({ character, zhuyin }) => [zhuyin, character])),
+  ...Object.fromEntries([firstLessonLines, thirdLessonLines].flat(2).map(({ character, zhuyin }) => [zhuyin, character])),
   "ㄇㄠˊ": "毛",
   "ㄇㄠˇ": "卯",
   "ㄇㄧˊ": "迷",
   "ㄇㄧˇ": "米",
   "ㄆㄠˊ": "袍",
   "ㄆㄠˋ": "泡",
+  "ㄑㄩ": "區",
+  "ㄑㄩˇ": "取",
+  "ㄗㄠ": "遭",
+  "ㄗㄠˋ": "造",
+  "ㄔㄠ": "超",
+  "ㄔㄠˇ": "炒",
 };
 
 function ZhuyinStack({ text, empty = false }: { text: string; empty?: boolean }) {
@@ -132,15 +154,23 @@ export default function Page() {
   const [listenMessage, setListenMessage] = useState("按下「開始聽」才會播放題目。時間會從這裡開始倒數。 ");
   const [retryMessage, setRetryMessage] = useState("");
   const [sessionScore, setSessionScore] = useState({ listeningCorrect: 0, needsReview: 0 });
+  const [completedFillLessons, setCompletedFillLessons] = useState<number[]>([]);
   const [isDrawing, setIsDrawing] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const cardDragRef = useRef<CardDrag | null>(null);
   const timerRef = useRef<number | null>(null);
   const timeoutRefs = useRef<number[]>([]);
 
-  const currentQuestion = listeningQuestions[listenIndex];
+  const exercise = exercises[selectedLesson] ?? exercises[0];
+  const lessonLines = exercise.lines;
+  const lessonItems = lessonLines.flat();
+  const blankIndexes = exercise.blanks;
+  const fillOptions = exercise.optionOrder.map((index) => lessonItems[index]);
+  const listeningQuestions = exercise.questions;
+  const currentQuestion = listeningQuestions[listenIndex] ?? listeningQuestions[0];
   const isFocusMode = view === "listen";
   const lesson = lessons[selectedLesson];
+  const lessonNumber = ["一", "二", "三"][selectedLesson];
 
   const openLesson = (index: number) => {
     setSelectedLesson(index);
@@ -177,7 +207,19 @@ export default function Page() {
 
   const openListening = () => {
     resetListeningQuestion(0);
+    setSessionScore({ listeningCorrect: 0, needsReview: 0 });
     setView("listen");
+  };
+
+  const openFill = () => {
+    setFillAnswers({});
+    setFillMessage("拖到虛線空格，或先點卡片、再點空格。");
+    setSelectedCard(null);
+    setDragging(null);
+    setDragPosition(null);
+    setHoveredSlot(null);
+    cardDragRef.current = null;
+    setView("fill");
   };
 
   const leaveFocus = () => {
@@ -303,6 +345,7 @@ export default function Page() {
     }
     const next = { ...fillAnswers, [slotIndex]: option.zhuyin };
     setFillAnswers(next);
+    if (blankIndexes.every((index) => next[index])) setCompletedFillLessons((current) => current.includes(selectedLesson) ? current : [...current, selectedLesson]);
     setFillMessage("答對了！完整音節會留在格子裡，不能再被拖走。 ");
     setSelectedCard(null);
     setDragging(null);
@@ -434,19 +477,19 @@ export default function Page() {
       <div className="course-grid">
         <button className="course-tile featured" type="button" onClick={() => openLesson(0)}><span className="course-badge">現在練習</span><span className="course-tile-number">01</span><strong>第一課</strong><b>{lessons[0].title}</b><small>默寫 · 聽寫</small><span className="tile-arrow">→</span></button>
         {[
-          ["02", "第二課", lessons[1].title],
-          ["03", "第三課", lessons[2].title],
-        ].map(([number, title, subtitle], index) => <button className="course-tile" type="button" key={number} onClick={() => openLesson(index + 1)}><span className="course-tile-number">{number}</span><strong>{title}</strong><b>{subtitle}</b><small>閱讀課文</small><span className="lock-icon">→</span></button>)}
+          ["02", "第二課", lessons[1].title, "閱讀課文"],
+          ["03", "第三課", lessons[2].title, "默寫 · 聽寫"],
+        ].map(([number, title, subtitle, status], index) => <button className="course-tile" type="button" key={number} onClick={() => openLesson(index + 1)}><span className="course-tile-number">{number}</span><strong>{title}</strong><b>{subtitle}</b><small>{status}</small><span className="lock-icon">→</span></button>)}
       </div>
-      <div className="course-note"><span>☑</span><p><strong>三課課文已更新</strong><br />第一課可以練默寫與聽寫；第二、三課先讀課文與注音符號。</p></div>
+      <div className="course-note"><span>☑</span><p><strong>三課課文已更新</strong><br />第一、三課可以練默寫與聽寫；第二課先讀課文與注音符號。</p></div>
     </section>
   );
 
   const renderLesson = () => (
     <section className="page-section lesson-page">
-      <div className="lesson-heading"><div><span className="eyebrow">LESSON {String(selectedLesson + 1).padStart(2, "0")}</span><h1>{lesson.title}</h1></div><span className="lesson-stamp">{selectedLesson === 0 ? <>先看<br />再寫</> : <>先讀<br />課文</>}</span></div>
-      {selectedLesson === 0 && <div className="mode-grid">
-        <button className="mode-card fill-mode" type="button" onClick={() => setView("fill")}><span className="mode-icon" aria-hidden="true"><PencilLine size={26} weight="duotone" /></span><small>第一關</small><strong>課文默寫</strong></button>
+      <div className="lesson-heading"><div><span className="eyebrow">LESSON {String(selectedLesson + 1).padStart(2, "0")}</span><h1>{lesson.title}</h1></div><span className="lesson-stamp">{exercises[selectedLesson] ? <>先看<br />再寫</> : <>先讀<br />課文</>}</span></div>
+      {exercises[selectedLesson] && <div className="mode-grid">
+        <button className="mode-card fill-mode" type="button" onClick={openFill}><span className="mode-icon" aria-hidden="true"><PencilLine size={26} weight="duotone" /></span><small>第一關</small><strong>課文默寫</strong></button>
         <button className="mode-card listen-mode" type="button" onClick={openListening}><span className="mode-icon" aria-hidden="true"><Headphones size={26} weight="duotone" /></span><small>第二關</small><strong>聽寫</strong></button>
       </div>}
       <div className="lesson-curriculum">
@@ -463,15 +506,15 @@ export default function Page() {
         <div className="lesson-curriculum-heading"><strong>注音符號</strong></div>
         <div className="lesson-symbols" dir="rtl" aria-label="本課注音符號">{lesson.symbols.map((symbol) => <span key={symbol}>{symbol}</span>)}</div>
       </div>
-      {selectedLesson !== 0 && <p className="lesson-upcoming">這一課的課文默寫與聽寫練習準備中。</p>}
+      {!exercises[selectedLesson] && <p className="lesson-upcoming">這一課的課文默寫與聽寫練習準備中。</p>}
     </section>
   );
 
   const renderFillBlank = () => (
     <section className={`page-section fill-page ${fillComplete ? "is-complete" : ""}`}>
-      <button className="back-link" type="button" onClick={() => setView("lesson")}>← 回到第一課</button>
+      <button className="back-link" type="button" onClick={() => setView("lesson")}>← 回到第{lessonNumber}課</button>
       <div className="zhuyin-sheet">
-        <div className="sheet-top"><h1>貓咪</h1><small>第一課 · 由右往左讀</small></div>
+        <div className="sheet-top"><h1>{lesson.title}</h1><small>第{lessonNumber}課 · 由右往左讀</small></div>
         <div className="syllable-row" dir="rtl" aria-label="課文直排注音，從右向左閱讀">
           {lessonLines.map((line, lineIndex) => {
             const lineStart = lessonLines.slice(0, lineIndex).reduce((count, previous) => count + previous.length, 0);
@@ -510,10 +553,10 @@ export default function Page() {
   const renderResult = () => (
     <section className="page-section result-page">
       <div className="result-celebration"><span className="result-spark">✦</span><div className="result-check">✓</div><span className="result-spark right">✦</span></div>
-      <span className="eyebrow">PRACTICE COMPLETE</span><h1>練習完成！</h1><p className="result-intro">今天的第一課，你已經往前走了一小步。</p>
-      <div className="result-card"><div><span className="result-icon fill"><PencilLine size={22} weight="duotone" /></span><span><strong>課文默寫</strong><small>直式注音格 · 已完成</small></span><b>✓</b></div><div><span className="result-icon listen"><Headphones size={22} weight="duotone" /></span><span><strong>聽寫</strong><small>{sessionScore.listeningCorrect} / {listeningQuestions.length} 題完成</small></span><b>✓</b></div></div>
+      <span className="eyebrow">PRACTICE COMPLETE</span><h1>練習完成！</h1><p className="result-intro">今天的第{lessonNumber}課，你已經往前走了一小步。</p>
+      <div className="result-card"><div><span className="result-icon fill"><PencilLine size={22} weight="duotone" /></span><span><strong>課文默寫</strong><small>直式注音格 · {completedFillLessons.includes(selectedLesson) ? "已完成" : "尚未練習"}</small></span><b>{completedFillLessons.includes(selectedLesson) ? "✓" : "—"}</b></div><div><span className="result-icon listen"><Headphones size={22} weight="duotone" /></span><span><strong>聽寫</strong><small>{sessionScore.listeningCorrect} / {listeningQuestions.length} 題完成</small></span><b>✓</b></div></div>
       <div className="result-note"><span>☼</span><p><strong>需要再練習：{sessionScore.needsReview} 題</strong><small>別急，補強就是學習的一部分。下次從「練習」繼續就好。</small></p></div>
-      <div className="result-actions"><button className="primary-button" type="button" onClick={() => { resetListeningQuestion(0); setView("listen"); }}>再練一次 <span>↻</span></button><button className="secondary-button" type="button" onClick={() => setView("lesson")}>回到課次</button></div>
+      <div className="result-actions"><button className="primary-button" type="button" onClick={openListening}>再練一次 <span>↻</span></button><button className="secondary-button" type="button" onClick={() => setView("lesson")}>回到課次</button></div>
     </section>
   );
 

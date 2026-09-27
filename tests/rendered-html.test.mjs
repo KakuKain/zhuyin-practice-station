@@ -68,3 +68,15 @@ test("the source keeps the handoff interaction vocabulary", async () => {
   assert.match(css, /\.lesson-page \.mode-grid \{ display: grid; grid-template-columns: repeat\(2/);
   assert.doesNotMatch(page, /className="focus-intro"/);
 });
+
+test("lesson three has its own complete practice data while lesson two stays preview-only", async () => {
+  const page = await (await import("node:fs/promises")).readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  assert.match(page, /const thirdLessonLines = \[/);
+  assert.match(page, /character: "築", zhuyin: "ㄓㄨˊ"/);
+  assert.match(page, /character: "著", zhuyin: "˙ㄓㄜ"/);
+  assert.match(page, /2: \{ lines: thirdLessonLines, blanks: \[0, 12, 15\], optionOrder: \[15, 0, 12\], questions: thirdListeningQuestions \}/);
+  assert.doesNotMatch(page, /1: \{ lines:/);
+  assert.match(page, /const exercise = exercises\[selectedLesson\]/);
+  assert.match(page, /const listeningQuestions = exercise\.questions/);
+  assert.match(page, /第三課", lessons\[2\]\.title, "默寫 · 聽寫"/);
+});
