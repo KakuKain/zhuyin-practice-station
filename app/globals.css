@@ -162,6 +162,7 @@ body { background: #e7f2f9; }
   text-align: center;
   transform: translate(-50%, -50%) scaleX(.68);
 }
+.zhuyin-glyph.is-neutral-di { font-feature-settings: "ss01" 1; }
 
 .syllable-cell.is-drop-hover {
   border: 2px solid var(--ref-green);
@@ -193,3 +194,68 @@ body { background: #e7f2f9; }
 @media (prefers-reduced-motion: reduce) {
   .syllable-cell.is-drop-hover { transition: none; }
 }
+
+/* Listening is a single-screen writing surface, with one square 田字格. */
+.focus-shell { height: 100dvh; min-height: 0; overflow: hidden; }
+.focus-topbar {
+  grid-template-columns: auto 1fr auto;
+  min-height: 58px;
+  gap: 8px;
+  padding: max(10px, env(safe-area-inset-top)) 14px 10px;
+}
+.focus-question { justify-self: center; text-align: center; }
+.focus-meta { grid-column: auto; grid-row: auto; gap: 8px; white-space: nowrap; font-size: 11px; }
+.focus-meta span { display: inline-flex; align-items: center; gap: 3px; }
+.focus-content {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 9px;
+  width: 100%;
+  margin: 0;
+  padding: 12px 14px max(14px, env(safe-area-inset-bottom));
+  overflow-y: auto;
+}
+.canvas-zone { display: flex; flex-direction: column; gap: 6px; width: min(100%, calc(100dvh - 270px), 430px); }
+.canvas-paper {
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  max-height: none;
+  aspect-ratio: 1;
+  border: 3px solid var(--ref-border);
+  border-radius: 10px;
+  background: #fffefb;
+  box-shadow: 5px 6px 0 #b8cddd;
+}
+.canvas-paper::before, .canvas-paper::after { position: absolute; z-index: 1; content: ""; pointer-events: none; }
+.canvas-paper::before { top: 0; bottom: 0; left: 50%; border-left: 1px dashed #a7c5d9; }
+.canvas-paper::after { top: 50%; right: 0; left: 0; border-top: 1px dashed #a7c5d9; }
+.canvas-toolbar { min-height: 29px; font-size: 11px; }
+.canvas-toolbar button { min-width: 54px; font-size: 11px; }
+.listen-start-button, .early-submit-button, .parent-review, .choice-panel, .retry-submit {
+  grid-column: auto;
+  width: min(100%, 430px);
+  margin: 0;
+}
+.listen-start-button { min-height: 58px; }
+.early-submit-button {
+  min-height: 45px;
+  border: 1px solid #f3b485;
+  border-radius: 10px;
+  background: #fff5e9;
+  color: #ae5427;
+  font-size: 14px;
+  font-weight: 800;
+}
+.phase-review .canvas-zone, .phase-choice .canvas-zone { width: min(100%, calc(100dvh - 380px), 320px); }
+.parent-review, .choice-panel { padding: 10px 12px; }
+.answer-reveal { padding-bottom: 5px; }
+.answer-reveal .zhuyin-stack { font-size: 14px; }
+.parent-review p, .choice-panel p { margin: 6px 0 8px; font-size: 11px; }
+.review-actions button { padding: 9px; }
+.choice-options button { min-height: 69px; }
+.choice-options .zhuyin-stack { font-size: 15px; }

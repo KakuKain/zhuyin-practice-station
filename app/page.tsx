@@ -12,7 +12,7 @@ const lessonLines = [
   [{ character: "咪", zhuyin: "ㄇㄧ" }, { character: "咪", zhuyin: "ㄇㄧ" }, { character: "咪", zhuyin: "ㄇㄧ" }],
   [{ character: "咪", zhuyin: "ㄇㄧ" }, { character: "咪", zhuyin: "ㄇㄧ" }, { character: "咪", zhuyin: "ㄇㄧ" }],
   [{ character: "逼", zhuyin: "ㄅㄧ" }],
-  [{ character: "貓", zhuyin: "ㄇㄠ" }, { character: "咪", zhuyin: "ㄇㄧ" }, { character: "弟", zhuyin: "ㄉㄧˋ" }, { character: "弟", zhuyin: "ㄉㄧˋ" }, { character: "跑", zhuyin: "ㄆㄠˇ" }, { character: "第", zhuyin: "ㄉㄧˋ" }, { character: "一", zhuyin: "ㄧ" }],
+  [{ character: "貓", zhuyin: "ㄇㄠ" }, { character: "咪", zhuyin: "ㄇㄧ" }, { character: "弟", zhuyin: "ㄉㄧˋ" }, { character: "弟", zhuyin: "˙ㄉㄧ" }, { character: "跑", zhuyin: "ㄆㄠˇ" }, { character: "第", zhuyin: "ㄉㄧˋ" }, { character: "一", zhuyin: "ㄧ" }],
 ] as const;
 const lessonItems = lessonLines.flat();
 
@@ -41,7 +41,7 @@ const syllableGlyphs: Record<string, string> = {
 function ZhuyinStack({ text, empty = false }: { text: string; empty?: boolean }) {
   return (
     <span className={`zhuyin-stack ${empty ? "is-empty" : ""}`} aria-label={empty ? "尚未填入音節" : text}>
-      {empty ? <span className="empty-mark">拖到這裡</span> : <span className="zhuyin-glyph" aria-hidden="true">{syllableGlyphs[text] ?? text}</span>}
+      {empty ? <span className="empty-mark">拖到這裡</span> : <span className={`zhuyin-glyph ${text === "˙ㄉㄧ" ? "is-neutral-di" : ""}`} aria-hidden="true">{syllableGlyphs[text] ?? text}</span>}
     </span>
   );
 }
@@ -164,12 +164,12 @@ export default function Page() {
     setListenPhase("ready");
   };
 
-  const finishListening = useCallback(() => {
+  const finishListening = useCallback((early = false) => {
     clearListenTimers();
     if ("speechSynthesis" in window) window.speechSynthesis.cancel();
     setSecondsLeft(0);
     setListenPhase("review");
-    setListenMessage("時間到，請把平板交給家長一起看看。 ");
+    setListenMessage(early ? "已交卷，請家長一起看看。" : "時間到，請把平板交給家長一起看看。");
   }, [clearListenTimers]);
 
   useEffect(() => {
@@ -185,7 +185,7 @@ export default function Page() {
       speak(currentQuestion.audioText);
     }, 8000);
 
-    const timeUp = window.setTimeout(finishListening, 30000);
+    const timeUp = window.setTimeout(() => finishListening(), 30000);
     timeoutRefs.current = [secondPlayback, timeUp];
 
     return clearListenTimers;
@@ -480,13 +480,13 @@ export default function Page() {
   const renderFocusMode = () => {
     const choiceAnswers = [currentQuestion.answer, ...currentQuestion.distractors];
     return (
-    <main className="focus-shell">
-      <header className="focus-topbar"><button type="button" className="focus-exit" onClick={leaveFocus}>← <span>離開</span></button><div className="focus-question"><small>第一課 · 聽寫</small><strong>第 {listenIndex + 1} 題 <em>/ {listeningQuestions.length}</em></strong></div><div className="focus-meta"><span className={secondsLeft <= 8 ? "urgent" : ""}><Timer size={14} weight="bold" /> {String(Math.floor(secondsLeft / 60)).padStart(2, "0")}:{String(secondsLeft % 60).padStart(2, "0")}</span><span><SpeakerHigh size={14} weight="bold" /> {playCount} 次</span></div></header>
+    <main className={`focus-shell phase-${listenPhase}`}>
+      <header className="focus-topbar"><button type="button" className="focus-exit" onClick={leaveFocus}>← <span>離開</span></button><div className="focus-question"><strong>第 {listenIndex + 1} 題 <em>/ {listeningQuestions.length}</em></strong></div><div className="focus-meta"><span className={secondsLeft <= 8 ? "urgent" : ""}><Timer size={14} weight="bold" /> {String(Math.floor(secondsLeft / 60)).padStart(2, "0")}:{String(secondsLeft % 60).padStart(2, "0")}</span><span><SpeakerHigh size={14} weight="bold" /> {playCount} 次</span></div></header>
       <div className="focus-content">
-        <div className="focus-intro"><span className="focus-kicker">{listenPhase === "ready" ? "準備好了嗎？" : listenPhase === "active" ? "聽到什麼，就寫什麼" : listenPhase === "review" ? "請家長幫忙看看" : listenPhase === "choice" ? "先選一個音節" : "再寫一次"}</span><h1>{listenPhase === "ready" ? "按下開始聽，題目才會播放。" : listenPhase === "active" ? "可以邊聽邊寫。" : listenPhase === "review" ? "這題寫得怎麼樣？" : listenPhase === "choice" ? "沒關係，我們再確認一次。" : "把剛剛聽到的寫下來。"}</h1><p aria-live="polite">{listenPhase === "choice" ? retryMessage : listenPhase === "retry" ? retryMessage : listenMessage}</p></div>
-        <div className={`canvas-zone ${listenPhase === "review" || listenPhase === "choice" ? "is-locked" : ""}`}><div className="canvas-paper"><canvas ref={canvasRef} onPointerDown={beginDrawing} onPointerMove={draw} onPointerUp={endDrawing} onPointerCancel={endDrawing} onPointerLeave={endDrawing} aria-label="手寫區" /><span className="canvas-placeholder">{listenPhase === "ready" ? "按下開始後，在這裡手寫" : listenPhase === "review" ? "手寫答案" : "在這裡自由書寫"}</span></div><div className="canvas-toolbar"><button type="button" onClick={clearCanvas} disabled={listenPhase !== "active" && listenPhase !== "retry"}>清除</button><span>touch-action: none · 支援觸控筆</span></div></div>
+        <p className="sr-only" aria-live="polite">{listenMessage}</p>
+        <div className={`canvas-zone ${listenPhase === "review" || listenPhase === "choice" ? "is-locked" : ""}`}><div className="canvas-paper"><canvas ref={canvasRef} onPointerDown={beginDrawing} onPointerMove={draw} onPointerUp={endDrawing} onPointerCancel={endDrawing} onPointerLeave={endDrawing} aria-label="田字格手寫區" /></div><div className="canvas-toolbar"><span>田字格</span><button type="button" onClick={clearCanvas} disabled={listenPhase !== "active" && listenPhase !== "retry"}>清除</button></div></div>
         {listenPhase === "ready" && <button type="button" className="listen-start-button" onClick={startListening}><span className="play-circle"><Play size={17} weight="fill" /></span><span><strong>開始聽</strong><small>播放 2 次 · 作答 30 秒</small></span><b><ArrowRight size={19} /></b></button>}
-        {listenPhase === "active" && <div className="active-tip"><span className="pulse-dot" /> 播放與書寫同步進行中　·　8 秒後播放第二次</div>}
+        {listenPhase === "active" && <button type="button" className="early-submit-button" onClick={() => finishListening(true)}>提早交卷</button>}
         {listenPhase === "review" && <div className="parent-review"><div className="answer-reveal"><span>正確答案</span><ZhuyinStack text={currentQuestion.answer} /></div><p>請家長依照孩子的手寫內容判定，不需要自動辨識。</p><div className="review-actions"><button type="button" className="review-correct" onClick={() => handleParentDecision("correct")}>✓ 答對</button><button type="button" className="review-retry" onClick={() => handleParentDecision("needs_review")}>↻ 需要補強</button></div></div>}
         {listenPhase === "choice" && <div className="choice-panel"><div className="choice-options">{choiceAnswers.map((answer) => <button type="button" key={answer} onClick={() => selectRemediation(answer)}><ZhuyinStack text={answer} /></button>)}</div><p>{retryMessage || "選出你剛剛聽到的完整音節。"}</p></div>}
         {listenPhase === "retry" && <button type="button" className="retry-submit" onClick={submitRetryWriting}>我寫好了，請家長看看 <span>→</span></button>}

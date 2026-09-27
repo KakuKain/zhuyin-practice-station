@@ -28,12 +28,16 @@ test("server-renders the public zhuyin practice station", async () => {
 
 test("the source keeps the handoff interaction vocabulary", async () => {
   const page = await (await import("node:fs/promises")).readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const css = await (await import("node:fs/promises")).readFile(new URL("../app/globals.css", import.meta.url), "utf8");
   assert.match(page, /ListenPhase = \"ready\" \| \"active\"/);
   assert.match(page, /開始聽/);
   assert.match(page, /需要補強/);
-  assert.match(page, /touch-action: none/);
+  assert.match(css, /touch-action: none/);
   assert.match(page, /ㄧ/);
   assert.match(page, /dir="rtl"/);
   assert.match(page, /貓咪弟弟跑第一|character: "跑"/);
   assert.doesNotMatch(page, /className="practice-title"|className="fill-progress"/);
+  assert.match(page, /zhuyin: "˙ㄉㄧ"/);
+  assert.match(page, /提早交卷/);
+  assert.doesNotMatch(page, /className="focus-intro"/);
 });
