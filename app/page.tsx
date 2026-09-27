@@ -7,10 +7,11 @@ type View = "home" | "courses" | "practice" | "more" | "lesson" | "fill" | "list
 type ListenPhase = "ready" | "active" | "review" | "choice" | "retry_ready" | "retry";
 type ParentResult = "correct" | "needs_review" | null;
 type PreviewMode = "annotated" | "zhuyin";
-type CardDrag = { pointerId: number; optionIndex: number; startX: number; startY: number; moved: boolean };
 type SyllableItem = { character: string; zhuyin: string };
 type ListeningQuestion = { answer: string; audioText: string; distractors: readonly string[] };
-type LessonExercise = { lines: readonly (readonly SyllableItem[])[]; blanks: readonly number[]; optionOrder: readonly number[]; questions: readonly ListeningQuestion[] };
+type LessonExercise = { lines: readonly (readonly SyllableItem[])[]; questions: readonly ListeningQuestion[] };
+type InkPoint = { x: number; y: number };
+type InkStroke = InkPoint[];
 type SavedQuestion = { lessonIndex: number; questionIndex: number };
 type PracticeState = { savedQuestions: SavedQuestion[]; recentLesson: number | null; completedSessions: number };
 const practiceStorageKey = "zhuyin-practice-state-v1";
@@ -54,8 +55,8 @@ const thirdListeningQuestions = [
 ] as const;
 
 const exercises: Record<number, LessonExercise> = {
-  0: { lines: firstLessonLines, blanks: [6, 7, 11], optionOrder: [11, 7, 6], questions: firstListeningQuestions },
-  2: { lines: thirdLessonLines, blanks: [0, 12, 15], optionOrder: [15, 0, 12], questions: thirdListeningQuestions },
+  0: { lines: firstLessonLines, questions: firstListeningQuestions },
+  2: { lines: thirdLessonLines, questions: thirdListeningQuestions },
 };
 
 // This font draws the complete vertical syllable (including its tone) from a
@@ -77,12 +78,18 @@ const syllableGlyphs: Record<string, string> = {
   "ㄔㄠˇ": "炒",
 };
 
-function ZhuyinStack({ text, empty = false }: { text: string; empty?: boolean }) {
+function ZhuyinStack({ text }: { text: string }) {
   return (
-    <span className={`zhuyin-stack ${empty ? "is-empty" : ""}`} aria-label={empty ? "尚未填入音節" : text}>
-      {empty ? <span className="empty-mark">拖到這裡</span> : <span className={`zhuyin-glyph ${text === "˙ㄉㄧ" ? "is-neutral-di" : ""}`} aria-hidden="true">{syllableGlyphs[text] ?? text}</span>}
+    <span className="zhuyin-stack" aria-label={text}>
+      <span className={`zhuyin-glyph ${text === "˙ㄉㄧ" ? "is-neutral-di" : ""}`} aria-hidden="true">{syllableGlyphs[text] ?? text}</span>
     </span>
   );
+}
+
+function InkPreview({ strokes }: { strokes: InkStroke[] }) {
+  return <svg viewBox="0 0 100 100" className="ink-preview" aria-hidden="true">{strokes.map((stroke, index) => stroke.length === 1
+    ? <circle key={index} cx={stroke[0].x} cy={stroke[0].y} r="1.5" />
+    : <polyline key={index} points={stroke.map((point) => `${point.x},${point.y}`).join(" ")} />)}</svg>;
 }
 
 function Logo() {
@@ -144,12 +151,11 @@ export default function Page() {
   const [view, setView] = useState<View>("home");
   const [selectedLesson, setSelectedLesson] = useState(0);
   const [previewMode, setPreviewMode] = useState<PreviewMode>("annotated");
-  const [fillAnswers, setFillAnswers] = useState<Record<number, string>>({});
-  const [fillMessage, setFillMessage] = useState("拖到虛線空格，或先點卡片、再點空格。");
-  const [dragging, setDragging] = useState<number | null>(null);
-  const [dragPosition, setDragPosition] = useState<{ x: number; y: number } | null>(null);
-  const [hoveredSlot, setHoveredSlot] = useState<number | null>(null);
-  const [selectedCard, setSelectedCard] = useState<number | null>(null);
+  const [fillStrokes, setFillStrokes] = useState<Record<number, InkStroke[]>>({});
+  const [activeFillCell, setActiveFillCell] = useState<number | null>(null);
+  const [fillReviewLine, setFillReviewLine] = useState<number | null>(null);
+  const [fillHasInk, setFillHasInk] = useState(false);
+  const [fillIsDirty, setFillIsDirty] = useState(false);
   const [listenIndex, setListenIndex] = useState(0);
   const [listenPhase, setListenPhase] = useState<ListenPhase>("ready");
   const [secondsLeft, setSecondsLeft] = useState(30);
@@ -167,16 +173,19 @@ export default function Page() {
   const [isDrawing, setIsDrawing] = useState(false);
   const [hasInk, setHasInk] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const cardDragRef = useRef<CardDrag | null>(null);
-  const dragEventsRef = useRef<{ move: (event: PointerEvent) => void; end: (event: PointerEvent) => void; cancel: () => void }>({ move: () => {}, end: () => {}, cancel: () => {} });
+  const fillCanvasRef = useRef<HTMLCanvasElement>(null);
+  const fillDraftRef = useRef<InkStroke[]>([]);
+  const fillActiveStrokeRef = useRef<InkStroke | null>(null);
+  const fillPointerIdRef = useRef<number | null>(null);
   const timerRef = useRef<number | null>(null);
   const timeoutRefs = useRef<number[]>([]);
 
   const exercise = exercises[selectedLesson] ?? exercises[0];
   const lessonLines = exercise.lines;
   const lessonItems = lessonLines.flat();
-  const blankIndexes = exercise.blanks;
-  const fillOptions = exercise.optionOrder.map((index) => lessonItems[index]);
+  const fillLineStarts = lessonLines.map((_, lineIndex) => lessonLines.slice(0, lineIndex).reduce((count, line) => count + line.length, 0));
+  const writtenCount = lessonItems.filter((_, index) => fillStrokes[index]?.length).length;
+  const fillComplete = writtenCount === lessonItems.length;
   const listeningQuestions = exercise.questions;
   const currentQuestion = listeningQuestions[listenIndex] ?? listeningQuestions[0];
   const isFocusMode = view === "listen";
@@ -274,13 +283,9 @@ export default function Page() {
   };
 
   const openFill = () => {
-    setFillAnswers({});
-    setFillMessage("拖到虛線空格，或先點卡片、再點空格。");
-    setSelectedCard(null);
-    setDragging(null);
-    setDragPosition(null);
-    setHoveredSlot(null);
-    cardDragRef.current = null;
+    setFillStrokes({});
+    setActiveFillCell(null);
+    setFillReviewLine(null);
     setView("fill");
   };
 
@@ -404,107 +409,124 @@ export default function Page() {
     setIsDrawing(false);
   };
 
-  const placeFillAnswer = (optionIndex: number, slotIndex: number) => {
-    if (!blankIndexes.includes(slotIndex)) {
-      setFillMessage("請放在有虛線的空格裡。");
-      return;
-    }
-    if (fillAnswers[slotIndex]) {
-      setFillMessage("這格已經填好了，換一個空格試試看。");
-      return;
-    }
-    const option = fillOptions[optionIndex];
-    if (Object.values(fillAnswers).includes(option.zhuyin)) return;
-    const expected = lessonItems[slotIndex];
-    if (option.zhuyin !== expected.zhuyin) {
-      setFillMessage("這個音節不屬於這格，卡片還在下方，換一格試試看。");
-      setSelectedCard(null);
-      setDragging(null);
-      return;
-    }
-    const next = { ...fillAnswers, [slotIndex]: option.zhuyin };
-    setFillAnswers(next);
-    if (blankIndexes.every((index) => next[index])) setCompletedFillLessons((current) => current.includes(selectedLesson) ? current : [...current, selectedLesson]);
-    setFillMessage("答對了！完整音節會留在格子裡，不能再被拖走。 ");
-    setSelectedCard(null);
-    setDragging(null);
+  const fillLineForCell = (index: number) => fillLineStarts.findIndex((start, lineIndex) => index >= start && index < start + lessonLines[lineIndex].length);
+
+  const openFillCell = (index: number) => {
+    setFillReviewLine(null);
+    setActiveFillCell(index);
   };
 
-  const slotAtPointer = (x: number, y: number) => {
-    for (const cell of document.querySelectorAll<HTMLElement>("[data-syllable-slot]")) {
-      const index = Number(cell.dataset.syllableSlot);
-      if (!blankIndexes.includes(index) || fillAnswers[index]) continue;
-      const bounds = cell.getBoundingClientRect();
-      if (x >= bounds.left && x <= bounds.right && y >= bounds.top && y <= bounds.bottom) return index;
+  useEffect(() => {
+    if (view !== "fill" || activeFillCell === null) return;
+    const canvas = fillCanvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const ratio = window.devicePixelRatio || 1;
+    canvas.width = Math.round(rect.width * ratio);
+    canvas.height = Math.round(rect.height * ratio);
+    const context = canvas.getContext("2d");
+    if (!context) return;
+    context.scale(ratio, ratio);
+    context.strokeStyle = "#17324f";
+    context.fillStyle = "#17324f";
+    context.lineWidth = Math.max(3, rect.width * .009);
+    context.lineCap = "round";
+    context.lineJoin = "round";
+    const saved = fillStrokes[activeFillCell] ?? [];
+    fillDraftRef.current = saved.map((stroke) => stroke.map((point) => ({ ...point })));
+    fillActiveStrokeRef.current = null;
+    fillPointerIdRef.current = null;
+    setFillHasInk(saved.length > 0);
+    setFillIsDirty(false);
+    for (const stroke of saved) {
+      if (!stroke.length) continue;
+      context.beginPath();
+      context.moveTo(stroke[0].x * rect.width / 100, stroke[0].y * rect.height / 100);
+      if (stroke.length === 1) {
+        context.arc(stroke[0].x * rect.width / 100, stroke[0].y * rect.height / 100, context.lineWidth / 2, 0, Math.PI * 2);
+        context.fill();
+      } else {
+        for (const point of stroke.slice(1)) context.lineTo(point.x * rect.width / 100, point.y * rect.height / 100);
+        context.stroke();
+      }
     }
-    return null;
+  }, [view, activeFillCell, fillStrokes]);
+
+  const fillPoint = (event: React.PointerEvent<HTMLCanvasElement>): InkPoint => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    return { x: Math.max(0, Math.min(100, (event.clientX - rect.left) / rect.width * 100)), y: Math.max(0, Math.min(100, (event.clientY - rect.top) / rect.height * 100)) };
   };
 
-  const beginCardDrag = (event: React.PointerEvent<HTMLButtonElement>, optionIndex: number) => {
-    if (Object.values(fillAnswers).includes(fillOptions[optionIndex].zhuyin)) return;
+  const beginFillDrawing = (event: React.PointerEvent<HTMLCanvasElement>) => {
+    if (fillPointerIdRef.current !== null) return;
     event.preventDefault();
     event.currentTarget.setPointerCapture(event.pointerId);
-    cardDragRef.current = { pointerId: event.pointerId, optionIndex, startX: event.clientX, startY: event.clientY, moved: false };
-    setDragging(optionIndex);
-    setDragPosition({ x: event.clientX, y: event.clientY });
-    setHoveredSlot(null);
-  };
-
-  const moveCardDrag = (event: PointerEvent) => {
-    const session = cardDragRef.current;
-    if (!session || session.pointerId !== event.pointerId) return;
-    if (Math.hypot(event.clientX - session.startX, event.clientY - session.startY) > 6) session.moved = true;
-    setDragPosition({ x: event.clientX, y: event.clientY });
-    setHoveredSlot(slotAtPointer(event.clientX, event.clientY));
-  };
-
-  const endCardDrag = (event: PointerEvent) => {
-    const session = cardDragRef.current;
-    if (!session || session.pointerId !== event.pointerId) return;
-    const slot = slotAtPointer(event.clientX, event.clientY);
-    cardDragRef.current = null;
-    setDragging(null);
-    setDragPosition(null);
-    setHoveredSlot(null);
-    if (slot !== null) placeFillAnswer(session.optionIndex, slot);
-    else if (!session.moved) setSelectedCard(session.optionIndex);
-    else {
-      setSelectedCard(null);
-      setFillMessage("沒有放進空格。請拖到虛線框，或先點卡片、再點空格。");
+    fillPointerIdRef.current = event.pointerId;
+    setFillIsDirty(true);
+    const point = fillPoint(event);
+    fillActiveStrokeRef.current = [point];
+    const context = event.currentTarget.getContext("2d");
+    const rect = event.currentTarget.getBoundingClientRect();
+    if (context) {
+      context.beginPath();
+      context.arc(point.x * rect.width / 100, point.y * rect.height / 100, context.lineWidth / 2, 0, Math.PI * 2);
+      context.fill();
+      context.beginPath();
+      context.moveTo(point.x * rect.width / 100, point.y * rect.height / 100);
     }
   };
 
-  const cancelCardDrag = () => {
-    cardDragRef.current = null;
-    setDragging(null);
-    setDragPosition(null);
-    setHoveredSlot(null);
+  const moveFillDrawing = (event: React.PointerEvent<HTMLCanvasElement>) => {
+    if (fillPointerIdRef.current !== event.pointerId || !fillActiveStrokeRef.current) return;
+    event.preventDefault();
+    const point = fillPoint(event);
+    fillActiveStrokeRef.current.push(point);
+    const rect = event.currentTarget.getBoundingClientRect();
+    const context = event.currentTarget.getContext("2d");
+    if (context) {
+      context.lineTo(point.x * rect.width / 100, point.y * rect.height / 100);
+      context.stroke();
+    }
   };
 
-  useEffect(() => {
-    dragEventsRef.current = { move: moveCardDrag, end: endCardDrag, cancel: cancelCardDrag };
-  });
+  const endFillDrawing = (event: React.PointerEvent<HTMLCanvasElement>) => {
+    if (fillPointerIdRef.current !== event.pointerId) return;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+    if (fillActiveStrokeRef.current?.length) fillDraftRef.current.push(fillActiveStrokeRef.current);
+    fillActiveStrokeRef.current = null;
+    fillPointerIdRef.current = null;
+    setFillHasInk(fillDraftRef.current.length > 0);
+  };
 
-  useEffect(() => {
-    if (view !== "fill") return;
-    // A captured pointer can be released over another cell (or lost by the
-    // browser). Listen at the window so the floating card always disappears.
-    const move = (event: PointerEvent) => dragEventsRef.current.move(event);
-    const end = (event: PointerEvent) => dragEventsRef.current.end(event);
-    const cancel = () => dragEventsRef.current.cancel();
-    window.addEventListener("pointermove", move, true);
-    window.addEventListener("pointerup", end, true);
-    window.addEventListener("pointercancel", cancel, true);
-    window.addEventListener("blur", cancel);
-    return () => {
-      window.removeEventListener("pointermove", move, true);
-      window.removeEventListener("pointerup", end, true);
-      window.removeEventListener("pointercancel", cancel, true);
-      window.removeEventListener("blur", cancel);
-    };
-  }, [view]);
+  const clearFillDrawing = () => {
+    const canvas = fillCanvasRef.current;
+    const context = canvas?.getContext("2d");
+    if (canvas && context) context.clearRect(0, 0, canvas.width, canvas.height);
+    fillDraftRef.current = [];
+    setFillHasInk(false);
+    setFillIsDirty(true);
+  };
 
-  const fillComplete = blankIndexes.every((index) => fillAnswers[index]);
+  const saveFillDrawing = () => {
+    if (activeFillCell === null || !fillDraftRef.current.length) return;
+    const index = activeFillCell;
+    const lineIndex = fillLineForCell(index);
+    const wasFilled = Boolean(fillStrokes[index]?.length);
+    const next = { ...fillStrokes, [index]: fillDraftRef.current.map((stroke) => stroke.map((point) => ({ ...point }))) };
+    setFillStrokes(next);
+    setActiveFillCell(null);
+    if (Object.keys(next).length === lessonItems.length) setCompletedFillLessons((current) => current.includes(selectedLesson) ? current : [...current, selectedLesson]);
+    if (wasFilled) return;
+    const lineStart = fillLineStarts[lineIndex];
+    const nextEmpty = lessonLines[lineIndex].findIndex((_, offset) => !next[lineStart + offset]?.length);
+    if (nextEmpty >= 0) setActiveFillCell(lineStart + nextEmpty);
+    else setFillReviewLine(lineIndex);
+  };
+
+  const leaveFillCell = () => {
+    if (fillIsDirty && !window.confirm("這一格還沒儲存，要返回課文嗎？")) return;
+    setActiveFillCell(null);
+  };
 
   const goToNextQuestion = () => {
     if (listenIndex >= listeningQuestions.length - 1) {
@@ -629,24 +651,44 @@ export default function Page() {
     <section className={`page-section fill-page ${fillComplete ? "is-complete" : ""}`}>
       <button className="back-link" type="button" onClick={() => setView("lesson")}>← 回到第{lessonNumber}課</button>
       <div className="zhuyin-sheet">
-        <div className="sheet-top"><h1>{lesson.title}</h1><small>第{lessonNumber}課 · 由右往左讀</small></div>
+        <div className="sheet-top"><h1>{lesson.title}</h1><small>已寫 {writtenCount} / {lessonItems.length} 格</small></div>
+        <p className="fill-sheet-help">點格子寫完整注音，包含聲調。寫完一行再對照答案。</p>
         <div className="syllable-row" dir="rtl" aria-label="課文直排注音，從右向左閱讀">
           {lessonLines.map((line, lineIndex) => {
-            const lineStart = lessonLines.slice(0, lineIndex).reduce((count, previous) => count + previous.length, 0);
+            const lineStart = fillLineStarts[lineIndex];
+            const lineDone = line.every((_, offset) => fillStrokes[lineStart + offset]?.length);
             return <div className="syllable-column" role="group" aria-label={`第 ${lineIndex + 1} 行`} key={lineIndex}>
-              {line.map((item, itemIndex) => {
+              {line.map((_, itemIndex) => {
                 const index = lineStart + itemIndex;
-                return <div className={`syllable-cell ${blankIndexes.includes(index) ? "is-target" : ""} ${fillAnswers[index] ? "is-filled" : ""} ${hoveredSlot === index ? "is-drop-hover" : ""}`} key={index} data-syllable-slot={index} role={blankIndexes.includes(index) && !fillAnswers[index] ? "button" : undefined} tabIndex={blankIndexes.includes(index) && !fillAnswers[index] ? 0 : undefined} aria-label={blankIndexes.includes(index) && !fillAnswers[index] ? `第 ${lineIndex + 1} 行第 ${itemIndex + 1} 格，放入音節` : undefined} onClick={() => selectedCard !== null && placeFillAnswer(selectedCard, index)} onKeyDown={(event) => { if (selectedCard !== null && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); placeFillAnswer(selectedCard, index); } }}>{fillAnswers[index] ? <><span className="filled-check">✓</span><ZhuyinStack text={fillAnswers[index]} /></> : blankIndexes.includes(index) ? <ZhuyinStack text="" empty /> : <ZhuyinStack text={item.zhuyin} />}<small className="cell-position">{index + 1}</small></div>;
+                return <button className={`syllable-cell fill-cell ${fillStrokes[index]?.length ? "is-filled" : "is-target"}`} key={index} type="button" aria-label={`第 ${lineIndex + 1} 行第 ${itemIndex + 1} 格，${fillStrokes[index]?.length ? "修改注音" : "寫注音"}`} onClick={() => openFillCell(index)}>{fillStrokes[index]?.length ? <InkPreview strokes={fillStrokes[index]} /> : <span className="fill-cell-plus" aria-hidden="true">＋</span>}</button>;
               })}
+              {lineDone && <button className="fill-line-review-link" type="button" onClick={() => setFillReviewLine(lineIndex)}>對照這行</button>}
             </div>;
           })}
         </div>
       </div>
-      <div className="fill-options"><div className="options-heading"><div><span className="eyebrow">音節卡片</span><h2>拖曳完整音節</h2></div><small>支援觸控、滑鼠與 iPad</small></div><p className="feedback-line" aria-live="polite"><span className={fillMessage.startsWith("答對") ? "good" : ""}>{fillMessage}</span></p><div className="option-row">{fillOptions.map((option, index) => { const used = Object.values(fillAnswers).includes(option.zhuyin); return <button key={option.zhuyin} type="button" draggable={false} disabled={used} aria-pressed={selectedCard === index} className={`syllable-card ${dragging === index ? "is-dragging" : ""} ${selectedCard === index ? "is-selected" : ""} ${used ? "is-used" : ""}`} onPointerDown={(event) => beginCardDrag(event, index)} onDragStart={(event) => event.preventDefault()} onClick={(event) => { if (event.detail === 0) setSelectedCard(index); }}><ZhuyinStack text={option.zhuyin} /><span>{option.character}</span></button>; })}</div></div>
-      {dragging !== null && dragPosition && <div className="drag-preview" style={{ left: dragPosition.x, top: dragPosition.y }} aria-hidden="true"><ZhuyinStack text={fillOptions[dragging].zhuyin} /></div>}
-      {fillComplete && <div className="completion-banner"><span>✓</span><p><strong>這一段完成了！</strong><small>接著進入聽寫，試試看把聲音寫下來。</small></p><button type="button" className="primary-button" onClick={openListening}>進入聽寫 <span>→</span></button></div>}
+      {!fillComplete && <button className="fill-begin-button" type="button" onClick={() => openFillCell(lessonItems.findIndex((_, index) => !fillStrokes[index]?.length))}>從第一個空格開始 <ArrowRight size={19} aria-hidden="true" /></button>}
+      {fillComplete && <div className="completion-banner"><span>✓</span><p><strong>整篇寫完了！</strong><small>可以點格子修改，或進入聽寫。</small></p><button type="button" className="primary-button" onClick={openListening}>進入聽寫 <span>→</span></button></div>}
     </section>
   );
+
+  const renderFillWriting = () => {
+    if (activeFillCell === null) return null;
+    const lineIndex = fillLineForCell(activeFillCell);
+    const position = activeFillCell - fillLineStarts[lineIndex] + 1;
+    return <main className="fill-focus-shell">
+      <header className="fill-focus-header"><button type="button" onClick={leaveFillCell}><ArrowLeft size={19} aria-hidden="true" /> 回到課文</button><strong>第 {lineIndex + 1} 行 · 第 {position} 格</strong><span>{writtenCount} / {lessonItems.length}</span></header>
+      <div className="fill-focus-body"><h1>寫出完整注音</h1><p>記得寫聲調，寫好後按「完成這格」。</p><div className="fill-writing-grid"><canvas ref={fillCanvasRef} onPointerDown={beginFillDrawing} onPointerMove={moveFillDrawing} onPointerUp={endFillDrawing} onPointerCancel={endFillDrawing} aria-label={`第 ${lineIndex + 1} 行第 ${position} 格手寫區`} /></div><div className="fill-writing-actions"><button type="button" className="fill-clear-button" onClick={clearFillDrawing}>清除重寫</button><button type="button" className="fill-save-button" disabled={!fillHasInk} onClick={saveFillDrawing}>完成這格 <ArrowRight size={19} aria-hidden="true" /></button></div></div>
+    </main>;
+  };
+
+  const renderFillReview = () => {
+    if (fillReviewLine === null) return null;
+    const line = lessonLines[fillReviewLine];
+    const start = fillLineStarts[fillReviewLine];
+    const nextLineStart = fillLineStarts[fillReviewLine + 1];
+    return <main className="fill-focus-shell fill-review-shell"><header className="fill-focus-header"><button type="button" onClick={() => setFillReviewLine(null)}><ArrowLeft size={19} aria-hidden="true" /> 回到課文</button><strong>第 {fillReviewLine + 1} 行完成</strong><span>{writtenCount} / {lessonItems.length}</span></header><div className="fill-review-body"><h1>一起對照這一行</h1><p>左邊是你的筆跡，右邊是正確注音。請家長陪孩子看看聲調。</p><div className="fill-compare-list">{line.map((item, offset) => <div className="fill-compare-row" key={offset}><span>{offset + 1}</span><div className="fill-compare-ink"><InkPreview strokes={fillStrokes[start + offset] ?? []} /></div><div className="fill-compare-answer"><ZhuyinStack text={item.zhuyin} /></div></div>)}</div><div className="fill-review-actions"><button type="button" onClick={() => setFillReviewLine(null)}>回課文修改</button><button type="button" onClick={() => { setFillReviewLine(null); if (nextLineStart !== undefined) openFillCell(nextLineStart); }}> {nextLineStart === undefined ? "完成對照" : "寫下一行"} <ArrowRight size={19} aria-hidden="true" /></button></div></div></main>;
+  };
 
   const renderPractice = () => (
     <section className="page-section practice-page">
@@ -723,6 +765,8 @@ export default function Page() {
   };
 
   if (isFocusMode) return renderFocusMode();
+  if (view === "fill" && activeFillCell !== null) return renderFillWriting();
+  if (view === "fill" && fillReviewLine !== null) return renderFillReview();
 
   return (
     <div className="app-shell">

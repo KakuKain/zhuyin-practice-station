@@ -401,3 +401,46 @@ body { background: #e7f2f9; }
   .saved-question-actions .saved-remove { flex: 1 1 100%; }
   .retry-actions .retry-replay, .retry-actions .retry-submit { font-size: 12px; }
 }
+
+/* One handwritten syllable per cell; reveal the model only after a full line. */
+.fill-page, .fill-page.is-complete { padding-bottom: 30px; }
+.fill-sheet-help { margin: 10px 0 0; color: #607895; font-size: 13px; line-height: 1.5; }
+.fill-page .syllable-row { gap: 7px; overflow-x: auto; padding: 14px 0 8px; }
+.fill-page .syllable-column { min-width: 0; }
+.fill-page .fill-cell { width: 100%; min-height: 74px; padding: 3px; cursor: pointer; }
+.fill-page .fill-cell.is-target { border: 1px dashed #9cccac; background: #fafffb; }
+.fill-page .fill-cell.is-filled { border: 1px solid #63b685; background: #f1fff5; }
+.fill-cell-plus { color: #a4ceb1; font-size: 25px; font-weight: 300; }
+.ink-preview { display: block; width: 100%; height: 100%; min-height: 60px; overflow: visible; }
+.ink-preview polyline { fill: none; stroke: #17324f; stroke-width: 3.4; stroke-linecap: round; stroke-linejoin: round; }
+.ink-preview circle { fill: #17324f; }
+.fill-line-review-link { min-height: 35px; margin-top: 4px; border: 1px solid #bedacb; border-radius: 7px; background: #eaf8f0; color: #237348; font-size: 11px; font-weight: 800; }
+.fill-begin-button { display: flex; width: 100%; min-height: 48px; align-items: center; justify-content: center; gap: 10px; margin-top: 13px; border: 0; border-radius: 10px; background: var(--ref-blue); color: white; font-size: 15px; font-weight: 800; }
+.fill-focus-shell { display: flex; width: min(100%, 480px); min-height: 100dvh; flex-direction: column; margin: 0 auto; background: #f7fcff; color: var(--ref-navy); box-shadow: 0 0 34px rgba(29,64,99,.14); }
+.fill-focus-header { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 5px; min-height: 62px; padding: max(10px, env(safe-area-inset-top)) 15px 10px; border-bottom: 1px solid #d5e5ef; background: white; }
+.fill-focus-header button { display: inline-flex; align-items: center; gap: 4px; padding: 6px 0; border: 0; background: transparent; color: var(--ref-navy); font-size: 12px; font-weight: 800; white-space: nowrap; }
+.fill-focus-header strong { font-size: 14px; white-space: nowrap; }
+.fill-focus-header > span { justify-self: end; color: #6b8194; font-size: 11px; }
+.fill-focus-body { display: flex; width: 100%; flex: 1; flex-direction: column; justify-content: center; padding: 18px 16px max(20px, env(safe-area-inset-bottom)); }
+.fill-focus-body h1, .fill-review-body h1 { margin: 0 0 4px; font-size: 24px; }
+.fill-focus-body p, .fill-review-body p { margin: 0 0 16px; color: #627c91; font-size: 13px; line-height: 1.5; }
+.fill-writing-grid { position: relative; width: min(100%, 52dvh, 440px); aspect-ratio: 1; align-self: center; overflow: hidden; border: 3px solid #b5d7c7; border-radius: 14px; background: #fffefb; box-shadow: 6px 7px 0 #d5eadc; }
+.fill-writing-grid::before, .fill-writing-grid::after { position: absolute; z-index: 0; content: ""; pointer-events: none; }
+.fill-writing-grid::before { top: 0; bottom: 0; left: 50%; border-left: 1px dashed #a8cad4; }
+.fill-writing-grid::after { top: 50%; right: 0; left: 0; border-top: 1px dashed #a8cad4; }
+.fill-writing-grid canvas { position: absolute; z-index: 1; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
+.fill-writing-actions, .fill-review-actions { display: flex; gap: 9px; margin-top: 22px; }
+.fill-writing-actions button, .fill-review-actions button { display: inline-flex; min-height: 49px; align-items: center; justify-content: center; gap: 6px; border-radius: 10px; font-size: 14px; font-weight: 800; }
+.fill-clear-button, .fill-review-actions button:first-child { flex: 0 0 35%; border: 1px solid #bfd8e9; background: white; color: var(--ref-navy); }
+.fill-save-button, .fill-review-actions button:last-child { flex: 1; border: 0; background: var(--ref-blue); color: white; }
+.fill-save-button:disabled { opacity: .48; cursor: not-allowed; }
+.fill-review-body { width: 100%; max-width: 480px; margin: auto; padding: 24px 16px; }
+.fill-compare-list { display: grid; max-height: 56dvh; gap: 7px; overflow-y: auto; }
+.fill-compare-row { display: grid; grid-template-columns: 24px 1fr 1fr; align-items: center; gap: 9px; min-height: 76px; }
+.fill-compare-row > span { color: #8196a6; font-size: 12px; }
+.fill-compare-ink, .fill-compare-answer { display: grid; place-items: center; height: 76px; padding: 4px; border: 1px solid #bddcc8; border-radius: 8px; background: #fff; }
+.fill-compare-answer { background: #f2fbf5; }
+.fill-compare-ink .ink-preview { width: 66px; height: 66px; }
+.fill-compare-answer .zhuyin-stack { font-size: 22px; }
+.fill-page .fill-cell:focus-visible, .fill-line-review-link:focus-visible, .fill-focus-shell button:focus-visible { outline: 3px solid #f0a341; outline-offset: 2px; }
+@media (max-width: 430px) { .fill-page .syllable-row { gap: 4px; } .fill-page .fill-cell { min-height: 62px; } .fill-focus-header { grid-template-columns: 1fr auto; } .fill-focus-header > span { display: none; } }

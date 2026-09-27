@@ -43,11 +43,14 @@ test("the source keeps the handoff interaction vocabulary", async () => {
   assert.match(page, /zhuyin: "˙ㄉㄧ"/);
   assert.match(page, /提早交卷/);
   assert.match(page, /canvas-replay-overlay/);
-  assert.match(page, /cell\.getBoundingClientRect\(\)/);
-  assert.match(page, /window\.addEventListener\("pointerup", end, true\)/);
-  assert.match(page, /window\.addEventListener\("pointercancel", cancel, true\)/);
-  assert.match(page, /window\.addEventListener\("blur", cancel\)/);
-  assert.match(page, /draggable=\{false\}/);
+  assert.match(page, /fillCanvasRef/);
+  assert.match(page, /onPointerDown=\{beginFillDrawing\}/);
+  assert.match(page, /onPointerMove=\{moveFillDrawing\}/);
+  assert.match(page, /onPointerUp=\{endFillDrawing\}/);
+  assert.match(page, /<InkPreview strokes=\{fillStrokes\[index\]\}/);
+  assert.match(page, /setFillReviewLine\(lineIndex\)/);
+  assert.match(page, /點格子寫完整注音/);
+  assert.doesNotMatch(page, /beginCardDrag|placeFillAnswer|draggable=\{false\}/);
   assert.doesNotMatch(page, /document\.elementFromPoint/);
   assert.match(page, /再播放一次題目/);
   assert.match(page, /"貓咪弟弟", "跑第一"/);
@@ -65,7 +68,7 @@ test("the source keeps the handoff interaction vocabulary", async () => {
   assert.match(page, /setPreviewMode\("annotated"\)/);
   assert.match(page, /\\u\{E01E1\}/);
   assert.match(page, /1: \{ 5: \{ 4: "\\u\{E01E1\}" \} \}/);
-  assert.match(page, /拖到虛線空格，或先點卡片、再點空格/);
+  assert.match(page, /完成這格/);
   assert.match(css, /lesson-text-lines\.is-zhuyin-only/);
   assert.match(css, /object-fit: cover/);
   assert.match(css, /\.text-button \{ display: inline-flex; flex: none/);
@@ -78,7 +81,7 @@ test("lesson three has its own complete practice data while lesson two stays pre
   assert.match(page, /const thirdLessonLines = \[/);
   assert.match(page, /character: "築", zhuyin: "ㄓㄨˊ"/);
   assert.match(page, /character: "著", zhuyin: "˙ㄓㄜ"/);
-  assert.match(page, /2: \{ lines: thirdLessonLines, blanks: \[0, 12, 15\], optionOrder: \[15, 0, 12\], questions: thirdListeningQuestions \}/);
+  assert.match(page, /2: \{ lines: thirdLessonLines, questions: thirdListeningQuestions \}/);
   assert.doesNotMatch(page, /1: \{ lines:/);
   assert.match(page, /const exercise = exercises\[selectedLesson\]/);
   assert.match(page, /const listeningQuestions = exercise\.questions/);
