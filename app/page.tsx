@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, BookOpenText, Gear, Headphones, Heart, House, Info, Lightbulb, MusicNotes, Notebook, PencilLine, Play, Question, SpeakerHigh, Timer } from "@phosphor-icons/react";
 
 type View = "home" | "courses" | "practice" | "more" | "lesson" | "fill" | "listen" | "result";
-type ListenPhase = "ready" | "active" | "review" | "choice" | "retry_ready" | "retry";
+type ListenPhase = "ready" | "active" | "review" | "remediation_offer" | "choice" | "retry_ready" | "retry";
 type ParentResult = "correct" | "needs_review" | null;
 type PreviewMode = "annotated" | "zhuyin";
 type SyllableItem = { character: string; zhuyin: string };
@@ -14,9 +14,12 @@ type ListeningQuestion = ListeningSeed & { id: string; choices: readonly string[
 type LessonExercise = { lines: readonly (readonly SyllableItem[])[]; questions: readonly ListeningSeed[] };
 type InkPoint = { x: number; y: number };
 type InkStroke = InkPoint[];
-type SavedQuestion = { lessonIndex: number; questionId: string };
+type SavedQuestion = { lessonIndex: number; questionId: string; needsPractice?: boolean };
 type PracticeState = { savedQuestions: SavedQuestion[]; recentLesson: number | null; completedSessions: number };
+type ListeningSettings = { repeatCount: 1 | 2 | 3; intervalSeconds: 5 | 8 | 10 };
 const practiceStorageKey = "zhuyin-practice-state-v3";
+const listeningSettingsStorageKey = "zhuyin-listening-settings-v1";
+const defaultListeningSettings: ListeningSettings = { repeatCount: 2, intervalSeconds: 8 };
 const previousPracticeStorageKey = "zhuyin-practice-state-v2";
 const firstPracticeStorageKey = "zhuyin-practice-state-v1";
 
@@ -261,7 +264,9 @@ export default function Page() {
   const [previewMode, setPreviewMode] = useState<PreviewMode>("annotated");
   const [fillStrokes, setFillStrokes] = useState<Record<number, InkStroke[]>>({});
   const [activeFillCell, setActiveFillCell] = useState<number | null>(null);
-  const [fillReviewLine, setFillReviewLine] = useState<number | null>(null);
+  const [fillReviewOpen, setFillReviewOpen] = useState(false);
+  const [fillNeedsRetry, setFillNeedsRetry] = useState<number[]>([]);
+  const [fillParentChecked, setFillParentChecked] = useState(false);
   const [fillHasInk, setFillHasInk] = useState(false);
   const [fillIsDirty, setFillIsDirty] = useState(false);
   const [listenIndex, setListenIndex] = useState(0);
@@ -275,6 +280,9 @@ export default function Page() {
   const [reviewedIndexes, setReviewedIndexes] = useState<number[]>([]);
   const [practiceState, setPracticeState] = useState<PracticeState>({ savedQuestions: [], recentLesson: null, completedSessions: 0 });
   const [practiceLoaded, setPracticeLoaded] = useState(false);
+  const [listeningSettings, setListeningSettings] = useState<ListeningSettings>(defaultListeningSettings);
+  const [settingsLoaded, setSettingsLoaded] = useState(false);
+  const [showListeningSettings, setShowListeningSettings] = useState(false);
   const [storageError, setStorageError] = useState(false);
   const [practiceNotice, setPracticeNotice] = useState("");
   const [singleQuestionPractice, setSingleQuestionPractice] = useState(false);
@@ -304,6 +312,7 @@ export default function Page() {
   const lesson = lessons[selectedLesson];
   const lessonNumber = ["一", "二", "三"][selectedLesson];
   const currentQuestionSaved = practiceState.savedQuestions.some((item) => item.lessonIndex === selectedLesson && item.questionId === currentQuestion.id);
+  const pendingSessionCount = reviewedIndexes.filter((index) => practiceState.savedQuestions.some((item) => item.lessonIndex === selectedLesson && item.questionId === listeningQuestions[index]?.id && item.needsPractice)).length;
 
   useEffect(() => {
     try {
@@ -311,7 +320,7 @@ export default function Page() {
       const previous = current ? null : window.localStorage.getItem(previousPracticeStorageKey);
       const stored = current ?? previous ?? window.localStorage.getItem(firstPracticeStorageKey);
       if (stored) {
-        const parsed: { savedQuestions?: Array<{ lessonIndex?: number; questionId?: string; questionIndex?: number }>; recentLesson?: number | null; completedSessions?: number } = JSON.parse(stored);
+        const parsed: { savedQuestions?: Array<{ lessonIndex?: number; questionId?: string; questionIndex?: number; needsPractice?: boolean }>; recentLesson?: number | null; completedSessions?: number } = JSON.parse(stored);
         const savedQuestions = (Array.isArray(parsed.savedQuestions) ? parsed.savedQuestions : []).flatMap((item): SavedQuestion[] => {
           if (typeof item?.lessonIndex !== "number" || !lessons[item.lessonIndex]) return [];
           let id = item.questionId;
@@ -320,7 +329,7 @@ export default function Page() {
             const legacyQuestion = legacyIndex === undefined ? undefined : exercises[item.lessonIndex]?.questions[legacyIndex];
             id = legacyQuestion ? questionId(legacyQuestion) : undefined;
           }
-          return typeof id === "string" && findQuestionSeed(item.lessonIndex, id) ? [{ lessonIndex: item.lessonIndex, questionId: id }] : [];
+          return typeof id === "string" && findQuestionSeed(item.lessonIndex, id) ? [{ lessonIndex: item.lessonIndex, questionId: id, needsPractice: Boolean(item.needsPractice) }] : [];
         });
         setPracticeState({
           savedQuestions: savedQuestions.filter((item, index) => savedQuestions.findIndex((other) => other.lessonIndex === item.lessonIndex && other.questionId === item.questionId) === index),
@@ -337,10 +346,37 @@ export default function Page() {
     try { window.localStorage.setItem(practiceStorageKey, JSON.stringify(practiceState)); } catch { setStorageError(true); }
   }, [practiceLoaded, practiceState]);
 
-  const saveQuestion = (lessonIndex: number, id: string) => {
-    setPracticeState((current) => current.savedQuestions.some((item) => item.lessonIndex === lessonIndex && item.questionId === id)
-      ? current
-      : { ...current, savedQuestions: [...current.savedQuestions, { lessonIndex, questionId: id }] });
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem(listeningSettingsStorageKey);
+      if (stored) {
+        const parsed: Partial<ListeningSettings> = JSON.parse(stored);
+        setListeningSettings({
+          repeatCount: parsed.repeatCount === 1 || parsed.repeatCount === 2 || parsed.repeatCount === 3 ? parsed.repeatCount : 2,
+          intervalSeconds: parsed.intervalSeconds === 5 || parsed.intervalSeconds === 8 || parsed.intervalSeconds === 10 ? parsed.intervalSeconds : 8,
+        });
+      }
+    } catch { setStorageError(true); }
+    setSettingsLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (!settingsLoaded) return;
+    try { window.localStorage.setItem(listeningSettingsStorageKey, JSON.stringify(listeningSettings)); } catch { setStorageError(true); }
+  }, [settingsLoaded, listeningSettings]);
+
+  const saveQuestion = (lessonIndex: number, id: string, needsPractice = false) => {
+    setPracticeState((current) => {
+      const existing = current.savedQuestions.find((item) => item.lessonIndex === lessonIndex && item.questionId === id);
+      if (existing) return needsPractice && !existing.needsPractice
+        ? { ...current, savedQuestions: current.savedQuestions.map((item) => item === existing ? { ...item, needsPractice: true } : item) }
+        : current;
+      return { ...current, savedQuestions: [...current.savedQuestions, { lessonIndex, questionId: id, needsPractice }] };
+    });
+  };
+
+  const markQuestionPracticed = (lessonIndex: number, id: string) => {
+    setPracticeState((current) => ({ ...current, savedQuestions: current.savedQuestions.map((item) => item.lessonIndex === lessonIndex && item.questionId === id ? { ...item, needsPractice: false } : item) }));
   };
 
   const removeQuestion = (lessonIndex: number, id: string) => {
@@ -413,7 +449,10 @@ export default function Page() {
   const openFill = () => {
     setFillStrokes({});
     setActiveFillCell(null);
-    setFillReviewLine(null);
+    setFillReviewOpen(false);
+    setFillNeedsRetry([]);
+    setFillParentChecked(false);
+    setCompletedFillLessons((current) => current.filter((index) => index !== selectedLesson));
     setView("fill");
   };
 
@@ -440,17 +479,17 @@ export default function Page() {
       setSecondsLeft((current) => (current <= 1 ? 0 : current - 1));
     }, 1000);
 
-    const secondPlayback = window.setTimeout(() => {
+    const repeatPlaybacks = Array.from({ length: listeningSettings.repeatCount - 1 }, (_, index) => window.setTimeout(() => {
       setPlayCount((current) => current + 1);
-      setListenMessage("第二次播放中，可以繼續寫，也可以修改剛剛的筆畫。 ");
+      setListenMessage(`第 ${index + 2} 次播放中，可以繼續寫，也可以修改剛剛的筆畫。`);
       speak(currentQuestion.audioText);
-    }, 8000);
+    }, (index + 1) * listeningSettings.intervalSeconds * 1000));
 
     const timeUp = window.setTimeout(() => finishListening(), 30000);
-    timeoutRefs.current = [secondPlayback, timeUp];
+    timeoutRefs.current = [...repeatPlaybacks, timeUp];
 
     return clearListenTimers;
-  }, [clearListenTimers, currentQuestion.audioText, finishListening, listenIndex, listenPhase, speak]);
+  }, [clearListenTimers, currentQuestion.audioText, finishListening, listenIndex, listenPhase, listeningSettings, speak]);
 
   useEffect(() => {
     if (view !== "listen" || (listenPhase !== "active" && listenPhase !== "retry")) return;
@@ -540,7 +579,7 @@ export default function Page() {
   const fillLineForCell = (index: number) => fillLineStarts.findIndex((start, lineIndex) => index >= start && index < start + lessonLines[lineIndex].length);
 
   const openFillCell = (index: number) => {
-    setFillReviewLine(null);
+    setFillReviewOpen(false);
     setActiveFillCell(index);
   };
 
@@ -560,7 +599,7 @@ export default function Page() {
     context.lineWidth = Math.max(3, rect.width * .009);
     context.lineCap = "round";
     context.lineJoin = "round";
-    const saved = fillStrokes[activeFillCell] ?? [];
+    const saved = fillNeedsRetry.includes(activeFillCell) ? [] : fillStrokes[activeFillCell] ?? [];
     fillDraftRef.current = saved.map((stroke) => stroke.map((point) => ({ ...point })));
     fillActiveStrokeRef.current = null;
     fillPointerIdRef.current = null;
@@ -578,7 +617,7 @@ export default function Page() {
         context.stroke();
       }
     }
-  }, [view, activeFillCell, fillStrokes]);
+  }, [view, activeFillCell, fillStrokes, fillNeedsRetry]);
 
   const fillPoint = (event: React.PointerEvent<HTMLCanvasElement>): InkPoint => {
     const rect = event.currentTarget.getBoundingClientRect();
@@ -643,12 +682,23 @@ export default function Page() {
     const next = { ...fillStrokes, [index]: fillDraftRef.current.map((stroke) => stroke.map((point) => ({ ...point }))) };
     setFillStrokes(next);
     setActiveFillCell(null);
-    if (Object.keys(next).length === lessonItems.length) setCompletedFillLessons((current) => current.includes(selectedLesson) ? current : [...current, selectedLesson]);
-    if (wasFilled) return;
+    setFillParentChecked(false);
+    setCompletedFillLessons((current) => current.filter((item) => item !== selectedLesson));
+    const remainingRetry = fillNeedsRetry.filter((item) => item !== index);
+    setFillNeedsRetry(remainingRetry);
+    if (wasFilled) {
+      if (remainingRetry.length) setActiveFillCell(remainingRetry[0]);
+      else if (Object.keys(next).length === lessonItems.length) setFillReviewOpen(true);
+      return;
+    }
     const lineStart = fillLineStarts[lineIndex];
     const nextEmpty = lessonLines[lineIndex].findIndex((_, offset) => !next[lineStart + offset]?.length);
     if (nextEmpty >= 0) setActiveFillCell(lineStart + nextEmpty);
-    else setFillReviewLine(lineIndex);
+    else if (Object.keys(next).length === lessonItems.length) setFillReviewOpen(true);
+    else {
+      const nextUnwritten = lessonItems.findIndex((_, itemIndex) => !next[itemIndex]?.length);
+      if (nextUnwritten >= 0) setActiveFillCell(nextUnwritten);
+    }
   };
 
   const leaveFillCell = () => {
@@ -668,6 +718,7 @@ export default function Page() {
 
   const handleParentDecision = (result: Exclude<ParentResult, null>) => {
     if (result === "correct") {
+      markQuestionPracticed(selectedLesson, currentQuestion.id);
       if (singleQuestionPractice) {
         setPracticeNotice("這題練完了！可以再練一次，或取消收藏。 ");
         setView("practice");
@@ -678,10 +729,18 @@ export default function Page() {
       }
     } else {
       setReviewedIndexes((current) => current.includes(listenIndex) ? current : [...current, listenIndex]);
-      saveQuestion(selectedLesson, currentQuestion.id);
-      setListenPhase("choice");
-      setListenMessage("沒關係，先用三選一確認聲音，再重新寫一次。 ");
+      saveQuestion(selectedLesson, currentQuestion.id, true);
+      setListenPhase("remediation_offer");
+      setListenMessage("已加入待補強，可以現在練，也可以稍後再練。 ");
     }
+  };
+
+  const deferRemediation = () => {
+    if (singleQuestionPractice) {
+      setPracticeNotice("這題還在待補強清單，之後可以再練。");
+      setView("practice");
+      clearListenTimers();
+    } else goToNextQuestion();
   };
 
   const selectRemediation = (answer: string) => {
@@ -776,27 +835,26 @@ export default function Page() {
   );
 
   const renderFillBlank = () => (
-    <section className={`page-section fill-page ${fillComplete ? "is-complete" : ""}`}>
+    <section className={`page-section fill-page ${fillParentChecked ? "is-complete" : ""}`}>
       <button className="back-link" type="button" onClick={() => setView("lesson")}>← 回到第{lessonNumber}課</button>
       <div className="zhuyin-sheet">
-        <div className="sheet-top"><h1>{lesson.title}</h1><small>已寫 {writtenCount} / {lessonItems.length} 格</small></div>
-        <p className="fill-sheet-help">點格子寫完整注音，包含聲調。寫完一行再對照答案。</p>
+        <div className="sheet-top"><h1>{lesson.title}</h1><small>{fillParentChecked ? "家長已檢查" : `已寫 ${writtenCount} / ${lessonItems.length} 格`}</small></div>
+        <p className="fill-sheet-help">{fillParentChecked ? "家長已檢查。修改任何一格後，需要再檢查一次。" : "先寫完整篇，再請家長對照答案。"}{fillNeedsRetry.length > 0 && `有 ${fillNeedsRetry.length} 格待重寫。`}</p>
         <div className="syllable-row" dir="rtl" aria-label="課文直排注音，從右向左閱讀">
           {lessonLines.map((line, lineIndex) => {
             const lineStart = fillLineStarts[lineIndex];
-            const lineDone = line.every((_, offset) => fillStrokes[lineStart + offset]?.length);
             return <div className="syllable-column" role="group" aria-label={`第 ${lineIndex + 1} 行`} key={lineIndex}>
               {line.map((_, itemIndex) => {
                 const index = lineStart + itemIndex;
-                return <button className={`syllable-cell fill-cell ${fillStrokes[index]?.length ? "is-filled" : "is-target"}`} key={index} type="button" aria-label={`第 ${lineIndex + 1} 行第 ${itemIndex + 1} 格，${fillStrokes[index]?.length ? "修改注音" : "寫注音"}`} onClick={() => openFillCell(index)}>{fillStrokes[index]?.length ? <InkPreview strokes={fillStrokes[index]} /> : <span className="fill-cell-plus" aria-hidden="true">＋</span>}</button>;
+                return <button className={`syllable-cell fill-cell ${fillStrokes[index]?.length ? "is-filled" : "is-target"} ${fillNeedsRetry.includes(index) ? "is-needs-retry" : ""}`} key={index} type="button" aria-label={`第 ${lineIndex + 1} 行第 ${itemIndex + 1} 格，${fillNeedsRetry.includes(index) ? "待重寫" : fillStrokes[index]?.length ? "修改注音" : "寫注音"}`} onClick={() => openFillCell(index)}>{fillStrokes[index]?.length ? <InkPreview strokes={fillStrokes[index]} /> : <span className="fill-cell-plus" aria-hidden="true">＋</span>}</button>;
               })}
-              {lineDone && <button className="fill-line-review-link" type="button" onClick={() => setFillReviewLine(lineIndex)}>對照這行</button>}
             </div>;
           })}
         </div>
       </div>
       {!fillComplete && <button className="fill-begin-button" type="button" onClick={() => openFillCell(lessonItems.findIndex((_, index) => !fillStrokes[index]?.length))}>從第一個空格開始 <ArrowRight size={19} aria-hidden="true" /></button>}
-      {fillComplete && <div className="completion-banner"><span>✓</span><p><strong>整篇寫完了！</strong><small>可以點格子修改，或進入聽寫。</small></p><button type="button" className="primary-button" onClick={openListening}>進入聽寫 <span>→</span></button></div>}
+      {fillComplete && !fillParentChecked && <div className="fill-check-actions">{fillNeedsRetry.length > 0 && <button type="button" className="fill-begin-button" onClick={() => openFillCell(fillNeedsRetry[0])}>重寫待補強的 {fillNeedsRetry.length} 格 <ArrowRight size={19} aria-hidden="true" /></button>}<button type="button" className="fill-begin-button" onClick={() => setFillReviewOpen(true)}>請家長檢查 <ArrowRight size={19} aria-hidden="true" /></button></div>}
+      {fillParentChecked && <div className="completion-banner"><span>✓</span><p><strong>家長檢查完成！</strong><small>全部注音都已對照；也可以點格子修改。</small></p><button type="button" className="primary-button" onClick={openListening}>進入聽寫 <span>→</span></button></div>}
     </section>
   );
 
@@ -811,26 +869,32 @@ export default function Page() {
   };
 
   const renderFillReview = () => {
-    if (fillReviewLine === null) return null;
-    const line = lessonLines[fillReviewLine];
-    const start = fillLineStarts[fillReviewLine];
-    const nextLineStart = fillLineStarts[fillReviewLine + 1];
-    return <main className="fill-focus-shell fill-review-shell"><header className="fill-focus-header"><button type="button" onClick={() => setFillReviewLine(null)}><ArrowLeft size={19} aria-hidden="true" /> 回到課文</button><strong>第 {fillReviewLine + 1} 行完成</strong><span>{writtenCount} / {lessonItems.length}</span></header><div className="fill-review-body"><h1>一起對照這一行</h1><p>左邊是你的筆跡，右邊是正確注音。請家長陪孩子看看聲調。</p><div className="fill-compare-list">{line.map((item, offset) => <div className="fill-compare-row" key={offset}><span>{offset + 1}</span><div className="fill-compare-ink"><InkPreview strokes={fillStrokes[start + offset] ?? []} /></div><div className="fill-compare-answer"><ZhuyinStack text={item.zhuyin} /></div></div>)}</div><div className="fill-review-actions"><button type="button" onClick={() => setFillReviewLine(null)}>回課文修改</button><button type="button" onClick={() => { setFillReviewLine(null); if (nextLineStart !== undefined) openFillCell(nextLineStart); }}> {nextLineStart === undefined ? "完成對照" : "寫下一行"} <ArrowRight size={19} aria-hidden="true" /></button></div></div></main>;
+    if (!fillReviewOpen) return null;
+    const confirmFillReview = () => {
+      setFillReviewOpen(false);
+      if (fillNeedsRetry.length) {
+        openFillCell(fillNeedsRetry[0]);
+      } else {
+        setFillParentChecked(true);
+        setCompletedFillLessons((current) => current.includes(selectedLesson) ? current : [...current, selectedLesson]);
+      }
+    };
+    return <main className="fill-focus-shell fill-review-shell"><header className="fill-focus-header"><button type="button" onClick={() => setFillReviewOpen(false)}><ArrowLeft size={19} aria-hidden="true" /> 回到課文</button><strong>家長檢查</strong><span>{fillNeedsRetry.length} 格待重寫</span></header><div className="fill-review-body"><h1>一起對照整篇課文</h1><p>請家長逐格看筆跡和正確注音；有錯的格子點「需要重寫」，其餘確認後即可完成。</p><div className="fill-compare-list">{lessonLines.map((line, lineIndex) => <section className="fill-review-line" key={lineIndex}><h2>第 {lineIndex + 1} 行</h2>{line.map((item, offset) => { const index = fillLineStarts[lineIndex] + offset; const needsRetry = fillNeedsRetry.includes(index); return <div className={`fill-compare-row ${needsRetry ? "is-needs-retry" : ""}`} key={index}><span>{offset + 1}</span><div className="fill-compare-ink"><InkPreview strokes={fillStrokes[index] ?? []} /></div><div className="fill-compare-answer"><ZhuyinStack text={item.zhuyin} /></div><button type="button" className="fill-mark-retry" aria-pressed={needsRetry} onClick={() => setFillNeedsRetry((current) => current.includes(index) ? current.filter((item) => item !== index) : [...current, index])}>{needsRetry ? "已標記 · 取消" : "需要重寫"}</button></div>; })}</section>)}</div><div className="fill-review-actions"><button type="button" onClick={() => setFillReviewOpen(false)}>稍後檢查</button><button type="button" onClick={confirmFillReview}>{fillNeedsRetry.length ? `重寫 ${fillNeedsRetry.length} 格` : "確認檢查完成"} <ArrowRight size={19} aria-hidden="true" /></button></div></div></main>;
   };
 
   const renderPractice = () => (
     <section className="page-section practice-page">
-      <SectionHeading eyebrow="YOUR PRACTICE" title="練習紀錄" description="收藏的題目留在這台裝置，可以隨時重練。" />
+      <SectionHeading eyebrow="YOUR PRACTICE" title="練習紀錄" description="待補強與收藏題目留在這台裝置，可以隨時重練。" />
       {storageError && <p className="practice-storage-error" role="alert">這個瀏覽器目前無法儲存收藏；關閉頁面後，紀錄可能會消失。</p>}
       {practiceNotice && <p className="practice-notice" role="status">{practiceNotice}</p>}
-      <div className="section-title-row"><h2>收藏題目</h2><span className="list-count">{practiceState.savedQuestions.length} 題</span></div>
+      <div className="section-title-row"><h2>待補強與收藏</h2><span className="list-count">{practiceState.savedQuestions.filter((item) => item.needsPractice).length} 題待補強</span></div>
       {practiceState.savedQuestions.length ? <div className="saved-question-list">
-        {practiceState.savedQuestions.map(({ lessonIndex, questionId }, savedIndex) => {
+        {[...practiceState.savedQuestions].sort((a, b) => Number(Boolean(b.needsPractice)) - Number(Boolean(a.needsPractice))).map(({ lessonIndex, questionId, needsPractice }, savedIndex) => {
           const question = findQuestionSeed(lessonIndex, questionId);
           if (!question) return null;
           return <div className="saved-question" key={`${lessonIndex}-${questionId}`}>
             <span className="saved-question-icon"><Headphones size={24} weight="duotone" aria-hidden="true" /></span>
-            <div className="saved-question-copy"><strong>第{["一", "二", "三"][lessonIndex]}課 · {listenCategoryLabels[question.category]}</strong><small>{lessons[lessonIndex].title} · 收藏題目 {savedIndex + 1}</small></div>
+            <div className="saved-question-copy"><strong>第{["一", "二", "三"][lessonIndex]}課 · {listenCategoryLabels[question.category]}</strong><small>{lessons[lessonIndex].title} · {needsPractice ? "待補強" : "已收藏"} · 題目 {savedIndex + 1}</small></div>
             <div className="saved-question-actions">
               <button type="button" onClick={() => speak(question.audioText)} aria-label={`播放第${["一", "二", "三"][lessonIndex]}課收藏題目 ${savedIndex + 1}`}><SpeakerHigh size={18} aria-hidden="true" /> 播放</button>
               <button type="button" className="saved-start" onClick={() => openSavedQuestion(lessonIndex, questionId)}>重練這題</button>
@@ -838,7 +902,7 @@ export default function Page() {
             </div>
           </div>;
         })}
-      </div> : <div className="empty-reinforce"><span>☆</span><strong>目前沒有收藏題目</strong><small>聽寫時按「需要補強」會自動收藏，也可以在家長判定時手動收藏。</small></div>}
+      </div> : <div className="empty-reinforce"><span>☆</span><strong>目前沒有待補強或收藏題目</strong><small>聽寫時按「需要補強」會先記下題目，之後可以再練。</small></div>}
       <div className="practice-summary"><div className="summary-score"><span>完成聽寫</span><strong>{practiceState.completedSessions}</strong><small>次</small></div><div className="summary-copy"><span className="eyebrow">KEEP GOING</span><h2>每天 5 分鐘，慢慢變熟悉。</h2><p>完成一個小練習，就是很棒的進度。</p></div><span className="summary-doodle">✦</span></div>
       <div className="practice-list"><div className="section-title-row"><h2>最近練習</h2><span className="list-count">{practiceState.recentLesson === null ? "0 個紀錄" : "1 個紀錄"}</span></div>
         {practiceState.recentLesson === null ? <p className="practice-no-recent">還沒有練習紀錄，先選一課開始吧。</p> : <button className="practice-row" type="button" onClick={() => openLesson(practiceState.recentLesson!)}><span className="practice-row-icon">{String(practiceState.recentLesson + 1).padStart(2, "0")}</span><span><strong>第{["一", "二", "三"][practiceState.recentLesson]}課・{lessons[practiceState.recentLesson].title}</strong><small>回到課程</small></span><b>繼續 <span>→</span></b></button>}
@@ -849,7 +913,8 @@ export default function Page() {
   const renderMore = () => (
     <section className="page-section more-page">
       <SectionHeading eyebrow="MORE" title="更多" description="簡單的說明與設定，陪孩子一起練習。" />
-      <div className="more-list"><button type="button"><span className="more-list-icon mint"><Question size={21} weight="bold" /></span><span><strong>使用說明</strong><small>第一次使用，先看這裡</small></span><b>→</b></button><button type="button"><span className="more-list-icon sky"><Heart size={21} weight="duotone" /></span><span><strong>給家長的話</strong><small>為什麼不需要孩子註冊</small></span><b>→</b></button><button type="button"><span className="more-list-icon cream"><MusicNotes size={21} weight="duotone" /></span><span><strong>聽寫設定</strong><small>目前播放 2 次 · 每題 30 秒</small></span><b>→</b></button><button type="button"><span className="more-list-icon coral"><Info size={21} weight="bold" /></span><span><strong>關於這個網站</strong><small>第一版測試版本 · v0.1</small></span><b>→</b></button></div>
+      <div className="more-list"><button type="button"><span className="more-list-icon mint"><Question size={21} weight="bold" /></span><span><strong>使用說明</strong><small>第一次使用，先看這裡</small></span><b>→</b></button><button type="button"><span className="more-list-icon sky"><Heart size={21} weight="duotone" /></span><span><strong>給家長的話</strong><small>為什麼不需要孩子註冊</small></span><b>→</b></button><button type="button" aria-expanded={showListeningSettings} aria-controls="listening-settings" onClick={() => setShowListeningSettings((current) => !current)}><span className="more-list-icon cream"><MusicNotes size={21} weight="duotone" /></span><span><strong>聽寫設定</strong><small>播放 {listeningSettings.repeatCount} 次 · 間隔 {listeningSettings.intervalSeconds} 秒 · 作答 30 秒</small></span><b>{showListeningSettings ? "−" : "→"}</b></button><button type="button"><span className="more-list-icon coral"><Info size={21} weight="bold" /></span><span><strong>關於這個網站</strong><small>第一版測試版本 · v0.1</small></span><b>→</b></button></div>
+      {showListeningSettings && <section id="listening-settings" className="listening-settings" aria-label="聽寫設定"><h2>給家長的聽寫設定</h2><p>設定會留在這台裝置。作答時間固定 30 秒，從第一次播放開始倒數。</p><fieldset><legend>每題播放幾次</legend><div className="settings-options">{([1, 2, 3] as const).map((count) => <button type="button" key={count} aria-pressed={listeningSettings.repeatCount === count} onClick={() => setListeningSettings((current) => ({ ...current, repeatCount: count }))}>{count} 次</button>)}</div></fieldset><fieldset><legend>每次播放相隔多久</legend><div className="settings-options">{([5, 8, 10] as const).map((seconds) => <button type="button" key={seconds} aria-pressed={listeningSettings.intervalSeconds === seconds} onClick={() => setListeningSettings((current) => ({ ...current, intervalSeconds: seconds }))}>{seconds} 秒</button>)}</div></fieldset></section>}
       <div className="privacy-card"><span>◌</span><p><strong>這裡不收集孩子的個人資料</strong><small>不需要姓名、Email 或帳號，練習紀錄只留在目前的裝置上。</small></p></div>
     </section>
   );
@@ -859,7 +924,7 @@ export default function Page() {
       <div className="result-celebration"><span className="result-spark">✦</span><div className="result-check">✓</div><span className="result-spark right">✦</span></div>
       <span className="eyebrow">PRACTICE COMPLETE</span><h1>練習完成！</h1><p className="result-intro">今天的第{lessonNumber}課，你已經往前走了一小步。</p>
       <div className="result-card"><div><span className="result-icon fill"><PencilLine size={22} weight="duotone" /></span><span><strong>課文默寫</strong><small>直式注音格 · {completedFillLessons.includes(selectedLesson) ? "已完成" : "尚未練習"}</small></span><b>{completedFillLessons.includes(selectedLesson) ? "✓" : "—"}</b></div><div><span className="result-icon listen"><Headphones size={22} weight="duotone" /></span><span><strong>聽寫</strong><small>三大題 · {sessionScore.listeningCorrect} / 12 格完成</small></span><b>✓</b></div></div>
-      <div className="result-note"><span>☼</span><p><strong>本次需要補強：{reviewedIndexes.length} 題</strong><small>{reviewedIndexes.length ? "需要補強的題目已加入「練習」，可以單題重練或取消收藏。" : "沒有需要補強的題目；手動收藏的題目也可以在「練習」重練。"}</small></p></div>
+      <div className="result-note"><span>☼</span><p><strong>待補強：{pendingSessionCount} 題</strong><small>{pendingSessionCount ? "題目已留在「練習」，可以稍後單題重練。" : "這次沒有待補強的題目；收藏的題目仍可在「練習」重練。"}</small></p></div>
       <div className="result-actions"><button className="primary-button" type="button" onClick={openListening}>再練一次 <span>↻</span></button><button className="secondary-button" type="button" onClick={() => setView("practice")}>查看收藏</button><button className="secondary-button" type="button" onClick={() => setView("lesson")}>回到課次</button></div>
     </section>
   );
@@ -871,12 +936,13 @@ export default function Page() {
       <header className="focus-topbar"><button type="button" className="focus-exit" onClick={leaveFocus}>← <span>離開</span></button><div className="focus-question"><strong>{listenCategoryLabels[currentQuestion.category]}</strong><small>{sectionProgress}</small></div><div className="focus-meta"><span className={secondsLeft <= 8 && (listenPhase === "active" || listenPhase === "retry") ? "urgent" : ""}><Timer size={14} weight="bold" /> {listenPhase === "retry_ready" ? "待重寫" : listenPhase === "review" || listenPhase === "choice" ? "已交卷" : `${String(Math.floor(secondsLeft / 60)).padStart(2, "0")}:${String(secondsLeft % 60).padStart(2, "0")}`}</span><span aria-label={`已播放 ${playCount} 次`}><SpeakerHigh size={14} weight="bold" /> {playCount} 次</span></div></header>
       <div className="focus-content">
         <p className="sr-only" aria-live="polite">{listenMessage}</p>
-        <div className={`canvas-zone ${isWordQuestion ? "is-word" : ""} ${listenPhase === "review" || listenPhase === "choice" || listenPhase === "retry_ready" ? "is-locked" : ""}`}><div className="canvas-paper">{isWordQuestion && <div className="word-grid-guide" aria-hidden="true"><span /><span /></div>}<canvas ref={canvasRef} onPointerDown={beginDrawing} onPointerMove={draw} onPointerUp={endDrawing} onPointerCancel={endDrawing} onPointerLeave={endDrawing} aria-label={isWordQuestion ? "語詞兩格田字格手寫區" : "田字格手寫區"} />{listenPhase === "choice" && <div className="canvas-replay-overlay"><button type="button" className="canvas-replay-button" onClick={replayQuestion} aria-label="再播放一次題目"><Play size={30} weight="fill" aria-hidden="true" /></button><span>點一下，再聽一次</span></div>}{listenPhase === "retry_ready" && <div className="canvas-replay-overlay retry-ready-overlay"><strong>答對了！再聽一次，重新寫。</strong><button type="button" onClick={startRetryWriting}><Play size={22} weight="fill" aria-hidden="true" /> 再聽一次並重寫</button></div>}</div><div className="canvas-toolbar"><span>{isWordQuestion ? "兩格田字格 · 從左到右寫" : "田字格"}</span><button type="button" onClick={clearCanvas} disabled={listenPhase !== "active" && listenPhase !== "retry"}>清除</button></div></div>
-        {listenPhase === "ready" && <button type="button" className="listen-start-button" onClick={startListening}><span className="play-circle"><Play size={17} weight="fill" /></span><span><strong>開始聽</strong><small>{isWordQuestion ? "一個詞寫兩格" : "一題寫一格"} · 播放 2 次 · 作答 30 秒</small></span><b><ArrowRight size={19} /></b></button>}
+        {listenPhase === "ready" ? <div className="listen-ready-card"><span className="listen-ready-icon"><Headphones size={42} weight="duotone" aria-hidden="true" /></span><h1>準備聽寫</h1><p>{isWordQuestion ? "聽一個語詞，寫在兩格田字格裡。" : "聽題目，在田字格寫下完整注音。"}</p><div className="listen-ready-summary"><span>播放 <strong>{listeningSettings.repeatCount} 次</strong></span><span>間隔 <strong>{listeningSettings.intervalSeconds} 秒</strong></span><span>作答 <strong>30 秒</strong></span></div><button type="button" className="listen-start-button" onClick={startListening}><span className="play-circle"><Play size={17} weight="fill" /></span><span><strong>開始聽</strong><small>按下後播放，並開始倒數</small></span><b><ArrowRight size={19} /></b></button></div> : <div className={`canvas-zone ${isWordQuestion ? "is-word" : ""} ${listenPhase === "review" || listenPhase === "remediation_offer" || listenPhase === "choice" || listenPhase === "retry_ready" ? "is-locked" : ""}`}><div className="canvas-paper">{isWordQuestion && <div className="word-grid-guide" aria-hidden="true"><span /><span /></div>}<canvas ref={canvasRef} onPointerDown={beginDrawing} onPointerMove={draw} onPointerUp={endDrawing} onPointerCancel={endDrawing} onPointerLeave={endDrawing} aria-label={isWordQuestion ? "語詞兩格田字格手寫區" : "田字格手寫區"} />{listenPhase === "choice" && <div className="canvas-replay-overlay"><button type="button" className="canvas-replay-button" onClick={replayQuestion} aria-label="再播放一次題目"><Play size={30} weight="fill" aria-hidden="true" /></button><span>點一下，再聽一次</span></div>}{listenPhase === "retry_ready" && <div className="canvas-replay-overlay retry-ready-overlay"><strong>答對了！再聽一次，重新寫。</strong><button type="button" onClick={startRetryWriting}><Play size={22} weight="fill" aria-hidden="true" /> 再聽一次並重寫</button></div>}</div><div className="canvas-toolbar"><span>{isWordQuestion ? "兩格田字格 · 從左到右寫" : "田字格"}</span><button type="button" onClick={clearCanvas} disabled={listenPhase !== "active" && listenPhase !== "retry"}>清除</button></div></div>}
         {listenPhase === "active" && <button type="button" className="early-submit-button" onClick={() => finishListening(true)}>提早交卷</button>}
         {listenPhase === "review" && <div className="parent-review"><div className="answer-reveal"><span>正確答案</span><AnswerDisplay answer={currentQuestion.answer} /></div><p>{hasInk ? "請家長依照孩子的手寫內容判定。" : "還沒有手寫內容；可以先按「需要補強」再練一次。"}</p><div className="review-actions"><button type="button" className="review-correct" disabled={!hasInk} onClick={() => handleParentDecision("correct")}>✓ 答對</button><button type="button" className="review-retry" onClick={() => handleParentDecision("needs_review")}>↻ 需要補強</button></div><button type="button" className={`review-save ${currentQuestionSaved ? "is-saved" : ""}`} aria-pressed={currentQuestionSaved} onClick={toggleCurrentQuestionSaved}>{currentQuestionSaved ? "★ 已收藏 · 取消收藏" : "☆ 收藏這題，之後再練"}</button></div>}
-        {listenPhase === "choice" && <div className={`choice-panel ${isWordQuestion ? "is-word" : ""}`}><div className="choice-options">{choiceAnswers.map((answer) => <button type="button" key={answer} onClick={() => selectRemediation(answer)}><AnswerDisplay answer={answer} /></button>)}</div><p>{retryMessage || (isWordQuestion ? "選出你剛剛聽到的完整語詞注音。" : "選出你剛剛聽到的完整音節。")}</p></div>}
-        {listenPhase === "retry" && <div className="retry-actions"><button type="button" className="retry-replay" onClick={replayQuestion}><SpeakerHigh size={18} aria-hidden="true" /> 再聽一次</button><button type="button" className="retry-submit" disabled={!hasInk} onClick={submitRetryWriting}>我寫好了，請家長看看 <span>→</span></button></div>}
+        {listenPhase === "remediation_offer" && <div className="remediation-offer"><strong>這題已加入待補強</strong><p>可以現在練，也可以先做下一題；稍後會留在「練習」。</p><div><button type="button" onClick={() => { setListenPhase("choice"); setRetryMessage(""); }}>現在補強</button><button type="button" onClick={deferRemediation}>稍後再練</button></div></div>}
+        {listenPhase === "choice" && <div className={`choice-panel ${isWordQuestion ? "is-word" : ""}`}><div className="choice-options">{choiceAnswers.map((answer) => <button type="button" key={answer} onClick={() => selectRemediation(answer)}><AnswerDisplay answer={answer} /></button>)}</div><p>{retryMessage || (isWordQuestion ? "選出你剛剛聽到的完整語詞注音。" : "選出你剛剛聽到的完整音節。")}</p><button type="button" className="remediation-later" onClick={deferRemediation}>稍後再練這題</button></div>}
+        {listenPhase === "retry_ready" && <button type="button" className="remediation-later" onClick={deferRemediation}>稍後再練這題</button>}
+        {listenPhase === "retry" && <div className="retry-actions"><button type="button" className="retry-replay" onClick={replayQuestion}><SpeakerHigh size={18} aria-hidden="true" /> 再聽一次</button><button type="button" className="retry-submit" disabled={!hasInk} onClick={submitRetryWriting}>我寫好了，請家長看看 <span>→</span></button><button type="button" className="remediation-later" onClick={deferRemediation}>稍後再練</button></div>}
       </div>
     </main>
     );
@@ -896,7 +962,7 @@ export default function Page() {
 
   if (isFocusMode) return renderFocusMode();
   if (view === "fill" && activeFillCell !== null) return renderFillWriting();
-  if (view === "fill" && fillReviewLine !== null) return renderFillReview();
+  if (view === "fill" && fillReviewOpen) return renderFillReview();
 
   return (
     <div className="app-shell">

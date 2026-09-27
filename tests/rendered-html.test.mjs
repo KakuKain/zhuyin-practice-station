@@ -48,8 +48,11 @@ test("the source keeps the handoff interaction vocabulary", async () => {
   assert.match(page, /onPointerMove=\{moveFillDrawing\}/);
   assert.match(page, /onPointerUp=\{endFillDrawing\}/);
   assert.match(page, /<InkPreview strokes=\{fillStrokes\[index\]\}/);
-  assert.match(page, /setFillReviewLine\(lineIndex\)/);
-  assert.match(page, /點格子寫完整注音/);
+  assert.match(page, /setFillReviewOpen\(true\)/);
+  assert.match(page, /先寫完整篇，再請家長對照答案/);
+  assert.match(page, /家長檢查完成/);
+  assert.match(page, /需要重寫/);
+  assert.match(page, /fillNeedsRetry\.includes\(activeFillCell\) \? \[\] : fillStrokes\[activeFillCell\]/);
   assert.doesNotMatch(page, /beginCardDrag|placeFillAnswer|draggable=\{false\}/);
   assert.doesNotMatch(page, /document\.elementFromPoint/);
   assert.match(page, /再播放一次題目/);
@@ -114,4 +117,16 @@ test("all three lessons have three listening sections with four writing units ea
   assert.doesNotMatch(page, /第二課先讀課文與注音符號|lessons\[1\]\.title, "閱讀課文"/);
   assert.match(page, /listeningCorrect: current\.listeningCorrect \+ currentQuestion\.answer\.split\("\|"\)\.length/);
   assert.match(page, /三大題 · \{sessionScore\.listeningCorrect\} \/ 12 格完成/);
+});
+
+test("parent review, listening preferences, and deferred reinforcement remain available", async () => {
+  const page = await (await import("node:fs/promises")).readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  assert.match(page, /ListeningSettings = \{ repeatCount: 1 \| 2 \| 3; intervalSeconds: 5 \| 8 \| 10 \}/);
+  assert.match(page, /listeningSettingsStorageKey/);
+  assert.match(page, /listenPhase === "ready" \? <div className="listen-ready-card"/);
+  assert.match(page, /repeatPlaybacks = Array\.from/);
+  assert.match(page, /needsPractice: true/);
+  assert.match(page, /現在補強/);
+  assert.match(page, /稍後再練/);
+  assert.match(page, /markQuestionPracticed\(selectedLesson, currentQuestion\.id\)/);
 });
