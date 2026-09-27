@@ -43,6 +43,8 @@ test("the source keeps the handoff interaction vocabulary", async () => {
   assert.match(page, /zhuyin: "˙ㄉㄧ"/);
   assert.match(page, /提早交卷/);
   assert.match(page, /canvas-replay-overlay/);
+  assert.match(page, /cell\.getBoundingClientRect\(\)/);
+  assert.doesNotMatch(page, /document\.elementFromPoint/);
   assert.match(page, /再播放一次題目/);
   assert.match(page, /"貓咪弟弟", "跑第一"/);
   assert.match(page, /"孵出", "五隻鵝寶寶"/);
@@ -58,6 +60,8 @@ test("the source keeps the handoff interaction vocabulary", async () => {
   assert.match(page, /純注音/);
   assert.match(page, /setPreviewMode\("annotated"\)/);
   assert.match(page, /\\u\{E01E1\}/);
+  assert.match(page, /1: \{ 5: \{ 4: "\\u\{E01E1\}" \} \}/);
+  assert.match(page, /拖到虛線空格，或先點卡片、再點空格/);
   assert.match(css, /lesson-text-lines\.is-zhuyin-only/);
   assert.match(css, /object-fit: cover/);
   assert.match(css, /\.text-button \{ display: inline-flex; flex: none/);
