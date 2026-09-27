@@ -431,18 +431,18 @@ export default function Page() {
   const renderLesson = () => (
     <section className="page-section lesson-page">
       <button className="back-link" type="button" onClick={() => setView("courses")}>← 回到課程</button>
-      <div className="lesson-heading"><div><span className="eyebrow">LESSON {String(selectedLesson + 1).padStart(2, "0")}</span><h1>{lesson.title}</h1><p>第{["一", "二", "三"][selectedLesson]}課 · {selectedLesson === 0 ? "兩種方式，自己選一個開始。" : "先讀課文，認識這一課的注音符號。"}</p></div><span className="lesson-stamp">{selectedLesson === 0 ? <>先看<br />再寫</> : <>先讀<br />課文</>}</span></div>
+      <div className="lesson-heading"><div><span className="eyebrow">LESSON {String(selectedLesson + 1).padStart(2, "0")}</span><h1>{lesson.title}</h1></div><span className="lesson-stamp">{selectedLesson === 0 ? <>先看<br />再寫</> : <>先讀<br />課文</>}</span></div>
       {selectedLesson === 0 && <div className="mode-grid">
-        <button className="mode-card fill-mode" type="button" onClick={() => setView("fill")}><span className="mode-icon"><PencilLine size={30} weight="duotone" /></span><span className="mode-copy"><small>第一關</small><strong>課文默寫</strong><p>看直式注音格，把缺少的音節拖回去。</p><b>開始練習 <ArrowRight size={17} /> </b></span></button>
-        <button className="mode-card listen-mode" type="button" onClick={openListening}><span className="mode-icon"><Headphones size={30} weight="duotone" /></span><span className="mode-copy"><small>第二關</small><strong>聽寫</strong><p>聽聲音、自由手寫，最後交給家長判定。</p><b>開始練習 <ArrowRight size={17} /> </b></span></button>
+        <button className="mode-card fill-mode" type="button" onClick={() => setView("fill")}><small>第一關</small><strong>課文默寫</strong></button>
+        <button className="mode-card listen-mode" type="button" onClick={openListening}><small>第二關</small><strong>聽寫</strong></button>
       </div>}
       <div className="lesson-curriculum">
         <div className="lesson-curriculum-heading"><strong>課文</strong><span>從右到左讀</span></div>
-        <div className="lesson-text-lines" dir="rtl" aria-label={`${lesson.title}課文`}>{lesson.lines.map((line, index) => <div className="lesson-text-line" key={index}>{line}</div>)}</div>
+        <div className="lesson-text-lines" dir="rtl" aria-label={`${lesson.title}課文`}>{lesson.lines.map((line, lineIndex) => <div className="lesson-text-line" dir="ltr" key={lineIndex}>{Array.from(line).map((char, charIndex) => <span className={selectedLesson === 0 && lineIndex === 3 && charIndex === 3 ? "is-neutral-di" : undefined} key={charIndex}>{char}</span>)}</div>)}</div>
         <div className="lesson-curriculum-heading"><strong>注音符號</strong></div>
-        <div className="lesson-symbols" aria-label="本課注音符號">{lesson.symbols.map((symbol) => <span key={symbol}>{symbol}</span>)}</div>
+        <div className="lesson-symbols" dir="rtl" aria-label="本課注音符號">{lesson.symbols.map((symbol) => <span key={symbol}>{symbol}</span>)}</div>
       </div>
-      {selectedLesson === 0 ? <div className="lesson-rule"><span>小提醒</span><p>課文默寫裡看到的是<strong>注音，不是國字</strong>。從右邊第一行開始，由上往下、由右往左讀。</p></div> : <p className="lesson-upcoming">這一課的課文默寫與聽寫練習準備中。</p>}
+      {selectedLesson !== 0 && <p className="lesson-upcoming">這一課的課文默寫與聽寫練習準備中。</p>}
     </section>
   );
 

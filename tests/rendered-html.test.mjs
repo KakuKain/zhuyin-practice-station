@@ -49,5 +49,9 @@ test("the source keeps the handoff interaction vocabulary", async () => {
   assert.match(page, /symbols: \["ㄅ", "ㄆ", "ㄇ", "ㄉ", "ㄧ", "ㄠ"\]/);
   assert.match(page, /symbols: \["ㄈ", "ㄏ", "ㄓ", "ㄔ", "ㄨ", "ㄚ", "ㄜ"\]/);
   assert.match(page, /symbols: \["ㄌ", "ㄑ", "ㄗ", "ㄩ", "ㄛ", "ㄢ", "ㄤ"\]/);
+  assert.doesNotMatch(page, /兩種方式，自己選一個開始|看直式注音格，把缺少的音節拖回去|聽聲音、自由手寫，最後交給家長判定/);
+  assert.match(page, /lesson-symbols" dir="rtl"/);
+  assert.match(css, /BpmfZihiSans-Regular\.ttf/);
+  assert.match(css, /\.lesson-page \.mode-grid \{ display: grid; grid-template-columns: repeat\(2/);
   assert.doesNotMatch(page, /className="focus-intro"/);
 });

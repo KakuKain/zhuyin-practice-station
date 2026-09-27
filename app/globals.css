@@ -138,6 +138,13 @@ body { background: #e7f2f9; }
   font-weight: 400;
   font-display: swap;
 }
+@font-face {
+  font-family: "BpmfZihiSans";
+  src: url("/fonts/BpmfZihiSans-Regular.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
 
 .zhuyin-stack, .logo-mark span {
   font-family: "BpmfZihiOnly", "PingFang TC", sans-serif;
@@ -314,3 +321,32 @@ body { background: #e7f2f9; }
 .lesson-symbols span { display: grid; place-items: center; width: 42px; height: 42px; border: 1px solid #a7d9f7; border-radius: 9px; background: #f1faff; color: var(--ref-navy); font-size: 22px; }
 .lesson-upcoming { margin-top: 13px; color: #607895; font-size: 14px; }
 .syllable-row { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.lesson-page .mode-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.lesson-page .mode-card {
+  display: flex;
+  min-width: 0;
+  min-height: 104px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 5px;
+  text-align: center;
+}
+.lesson-page .fill-mode { background: #eff8ff; border-color: #a7d9f7; }
+.lesson-page .listen-mode { background: #effbf2; border-color: #b9dda9; }
+.lesson-page .mode-card small { color: var(--ref-blue); font-size: 14px; font-weight: 800; }
+.lesson-page .listen-mode small { color: var(--ref-green); }
+.lesson-page .mode-card strong { color: var(--ref-navy); font-size: clamp(18px, 5vw, 22px); line-height: 1.2; white-space: nowrap; }
+.lesson-page .mode-card:focus-visible { outline: 3px solid var(--ref-blue); outline-offset: 3px; }
+.lesson-text-lines { align-items: flex-start; }
+.lesson-text-line {
+  direction: ltr;
+  font-family: "BpmfZihiSans", "PingFang TC", sans-serif;
+  font-size: 29px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.15;
+}
+.lesson-text-line .is-neutral-di { font-feature-settings: "ss01" 1; }
+.lesson-symbols { direction: rtl; justify-content: flex-start; }
