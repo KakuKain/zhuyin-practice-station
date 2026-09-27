@@ -27,13 +27,23 @@ const listeningQuestions = [
 const blankIndexes = [1, 4, 6];
 const fillOptions = [lessonItems[4], lessonItems[1], lessonItems[6]];
 
+// This font draws the complete vertical syllable (including its tone) from a
+// representative Han character. Rendering individual Bopomofo characters would
+// discard the font's built-in tone placement.
+const syllableGlyphs: Record<string, string> = {
+  ...Object.fromEntries(lessonItems.map(({ character, zhuyin }) => [zhuyin, character])),
+  "ㄇㄧㄣˊ": "民",
+  "ㄇㄧㄥˇ": "酩",
+  "ㄒㄩㄝˇ": "雪",
+  "ㄒㄩㄢˊ": "旋",
+  "ㄕㄣ": "申",
+  "ㄕㄥˇ": "省",
+};
+
 function ZhuyinStack({ text, empty = false }: { text: string; empty?: boolean }) {
-  const tone = text.match(/[ˊˇˋ˙]$/)?.[0] ?? (text.startsWith("˙") ? "˙" : "");
-  const symbols = tone === "˙" && text.startsWith("˙") ? text.slice(1) : tone ? text.slice(0, -1) : text;
-  const lastSymbolTop = symbols.length > 0 ? `${((symbols.length - 1) / symbols.length) * 100}%` : "0%";
   return (
     <span className={`zhuyin-stack ${empty ? "is-empty" : ""}`} aria-label={empty ? "尚未填入音節" : text}>
-      {empty ? <span className="empty-mark">拖到這裡</span> : <><span className="zhuyin-base">{symbols}</span>{tone && <span className={`zhuyin-tone ${tone === "˙" ? "is-neutral" : ""}`} style={{ top: tone === "˙" ? "0%" : lastSymbolTop }} aria-hidden="true">{tone}</span>}</>}
+      {empty ? <span className="empty-mark">拖到這裡</span> : <span className="zhuyin-glyph" aria-hidden="true">{syllableGlyphs[text] ?? text}</span>}
     </span>
   );
 }
