@@ -4,13 +4,16 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, BookOpenText, Gear, Headphones, Heart, House, Info, Lightbulb, MusicNotes, Notebook, PencilLine, Play, Question, SpeakerHigh, Timer } from "@phosphor-icons/react";
 
 type View = "home" | "courses" | "practice" | "more" | "lesson" | "fill" | "listen" | "result";
-type ListenPhase = "ready" | "active" | "review" | "choice" | "retry";
+type ListenPhase = "ready" | "active" | "review" | "choice" | "retry_ready" | "retry";
 type ParentResult = "correct" | "needs_review" | null;
 type PreviewMode = "annotated" | "zhuyin";
 type CardDrag = { pointerId: number; optionIndex: number; startX: number; startY: number; moved: boolean };
 type SyllableItem = { character: string; zhuyin: string };
 type ListeningQuestion = { answer: string; audioText: string; distractors: readonly string[] };
 type LessonExercise = { lines: readonly (readonly SyllableItem[])[]; blanks: readonly number[]; optionOrder: readonly number[]; questions: readonly ListeningQuestion[] };
+type SavedQuestion = { lessonIndex: number; questionIndex: number };
+type PracticeState = { savedQuestions: SavedQuestion[]; recentLesson: number | null; completedSessions: number };
+const practiceStorageKey = "zhuyin-practice-state-v1";
 
 const lessons = [
   { title: "貓咪", lines: ["咪咪咪", "咪咪咪", "逼", "貓咪弟弟", "跑第一"], symbols: ["ㄅ", "ㄆ", "ㄇ", "ㄉ", "ㄧ", "ㄠ"] },
@@ -150,12 +153,19 @@ export default function Page() {
   const [listenIndex, setListenIndex] = useState(0);
   const [listenPhase, setListenPhase] = useState<ListenPhase>("ready");
   const [secondsLeft, setSecondsLeft] = useState(30);
-  const [playCount, setPlayCount] = useState(2);
+  const [playCount, setPlayCount] = useState(0);
   const [listenMessage, setListenMessage] = useState("按下「開始聽」才會播放題目。時間會從這裡開始倒數。 ");
   const [retryMessage, setRetryMessage] = useState("");
-  const [sessionScore, setSessionScore] = useState({ listeningCorrect: 0, needsReview: 0 });
+  const [sessionScore, setSessionScore] = useState({ listeningCorrect: 0 });
+  const [reviewedIndexes, setReviewedIndexes] = useState<number[]>([]);
+  const [practiceState, setPracticeState] = useState<PracticeState>({ savedQuestions: [], recentLesson: null, completedSessions: 0 });
+  const [practiceLoaded, setPracticeLoaded] = useState(false);
+  const [storageError, setStorageError] = useState(false);
+  const [practiceNotice, setPracticeNotice] = useState("");
+  const [singleQuestionPractice, setSingleQuestionPractice] = useState(false);
   const [completedFillLessons, setCompletedFillLessons] = useState<number[]>([]);
   const [isDrawing, setIsDrawing] = useState(false);
+  const [hasInk, setHasInk] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const cardDragRef = useRef<CardDrag | null>(null);
   const dragEventsRef = useRef<{ move: (event: PointerEvent) => void; end: (event: PointerEvent) => void; cancel: () => void }>({ move: () => {}, end: () => {}, cancel: () => {} });
@@ -172,10 +182,50 @@ export default function Page() {
   const isFocusMode = view === "listen";
   const lesson = lessons[selectedLesson];
   const lessonNumber = ["一", "二", "三"][selectedLesson];
+  const currentQuestionSaved = practiceState.savedQuestions.some((item) => item.lessonIndex === selectedLesson && item.questionIndex === listenIndex);
+
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem(practiceStorageKey);
+      if (saved) {
+        const parsed: Partial<PracticeState> = JSON.parse(saved);
+        setPracticeState({
+          savedQuestions: Array.isArray(parsed.savedQuestions) ? parsed.savedQuestions.filter((item): item is SavedQuestion =>
+            typeof item?.lessonIndex === "number" && typeof item?.questionIndex === "number" &&
+            Boolean(exercises[item.lessonIndex]?.questions[item.questionIndex])) : [],
+          recentLesson: typeof parsed.recentLesson === "number" && lessons[parsed.recentLesson] ? parsed.recentLesson : null,
+          completedSessions: typeof parsed.completedSessions === "number" && Number.isFinite(parsed.completedSessions) ? Math.max(0, parsed.completedSessions) : 0,
+        });
+      }
+    } catch { setStorageError(true); }
+    setPracticeLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (!practiceLoaded) return;
+    try { window.localStorage.setItem(practiceStorageKey, JSON.stringify(practiceState)); } catch { setStorageError(true); }
+  }, [practiceLoaded, practiceState]);
+
+  const saveQuestion = (lessonIndex: number, questionIndex: number) => {
+    setPracticeState((current) => current.savedQuestions.some((item) => item.lessonIndex === lessonIndex && item.questionIndex === questionIndex)
+      ? current
+      : { ...current, savedQuestions: [...current.savedQuestions, { lessonIndex, questionIndex }] });
+  };
+
+  const removeQuestion = (lessonIndex: number, questionIndex: number) => {
+    setPracticeState((current) => ({ ...current, savedQuestions: current.savedQuestions.filter((item) => item.lessonIndex !== lessonIndex || item.questionIndex !== questionIndex) }));
+    setPracticeNotice("已取消收藏，這題不會再顯示在練習頁。 ");
+  };
+
+  const toggleCurrentQuestionSaved = () => {
+    if (currentQuestionSaved) removeQuestion(selectedLesson, listenIndex);
+    else saveQuestion(selectedLesson, listenIndex);
+  };
 
   const openLesson = (index: number) => {
     setSelectedLesson(index);
     setPreviewMode("annotated");
+    setPracticeState((current) => ({ ...current, recentLesson: index }));
     setView("lesson");
   };
 
@@ -201,14 +251,25 @@ export default function Page() {
     setListenIndex(index);
     setListenPhase("ready");
     setSecondsLeft(30);
-    setPlayCount(2);
+    setPlayCount(0);
+    setHasInk(false);
     setRetryMessage("");
     setListenMessage("按下「開始聽」才會播放題目。時間會從這裡開始倒數。 ");
   };
 
   const openListening = () => {
     resetListeningQuestion(0);
-    setSessionScore({ listeningCorrect: 0, needsReview: 0 });
+    setSessionScore({ listeningCorrect: 0 });
+    setReviewedIndexes([]);
+    setSingleQuestionPractice(false);
+    setView("listen");
+  };
+
+  const openSavedQuestion = (lessonIndex: number, questionIndex: number) => {
+    setSelectedLesson(lessonIndex);
+    setSingleQuestionPractice(true);
+    setPracticeNotice("");
+    resetListeningQuestion(questionIndex);
     setView("listen");
   };
 
@@ -227,7 +288,7 @@ export default function Page() {
     if (listenPhase === "active" && !window.confirm("這一題尚未完成，要先離開嗎？")) return;
     clearListenTimers();
     if ("speechSynthesis" in window) window.speechSynthesis.cancel();
-    setView("lesson");
+    setView(singleQuestionPractice ? "practice" : "lesson");
     setListenPhase("ready");
   };
 
@@ -240,14 +301,14 @@ export default function Page() {
   }, [clearListenTimers]);
 
   useEffect(() => {
-    if (listenPhase !== "active") return;
+    if (listenPhase !== "active" && listenPhase !== "retry") return;
 
     timerRef.current = window.setInterval(() => {
       setSecondsLeft((current) => (current <= 1 ? 0 : current - 1));
     }, 1000);
 
     const secondPlayback = window.setTimeout(() => {
-      setPlayCount(0);
+      setPlayCount((current) => current + 1);
       setListenMessage("第二次播放中，可以繼續寫，也可以修改剛剛的筆畫。 ");
       speak(currentQuestion.audioText);
     }, 8000);
@@ -285,7 +346,22 @@ export default function Page() {
     setListenPhase("active");
     setSecondsLeft(30);
     setPlayCount(1);
+    setHasInk(false);
     setListenMessage("第一次播放中，Canvas 已開放，可以邊聽邊寫。 ");
+    speak(currentQuestion.audioText);
+  };
+
+  const startRetryWriting = () => {
+    setHasInk(false);
+    setListenPhase("retry");
+    setSecondsLeft(30);
+    setPlayCount((current) => current + 1);
+    setListenMessage("題目正在播放，請重新寫一次；需要時可按重播。 ");
+    speak(currentQuestion.audioText);
+  };
+
+  const replayQuestion = () => {
+    setPlayCount((current) => current + 1);
     speak(currentQuestion.audioText);
   };
 
@@ -293,6 +369,7 @@ export default function Page() {
     const canvas = canvasRef.current;
     const context = canvas?.getContext("2d");
     if (canvas && context) context.clearRect(0, 0, canvas.width, canvas.height);
+    setHasInk(false);
   };
 
   const pointFromEvent = (event: React.PointerEvent<HTMLCanvasElement>) => {
@@ -318,6 +395,7 @@ export default function Page() {
     if (!context) return;
     context.lineTo(point.x, point.y);
     context.stroke();
+    setHasInk(true);
   };
 
   const endDrawing = (event: React.PointerEvent<HTMLCanvasElement>) => {
@@ -430,6 +508,7 @@ export default function Page() {
 
   const goToNextQuestion = () => {
     if (listenIndex >= listeningQuestions.length - 1) {
+      setPracticeState((current) => ({ ...current, completedSessions: current.completedSessions + 1 }));
       setView("result");
       clearListenTimers();
       return;
@@ -439,10 +518,17 @@ export default function Page() {
 
   const handleParentDecision = (result: Exclude<ParentResult, null>) => {
     if (result === "correct") {
-      setSessionScore((current) => ({ ...current, listeningCorrect: current.listeningCorrect + 1 }));
-      goToNextQuestion();
+      if (singleQuestionPractice) {
+        setPracticeNotice("這題練完了！可以再練一次，或取消收藏。 ");
+        setView("practice");
+        clearListenTimers();
+      } else {
+        setSessionScore((current) => ({ ...current, listeningCorrect: current.listeningCorrect + 1 }));
+        goToNextQuestion();
+      }
     } else {
-      setSessionScore((current) => ({ ...current, needsReview: current.needsReview + 1 }));
+      setReviewedIndexes((current) => current.includes(listenIndex) ? current : [...current, listenIndex]);
+      saveQuestion(selectedLesson, listenIndex);
       setListenPhase("choice");
       setListenMessage("沒關係，先用三選一確認聲音，再重新寫一次。 ");
     }
@@ -454,10 +540,16 @@ export default function Page() {
       return;
     }
     setRetryMessage("你選對了！請在下方再寫一次這個音節。 ");
-    setListenPhase("retry");
+    clearCanvas();
+    setListenPhase("retry_ready");
+    setListenMessage("選對了！按下再聽一次並重寫，聽到聲音後開始寫。 ");
   };
 
   const submitRetryWriting = () => {
+    if (!hasInk) return;
+    clearListenTimers();
+    if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+    setSecondsLeft(0);
     setListenPhase("review");
     setListenMessage("這是補強後的手寫答案，請家長再次判定。 ");
   };
@@ -557,11 +649,28 @@ export default function Page() {
   );
 
   const renderPractice = () => (
-    <section className="page-section">
-      <SectionHeading eyebrow="YOUR PRACTICE" title="練習紀錄" description="把需要再看一次的音節留下來，下次從這裡繼續。" />
-      <div className="practice-summary"><div className="summary-score"><span>本週練習</span><strong>1</strong><small>次</small></div><div className="summary-copy"><span className="eyebrow">KEEP GOING</span><h2>每天 5 分鐘，慢慢變熟悉。</h2><p>完成一個小練習，就是很棒的進度。</p></div><span className="summary-doodle">✦</span></div>
-      <div className="practice-list"><div className="section-title-row"><div><span className="eyebrow">RECENT</span><h2>最近練習</h2></div><span className="list-count">1 個紀錄</span></div><button className="practice-row" type="button" onClick={() => setView("lesson")}><span className="practice-row-icon">01</span><span><strong>第一課・貓咪</strong><small>課文默寫 · 尚未完成聽寫</small></span><b>繼續 <span>→</span></b></button></div>
-      <div className="empty-reinforce"><span>☼</span><strong>目前沒有需要補強的題目</strong><small>完成聽寫後，家長標記需要補強的題目會出現在這裡。</small></div>
+    <section className="page-section practice-page">
+      <SectionHeading eyebrow="YOUR PRACTICE" title="練習紀錄" description="收藏的題目留在這台裝置，可以隨時重練。" />
+      {storageError && <p className="practice-storage-error" role="alert">這個瀏覽器目前無法儲存收藏；關閉頁面後，紀錄可能會消失。</p>}
+      {practiceNotice && <p className="practice-notice" role="status">{practiceNotice}</p>}
+      <div className="section-title-row"><h2>收藏題目</h2><span className="list-count">{practiceState.savedQuestions.length} 題</span></div>
+      {practiceState.savedQuestions.length ? <div className="saved-question-list">
+        {practiceState.savedQuestions.map(({ lessonIndex, questionIndex }) => (
+          <div className="saved-question" key={`${lessonIndex}-${questionIndex}`}>
+            <span className="saved-question-icon"><Headphones size={24} weight="duotone" aria-hidden="true" /></span>
+            <div className="saved-question-copy"><strong>第{["一", "二", "三"][lessonIndex]}課 · 第 {questionIndex + 1} 題</strong><small>{lessons[lessonIndex].title} · 聽寫</small></div>
+            <div className="saved-question-actions">
+              <button type="button" onClick={() => speak(exercises[lessonIndex].questions[questionIndex].audioText)} aria-label={`播放第${["一", "二", "三"][lessonIndex]}課第${questionIndex + 1}題`}><SpeakerHigh size={18} aria-hidden="true" /> 播放</button>
+              <button type="button" className="saved-start" onClick={() => openSavedQuestion(lessonIndex, questionIndex)}>重練這題</button>
+              <button type="button" className="saved-remove" onClick={() => removeQuestion(lessonIndex, questionIndex)}>取消收藏</button>
+            </div>
+          </div>
+        ))}
+      </div> : <div className="empty-reinforce"><span>☆</span><strong>目前沒有收藏題目</strong><small>聽寫時按「需要補強」會自動收藏，也可以在家長判定時手動收藏。</small></div>}
+      <div className="practice-summary"><div className="summary-score"><span>完成聽寫</span><strong>{practiceState.completedSessions}</strong><small>次</small></div><div className="summary-copy"><span className="eyebrow">KEEP GOING</span><h2>每天 5 分鐘，慢慢變熟悉。</h2><p>完成一個小練習，就是很棒的進度。</p></div><span className="summary-doodle">✦</span></div>
+      <div className="practice-list"><div className="section-title-row"><h2>最近練習</h2><span className="list-count">{practiceState.recentLesson === null ? "0 個紀錄" : "1 個紀錄"}</span></div>
+        {practiceState.recentLesson === null ? <p className="practice-no-recent">還沒有練習紀錄，先選一課開始吧。</p> : <button className="practice-row" type="button" onClick={() => openLesson(practiceState.recentLesson!)}><span className="practice-row-icon">{String(practiceState.recentLesson + 1).padStart(2, "0")}</span><span><strong>第{["一", "二", "三"][practiceState.recentLesson]}課・{lessons[practiceState.recentLesson].title}</strong><small>回到課程</small></span><b>繼續 <span>→</span></b></button>}
+      </div>
     </section>
   );
 
@@ -578,8 +687,8 @@ export default function Page() {
       <div className="result-celebration"><span className="result-spark">✦</span><div className="result-check">✓</div><span className="result-spark right">✦</span></div>
       <span className="eyebrow">PRACTICE COMPLETE</span><h1>練習完成！</h1><p className="result-intro">今天的第{lessonNumber}課，你已經往前走了一小步。</p>
       <div className="result-card"><div><span className="result-icon fill"><PencilLine size={22} weight="duotone" /></span><span><strong>課文默寫</strong><small>直式注音格 · {completedFillLessons.includes(selectedLesson) ? "已完成" : "尚未練習"}</small></span><b>{completedFillLessons.includes(selectedLesson) ? "✓" : "—"}</b></div><div><span className="result-icon listen"><Headphones size={22} weight="duotone" /></span><span><strong>聽寫</strong><small>{sessionScore.listeningCorrect} / {listeningQuestions.length} 題完成</small></span><b>✓</b></div></div>
-      <div className="result-note"><span>☼</span><p><strong>需要再練習：{sessionScore.needsReview} 題</strong><small>別急，補強就是學習的一部分。下次從「練習」繼續就好。</small></p></div>
-      <div className="result-actions"><button className="primary-button" type="button" onClick={openListening}>再練一次 <span>↻</span></button><button className="secondary-button" type="button" onClick={() => setView("lesson")}>回到課次</button></div>
+      <div className="result-note"><span>☼</span><p><strong>本次需要補強：{reviewedIndexes.length} 題</strong><small>{reviewedIndexes.length ? "需要補強的題目已加入「練習」，可以單題重練或取消收藏。" : "沒有需要補強的題目；手動收藏的題目也可以在「練習」重練。"}</small></p></div>
+      <div className="result-actions"><button className="primary-button" type="button" onClick={openListening}>再練一次 <span>↻</span></button><button className="secondary-button" type="button" onClick={() => setView("practice")}>查看收藏</button><button className="secondary-button" type="button" onClick={() => setView("lesson")}>回到課次</button></div>
     </section>
   );
 
@@ -587,15 +696,15 @@ export default function Page() {
     const choiceAnswers = [currentQuestion.answer, ...currentQuestion.distractors];
     return (
     <main className={`focus-shell phase-${listenPhase}`}>
-      <header className="focus-topbar"><button type="button" className="focus-exit" onClick={leaveFocus}>← <span>離開</span></button><div className="focus-question"><strong>第 {listenIndex + 1} 題 <em>/ {listeningQuestions.length}</em></strong></div><div className="focus-meta"><span className={secondsLeft <= 8 ? "urgent" : ""}><Timer size={14} weight="bold" /> {String(Math.floor(secondsLeft / 60)).padStart(2, "0")}:{String(secondsLeft % 60).padStart(2, "0")}</span><span><SpeakerHigh size={14} weight="bold" /> {playCount} 次</span></div></header>
+      <header className="focus-topbar"><button type="button" className="focus-exit" onClick={leaveFocus}>← <span>離開</span></button><div className="focus-question"><strong>第 {listenIndex + 1} 題 {!singleQuestionPractice && <em>/ {listeningQuestions.length}</em>}</strong></div><div className="focus-meta"><span className={secondsLeft <= 8 && (listenPhase === "active" || listenPhase === "retry") ? "urgent" : ""}><Timer size={14} weight="bold" /> {listenPhase === "retry_ready" ? "待重寫" : listenPhase === "review" || listenPhase === "choice" ? "已交卷" : `${String(Math.floor(secondsLeft / 60)).padStart(2, "0")}:${String(secondsLeft % 60).padStart(2, "0")}`}</span><span aria-label={`已播放 ${playCount} 次`}><SpeakerHigh size={14} weight="bold" /> {playCount} 次</span></div></header>
       <div className="focus-content">
         <p className="sr-only" aria-live="polite">{listenMessage}</p>
-        <div className={`canvas-zone ${listenPhase === "review" || listenPhase === "choice" ? "is-locked" : ""}`}><div className="canvas-paper"><canvas ref={canvasRef} onPointerDown={beginDrawing} onPointerMove={draw} onPointerUp={endDrawing} onPointerCancel={endDrawing} onPointerLeave={endDrawing} aria-label="田字格手寫區" />{listenPhase === "choice" && <div className="canvas-replay-overlay"><button type="button" className="canvas-replay-button" onClick={() => speak(currentQuestion.audioText)} aria-label="再播放一次題目"><Play size={30} weight="fill" aria-hidden="true" /></button><span>點一下，再聽一次</span></div>}</div><div className="canvas-toolbar"><span>田字格</span><button type="button" onClick={clearCanvas} disabled={listenPhase !== "active" && listenPhase !== "retry"}>清除</button></div></div>
+        <div className={`canvas-zone ${listenPhase === "review" || listenPhase === "choice" || listenPhase === "retry_ready" ? "is-locked" : ""}`}><div className="canvas-paper"><canvas ref={canvasRef} onPointerDown={beginDrawing} onPointerMove={draw} onPointerUp={endDrawing} onPointerCancel={endDrawing} onPointerLeave={endDrawing} aria-label="田字格手寫區" />{listenPhase === "choice" && <div className="canvas-replay-overlay"><button type="button" className="canvas-replay-button" onClick={replayQuestion} aria-label="再播放一次題目"><Play size={30} weight="fill" aria-hidden="true" /></button><span>點一下，再聽一次</span></div>}{listenPhase === "retry_ready" && <div className="canvas-replay-overlay retry-ready-overlay"><strong>答對了！再聽一次，重新寫。</strong><button type="button" onClick={startRetryWriting}><Play size={22} weight="fill" aria-hidden="true" /> 再聽一次並重寫</button></div>}</div><div className="canvas-toolbar"><span>田字格</span><button type="button" onClick={clearCanvas} disabled={listenPhase !== "active" && listenPhase !== "retry"}>清除</button></div></div>
         {listenPhase === "ready" && <button type="button" className="listen-start-button" onClick={startListening}><span className="play-circle"><Play size={17} weight="fill" /></span><span><strong>開始聽</strong><small>播放 2 次 · 作答 30 秒</small></span><b><ArrowRight size={19} /></b></button>}
         {listenPhase === "active" && <button type="button" className="early-submit-button" onClick={() => finishListening(true)}>提早交卷</button>}
-        {listenPhase === "review" && <div className="parent-review"><div className="answer-reveal"><span>正確答案</span><ZhuyinStack text={currentQuestion.answer} /></div><p>請家長依照孩子的手寫內容判定，不需要自動辨識。</p><div className="review-actions"><button type="button" className="review-correct" onClick={() => handleParentDecision("correct")}>✓ 答對</button><button type="button" className="review-retry" onClick={() => handleParentDecision("needs_review")}>↻ 需要補強</button></div></div>}
+        {listenPhase === "review" && <div className="parent-review"><div className="answer-reveal"><span>正確答案</span><ZhuyinStack text={currentQuestion.answer} /></div><p>{hasInk ? "請家長依照孩子的手寫內容判定。" : "還沒有手寫內容；可以先按「需要補強」再練一次。"}</p><div className="review-actions"><button type="button" className="review-correct" disabled={!hasInk} onClick={() => handleParentDecision("correct")}>✓ 答對</button><button type="button" className="review-retry" onClick={() => handleParentDecision("needs_review")}>↻ 需要補強</button></div><button type="button" className={`review-save ${currentQuestionSaved ? "is-saved" : ""}`} aria-pressed={currentQuestionSaved} onClick={toggleCurrentQuestionSaved}>{currentQuestionSaved ? "★ 已收藏 · 取消收藏" : "☆ 收藏這題，之後再練"}</button></div>}
         {listenPhase === "choice" && <div className="choice-panel"><div className="choice-options">{choiceAnswers.map((answer) => <button type="button" key={answer} onClick={() => selectRemediation(answer)}><ZhuyinStack text={answer} /></button>)}</div><p>{retryMessage || "選出你剛剛聽到的完整音節。"}</p></div>}
-        {listenPhase === "retry" && <button type="button" className="retry-submit" onClick={submitRetryWriting}>我寫好了，請家長看看 <span>→</span></button>}
+        {listenPhase === "retry" && <div className="retry-actions"><button type="button" className="retry-replay" onClick={replayQuestion}><SpeakerHigh size={18} aria-hidden="true" /> 再聽一次</button><button type="button" className="retry-submit" disabled={!hasInk} onClick={submitRetryWriting}>我寫好了，請家長看看 <span>→</span></button></div>}
       </div>
     </main>
     );
