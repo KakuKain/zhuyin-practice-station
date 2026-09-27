@@ -158,6 +158,7 @@ export default function Page() {
   const [isDrawing, setIsDrawing] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const cardDragRef = useRef<CardDrag | null>(null);
+  const dragEventsRef = useRef<{ move: (event: PointerEvent) => void; end: (event: PointerEvent) => void; cancel: () => void }>({ move: () => {}, end: () => {}, cancel: () => {} });
   const timerRef = useRef<number | null>(null);
   const timeoutRefs = useRef<number[]>([]);
 
@@ -371,7 +372,7 @@ export default function Page() {
     setHoveredSlot(null);
   };
 
-  const moveCardDrag = (event: React.PointerEvent<HTMLButtonElement>) => {
+  const moveCardDrag = (event: PointerEvent) => {
     const session = cardDragRef.current;
     if (!session || session.pointerId !== event.pointerId) return;
     if (Math.hypot(event.clientX - session.startX, event.clientY - session.startY) > 6) session.moved = true;
@@ -379,11 +380,10 @@ export default function Page() {
     setHoveredSlot(slotAtPointer(event.clientX, event.clientY));
   };
 
-  const endCardDrag = (event: React.PointerEvent<HTMLButtonElement>) => {
+  const endCardDrag = (event: PointerEvent) => {
     const session = cardDragRef.current;
     if (!session || session.pointerId !== event.pointerId) return;
     const slot = slotAtPointer(event.clientX, event.clientY);
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
     cardDragRef.current = null;
     setDragging(null);
     setDragPosition(null);
@@ -402,6 +402,29 @@ export default function Page() {
     setDragPosition(null);
     setHoveredSlot(null);
   };
+
+  useEffect(() => {
+    dragEventsRef.current = { move: moveCardDrag, end: endCardDrag, cancel: cancelCardDrag };
+  });
+
+  useEffect(() => {
+    if (view !== "fill") return;
+    // A captured pointer can be released over another cell (or lost by the
+    // browser). Listen at the window so the floating card always disappears.
+    const move = (event: PointerEvent) => dragEventsRef.current.move(event);
+    const end = (event: PointerEvent) => dragEventsRef.current.end(event);
+    const cancel = () => dragEventsRef.current.cancel();
+    window.addEventListener("pointermove", move, true);
+    window.addEventListener("pointerup", end, true);
+    window.addEventListener("pointercancel", cancel, true);
+    window.addEventListener("blur", cancel);
+    return () => {
+      window.removeEventListener("pointermove", move, true);
+      window.removeEventListener("pointerup", end, true);
+      window.removeEventListener("pointercancel", cancel, true);
+      window.removeEventListener("blur", cancel);
+    };
+  }, [view]);
 
   const fillComplete = blankIndexes.every((index) => fillAnswers[index]);
 
@@ -527,7 +550,7 @@ export default function Page() {
           })}
         </div>
       </div>
-      <div className="fill-options"><div className="options-heading"><div><span className="eyebrow">音節卡片</span><h2>拖曳完整音節</h2></div><small>支援觸控、滑鼠與 iPad</small></div><p className="feedback-line" aria-live="polite"><span className={fillMessage.startsWith("答對") ? "good" : ""}>{fillMessage}</span></p><div className="option-row">{fillOptions.map((option, index) => { const used = Object.values(fillAnswers).includes(option.zhuyin); return <button key={option.zhuyin} type="button" disabled={used} aria-pressed={selectedCard === index} className={`syllable-card ${dragging === index ? "is-dragging" : ""} ${selectedCard === index ? "is-selected" : ""} ${used ? "is-used" : ""}`} onPointerDown={(event) => beginCardDrag(event, index)} onPointerMove={moveCardDrag} onPointerUp={endCardDrag} onPointerCancel={cancelCardDrag} onClick={(event) => { if (event.detail === 0) setSelectedCard(index); }}><ZhuyinStack text={option.zhuyin} /><span>{option.character}</span></button>; })}</div></div>
+      <div className="fill-options"><div className="options-heading"><div><span className="eyebrow">音節卡片</span><h2>拖曳完整音節</h2></div><small>支援觸控、滑鼠與 iPad</small></div><p className="feedback-line" aria-live="polite"><span className={fillMessage.startsWith("答對") ? "good" : ""}>{fillMessage}</span></p><div className="option-row">{fillOptions.map((option, index) => { const used = Object.values(fillAnswers).includes(option.zhuyin); return <button key={option.zhuyin} type="button" draggable={false} disabled={used} aria-pressed={selectedCard === index} className={`syllable-card ${dragging === index ? "is-dragging" : ""} ${selectedCard === index ? "is-selected" : ""} ${used ? "is-used" : ""}`} onPointerDown={(event) => beginCardDrag(event, index)} onDragStart={(event) => event.preventDefault()} onClick={(event) => { if (event.detail === 0) setSelectedCard(index); }}><ZhuyinStack text={option.zhuyin} /><span>{option.character}</span></button>; })}</div></div>
       {dragging !== null && dragPosition && <div className="drag-preview" style={{ left: dragPosition.x, top: dragPosition.y }} aria-hidden="true"><ZhuyinStack text={fillOptions[dragging].zhuyin} /></div>}
       {fillComplete && <div className="completion-banner"><span>✓</span><p><strong>這一段完成了！</strong><small>接著進入聽寫，試試看把聲音寫下來。</small></p><button type="button" className="primary-button" onClick={openListening}>進入聽寫 <span>→</span></button></div>}
     </section>

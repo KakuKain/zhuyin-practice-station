@@ -44,6 +44,10 @@ test("the source keeps the handoff interaction vocabulary", async () => {
   assert.match(page, /提早交卷/);
   assert.match(page, /canvas-replay-overlay/);
   assert.match(page, /cell\.getBoundingClientRect\(\)/);
+  assert.match(page, /window\.addEventListener\("pointerup", end, true\)/);
+  assert.match(page, /window\.addEventListener\("pointercancel", cancel, true\)/);
+  assert.match(page, /window\.addEventListener\("blur", cancel\)/);
+  assert.match(page, /draggable=\{false\}/);
   assert.doesNotMatch(page, /document\.elementFromPoint/);
   assert.match(page, /再播放一次題目/);
   assert.match(page, /"貓咪弟弟", "跑第一"/);
