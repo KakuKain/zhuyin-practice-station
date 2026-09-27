@@ -102,3 +102,71 @@ body { background: #e7f2f9; }
 .course-grid .course-tile.featured .course-badge { position: absolute; top: 8px; right: 32px; }
 .syllable-row { grid-template-columns: repeat(7, minmax(0, 1fr)); overflow: visible; }
 .syllable-cell { min-width: 0; }
+
+@font-face {
+  font-family: "BpmfZihiOnly";
+  src: url("/fonts/BpmfZihiOnly-R.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+.zhuyin-stack, .logo-mark span {
+  font-family: "BpmfZihiOnly", "PingFang TC", sans-serif;
+  font-weight: 400;
+}
+.zhuyin-stack:not(.is-empty) {
+  position: relative;
+  display: block;
+  width: 1.65em;
+  min-width: 0;
+  line-height: 1;
+}
+.zhuyin-base {
+  display: block;
+  width: 1em;
+  text-orientation: upright;
+  white-space: nowrap;
+  writing-mode: vertical-rl;
+}
+.zhuyin-tone {
+  position: absolute;
+  left: 62%;
+  color: inherit;
+  font-family: "BpmfZihiOnly", "PingFang TC", sans-serif;
+  font-size: .68em;
+  line-height: 1;
+  transform: translateY(-.16em);
+}
+.zhuyin-tone.is-neutral { left: 24%; transform: translateY(-1.25em); }
+
+.syllable-cell.is-drop-hover {
+  border: 2px solid var(--ref-green);
+  background: #ddffe8;
+  box-shadow: 0 0 0 4px rgba(22, 166, 91, .19);
+  transform: scale(1.04);
+  transition: transform .12s ease, background .12s ease, box-shadow .12s ease;
+}
+
+.syllable-card.is-dragging { opacity: .35; transform: none; box-shadow: none; }
+.syllable-card, .syllable-cell, .drag-preview { user-select: none; -webkit-user-select: none; }
+.syllable-card.is-selected { border: 2px solid var(--ref-blue); background: #e8f3ff; }
+.syllable-card.is-used { opacity: .38; cursor: default; }
+.drag-preview {
+  position: fixed;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  width: 78px;
+  height: 102px;
+  border: 2px solid var(--ref-blue);
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 14px 28px rgba(16, 44, 90, .25);
+  pointer-events: none;
+  transform: translate(-50%, -55%) rotate(-4deg) scale(1.05);
+}
+.drag-preview .zhuyin-stack { color: var(--ref-navy); }
+@media (prefers-reduced-motion: reduce) {
+  .syllable-cell.is-drop-hover { transition: none; }
+}

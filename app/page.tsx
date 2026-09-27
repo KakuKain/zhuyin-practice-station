@@ -6,6 +6,7 @@ import { ArrowRight, BookOpenText, Gear, Headphones, Heart, House, Info, Lightbu
 type View = "home" | "courses" | "practice" | "more" | "lesson" | "fill" | "listen" | "result";
 type ListenPhase = "ready" | "active" | "review" | "choice" | "retry";
 type ParentResult = "correct" | "needs_review" | null;
+type CardDrag = { pointerId: number; optionIndex: number; startX: number; startY: number; moved: boolean };
 
 const lessonItems = [
   { character: "小", zhuyin: "ㄒㄧㄠˇ" },
@@ -24,16 +25,15 @@ const listeningQuestions = [
 ] as const;
 
 const blankIndexes = [1, 4, 6];
-const fillOptions = [lessonItems[5], lessonItems[1], lessonItems[6]];
-
-function splitZhuyin(text: string) {
-  return Array.from(text);
-}
+const fillOptions = [lessonItems[4], lessonItems[1], lessonItems[6]];
 
 function ZhuyinStack({ text, empty = false }: { text: string; empty?: boolean }) {
+  const tone = text.match(/[ˊˇˋ˙]$/)?.[0] ?? (text.startsWith("˙") ? "˙" : "");
+  const symbols = tone === "˙" && text.startsWith("˙") ? text.slice(1) : tone ? text.slice(0, -1) : text;
+  const lastSymbolTop = symbols.length > 0 ? `${((symbols.length - 1) / symbols.length) * 100}%` : "0%";
   return (
     <span className={`zhuyin-stack ${empty ? "is-empty" : ""}`} aria-label={empty ? "尚未填入音節" : text}>
-      {empty ? <span className="empty-mark">拖到這裡</span> : splitZhuyin(text).map((symbol, index) => <span key={`${symbol}-${index}`}>{symbol}</span>)}
+      {empty ? <span className="empty-mark">拖到這裡</span> : <><span className="zhuyin-base">{symbols}</span>{tone && <span className={`zhuyin-tone ${tone === "˙" ? "is-neutral" : ""}`} style={{ top: tone === "˙" ? "0%" : lastSymbolTop }} aria-hidden="true">{tone}</span>}</>}
     </span>
   );
 }
@@ -97,6 +97,8 @@ export default function Page() {
   const [fillAnswers, setFillAnswers] = useState<Record<number, string>>({});
   const [fillMessage, setFillMessage] = useState("把下方的完整音節，拖到對應的空格裡。每一格就是一個音節。\n");
   const [dragging, setDragging] = useState<number | null>(null);
+  const [dragPosition, setDragPosition] = useState<{ x: number; y: number } | null>(null);
+  const [hoveredSlot, setHoveredSlot] = useState<number | null>(null);
   const [selectedCard, setSelectedCard] = useState<number | null>(null);
   const [listenIndex, setListenIndex] = useState(0);
   const [listenPhase, setListenPhase] = useState<ListenPhase>("ready");
@@ -107,6 +109,7 @@ export default function Page() {
   const [sessionScore, setSessionScore] = useState({ listeningCorrect: 0, needsReview: 0 });
   const [isDrawing, setIsDrawing] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const cardDragRef = useRef<CardDrag | null>(null);
   const timerRef = useRef<number | null>(null);
   const timeoutRefs = useRef<number[]>([]);
 
@@ -249,8 +252,9 @@ export default function Page() {
   };
 
   const placeFillAnswer = (optionIndex: number, slotIndex: number) => {
-    if (fillAnswers[slotIndex]) return;
+    if (!blankIndexes.includes(slotIndex) || fillAnswers[slotIndex]) return;
     const option = fillOptions[optionIndex];
+    if (Object.values(fillAnswers).includes(option.zhuyin)) return;
     const expected = lessonItems[slotIndex];
     if (option.zhuyin !== expected.zhuyin) {
       setFillMessage("這張音節卡先回到原位，再看看空格裡需要哪一個音。 ");
@@ -263,6 +267,52 @@ export default function Page() {
     setFillMessage("答對了！完整音節會留在格子裡，不能再被拖走。 ");
     setSelectedCard(null);
     setDragging(null);
+  };
+
+  const slotAtPointer = (x: number, y: number) => {
+    const cell = document.elementFromPoint(x, y)?.closest<HTMLElement>("[data-syllable-slot]");
+    if (!cell) return null;
+    const index = Number(cell.dataset.syllableSlot);
+    return blankIndexes.includes(index) && !fillAnswers[index] ? index : null;
+  };
+
+  const beginCardDrag = (event: React.PointerEvent<HTMLButtonElement>, optionIndex: number) => {
+    if (Object.values(fillAnswers).includes(fillOptions[optionIndex].zhuyin)) return;
+    event.preventDefault();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    cardDragRef.current = { pointerId: event.pointerId, optionIndex, startX: event.clientX, startY: event.clientY, moved: false };
+    setDragging(optionIndex);
+    setDragPosition({ x: event.clientX, y: event.clientY });
+    setHoveredSlot(null);
+  };
+
+  const moveCardDrag = (event: React.PointerEvent<HTMLButtonElement>) => {
+    const session = cardDragRef.current;
+    if (!session || session.pointerId !== event.pointerId) return;
+    if (Math.hypot(event.clientX - session.startX, event.clientY - session.startY) > 6) session.moved = true;
+    setDragPosition({ x: event.clientX, y: event.clientY });
+    setHoveredSlot(slotAtPointer(event.clientX, event.clientY));
+  };
+
+  const endCardDrag = (event: React.PointerEvent<HTMLButtonElement>) => {
+    const session = cardDragRef.current;
+    if (!session || session.pointerId !== event.pointerId) return;
+    const slot = slotAtPointer(event.clientX, event.clientY);
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+    cardDragRef.current = null;
+    setDragging(null);
+    setDragPosition(null);
+    setHoveredSlot(null);
+    if (slot !== null) placeFillAnswer(session.optionIndex, slot);
+    else if (!session.moved) setSelectedCard(session.optionIndex);
+    else setSelectedCard(null);
+  };
+
+  const cancelCardDrag = () => {
+    cardDragRef.current = null;
+    setDragging(null);
+    setDragPosition(null);
+    setHoveredSlot(null);
   };
 
   const fillComplete = blankIndexes.every((index) => fillAnswers[index]);
@@ -318,7 +368,10 @@ export default function Page() {
             <span className="quiet-note"><Sparkle size={14} weight="fill" /> 適合 iPad 手寫</span>
           </div>
         </div>
-        <div className="hero-illustration">{/* eslint-disable-next-line @next/next/no-img-element */}<img src="/zhuyin-children-hero.jpg" alt="兩位孩子一起練習注音" /></div>
+        <div className="hero-illustration">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/zhuyin-children-hero.jpg" alt="兩位孩子一起練習注音" />
+        </div>
       </section>
 
       <section className="home-stats" aria-label="練習摘要">
@@ -374,11 +427,12 @@ export default function Page() {
       <div className="zhuyin-sheet">
         <div className="sheet-top"><span>第一課</span><small>一個空格 = 一個完整音節</small></div>
         <div className="syllable-row">
-          {lessonItems.map((item, index) => <div className={`syllable-cell ${blankIndexes.includes(index) ? "is-target" : ""} ${fillAnswers[index] ? "is-filled" : ""}`} key={item.character} onPointerUp={() => dragging !== null && placeFillAnswer(dragging, index)} onClick={() => selectedCard !== null && placeFillAnswer(selectedCard, index)}>{fillAnswers[index] ? <><span className="filled-check">✓</span><ZhuyinStack text={fillAnswers[index]} /></> : blankIndexes.includes(index) ? <ZhuyinStack text="" empty /> : <ZhuyinStack text={item.zhuyin} />}<small className="cell-position">{index + 1}</small></div>)}
+          {lessonItems.map((item, index) => <div className={`syllable-cell ${blankIndexes.includes(index) ? "is-target" : ""} ${fillAnswers[index] ? "is-filled" : ""} ${hoveredSlot === index ? "is-drop-hover" : ""}`} key={item.character} data-syllable-slot={index} role={blankIndexes.includes(index) && !fillAnswers[index] ? "button" : undefined} tabIndex={blankIndexes.includes(index) && !fillAnswers[index] ? 0 : undefined} aria-label={blankIndexes.includes(index) && !fillAnswers[index] ? `第 ${index + 1} 格，放入音節` : undefined} onClick={() => selectedCard !== null && placeFillAnswer(selectedCard, index)} onKeyDown={(event) => { if (selectedCard !== null && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); placeFillAnswer(selectedCard, index); } }}>{fillAnswers[index] ? <><span className="filled-check">✓</span><ZhuyinStack text={fillAnswers[index]} /></> : blankIndexes.includes(index) ? <ZhuyinStack text="" empty /> : <ZhuyinStack text={item.zhuyin} />}<small className="cell-position">{index + 1}</small></div>)}
         </div>
         <div className="sheet-hint"><span>讀法提示</span><strong>ㄒㄧㄠˇ　ㄇㄧㄥˊ　ㄕˋ　ㄍㄜˋ　ㄏㄠˇ　ㄒㄩㄝˊ　ㄕㄥ</strong></div>
       </div>
-      <div className="fill-options"><div className="options-heading"><div><span className="eyebrow">音節卡片</span><h2>拖曳完整音節</h2></div><small>支援觸控、滑鼠與 iPad</small></div><div className="option-row">{fillOptions.map((option, index) => <button key={option.zhuyin} type="button" className={`syllable-card ${dragging === index || selectedCard === index ? "is-dragging" : ""}`} onPointerDown={() => setDragging(index)} onPointerUp={() => { setSelectedCard(index); setDragging(null); }} onClick={() => setSelectedCard(index)}><ZhuyinStack text={option.zhuyin} /><span>{option.character}</span></button>)}</div><p className="feedback-line" aria-live="polite"><span className={fillMessage.startsWith("答對") ? "good" : ""}>{fillMessage}</span></p></div>
+      <div className="fill-options"><div className="options-heading"><div><span className="eyebrow">音節卡片</span><h2>拖曳完整音節</h2></div><small>支援觸控、滑鼠與 iPad</small></div><div className="option-row">{fillOptions.map((option, index) => { const used = Object.values(fillAnswers).includes(option.zhuyin); return <button key={option.zhuyin} type="button" disabled={used} aria-pressed={selectedCard === index} className={`syllable-card ${dragging === index ? "is-dragging" : ""} ${selectedCard === index ? "is-selected" : ""} ${used ? "is-used" : ""}`} onPointerDown={(event) => beginCardDrag(event, index)} onPointerMove={moveCardDrag} onPointerUp={endCardDrag} onPointerCancel={cancelCardDrag} onClick={(event) => { if (event.detail === 0) setSelectedCard(index); }}><ZhuyinStack text={option.zhuyin} /><span>{option.character}</span></button>; })}</div><p className="feedback-line" aria-live="polite"><span className={fillMessage.startsWith("答對") ? "good" : ""}>{fillMessage}</span></p></div>
+      {dragging !== null && dragPosition && <div className="drag-preview" style={{ left: dragPosition.x, top: dragPosition.y }} aria-hidden="true"><ZhuyinStack text={fillOptions[dragging].zhuyin} /></div>}
       {fillComplete && <div className="completion-banner"><span>✓</span><p><strong>這一段完成了！</strong><small>接著進入聽寫，試試看把聲音寫下來。</small></p><button type="button" className="primary-button" onClick={openListening}>進入聽寫 <span>→</span></button></div>}
     </section>
   );
