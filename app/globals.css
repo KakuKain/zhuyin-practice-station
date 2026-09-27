@@ -353,6 +353,7 @@ body { background: #e7f2f9; }
 .lesson-symbols { direction: rtl; justify-content: flex-start; }
 .app-header.has-back { gap: 10px; }
 .app-header.has-back .brand-button { margin-left: auto; }
-.header-back { min-height: 44px; padding: 0 4px; border: 0; background: transparent; color: var(--ref-navy); font-size: 13px; font-weight: 800; white-space: nowrap; }
+.header-back { display: inline-flex; min-height: 38px; align-items: center; gap: 5px; padding: 0 9px; border: 1px solid #c9e3f5; border-radius: 9px; background: #f0f8ff; color: var(--ref-navy); font-size: 13px; font-weight: 800; white-space: nowrap; }
+.header-back svg { color: var(--ref-blue); }
 .header-back:focus-visible { outline: 3px solid var(--ref-blue); outline-offset: 2px; border-radius: 5px; }
 .lesson-page .lesson-heading { margin-top: 10px; }

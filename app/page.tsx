@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowRight, BookOpenText, Gear, Headphones, Heart, House, Info, Lightbulb, MusicNotes, Notebook, PencilLine, Play, Question, SpeakerHigh, Sparkle, Sun, Timer, Tree } from "@phosphor-icons/react";
+import { ArrowLeft, ArrowRight, BookOpenText, Gear, Headphones, Heart, House, Info, Lightbulb, MusicNotes, Notebook, PencilLine, Play, Question, SpeakerHigh, Sparkle, Sun, Timer, Tree } from "@phosphor-icons/react";
 
 type View = "home" | "courses" | "practice" | "more" | "lesson" | "fill" | "listen" | "result";
 type ListenPhase = "ready" | "active" | "review" | "choice" | "retry";
@@ -65,7 +65,7 @@ function Logo() {
 function AppHeader({ onHome, onBackToCourses }: { onHome: () => void; onBackToCourses?: () => void }) {
   return (
     <header className={`app-header ${onBackToCourses ? "has-back" : ""}`}>
-      {onBackToCourses && <button className="header-back" type="button" onClick={onBackToCourses}>← 回到課程</button>}
+      {onBackToCourses && <button className="header-back" type="button" onClick={onBackToCourses}><ArrowLeft size={18} weight="bold" aria-hidden="true" /><span>回到課程</span></button>}
       <button className="brand-button" type="button" onClick={onHome} aria-label="回到首頁">
         <Logo />
         <span>
