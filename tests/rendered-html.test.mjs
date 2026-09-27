@@ -76,14 +76,33 @@ test("the source keeps the handoff interaction vocabulary", async () => {
   assert.doesNotMatch(page, /className="focus-intro"/);
 });
 
-test("lesson three has its own complete practice data while lesson two stays preview-only", async () => {
+test("all three lessons have three listening sections with four writing units each", async () => {
   const page = await (await import("node:fs/promises")).readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const css = await (await import("node:fs/promises")).readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+  assert.match(page, /const secondLessonLines = \[/);
   assert.match(page, /const thirdLessonLines = \[/);
+  assert.match(page, /character: "寶", zhuyin: "˙ㄅㄠ"/);
   assert.match(page, /character: "築", zhuyin: "ㄓㄨˊ"/);
   assert.match(page, /character: "著", zhuyin: "˙ㄓㄜ"/);
+  assert.match(page, /1: \{ lines: secondLessonLines, questions: secondListeningQuestions \}/);
   assert.match(page, /2: \{ lines: thirdLessonLines, questions: thirdListeningQuestions \}/);
-  assert.doesNotMatch(page, /1: \{ lines:/);
   assert.match(page, /const exercise = exercises\[selectedLesson\]/);
   assert.match(page, /const listeningQuestions = exercise\.questions/);
   assert.match(page, /第三課", lessons\[2\]\.title, "默寫 · 聽寫"/);
+  for (const lesson of ["first", "second", "third"]) {
+    const questions = page.match(new RegExp(`const ${lesson}ListeningQuestions = \\[([\\s\\S]*?)\\] as const;`))?.[1];
+    assert.ok(questions, `${lesson} listening questions exist`);
+    assert.equal((questions.match(/category: "symbols"/g) ?? []).length, 4);
+    assert.equal((questions.match(/category: "characters"/g) ?? []).length, 4);
+    assert.equal((questions.match(/category: "words"/g) ?? []).length, 2);
+    assert.equal((questions.match(/category: "words", answer: "[^"]+\|[^"]+"/g) ?? []).length, 2);
+  }
+  assert.match(page, /第一大題 · 注音符號/);
+  assert.match(page, /第二大題 · 生字/);
+  assert.match(page, /第三大題 · 語詞/);
+  assert.match(page, /word-grid-guide/);
+  assert.match(css, /\.canvas-zone\.is-word \.canvas-paper/);
+  assert.match(page, /legacySavedQuestionIndexes/);
+  assert.match(page, /listeningCorrect: current\.listeningCorrect \+ currentQuestion\.answer\.split\("\|"\)\.length/);
+  assert.match(page, /三大題 · \{sessionScore\.listeningCorrect\} \/ 12 格完成/);
 });
