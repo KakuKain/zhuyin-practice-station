@@ -325,7 +325,7 @@ body { background: #e7f2f9; }
 .lesson-page .mode-card {
   display: flex;
   min-width: 0;
-  min-height: 104px;
+  min-height: 128px;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -335,11 +335,12 @@ body { background: #e7f2f9; }
 }
 .lesson-page .fill-mode { background: #eff8ff; border-color: #a7d9f7; }
 .lesson-page .listen-mode { background: #effbf2; border-color: #b9dda9; }
+.lesson-page .mode-card .mode-icon { flex: none; width: 43px; height: 43px; }
 .lesson-page .mode-card small { color: var(--ref-blue); font-size: 14px; font-weight: 800; }
 .lesson-page .listen-mode small { color: var(--ref-green); }
 .lesson-page .mode-card strong { color: var(--ref-navy); font-size: clamp(18px, 5vw, 22px); line-height: 1.2; white-space: nowrap; }
 .lesson-page .mode-card:focus-visible { outline: 3px solid var(--ref-blue); outline-offset: 3px; }
-.lesson-text-lines { align-items: flex-start; }
+.lesson-text-lines { min-height: 160px; align-items: flex-start; }
 .lesson-text-line {
   direction: ltr;
   font-family: "BpmfZihiSans", "PingFang TC", sans-serif;

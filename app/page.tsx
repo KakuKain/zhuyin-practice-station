@@ -433,8 +433,8 @@ export default function Page() {
       <button className="back-link" type="button" onClick={() => setView("courses")}>← 回到課程</button>
       <div className="lesson-heading"><div><span className="eyebrow">LESSON {String(selectedLesson + 1).padStart(2, "0")}</span><h1>{lesson.title}</h1></div><span className="lesson-stamp">{selectedLesson === 0 ? <>先看<br />再寫</> : <>先讀<br />課文</>}</span></div>
       {selectedLesson === 0 && <div className="mode-grid">
-        <button className="mode-card fill-mode" type="button" onClick={() => setView("fill")}><small>第一關</small><strong>課文默寫</strong></button>
-        <button className="mode-card listen-mode" type="button" onClick={openListening}><small>第二關</small><strong>聽寫</strong></button>
+        <button className="mode-card fill-mode" type="button" onClick={() => setView("fill")}><span className="mode-icon" aria-hidden="true"><PencilLine size={26} weight="duotone" /></span><small>第一關</small><strong>課文默寫</strong></button>
+        <button className="mode-card listen-mode" type="button" onClick={openListening}><span className="mode-icon" aria-hidden="true"><Headphones size={26} weight="duotone" /></span><small>第二關</small><strong>聽寫</strong></button>
       </div>}
       <div className="lesson-curriculum">
         <div className="lesson-curriculum-heading"><strong>課文</strong><span>從右到左讀</span></div>
