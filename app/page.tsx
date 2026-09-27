@@ -9,7 +9,6 @@ type ParentResult = "correct" | "needs_review" | null;
 type CardDrag = { pointerId: number; optionIndex: number; startX: number; startY: number; moved: boolean };
 
 const lessonLines = [
-  [{ character: "貓", zhuyin: "ㄇㄠ" }, { character: "咪", zhuyin: "ㄇㄧ" }],
   [{ character: "咪", zhuyin: "ㄇㄧ" }, { character: "咪", zhuyin: "ㄇㄧ" }, { character: "咪", zhuyin: "ㄇㄧ" }],
   [{ character: "咪", zhuyin: "ㄇㄧ" }, { character: "咪", zhuyin: "ㄇㄧ" }, { character: "咪", zhuyin: "ㄇㄧ" }],
   [{ character: "逼", zhuyin: "ㄅㄧ" }],
@@ -23,8 +22,8 @@ const listeningQuestions = [
   { answer: "ㄆㄠˇ", audioText: "跑", distractors: ["ㄆㄠˊ", "ㄆㄠˋ"] },
 ] as const;
 
-const blankIndexes = [0, 8, 13];
-const fillOptions = [lessonItems[13], lessonItems[0], lessonItems[8]];
+const blankIndexes = [6, 7, 11];
+const fillOptions = [lessonItems[11], lessonItems[7], lessonItems[6]];
 
 // This font draws the complete vertical syllable (including its tone) from a
 // representative Han character. Rendering individual Bopomofo characters would
@@ -431,10 +430,8 @@ export default function Page() {
   const renderFillBlank = () => (
     <section className={`page-section fill-page ${fillComplete ? "is-complete" : ""}`}>
       <button className="back-link" type="button" onClick={() => setView("lesson")}>← 回到第一課</button>
-      <div className="practice-title"><div><span className="eyebrow">第一關 · 課文默寫</span><h1>把音節放回課文裡</h1><p>從右上角開始，先往下讀，再往左讀下一行；把下方卡片拖進空格。</p></div><span className="step-pill">1 / 2</span></div>
-      <div className="fill-progress"><span className="progress-label">完成度</span><span className="progress-track"><i style={{ width: `${(Object.keys(fillAnswers).length / blankIndexes.length) * 100}%` }} /></span><strong>{Object.keys(fillAnswers).length} / {blankIndexes.length}</strong></div>
       <div className="zhuyin-sheet">
-        <div className="sheet-top"><span>第一課・貓咪</span><small>右 → 左，每格一個完整音節</small></div>
+        <div className="sheet-top"><h1>貓咪</h1><small>第一課 · 由右往左讀</small></div>
         <div className="syllable-row" dir="rtl" aria-label="課文直排注音，從右向左閱讀">
           {lessonLines.map((line, lineIndex) => {
             const lineStart = lessonLines.slice(0, lineIndex).reduce((count, previous) => count + previous.length, 0);

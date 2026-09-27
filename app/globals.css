@@ -102,7 +102,7 @@ body { background: #e7f2f9; }
 .course-grid .course-tile.featured .course-badge { position: absolute; top: 8px; right: 32px; }
 .syllable-row {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   align-items: start;
   direction: rtl;
   overflow: visible;
@@ -112,6 +112,8 @@ body { background: #e7f2f9; }
 .syllable-cell .zhuyin-stack { font-size: 17px; }
 .syllable-cell .zhuyin-stack.is-empty { width: calc(100% - 6px); min-width: 0; min-height: 60px; height: 60px; }
 .syllable-cell .cell-position { display: none; }
+.fill-page .back-link { display: inline-block; margin-bottom: 14px; }
+.fill-page .sheet-top h1 { margin: 0; color: var(--ref-navy); font-size: 22px; line-height: 1.2; }
 .fill-page { padding-bottom: 220px; }
 .fill-page .fill-options {
   position: fixed;

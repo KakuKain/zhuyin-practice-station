@@ -35,4 +35,5 @@ test("the source keeps the handoff interaction vocabulary", async () => {
   assert.match(page, /ㄧ/);
   assert.match(page, /dir="rtl"/);
   assert.match(page, /貓咪弟弟跑第一|character: "跑"/);
+  assert.doesNotMatch(page, /className="practice-title"|className="fill-progress"/);
 });
