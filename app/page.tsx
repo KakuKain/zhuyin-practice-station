@@ -9,14 +9,16 @@ type ParentResult = "correct" | "needs_review" | null;
 type PreviewMode = "annotated" | "zhuyin";
 type SyllableItem = { character: string; zhuyin: string };
 type ListenCategory = "symbols" | "characters" | "words";
-type ListeningQuestion = { category: ListenCategory; answer: string; audioText: string; distractors: readonly string[] };
-type LessonExercise = { lines: readonly (readonly SyllableItem[])[]; questions: readonly ListeningQuestion[] };
+type ListeningSeed = { category: ListenCategory; answer: string; audioText: string; distractors: readonly string[] };
+type ListeningQuestion = ListeningSeed & { id: string; choices: readonly string[] };
+type LessonExercise = { lines: readonly (readonly SyllableItem[])[]; questions: readonly ListeningSeed[] };
 type InkPoint = { x: number; y: number };
 type InkStroke = InkPoint[];
-type SavedQuestion = { lessonIndex: number; questionIndex: number };
+type SavedQuestion = { lessonIndex: number; questionId: string };
 type PracticeState = { savedQuestions: SavedQuestion[]; recentLesson: number | null; completedSessions: number };
-const practiceStorageKey = "zhuyin-practice-state-v2";
-const previousPracticeStorageKey = "zhuyin-practice-state-v1";
+const practiceStorageKey = "zhuyin-practice-state-v3";
+const previousPracticeStorageKey = "zhuyin-practice-state-v2";
+const firstPracticeStorageKey = "zhuyin-practice-state-v1";
 
 const lessons = [
   { title: "貓咪", lines: ["咪咪咪", "咪咪咪", "逼", "貓咪弟弟", "跑第一"], symbols: ["ㄅ", "ㄆ", "ㄇ", "ㄉ", "ㄧ", "ㄠ"] },
@@ -95,6 +97,67 @@ const exercises: Record<number, LessonExercise> = {
   1: { lines: secondLessonLines, questions: secondListeningQuestions },
   2: { lines: thirdLessonLines, questions: thirdListeningQuestions },
 };
+
+const extraWordQuestions: Record<number, readonly ListeningSeed[]> = {
+  0: [{ category: "words", answer: "ㄉㄧˋ|ㄧ", audioText: "第一", distractors: ["ㄉㄧˋ|ㄇㄧ", "ㄆㄠˇ|ㄧ"] }],
+  1: [{ category: "words", answer: "ㄉㄜˊ|ㄧˋ", audioText: "得意", distractors: ["ㄉㄜˊ|ㄜˊ", "ㄈㄨ|ㄧˋ"] }],
+  2: [
+    { category: "words", answer: "ㄆㄠˋ|ㄗㄠˇ", audioText: "泡澡", distractors: ["ㄆㄠˊ|ㄗㄠˇ", "ㄆㄠˋ|ㄗㄠˋ"] },
+    { category: "words", answer: "ㄅㄢˋ|ㄌㄨˋ", audioText: "半路", distractors: ["ㄅㄢˋ|ㄌㄧˊ", "ㄏㄜˊ|ㄌㄨˋ"] },
+    { category: "words", answer: "ㄩˋ|ㄉㄠˋ", audioText: "遇到", distractors: ["ㄩˋ|ㄗㄠˇ", "ㄑㄩˋ|ㄉㄠˋ"] },
+    { category: "words", answer: "ㄓㄨˊ|ㄔㄠˊ", audioText: "築巢", distractors: ["ㄓㄨˊ|ㄗㄠˇ", "ㄔㄠˊ|ㄓㄨˊ"] },
+  ],
+};
+
+function shuffleItems<T>(items: readonly T[]): T[] {
+  const shuffled = [...items];
+  for (let index = shuffled.length - 1; index > 0; index--) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+  }
+  return shuffled;
+}
+
+function questionId(question: ListeningSeed): string {
+  return `${question.category}:${question.audioText}`;
+}
+
+function questionSeedsForLesson(lessonIndex: number): Record<ListenCategory, ListeningSeed[]> {
+  const lesson = lessons[lessonIndex] ?? lessons[0];
+  const exercise = exercises[lessonIndex] ?? exercises[0];
+  const symbols: ListeningSeed[] = lesson.symbols.map((symbol) => ({
+    category: "symbols", answer: symbol, audioText: symbol,
+    distractors: lesson.symbols.filter((other) => other !== symbol).slice(0, 2),
+  }));
+  const uniqueCharacters = [...new Map(exercise.lines.flat().map((item) => [item.character, item])).values()];
+  const uniqueSounds = [...new Set(uniqueCharacters.map((item) => item.zhuyin))];
+  const characters: ListeningSeed[] = uniqueCharacters.map((item) => ({
+    category: "characters", answer: item.zhuyin, audioText: item.character,
+    distractors: uniqueSounds.filter((sound) => sound !== item.zhuyin).slice(0, 2),
+  }));
+  const words = [...exercise.questions.filter((question) => question.category === "words"), ...(extraWordQuestions[lessonIndex] ?? [])];
+  return { symbols, characters, words };
+}
+
+function makeQuestion(seed: ListeningSeed): ListeningQuestion {
+  return { ...seed, id: questionId(seed), choices: shuffleItems([seed.answer, ...seed.distractors]) };
+}
+
+function buildListeningSession(lessonIndex: number): ListeningQuestion[] {
+  const pools = questionSeedsForLesson(lessonIndex);
+  return [
+    ...shuffleItems(pools.symbols).slice(0, 4),
+    ...shuffleItems(pools.characters).slice(0, 4),
+    ...shuffleItems(pools.words).slice(0, 2),
+  ].map(makeQuestion);
+}
+
+function findQuestionSeed(lessonIndex: number, id: string): ListeningSeed | undefined {
+  const pools = questionSeedsForLesson(lessonIndex);
+  return [...pools.symbols, ...pools.characters, ...pools.words].find((question) => questionId(question) === id);
+}
+
+const fallbackListeningQuestion: ListeningQuestion = { ...firstListeningQuestions[0], id: "symbols:ㄅ", choices: ["ㄅ", "ㄆ", "ㄇ"] };
 
 // This font draws the complete vertical syllable (including its tone) from a
 // representative Han character. Rendering individual Bopomofo characters would
@@ -202,6 +265,7 @@ export default function Page() {
   const [fillHasInk, setFillHasInk] = useState(false);
   const [fillIsDirty, setFillIsDirty] = useState(false);
   const [listenIndex, setListenIndex] = useState(0);
+  const [sessionQuestions, setSessionQuestions] = useState<ListeningQuestion[]>([]);
   const [listenPhase, setListenPhase] = useState<ListenPhase>("ready");
   const [secondsLeft, setSecondsLeft] = useState(30);
   const [playCount, setPlayCount] = useState(0);
@@ -231,27 +295,35 @@ export default function Page() {
   const fillLineStarts = lessonLines.map((_, lineIndex) => lessonLines.slice(0, lineIndex).reduce((count, line) => count + line.length, 0));
   const writtenCount = lessonItems.filter((_, index) => fillStrokes[index]?.length).length;
   const fillComplete = writtenCount === lessonItems.length;
-  const listeningQuestions = exercise.questions;
-  const currentQuestion = listeningQuestions[listenIndex] ?? listeningQuestions[0];
+  const listeningQuestions = sessionQuestions;
+  const currentQuestion = listeningQuestions[listenIndex] ?? fallbackListeningQuestion;
   const isWordQuestion = currentQuestion.category === "words";
   const sectionQuestionIndex = listenIndex - (currentQuestion.category === "symbols" ? 0 : currentQuestion.category === "characters" ? 4 : 8);
-  const sectionProgress = isWordQuestion ? `第 ${sectionQuestionIndex * 2 + 1}–${sectionQuestionIndex * 2 + 2} 格 / 4` : `第 ${sectionQuestionIndex + 1} 小題 / 4`;
+  const sectionProgress = singleQuestionPractice ? "收藏題目重練" : isWordQuestion ? `第 ${sectionQuestionIndex * 2 + 1}–${sectionQuestionIndex * 2 + 2} 格 / 4` : `第 ${sectionQuestionIndex + 1} 小題 / 4`;
   const isFocusMode = view === "listen";
   const lesson = lessons[selectedLesson];
   const lessonNumber = ["一", "二", "三"][selectedLesson];
-  const currentQuestionSaved = practiceState.savedQuestions.some((item) => item.lessonIndex === selectedLesson && item.questionIndex === listenIndex);
+  const currentQuestionSaved = practiceState.savedQuestions.some((item) => item.lessonIndex === selectedLesson && item.questionId === currentQuestion.id);
 
   useEffect(() => {
     try {
-      const saved = window.localStorage.getItem(practiceStorageKey);
-      const isLegacy = !saved;
-      const stored = saved ?? window.localStorage.getItem(previousPracticeStorageKey);
+      const current = window.localStorage.getItem(practiceStorageKey);
+      const previous = current ? null : window.localStorage.getItem(previousPracticeStorageKey);
+      const stored = current ?? previous ?? window.localStorage.getItem(firstPracticeStorageKey);
       if (stored) {
-        const parsed: Partial<PracticeState> = JSON.parse(stored);
+        const parsed: { savedQuestions?: Array<{ lessonIndex?: number; questionId?: string; questionIndex?: number }>; recentLesson?: number | null; completedSessions?: number } = JSON.parse(stored);
+        const savedQuestions = (Array.isArray(parsed.savedQuestions) ? parsed.savedQuestions : []).flatMap((item): SavedQuestion[] => {
+          if (typeof item?.lessonIndex !== "number" || !lessons[item.lessonIndex]) return [];
+          let id = item.questionId;
+          if (!current) {
+            const legacyIndex = typeof item.questionIndex === "number" ? (previous ? item.questionIndex : legacySavedQuestionIndexes[item.lessonIndex]?.[item.questionIndex]) : undefined;
+            const legacyQuestion = legacyIndex === undefined ? undefined : exercises[item.lessonIndex]?.questions[legacyIndex];
+            id = legacyQuestion ? questionId(legacyQuestion) : undefined;
+          }
+          return typeof id === "string" && findQuestionSeed(item.lessonIndex, id) ? [{ lessonIndex: item.lessonIndex, questionId: id }] : [];
+        });
         setPracticeState({
-          savedQuestions: Array.isArray(parsed.savedQuestions) ? parsed.savedQuestions.map((item) => isLegacy ? { ...item, questionIndex: legacySavedQuestionIndexes[item.lessonIndex]?.[item.questionIndex] ?? -1 } : item).filter((item): item is SavedQuestion =>
-            typeof item?.lessonIndex === "number" && typeof item?.questionIndex === "number" &&
-            Boolean(exercises[item.lessonIndex]?.questions[item.questionIndex])) : [],
+          savedQuestions: savedQuestions.filter((item, index) => savedQuestions.findIndex((other) => other.lessonIndex === item.lessonIndex && other.questionId === item.questionId) === index),
           recentLesson: typeof parsed.recentLesson === "number" && lessons[parsed.recentLesson] ? parsed.recentLesson : null,
           completedSessions: typeof parsed.completedSessions === "number" && Number.isFinite(parsed.completedSessions) ? Math.max(0, parsed.completedSessions) : 0,
         });
@@ -265,20 +337,20 @@ export default function Page() {
     try { window.localStorage.setItem(practiceStorageKey, JSON.stringify(practiceState)); } catch { setStorageError(true); }
   }, [practiceLoaded, practiceState]);
 
-  const saveQuestion = (lessonIndex: number, questionIndex: number) => {
-    setPracticeState((current) => current.savedQuestions.some((item) => item.lessonIndex === lessonIndex && item.questionIndex === questionIndex)
+  const saveQuestion = (lessonIndex: number, id: string) => {
+    setPracticeState((current) => current.savedQuestions.some((item) => item.lessonIndex === lessonIndex && item.questionId === id)
       ? current
-      : { ...current, savedQuestions: [...current.savedQuestions, { lessonIndex, questionIndex }] });
+      : { ...current, savedQuestions: [...current.savedQuestions, { lessonIndex, questionId: id }] });
   };
 
-  const removeQuestion = (lessonIndex: number, questionIndex: number) => {
-    setPracticeState((current) => ({ ...current, savedQuestions: current.savedQuestions.filter((item) => item.lessonIndex !== lessonIndex || item.questionIndex !== questionIndex) }));
+  const removeQuestion = (lessonIndex: number, id: string) => {
+    setPracticeState((current) => ({ ...current, savedQuestions: current.savedQuestions.filter((item) => item.lessonIndex !== lessonIndex || item.questionId !== id) }));
     setPracticeNotice("已取消收藏，這題不會再顯示在練習頁。 ");
   };
 
   const toggleCurrentQuestionSaved = () => {
-    if (currentQuestionSaved) removeQuestion(selectedLesson, listenIndex);
-    else saveQuestion(selectedLesson, listenIndex);
+    if (currentQuestionSaved) removeQuestion(selectedLesson, currentQuestion.id);
+    else saveQuestion(selectedLesson, currentQuestion.id);
   };
 
   const openLesson = (index: number) => {
@@ -319,6 +391,7 @@ export default function Page() {
   };
 
   const openListening = () => {
+    setSessionQuestions(buildListeningSession(selectedLesson));
     resetListeningQuestion(0);
     setSessionScore({ listeningCorrect: 0 });
     setReviewedIndexes([]);
@@ -326,11 +399,14 @@ export default function Page() {
     setView("listen");
   };
 
-  const openSavedQuestion = (lessonIndex: number, questionIndex: number) => {
+  const openSavedQuestion = (lessonIndex: number, id: string) => {
+    const seed = findQuestionSeed(lessonIndex, id);
+    if (!seed) return;
     setSelectedLesson(lessonIndex);
+    setSessionQuestions([makeQuestion(seed)]);
     setSingleQuestionPractice(true);
     setPracticeNotice("");
-    resetListeningQuestion(questionIndex);
+    resetListeningQuestion(0);
     setView("listen");
   };
 
@@ -602,7 +678,7 @@ export default function Page() {
       }
     } else {
       setReviewedIndexes((current) => current.includes(listenIndex) ? current : [...current, listenIndex]);
-      saveQuestion(selectedLesson, listenIndex);
+      saveQuestion(selectedLesson, currentQuestion.id);
       setListenPhase("choice");
       setListenMessage("沒關係，先用三選一確認聲音，再重新寫一次。 ");
     }
@@ -666,11 +742,11 @@ export default function Page() {
       <div className="course-grid">
         <button className="course-tile featured" type="button" onClick={() => openLesson(0)}><span className="course-badge">現在練習</span><span className="course-tile-number">01</span><strong>第一課</strong><b>{lessons[0].title}</b><small>默寫 · 聽寫</small><span className="tile-arrow">→</span></button>
         {[
-          ["02", "第二課", lessons[1].title, "閱讀課文"],
+          ["02", "第二課", lessons[1].title, "默寫 · 聽寫"],
           ["03", "第三課", lessons[2].title, "默寫 · 聽寫"],
         ].map(([number, title, subtitle, status], index) => <button className="course-tile" type="button" key={number} onClick={() => openLesson(index + 1)}><span className="course-tile-number">{number}</span><strong>{title}</strong><b>{subtitle}</b><small>{status}</small><span className="lock-icon">→</span></button>)}
       </div>
-      <div className="course-note"><span>☑</span><p><strong>三課課文已更新</strong><br />第一、三課可以練默寫與聽寫；第二課先讀課文與注音符號。</p></div>
+      <div className="course-note"><span>☑</span><p><strong>三課都能練習</strong><br />每課都可以練課文默寫與隨機聽寫。</p></div>
     </section>
   );
 
@@ -749,17 +825,19 @@ export default function Page() {
       {practiceNotice && <p className="practice-notice" role="status">{practiceNotice}</p>}
       <div className="section-title-row"><h2>收藏題目</h2><span className="list-count">{practiceState.savedQuestions.length} 題</span></div>
       {practiceState.savedQuestions.length ? <div className="saved-question-list">
-        {practiceState.savedQuestions.map(({ lessonIndex, questionIndex }) => (
-          <div className="saved-question" key={`${lessonIndex}-${questionIndex}`}>
+        {practiceState.savedQuestions.map(({ lessonIndex, questionId }, savedIndex) => {
+          const question = findQuestionSeed(lessonIndex, questionId);
+          if (!question) return null;
+          return <div className="saved-question" key={`${lessonIndex}-${questionId}`}>
             <span className="saved-question-icon"><Headphones size={24} weight="duotone" aria-hidden="true" /></span>
-            <div className="saved-question-copy"><strong>第{["一", "二", "三"][lessonIndex]}課 · {listenCategoryLabels[exercises[lessonIndex].questions[questionIndex].category]}</strong><small>{lessons[lessonIndex].title} · {questionIndex < 8 ? `第 ${questionIndex % 4 + 1} 小題` : `第 ${questionIndex - 7} 個語詞`}</small></div>
+            <div className="saved-question-copy"><strong>第{["一", "二", "三"][lessonIndex]}課 · {listenCategoryLabels[question.category]}</strong><small>{lessons[lessonIndex].title} · 收藏題目 {savedIndex + 1}</small></div>
             <div className="saved-question-actions">
-              <button type="button" onClick={() => speak(exercises[lessonIndex].questions[questionIndex].audioText)} aria-label={`播放第${["一", "二", "三"][lessonIndex]}課${listenCategoryLabels[exercises[lessonIndex].questions[questionIndex].category]}題目`}><SpeakerHigh size={18} aria-hidden="true" /> 播放</button>
-              <button type="button" className="saved-start" onClick={() => openSavedQuestion(lessonIndex, questionIndex)}>重練這題</button>
-              <button type="button" className="saved-remove" onClick={() => removeQuestion(lessonIndex, questionIndex)}>取消收藏</button>
+              <button type="button" onClick={() => speak(question.audioText)} aria-label={`播放第${["一", "二", "三"][lessonIndex]}課收藏題目 ${savedIndex + 1}`}><SpeakerHigh size={18} aria-hidden="true" /> 播放</button>
+              <button type="button" className="saved-start" onClick={() => openSavedQuestion(lessonIndex, questionId)}>重練這題</button>
+              <button type="button" className="saved-remove" onClick={() => removeQuestion(lessonIndex, questionId)}>取消收藏</button>
             </div>
-          </div>
-        ))}
+          </div>;
+        })}
       </div> : <div className="empty-reinforce"><span>☆</span><strong>目前沒有收藏題目</strong><small>聽寫時按「需要補強」會自動收藏，也可以在家長判定時手動收藏。</small></div>}
       <div className="practice-summary"><div className="summary-score"><span>完成聽寫</span><strong>{practiceState.completedSessions}</strong><small>次</small></div><div className="summary-copy"><span className="eyebrow">KEEP GOING</span><h2>每天 5 分鐘，慢慢變熟悉。</h2><p>完成一個小練習，就是很棒的進度。</p></div><span className="summary-doodle">✦</span></div>
       <div className="practice-list"><div className="section-title-row"><h2>最近練習</h2><span className="list-count">{practiceState.recentLesson === null ? "0 個紀錄" : "1 個紀錄"}</span></div>
@@ -787,7 +865,7 @@ export default function Page() {
   );
 
   const renderFocusMode = () => {
-    const choiceAnswers = [currentQuestion.answer, ...currentQuestion.distractors];
+    const choiceAnswers = currentQuestion.choices;
     return (
     <main className={`focus-shell phase-${listenPhase}`}>
       <header className="focus-topbar"><button type="button" className="focus-exit" onClick={leaveFocus}>← <span>離開</span></button><div className="focus-question"><strong>{listenCategoryLabels[currentQuestion.category]}</strong><small>{sectionProgress}</small></div><div className="focus-meta"><span className={secondsLeft <= 8 && (listenPhase === "active" || listenPhase === "retry") ? "urgent" : ""}><Timer size={14} weight="bold" /> {listenPhase === "retry_ready" ? "待重寫" : listenPhase === "review" || listenPhase === "choice" ? "已交卷" : `${String(Math.floor(secondsLeft / 60)).padStart(2, "0")}:${String(secondsLeft % 60).padStart(2, "0")}`}</span><span aria-label={`已播放 ${playCount} 次`}><SpeakerHigh size={14} weight="bold" /> {playCount} 次</span></div></header>

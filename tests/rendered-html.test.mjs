@@ -87,7 +87,7 @@ test("all three lessons have three listening sections with four writing units ea
   assert.match(page, /1: \{ lines: secondLessonLines, questions: secondListeningQuestions \}/);
   assert.match(page, /2: \{ lines: thirdLessonLines, questions: thirdListeningQuestions \}/);
   assert.match(page, /const exercise = exercises\[selectedLesson\]/);
-  assert.match(page, /const listeningQuestions = exercise\.questions/);
+  assert.match(page, /const listeningQuestions = sessionQuestions/);
   assert.match(page, /第三課", lessons\[2\]\.title, "默寫 · 聽寫"/);
   for (const lesson of ["first", "second", "third"]) {
     const questions = page.match(new RegExp(`const ${lesson}ListeningQuestions = \\[([\\s\\S]*?)\\] as const;`))?.[1];
@@ -103,6 +103,15 @@ test("all three lessons have three listening sections with four writing units ea
   assert.match(page, /word-grid-guide/);
   assert.match(css, /\.canvas-zone\.is-word \.canvas-paper/);
   assert.match(page, /legacySavedQuestionIndexes/);
+  assert.match(page, /lesson\.symbols\.map\(\(symbol\) =>/);
+  assert.match(page, /new Map\(exercise\.lines\.flat\(\)\.map/);
+  assert.match(page, /shuffleItems\(pools\.symbols\)\.slice\(0, 4\)/);
+  assert.match(page, /shuffleItems\(pools\.characters\)\.slice\(0, 4\)/);
+  assert.match(page, /shuffleItems\(pools\.words\)\.slice\(0, 2\)/);
+  assert.match(page, /choices: shuffleItems\(\[seed\.answer, \.\.\.seed\.distractors\]\)/);
+  assert.match(page, /questionId: id/);
+  assert.match(page, /firstPracticeStorageKey/);
+  assert.doesNotMatch(page, /第二課先讀課文與注音符號|lessons\[1\]\.title, "閱讀課文"/);
   assert.match(page, /listeningCorrect: current\.listeningCorrect \+ currentQuestion\.answer\.split\("\|"\)\.length/);
   assert.match(page, /三大題 · \{sessionScore\.listeningCorrect\} \/ 12 格完成/);
 });
