@@ -259,3 +259,32 @@ body { background: #e7f2f9; }
 .review-actions button { padding: 9px; }
 .choice-options button { min-height: 69px; }
 .choice-options .zhuyin-stack { font-size: 15px; }
+.canvas-replay-overlay {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: rgba(11, 29, 47, .62);
+  color: white;
+  font-size: 14px;
+  font-weight: 800;
+}
+.canvas-replay-button {
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  padding-left: 5px;
+  border: 3px solid white;
+  border-radius: 50%;
+  background: var(--ref-blue);
+  box-shadow: 0 5px 18px rgba(0, 0, 0, .24);
+  color: white;
+  cursor: pointer;
+}
+.canvas-replay-button:hover { background: #0f58b5; }
+.canvas-replay-button:focus-visible { outline: 3px solid #ffdc7a; outline-offset: 4px; }

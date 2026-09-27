@@ -39,5 +39,7 @@ test("the source keeps the handoff interaction vocabulary", async () => {
   assert.doesNotMatch(page, /className="practice-title"|className="fill-progress"/);
   assert.match(page, /zhuyin: "˙ㄉㄧ"/);
   assert.match(page, /提早交卷/);
+  assert.match(page, /canvas-replay-overlay/);
+  assert.match(page, /再播放一次題目/);
   assert.doesNotMatch(page, /className="focus-intro"/);
 });
