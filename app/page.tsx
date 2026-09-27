@@ -62,9 +62,10 @@ function Logo() {
   );
 }
 
-function AppHeader({ onHome }: { onHome: () => void }) {
+function AppHeader({ onHome, onBackToCourses }: { onHome: () => void; onBackToCourses?: () => void }) {
   return (
-    <header className="app-header">
+    <header className={`app-header ${onBackToCourses ? "has-back" : ""}`}>
+      {onBackToCourses && <button className="header-back" type="button" onClick={onBackToCourses}>← 回到課程</button>}
       <button className="brand-button" type="button" onClick={onHome} aria-label="回到首頁">
         <Logo />
         <span>
@@ -72,7 +73,7 @@ function AppHeader({ onHome }: { onHome: () => void }) {
           <small>一年級學習站</small>
         </span>
       </button>
-      <div className="header-chip"><span className="status-dot" /> 不用登入也能練</div>
+      {!onBackToCourses && <div className="header-chip"><span className="status-dot" /> 不用登入也能練</div>}
     </header>
   );
 }
@@ -430,7 +431,6 @@ export default function Page() {
 
   const renderLesson = () => (
     <section className="page-section lesson-page">
-      <button className="back-link" type="button" onClick={() => setView("courses")}>← 回到課程</button>
       <div className="lesson-heading"><div><span className="eyebrow">LESSON {String(selectedLesson + 1).padStart(2, "0")}</span><h1>{lesson.title}</h1></div><span className="lesson-stamp">{selectedLesson === 0 ? <>先看<br />再寫</> : <>先讀<br />課文</>}</span></div>
       {selectedLesson === 0 && <div className="mode-grid">
         <button className="mode-card fill-mode" type="button" onClick={() => setView("fill")}><span className="mode-icon" aria-hidden="true"><PencilLine size={26} weight="duotone" /></span><small>第一關</small><strong>課文默寫</strong></button>
@@ -530,7 +530,7 @@ export default function Page() {
 
   return (
     <div className="app-shell">
-      <AppHeader onHome={() => setView("home")} />
+      <AppHeader onHome={() => setView("home")} onBackToCourses={view === "lesson" ? () => setView("courses") : undefined} />
       <main className="main-content">{renderMain()}</main>
       <BottomNav active={view === "lesson" || view === "fill" || view === "result" ? "courses" : view} onNavigate={navigate} />
     </div>

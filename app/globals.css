@@ -351,3 +351,8 @@ body { background: #e7f2f9; }
 }
 .lesson-text-line .is-neutral-di { font-feature-settings: "ss01" 1; }
 .lesson-symbols { direction: rtl; justify-content: flex-start; }
+.app-header.has-back { gap: 10px; }
+.app-header.has-back .brand-button { margin-left: auto; }
+.header-back { min-height: 44px; padding: 0 4px; border: 0; background: transparent; color: var(--ref-navy); font-size: 13px; font-weight: 800; white-space: nowrap; }
+.header-back:focus-visible { outline: 3px solid var(--ref-blue); outline-offset: 2px; border-radius: 5px; }
+.lesson-page .lesson-heading { margin-top: 10px; }
