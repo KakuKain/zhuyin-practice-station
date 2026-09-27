@@ -288,3 +288,29 @@ body { background: #e7f2f9; }
 }
 .canvas-replay-button:hover { background: #0f58b5; }
 .canvas-replay-button:focus-visible { outline: 3px solid #ffdc7a; outline-offset: 4px; }
+
+.lesson-curriculum {
+  margin-top: 16px;
+  padding: 14px;
+  border: 1px solid #b8d9ef;
+  border-radius: 13px;
+  background: #fff;
+}
+.lesson-curriculum-heading { display: flex; align-items: center; justify-content: space-between; color: var(--ref-navy); font-size: 15px; }
+.lesson-curriculum-heading span { color: #6b859e; font-size: 12px; }
+.lesson-text-lines {
+  display: flex;
+  gap: clamp(12px, 3vw, 22px);
+  min-height: 205px;
+  margin: 13px 0 17px;
+  padding: 14px 10px;
+  overflow-x: auto;
+  border: 1px solid #dbe9f2;
+  border-radius: 9px;
+  background: #fbfff9;
+}
+.lesson-text-line { flex: 0 0 auto; writing-mode: vertical-rl; text-orientation: upright; color: #1e4731; font-size: 18px; font-weight: 650; letter-spacing: 3px; }
+.lesson-symbols { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
+.lesson-symbols span { display: grid; place-items: center; width: 42px; height: 42px; border: 1px solid #a7d9f7; border-radius: 9px; background: #f1faff; color: var(--ref-navy); font-size: 22px; }
+.lesson-upcoming { margin-top: 13px; color: #607895; font-size: 14px; }
+.syllable-row { grid-template-columns: repeat(5, minmax(0, 1fr)); }

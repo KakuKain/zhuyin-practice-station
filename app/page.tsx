@@ -8,11 +8,18 @@ type ListenPhase = "ready" | "active" | "review" | "choice" | "retry";
 type ParentResult = "correct" | "needs_review" | null;
 type CardDrag = { pointerId: number; optionIndex: number; startX: number; startY: number; moved: boolean };
 
+const lessons = [
+  { title: "貓咪", lines: ["咪咪咪", "咪咪咪", "逼", "貓咪弟弟", "跑第一"], symbols: ["ㄅ", "ㄆ", "ㄇ", "ㄉ", "ㄧ", "ㄠ"] },
+  { title: "鵝寶寶", lines: ["鵝鵝鵝", "鵝鵝鵝", "哈哈哈", "好得意", "孵出", "五隻鵝寶寶"], symbols: ["ㄈ", "ㄏ", "ㄓ", "ㄔ", "ㄨ", "ㄚ", "ㄜ"] },
+  { title: "河馬和河狸", lines: ["河馬要去泡澡", "半路遇到河狸", "喔", "河狸", "忙著築巢"], symbols: ["ㄌ", "ㄑ", "ㄗ", "ㄩ", "ㄛ", "ㄢ", "ㄤ"] },
+] as const;
+
 const lessonLines = [
   [{ character: "咪", zhuyin: "ㄇㄧ" }, { character: "咪", zhuyin: "ㄇㄧ" }, { character: "咪", zhuyin: "ㄇㄧ" }],
   [{ character: "咪", zhuyin: "ㄇㄧ" }, { character: "咪", zhuyin: "ㄇㄧ" }, { character: "咪", zhuyin: "ㄇㄧ" }],
   [{ character: "逼", zhuyin: "ㄅㄧ" }],
-  [{ character: "貓", zhuyin: "ㄇㄠ" }, { character: "咪", zhuyin: "ㄇㄧ" }, { character: "弟", zhuyin: "ㄉㄧˋ" }, { character: "弟", zhuyin: "˙ㄉㄧ" }, { character: "跑", zhuyin: "ㄆㄠˇ" }, { character: "第", zhuyin: "ㄉㄧˋ" }, { character: "一", zhuyin: "ㄧ" }],
+  [{ character: "貓", zhuyin: "ㄇㄠ" }, { character: "咪", zhuyin: "ㄇㄧ" }, { character: "弟", zhuyin: "ㄉㄧˋ" }, { character: "弟", zhuyin: "˙ㄉㄧ" }],
+  [{ character: "跑", zhuyin: "ㄆㄠˇ" }, { character: "第", zhuyin: "ㄉㄧˋ" }, { character: "一", zhuyin: "ㄧ" }],
 ] as const;
 const lessonItems = lessonLines.flat();
 
@@ -102,6 +109,7 @@ function SectionHeading({ eyebrow, title, description }: { eyebrow?: string; tit
 
 export default function Page() {
   const [view, setView] = useState<View>("home");
+  const [selectedLesson, setSelectedLesson] = useState(0);
   const [fillAnswers, setFillAnswers] = useState<Record<number, string>>({});
   const [fillMessage, setFillMessage] = useState("把下方的完整音節，拖到對應的空格裡。每一格就是一個音節。\n");
   const [dragging, setDragging] = useState<number | null>(null);
@@ -123,6 +131,12 @@ export default function Page() {
 
   const currentQuestion = listeningQuestions[listenIndex];
   const isFocusMode = view === "listen";
+  const lesson = lessons[selectedLesson];
+
+  const openLesson = (index: number) => {
+    setSelectedLesson(index);
+    setView("lesson");
+  };
 
   const clearListenTimers = useCallback(() => {
     if (timerRef.current !== null) window.clearInterval(timerRef.current);
@@ -390,13 +404,13 @@ export default function Page() {
 
       <section className="content-section">
         <div className="section-title-row"><div><span className="eyebrow">Pick up where you left off</span><h2>最近練習</h2></div><button className="text-button" type="button" onClick={() => setView("courses")}>看全部課程 <span>→</span></button></div>
-        <button className="recent-card" type="button" onClick={() => setView("lesson")}>
+        <button className="recent-card" type="button" onClick={() => openLesson(0)}>
           <span className="lesson-number"><Notebook size={25} weight="duotone" /></span><span className="recent-copy"><small>第一課</small><strong>貓咪</strong><span>課文默寫・聽寫</span></span><span className="progress-ring"><b>2/5</b><small>進度</small></span><span className="card-arrow"><ArrowRight size={21} /></span>
         </button>
       </section>
 
       <section className="tip-card"><span className="tip-icon"><Lightbulb size={20} weight="duotone" /></span><span><strong>給陪練的大人</strong><small>聽寫時會先播放兩次，時間到才會請你幫忙判定，孩子可以安心慢慢寫。</small></span><button type="button" onClick={() => setView("more")} aria-label="查看陪練說明"><ArrowRight size={20} /></button></section>
-      <section className="quick-courses"><div className="section-title-row"><div><span className="eyebrow">CHOOSE A LESSON</span><h2>選擇課程</h2></div><button className="text-button" type="button" onClick={() => setView("courses")}>看全部 <ArrowRight size={15} /></button></div><div className="quick-course-grid"><button type="button" onClick={() => setView("lesson")}><Sun size={27} weight="duotone" /><strong>第一課</strong><small>貓咪</small></button><button type="button" onClick={() => setFillMessage("這一課正在準備中，先來完成第一課吧！ ")}><House size={27} weight="duotone" /><strong>第二課</strong><small>我有一個家。</small></button><button type="button" onClick={() => setFillMessage("這一課正在準備中，先來完成第一課吧！ ")}><Tree size={27} weight="duotone" /><strong>第三課</strong><small>美麗的校園</small></button></div></section>
+      <section className="quick-courses"><div className="section-title-row"><div><span className="eyebrow">CHOOSE A LESSON</span><h2>選擇課程</h2></div><button className="text-button" type="button" onClick={() => setView("courses")}>看全部 <ArrowRight size={15} /></button></div><div className="quick-course-grid"><button type="button" onClick={() => openLesson(0)}><Sun size={27} weight="duotone" /><strong>第一課</strong><small>{lessons[0].title}</small></button><button type="button" onClick={() => openLesson(1)}><House size={27} weight="duotone" /><strong>第二課</strong><small>{lessons[1].title}</small></button><button type="button" onClick={() => openLesson(2)}><Tree size={27} weight="duotone" /><strong>第三課</strong><small>{lessons[2].title}</small></button></div></section>
     </>
   );
 
@@ -404,26 +418,31 @@ export default function Page() {
     <section className="page-section">
       <SectionHeading eyebrow="COURSES" title="選擇課程" description="每一課都從一小段注音開始，按自己的步調練習就好。" />
       <div className="course-grid">
-        <button className="course-tile featured" type="button" onClick={() => setView("lesson")}><span className="course-badge">現在練習</span><span className="course-tile-number">01</span><strong>第一課</strong><b>貓咪</b><small>默寫 · 聽寫</small><span className="tile-arrow">→</span></button>
+        <button className="course-tile featured" type="button" onClick={() => openLesson(0)}><span className="course-badge">現在練習</span><span className="course-tile-number">01</span><strong>第一課</strong><b>{lessons[0].title}</b><small>默寫 · 聽寫</small><span className="tile-arrow">→</span></button>
         {[
-          ["02", "第二課", "快樂上學去"],
-          ["03", "第三課", "我的好朋友"],
-          ["04", "第四課", "一起來學習"],
-        ].map(([number, title, subtitle]) => <button className="course-tile locked" type="button" key={number} onClick={() => setFillMessage("這一課正在準備中，先來完成第一課吧！ ")}><span className="course-tile-number">{number}</span><strong>{title}</strong><b>{subtitle}</b><small>即將開放</small><span className="lock-icon">⌁</span></button>)}
+          ["02", "第二課", lessons[1].title],
+          ["03", "第三課", lessons[2].title],
+        ].map(([number, title, subtitle], index) => <button className="course-tile" type="button" key={number} onClick={() => openLesson(index + 1)}><span className="course-tile-number">{number}</span><strong>{title}</strong><b>{subtitle}</b><small>閱讀課文</small><span className="lock-icon">→</span></button>)}
       </div>
-      <div className="course-note"><span>☑</span><p><strong>題庫由老師整理</strong><br />每個音節都經過確認，孩子可以專心看、聽、寫。</p></div>
+      <div className="course-note"><span>☑</span><p><strong>三課課文已更新</strong><br />第一課可以練默寫與聽寫；第二、三課先讀課文與注音符號。</p></div>
     </section>
   );
 
   const renderLesson = () => (
     <section className="page-section lesson-page">
       <button className="back-link" type="button" onClick={() => setView("courses")}>← 回到課程</button>
-      <div className="lesson-heading"><div><span className="eyebrow">LESSON 01</span><h1>貓咪</h1><p>第一課 · 兩種方式，自己選一個開始。</p></div><span className="lesson-stamp">先看<br />再寫</span></div>
-      <div className="mode-grid">
+      <div className="lesson-heading"><div><span className="eyebrow">LESSON {String(selectedLesson + 1).padStart(2, "0")}</span><h1>{lesson.title}</h1><p>第{["一", "二", "三"][selectedLesson]}課 · {selectedLesson === 0 ? "兩種方式，自己選一個開始。" : "先讀課文，認識這一課的注音符號。"}</p></div><span className="lesson-stamp">{selectedLesson === 0 ? <>先看<br />再寫</> : <>先讀<br />課文</>}</span></div>
+      {selectedLesson === 0 && <div className="mode-grid">
         <button className="mode-card fill-mode" type="button" onClick={() => setView("fill")}><span className="mode-icon"><PencilLine size={30} weight="duotone" /></span><span className="mode-copy"><small>第一關</small><strong>課文默寫</strong><p>看直式注音格，把缺少的音節拖回去。</p><b>開始練習 <ArrowRight size={17} /> </b></span></button>
         <button className="mode-card listen-mode" type="button" onClick={openListening}><span className="mode-icon"><Headphones size={30} weight="duotone" /></span><span className="mode-copy"><small>第二關</small><strong>聽寫</strong><p>聽聲音、自由手寫，最後交給家長判定。</p><b>開始練習 <ArrowRight size={17} /> </b></span></button>
+      </div>}
+      <div className="lesson-curriculum">
+        <div className="lesson-curriculum-heading"><strong>課文</strong><span>從右到左讀</span></div>
+        <div className="lesson-text-lines" dir="rtl" aria-label={`${lesson.title}課文`}>{lesson.lines.map((line, index) => <div className="lesson-text-line" key={index}>{line}</div>)}</div>
+        <div className="lesson-curriculum-heading"><strong>注音符號</strong></div>
+        <div className="lesson-symbols" aria-label="本課注音符號">{lesson.symbols.map((symbol) => <span key={symbol}>{symbol}</span>)}</div>
       </div>
-      <div className="lesson-rule"><span>小提醒</span><p>課文默寫裡看到的是<strong>注音，不是國字</strong>。從右邊第一行開始，由上往下、由右往左讀。</p></div>
+      {selectedLesson === 0 ? <div className="lesson-rule"><span>小提醒</span><p>課文默寫裡看到的是<strong>注音，不是國字</strong>。從右邊第一行開始，由上往下、由右往左讀。</p></div> : <p className="lesson-upcoming">這一課的課文默寫與聽寫練習準備中。</p>}
     </section>
   );
 

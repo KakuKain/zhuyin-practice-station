@@ -23,6 +23,8 @@ test("server-renders the public zhuyin practice station", async () => {
   assert.match(html, /注音小練習/);
   assert.match(html, /開心練習/);
   assert.match(html, /貓咪/);
+  assert.match(html, /鵝寶寶/);
+  assert.match(html, /河馬和河狸/);
   assert.match(html, /不用登入也能練/);
 });
 
@@ -41,5 +43,11 @@ test("the source keeps the handoff interaction vocabulary", async () => {
   assert.match(page, /提早交卷/);
   assert.match(page, /canvas-replay-overlay/);
   assert.match(page, /再播放一次題目/);
+  assert.match(page, /"貓咪弟弟", "跑第一"/);
+  assert.match(page, /"孵出", "五隻鵝寶寶"/);
+  assert.match(page, /"喔", "河狸", "忙著築巢"/);
+  assert.match(page, /symbols: \["ㄅ", "ㄆ", "ㄇ", "ㄉ", "ㄧ", "ㄠ"\]/);
+  assert.match(page, /symbols: \["ㄈ", "ㄏ", "ㄓ", "ㄔ", "ㄨ", "ㄚ", "ㄜ"\]/);
+  assert.match(page, /symbols: \["ㄌ", "ㄑ", "ㄗ", "ㄩ", "ㄛ", "ㄢ", "ㄤ"\]/);
   assert.doesNotMatch(page, /className="focus-intro"/);
 });
