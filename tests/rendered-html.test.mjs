@@ -21,7 +21,7 @@ test("server-renders the public zhuyin practice station", async () => {
   const html = await response.text();
   assert.match(html, /<title>一年級注音練習站｜注音小練習<\/title>/);
   assert.match(html, /注音小練習/);
-  assert.match(html, /今天也來/);
+  assert.match(html, /開心練習/);
   assert.match(html, /小明是個好學生/);
   assert.match(html, /不用登入也能練/);
 });

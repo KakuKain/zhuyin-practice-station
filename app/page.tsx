@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { ArrowRight, BookOpenText, Gear, Headphones, Heart, House, Info, Lightbulb, MusicNotes, Notebook, PencilLine, Play, Question, SpeakerHigh, Sparkle, Sun, Timer, Tree } from "@phosphor-icons/react";
 
 type View = "home" | "courses" | "practice" | "more" | "lesson" | "fill" | "listen" | "result";
 type ListenPhase = "ready" | "active" | "review" | "choice" | "retry";
@@ -62,18 +63,18 @@ function AppHeader({ onHome }: { onHome: () => void }) {
 }
 
 function BottomNav({ active, onNavigate }: { active: View; onNavigate: (view: View) => void }) {
-  const items: Array<{ id: View; icon: string; label: string }> = [
-    { id: "home", icon: "⌂", label: "首頁" },
-    { id: "courses", icon: "▤", label: "課程" },
-    { id: "practice", icon: "✎", label: "練習" },
-    { id: "more", icon: "•••", label: "更多" },
+  const items = [
+    { id: "home" as View, Icon: House, label: "首頁" },
+    { id: "courses" as View, Icon: BookOpenText, label: "課程" },
+    { id: "practice" as View, Icon: PencilLine, label: "練習" },
+    { id: "more" as View, Icon: Gear, label: "更多" },
   ];
 
   return (
     <nav className="bottom-nav" aria-label="主要導覽">
       {items.map((item) => (
         <button key={item.id} type="button" className={active === item.id ? "active" : ""} onClick={() => onNavigate(item.id)}>
-          <span className="nav-icon" aria-hidden="true">{item.icon}</span>
+          <span className="nav-icon" aria-hidden="true"><item.Icon size={22} weight={active === item.id ? "fill" : "regular"} /></span>
           <span>{item.label}</span>
         </button>
       ))}
@@ -309,21 +310,15 @@ export default function Page() {
     <>
       <section className="home-hero">
         <div className="hero-copy">
-          <span className="eyebrow">一年級 · 第一課</span>
-          <h1>今天也來<br /><em>練一下注音</em></h1>
+          <span className="eyebrow">一年級注音練習</span>
+          <h1>開心練習，<br /><em>打好基礎</em></h1>
           <p>不用登入、不用記名字，打開就能練。每天一點點，把聽到的聲音寫下來。</p>
           <div className="hero-actions">
-            <button className="primary-button" type="button" onClick={() => setView("courses")}>開始今天的練習 <span>→</span></button>
-            <span className="quiet-note"><span className="tiny-spark">✦</span> 適合 iPad 手寫</span>
+            <button className="primary-button" type="button" onClick={() => setView("courses")}>開始今天的練習 <ArrowRight size={18} weight="bold" /></button>
+            <span className="quiet-note"><Sparkle size={14} weight="fill" /> 適合 iPad 手寫</span>
           </div>
         </div>
-        <div className="hero-illustration" aria-label="注音練習插圖" role="img">
-          <div className="sun-shape" />
-          <div className="letter-bubble bubble-one">ㄅ</div>
-          <div className="letter-bubble bubble-two">ㄇ</div>
-          <div className="letter-bubble bubble-three">ㄓ</div>
-          <div className="notebook-card"><span className="notebook-title">我的練習本</span><div className="notebook-line"><b>ㄅ</b><i /><b>ㄆ</b><i /></div><div className="notebook-line short"><b>ㄇ</b><i /><b>ㄈ</b><i /></div><span className="check-sticker">✓</span></div>
-        </div>
+        <div className="hero-illustration">{/* eslint-disable-next-line @next/next/no-img-element */}<img src="/zhuyin-children-hero.jpg" alt="兩位孩子一起練習注音" /></div>
       </section>
 
       <section className="home-stats" aria-label="練習摘要">
@@ -335,11 +330,12 @@ export default function Page() {
       <section className="content-section">
         <div className="section-title-row"><div><span className="eyebrow">Pick up where you left off</span><h2>最近練習</h2></div><button className="text-button" type="button" onClick={() => setView("courses")}>看全部課程 <span>→</span></button></div>
         <button className="recent-card" type="button" onClick={() => setView("lesson")}>
-          <span className="lesson-number">01</span><span className="recent-copy"><small>第一課</small><strong>小明是個好學生</strong><span>課文默寫・聽寫</span></span><span className="progress-ring"><b>40%</b><small>已開始</small></span><span className="card-arrow">→</span>
+          <span className="lesson-number"><Notebook size={25} weight="duotone" /></span><span className="recent-copy"><small>第一課</small><strong>小明是個好學生</strong><span>課文默寫・聽寫</span></span><span className="progress-ring"><b>2/5</b><small>進度</small></span><span className="card-arrow"><ArrowRight size={21} /></span>
         </button>
       </section>
 
-      <section className="tip-card"><span className="tip-icon">☼</span><span><strong>給陪練的大人</strong><small>聽寫時會先播放兩次，時間到才會請你幫忙判定，孩子可以安心慢慢寫。</small></span><button type="button" onClick={() => setView("more")} aria-label="查看陪練說明">→</button></section>
+      <section className="tip-card"><span className="tip-icon"><Lightbulb size={20} weight="duotone" /></span><span><strong>給陪練的大人</strong><small>聽寫時會先播放兩次，時間到才會請你幫忙判定，孩子可以安心慢慢寫。</small></span><button type="button" onClick={() => setView("more")} aria-label="查看陪練說明"><ArrowRight size={20} /></button></section>
+      <section className="quick-courses"><div className="section-title-row"><div><span className="eyebrow">CHOOSE A LESSON</span><h2>選擇課程</h2></div><button className="text-button" type="button" onClick={() => setView("courses")}>看全部 <ArrowRight size={15} /></button></div><div className="quick-course-grid"><button type="button" onClick={() => setView("lesson")}><Sun size={27} weight="duotone" /><strong>第一課</strong><small>小明是個好學生</small></button><button type="button" onClick={() => setFillMessage("這一課正在準備中，先來完成第一課吧！ ")}><House size={27} weight="duotone" /><strong>第二課</strong><small>我有一個家。</small></button><button type="button" onClick={() => setFillMessage("這一課正在準備中，先來完成第一課吧！ ")}><Tree size={27} weight="duotone" /><strong>第三課</strong><small>美麗的校園</small></button></div></section>
     </>
   );
 
@@ -363,8 +359,8 @@ export default function Page() {
       <button className="back-link" type="button" onClick={() => setView("courses")}>← 回到課程</button>
       <div className="lesson-heading"><div><span className="eyebrow">LESSON 01</span><h1>小明是個好學生</h1><p>第一課 · 兩種方式，自己選一個開始。</p></div><span className="lesson-stamp">先看<br />再寫</span></div>
       <div className="mode-grid">
-        <button className="mode-card fill-mode" type="button" onClick={() => setView("fill")}><span className="mode-icon">ㄇ</span><span className="mode-copy"><small>第一關</small><strong>課文默寫</strong><p>看直式注音格，把缺少的音節拖回去。</p><b>開始練習 <span>→</span></b></span></button>
-        <button className="mode-card listen-mode" type="button" onClick={openListening}><span className="mode-icon">◖</span><span className="mode-copy"><small>第二關</small><strong>聽寫</strong><p>聽聲音、自由手寫，最後交給家長判定。</p><b>開始練習 <span>→</span></b></span></button>
+        <button className="mode-card fill-mode" type="button" onClick={() => setView("fill")}><span className="mode-icon"><PencilLine size={30} weight="duotone" /></span><span className="mode-copy"><small>第一關</small><strong>課文默寫</strong><p>看直式注音格，把缺少的音節拖回去。</p><b>開始練習 <ArrowRight size={17} /> </b></span></button>
+        <button className="mode-card listen-mode" type="button" onClick={openListening}><span className="mode-icon"><Headphones size={30} weight="duotone" /></span><span className="mode-copy"><small>第二關</small><strong>聽寫</strong><p>聽聲音、自由手寫，最後交給家長判定。</p><b>開始練習 <ArrowRight size={17} /> </b></span></button>
       </div>
       <div className="lesson-rule"><span>小提醒</span><p>課文默寫裡看到的是<strong>注音，不是國字</strong>。每一格代表完整的一個音節。</p></div>
     </section>
@@ -399,7 +395,7 @@ export default function Page() {
   const renderMore = () => (
     <section className="page-section more-page">
       <SectionHeading eyebrow="MORE" title="更多" description="簡單的說明與設定，陪孩子一起練習。" />
-      <div className="more-list"><button type="button"><span className="more-list-icon mint">?</span><span><strong>使用說明</strong><small>第一次使用，先看這裡</small></span><b>→</b></button><button type="button"><span className="more-list-icon sky">♡</span><span><strong>給家長的話</strong><small>為什麼不需要孩子註冊</small></span><b>→</b></button><button type="button"><span className="more-list-icon cream">♫</span><span><strong>聽寫設定</strong><small>目前播放 2 次 · 每題 30 秒</small></span><b>→</b></button><button type="button"><span className="more-list-icon coral">i</span><span><strong>關於這個網站</strong><small>第一版測試版本 · v0.1</small></span><b>→</b></button></div>
+      <div className="more-list"><button type="button"><span className="more-list-icon mint"><Question size={21} weight="bold" /></span><span><strong>使用說明</strong><small>第一次使用，先看這裡</small></span><b>→</b></button><button type="button"><span className="more-list-icon sky"><Heart size={21} weight="duotone" /></span><span><strong>給家長的話</strong><small>為什麼不需要孩子註冊</small></span><b>→</b></button><button type="button"><span className="more-list-icon cream"><MusicNotes size={21} weight="duotone" /></span><span><strong>聽寫設定</strong><small>目前播放 2 次 · 每題 30 秒</small></span><b>→</b></button><button type="button"><span className="more-list-icon coral"><Info size={21} weight="bold" /></span><span><strong>關於這個網站</strong><small>第一版測試版本 · v0.1</small></span><b>→</b></button></div>
       <div className="privacy-card"><span>◌</span><p><strong>這裡不收集孩子的個人資料</strong><small>不需要姓名、Email 或帳號，練習紀錄只留在目前的裝置上。</small></p></div>
     </section>
   );
@@ -408,7 +404,7 @@ export default function Page() {
     <section className="page-section result-page">
       <div className="result-celebration"><span className="result-spark">✦</span><div className="result-check">✓</div><span className="result-spark right">✦</span></div>
       <span className="eyebrow">PRACTICE COMPLETE</span><h1>練習完成！</h1><p className="result-intro">今天的第一課，你已經往前走了一小步。</p>
-      <div className="result-card"><div><span className="result-icon fill">ㄇ</span><span><strong>課文默寫</strong><small>直式注音格 · 已完成</small></span><b>✓</b></div><div><span className="result-icon listen">◖</span><span><strong>聽寫</strong><small>{sessionScore.listeningCorrect} / {listeningQuestions.length} 題完成</small></span><b>✓</b></div></div>
+      <div className="result-card"><div><span className="result-icon fill"><PencilLine size={22} weight="duotone" /></span><span><strong>課文默寫</strong><small>直式注音格 · 已完成</small></span><b>✓</b></div><div><span className="result-icon listen"><Headphones size={22} weight="duotone" /></span><span><strong>聽寫</strong><small>{sessionScore.listeningCorrect} / {listeningQuestions.length} 題完成</small></span><b>✓</b></div></div>
       <div className="result-note"><span>☼</span><p><strong>需要再練習：{sessionScore.needsReview} 題</strong><small>別急，補強就是學習的一部分。下次從「練習」繼續就好。</small></p></div>
       <div className="result-actions"><button className="primary-button" type="button" onClick={() => { resetListeningQuestion(0); setView("listen"); }}>再練一次 <span>↻</span></button><button className="secondary-button" type="button" onClick={() => setView("lesson")}>回到課次</button></div>
     </section>
@@ -418,11 +414,11 @@ export default function Page() {
     const choiceAnswers = [currentQuestion.answer, ...currentQuestion.distractors];
     return (
     <main className="focus-shell">
-      <header className="focus-topbar"><button type="button" className="focus-exit" onClick={leaveFocus}>← <span>離開</span></button><div className="focus-question"><small>第一課 · 聽寫</small><strong>第 {listenIndex + 1} 題 <em>/ {listeningQuestions.length}</em></strong></div><div className="focus-meta"><span className={secondsLeft <= 8 ? "urgent" : ""}>◷ {String(Math.floor(secondsLeft / 60)).padStart(2, "0")}:{String(secondsLeft % 60).padStart(2, "0")}</span><span>🔊 {playCount} 次</span></div></header>
+      <header className="focus-topbar"><button type="button" className="focus-exit" onClick={leaveFocus}>← <span>離開</span></button><div className="focus-question"><small>第一課 · 聽寫</small><strong>第 {listenIndex + 1} 題 <em>/ {listeningQuestions.length}</em></strong></div><div className="focus-meta"><span className={secondsLeft <= 8 ? "urgent" : ""}><Timer size={14} weight="bold" /> {String(Math.floor(secondsLeft / 60)).padStart(2, "0")}:{String(secondsLeft % 60).padStart(2, "0")}</span><span><SpeakerHigh size={14} weight="bold" /> {playCount} 次</span></div></header>
       <div className="focus-content">
         <div className="focus-intro"><span className="focus-kicker">{listenPhase === "ready" ? "準備好了嗎？" : listenPhase === "active" ? "聽到什麼，就寫什麼" : listenPhase === "review" ? "請家長幫忙看看" : listenPhase === "choice" ? "先選一個音節" : "再寫一次"}</span><h1>{listenPhase === "ready" ? "按下開始聽，題目才會播放。" : listenPhase === "active" ? "可以邊聽邊寫。" : listenPhase === "review" ? "這題寫得怎麼樣？" : listenPhase === "choice" ? "沒關係，我們再確認一次。" : "把剛剛聽到的寫下來。"}</h1><p aria-live="polite">{listenPhase === "choice" ? retryMessage : listenPhase === "retry" ? retryMessage : listenMessage}</p></div>
         <div className={`canvas-zone ${listenPhase === "review" || listenPhase === "choice" ? "is-locked" : ""}`}><div className="canvas-paper"><canvas ref={canvasRef} onPointerDown={beginDrawing} onPointerMove={draw} onPointerUp={endDrawing} onPointerCancel={endDrawing} onPointerLeave={endDrawing} aria-label="手寫區" /><span className="canvas-placeholder">{listenPhase === "ready" ? "按下開始後，在這裡手寫" : listenPhase === "review" ? "手寫答案" : "在這裡自由書寫"}</span></div><div className="canvas-toolbar"><button type="button" onClick={clearCanvas} disabled={listenPhase !== "active" && listenPhase !== "retry"}>清除</button><span>touch-action: none · 支援觸控筆</span></div></div>
-        {listenPhase === "ready" && <button type="button" className="listen-start-button" onClick={startListening}><span className="play-circle">▶</span><span><strong>開始聽</strong><small>播放 2 次 · 作答 30 秒</small></span><b>→</b></button>}
+        {listenPhase === "ready" && <button type="button" className="listen-start-button" onClick={startListening}><span className="play-circle"><Play size={17} weight="fill" /></span><span><strong>開始聽</strong><small>播放 2 次 · 作答 30 秒</small></span><b><ArrowRight size={19} /></b></button>}
         {listenPhase === "active" && <div className="active-tip"><span className="pulse-dot" /> 播放與書寫同步進行中　·　8 秒後播放第二次</div>}
         {listenPhase === "review" && <div className="parent-review"><div className="answer-reveal"><span>正確答案</span><ZhuyinStack text={currentQuestion.answer} /></div><p>請家長依照孩子的手寫內容判定，不需要自動辨識。</p><div className="review-actions"><button type="button" className="review-correct" onClick={() => handleParentDecision("correct")}>✓ 答對</button><button type="button" className="review-retry" onClick={() => handleParentDecision("needs_review")}>↻ 需要補強</button></div></div>}
         {listenPhase === "choice" && <div className="choice-panel"><div className="choice-options">{choiceAnswers.map((answer) => <button type="button" key={answer} onClick={() => selectRemediation(answer)}><ZhuyinStack text={answer} /></button>)}</div><p>{retryMessage || "選出你剛剛聽到的完整音節。"}</p></div>}
