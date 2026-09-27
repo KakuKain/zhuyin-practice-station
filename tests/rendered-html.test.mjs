@@ -21,7 +21,8 @@ test("server-renders the public zhuyin practice station", async () => {
   const html = await response.text();
   assert.match(html, /<title>一年級注音練習站｜注音小練習<\/title>/);
   assert.match(html, /注音小練習/);
-  assert.match(html, /開心練習/);
+  assert.doesNotMatch(html, /<span class="eyebrow">一年級注音練習<\/span>|開心練習|打好基礎/);
+  assert.doesNotMatch(html, /課文默寫・聽寫/);
   assert.match(html, /貓咪/);
   assert.match(html, /鵝寶寶/);
   assert.match(html, /河馬和河狸/);
@@ -52,6 +53,14 @@ test("the source keeps the handoff interaction vocabulary", async () => {
   assert.doesNotMatch(page, /兩種方式，自己選一個開始|看直式注音格，把缺少的音節拖回去|聽聲音、自由手寫，最後交給家長判定/);
   assert.match(page, /lesson-symbols" dir="rtl"/);
   assert.match(css, /BpmfZihiSans-Regular\.ttf/);
+  assert.match(css, /BpmfZihiOnly-R\.ttf/);
+  assert.match(page, /國字＋注音/);
+  assert.match(page, /純注音/);
+  assert.match(page, /setPreviewMode\("annotated"\)/);
+  assert.match(page, /\\u\{E01E1\}/);
+  assert.match(css, /lesson-text-lines\.is-zhuyin-only/);
+  assert.match(css, /object-fit: cover/);
+  assert.match(css, /\.text-button \{ display: inline-flex; flex: none/);
   assert.match(css, /\.lesson-page \.mode-grid \{ display: grid; grid-template-columns: repeat\(2/);
   assert.doesNotMatch(page, /className="focus-intro"/);
 });

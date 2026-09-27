@@ -1,11 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, BookOpenText, Gear, Headphones, Heart, House, Info, Lightbulb, MusicNotes, Notebook, PencilLine, Play, Question, SpeakerHigh, Sparkle, Sun, Timer, Tree } from "@phosphor-icons/react";
+import { ArrowLeft, ArrowRight, BookOpenText, Gear, Headphones, Heart, House, Info, Lightbulb, MusicNotes, Notebook, PencilLine, Play, Question, SpeakerHigh, Timer } from "@phosphor-icons/react";
 
 type View = "home" | "courses" | "practice" | "more" | "lesson" | "fill" | "listen" | "result";
 type ListenPhase = "ready" | "active" | "review" | "choice" | "retry";
 type ParentResult = "correct" | "needs_review" | null;
+type PreviewMode = "annotated" | "zhuyin";
 type CardDrag = { pointerId: number; optionIndex: number; startX: number; startY: number; moved: boolean };
 
 const lessons = [
@@ -111,6 +112,7 @@ function SectionHeading({ eyebrow, title, description }: { eyebrow?: string; tit
 export default function Page() {
   const [view, setView] = useState<View>("home");
   const [selectedLesson, setSelectedLesson] = useState(0);
+  const [previewMode, setPreviewMode] = useState<PreviewMode>("annotated");
   const [fillAnswers, setFillAnswers] = useState<Record<number, string>>({});
   const [fillMessage, setFillMessage] = useState("把下方的完整音節，拖到對應的空格裡。每一格就是一個音節。\n");
   const [dragging, setDragging] = useState<number | null>(null);
@@ -136,6 +138,7 @@ export default function Page() {
 
   const openLesson = (index: number) => {
     setSelectedLesson(index);
+    setPreviewMode("annotated");
     setView("lesson");
   };
 
@@ -382,15 +385,6 @@ export default function Page() {
   const renderHome = () => (
     <>
       <section className="home-hero">
-        <div className="hero-copy">
-          <span className="eyebrow">一年級注音練習</span>
-          <h1>開心練習，<br /><em>打好基礎</em></h1>
-          <p>不用登入、不用記名字，打開就能練。每天一點點，把聽到的聲音寫下來。</p>
-          <div className="hero-actions">
-            <button className="primary-button" type="button" onClick={() => setView("courses")}>開始今天的練習 <ArrowRight size={18} weight="bold" /></button>
-            <span className="quiet-note"><Sparkle size={14} weight="fill" /> 適合 iPad 手寫</span>
-          </div>
-        </div>
         <div className="hero-illustration">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/zhuyin-children-hero.jpg" alt="兩位孩子一起練習注音" />
@@ -406,12 +400,12 @@ export default function Page() {
       <section className="content-section">
         <div className="section-title-row"><div><span className="eyebrow">Pick up where you left off</span><h2>最近練習</h2></div><button className="text-button" type="button" onClick={() => setView("courses")}>看全部課程 <span>→</span></button></div>
         <button className="recent-card" type="button" onClick={() => openLesson(0)}>
-          <span className="lesson-number"><Notebook size={25} weight="duotone" /></span><span className="recent-copy"><small>第一課</small><strong>貓咪</strong><span>課文默寫・聽寫</span></span><span className="progress-ring"><b>2/5</b><small>進度</small></span><span className="card-arrow"><ArrowRight size={21} /></span>
+          <span className="lesson-number"><Notebook size={25} weight="duotone" /></span><span className="recent-copy"><small>第一課</small><strong>貓咪</strong></span><span className="progress-ring"><b>2/5</b><small>進度</small></span><span className="card-arrow"><ArrowRight size={21} /></span>
         </button>
       </section>
 
       <section className="tip-card"><span className="tip-icon"><Lightbulb size={20} weight="duotone" /></span><span><strong>給陪練的大人</strong><small>聽寫時會先播放兩次，時間到才會請你幫忙判定，孩子可以安心慢慢寫。</small></span><button type="button" onClick={() => setView("more")} aria-label="查看陪練說明"><ArrowRight size={20} /></button></section>
-      <section className="quick-courses"><div className="section-title-row"><div><span className="eyebrow">CHOOSE A LESSON</span><h2>選擇課程</h2></div><button className="text-button" type="button" onClick={() => setView("courses")}>看全部 <ArrowRight size={15} /></button></div><div className="quick-course-grid"><button type="button" onClick={() => openLesson(0)}><Sun size={27} weight="duotone" /><strong>第一課</strong><small>{lessons[0].title}</small></button><button type="button" onClick={() => openLesson(1)}><House size={27} weight="duotone" /><strong>第二課</strong><small>{lessons[1].title}</small></button><button type="button" onClick={() => openLesson(2)}><Tree size={27} weight="duotone" /><strong>第三課</strong><small>{lessons[2].title}</small></button></div></section>
+      <section className="quick-courses"><div className="section-title-row"><div><span className="eyebrow">CHOOSE A LESSON</span><h2>選擇課程</h2></div><button className="text-button" type="button" onClick={() => setView("courses")}>看全部 <ArrowRight size={15} aria-hidden="true" /></button></div><div className="quick-course-grid">{lessons.map((item, index) => <button type="button" key={item.title} onClick={() => openLesson(index)}><small>第{["一", "二", "三"][index]}課</small><strong>{item.title}</strong></button>)}</div></section>
     </>
   );
 
@@ -437,8 +431,16 @@ export default function Page() {
         <button className="mode-card listen-mode" type="button" onClick={openListening}><span className="mode-icon" aria-hidden="true"><Headphones size={26} weight="duotone" /></span><small>第二關</small><strong>聽寫</strong></button>
       </div>}
       <div className="lesson-curriculum">
-        <div className="lesson-curriculum-heading"><strong>課文</strong><span>從右到左讀</span></div>
-        <div className="lesson-text-lines" dir="rtl" aria-label={`${lesson.title}課文`}>{lesson.lines.map((line, lineIndex) => <div className="lesson-text-line" dir="ltr" key={lineIndex}>{Array.from(line).map((char, charIndex) => <span className={selectedLesson === 0 && lineIndex === 3 && charIndex === 3 ? "is-neutral-di" : undefined} key={charIndex}>{char}</span>)}</div>)}</div>
+        <div className="lesson-curriculum-heading">
+          <strong>課文</strong>
+          <div className="lesson-preview-switch" role="group" aria-label="課文顯示方式">
+            <button type="button" aria-pressed={previewMode === "annotated"} onClick={() => setPreviewMode("annotated")}>國字＋注音</button>
+            <button type="button" aria-pressed={previewMode === "zhuyin"} onClick={() => setPreviewMode("zhuyin")}>純注音</button>
+          </div>
+        </div>
+        <div className={`lesson-text-lines ${previewMode === "zhuyin" ? "is-zhuyin-only" : ""}`} dir="rtl" aria-label={`${lesson.title}課文，${previewMode === "zhuyin" ? "純注音" : "國字加注音"}`}>
+          {lesson.lines.map((line, lineIndex) => <div className="lesson-text-line" dir="ltr" key={lineIndex}>{Array.from(line).map((char, charIndex) => <span key={charIndex}>{selectedLesson === 0 && lineIndex === 3 && charIndex === 3 ? `${char}\u{E01E1}` : char}</span>)}</div>)}
+        </div>
         <div className="lesson-curriculum-heading"><strong>注音符號</strong></div>
         <div className="lesson-symbols" dir="rtl" aria-label="本課注音符號">{lesson.symbols.map((symbol) => <span key={symbol}>{symbol}</span>)}</div>
       </div>

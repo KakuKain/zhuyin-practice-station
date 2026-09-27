@@ -1,0 +1,10 @@
+BpmfZihiOnly-R.ttf (字嗨注音而已 R)
+Copyright 2020 But Ko, with Reserved Font Name '字嗨' and 'Zihi'.
+https://github.com/ButTaiwan/bpmfvs
+
+Licensed under the SIL Open Font License 1.1. The complete OFL 1.1 text
+is included in BpmfZihiSans-LICENSE.txt in this directory.
+
+Bopomofo IVS Font Specification (注音IVS字型規格)
+Copyright 2020 But Ko
+Licensed under Apache License 2.0. See NOTICE.txt in this directory.
