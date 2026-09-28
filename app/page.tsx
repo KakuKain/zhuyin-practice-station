@@ -105,6 +105,7 @@ const exercises: Record<number, LessonExercise> = {
 };
 
 const siteReleaseNotes = [
+  [23, "依設定間隔重播", "每次只唸一遍；唸完後才開始計算重播間隔，並修正注音符號題的答案顯示。"],
   [22, "生字與語詞聽得更清楚", "生字和語詞也改為每次唸兩遍，中間留停頓。"],
   [21, "注音符號聽得更清楚", "單個注音符號每次會唸兩遍，中間留停頓，讓孩子有時間辨音。"],
   [20, "聽寫聲音與操作介面", "加入網站內建題目音檔；語詞改為上下兩個正方形田字格；重整「更多」與練習紀錄頁。"],
@@ -246,16 +247,17 @@ const syllableGlyphs: Record<string, string> = {
   "ㄔㄠˇ": "炒",
 };
 
-function ZhuyinStack({ text }: { text: string }) {
+function ZhuyinStack({ text, literalSymbol = false }: { text: string; literalSymbol?: boolean }) {
+  const isSymbol = literalSymbol && /^[\u3105-\u3129]$/.test(text);
   return (
     <span className="zhuyin-stack" aria-label={text}>
-      <span className={`zhuyin-glyph ${text === "˙ㄉㄧ" ? "is-neutral-di" : ""} ${text.length === 1 ? "is-symbol" : ""}`} aria-hidden="true">{syllableGlyphs[text] ?? text}</span>
+      <span className={`zhuyin-glyph ${text === "˙ㄉㄧ" ? "is-neutral-di" : ""} ${isSymbol ? "is-symbol" : ""}`} aria-hidden="true">{isSymbol ? text : syllableGlyphs[text] ?? text}</span>
     </span>
   );
 }
 
-function AnswerDisplay({ answer }: { answer: string }) {
-  return <span className={`answer-display ${answer.includes("|") ? "is-word" : ""}`}>{answer.split("|").map((syllable, index) => <ZhuyinStack text={syllable} key={`${index}-${syllable}`} />)}</span>;
+function AnswerDisplay({ answer, literalSymbols = false }: { answer: string; literalSymbols?: boolean }) {
+  return <span className={`answer-display ${answer.includes("|") ? "is-word" : ""}`}>{answer.split("|").map((syllable, index) => <ZhuyinStack text={syllable} literalSymbol={literalSymbols} key={`${index}-${syllable}`} />)}</span>;
 }
 
 const listenCategoryLabels: Record<ListenCategory, string> = { symbols: "第一大題 · 注音符號", characters: "第二大題 · 生字", words: "第三大題 · 語詞" };
@@ -370,6 +372,11 @@ export default function Page() {
   const fillReviewBaselineRef = useRef<Map<string, FillFavorite | null>>(new Map());
   const timerRef = useRef<number | null>(null);
   const timeoutRefs = useRef<number[]>([]);
+  const repeatTimeoutRef = useRef<number | null>(null);
+  const repeatRemainingRef = useRef(0);
+  const autoRepeatEnabledRef = useRef(false);
+  const playbackTokenRef = useRef(0);
+  const playbackEndedRef = useRef<() => void>(() => {});
 
   const exercise = exercises[selectedLesson] ?? exercises[0];
   const lessonLines = exercise.lines;
@@ -487,11 +494,18 @@ export default function Page() {
   const clearListenTimers = useCallback(() => {
     if (timerRef.current !== null) window.clearInterval(timerRef.current);
     timerRef.current = null;
+    if (repeatTimeoutRef.current !== null) window.clearTimeout(repeatTimeoutRef.current);
+    repeatTimeoutRef.current = null;
+    repeatRemainingRef.current = 0;
+    autoRepeatEnabledRef.current = false;
     timeoutRefs.current.forEach((id) => window.clearTimeout(id));
     timeoutRefs.current = [];
   }, []);
 
   const stopPlayback = useCallback(() => {
+    playbackTokenRef.current += 1;
+    if (repeatTimeoutRef.current !== null) window.clearTimeout(repeatTimeoutRef.current);
+    repeatTimeoutRef.current = null;
     const audio = playbackRef.current;
     if (audio) { audio.pause(); audio.currentTime = 0; }
     if ("speechSynthesis" in window) window.speechSynthesis.cancel();
@@ -501,13 +515,18 @@ export default function Page() {
     const audio = playbackRef.current;
     if (!audio) { setAudioError(true); if (view === "practice") setPracticeNotice("音訊無法播放，請重新整理後再試。"); return; }
     stopPlayback();
+    const playbackToken = playbackTokenRef.current;
     setAudioError(false);
     audio.src = listeningAudioUrl(text);
     audio.play().catch(() => {
+      if (playbackToken !== playbackTokenRef.current) return;
       if ("speechSynthesis" in window) {
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = "zh-TW";
         utterance.rate = 0.82;
+        utterance.onend = () => {
+          if (playbackToken === playbackTokenRef.current) playbackEndedRef.current();
+        };
         window.speechSynthesis.speak(utterance);
       } else {
         setAudioError(true);
@@ -515,6 +534,20 @@ export default function Page() {
       }
     });
   }, [stopPlayback, view]);
+
+  playbackEndedRef.current = () => {
+    if (!autoRepeatEnabledRef.current || repeatRemainingRef.current <= 0) return;
+    const nextPlay = listeningSettings.repeatCount - repeatRemainingRef.current + 1;
+    setListenMessage(`等待 ${listeningSettings.intervalSeconds} 秒後播放第 ${nextPlay} 次，可以繼續寫。`);
+    repeatTimeoutRef.current = window.setTimeout(() => {
+      repeatTimeoutRef.current = null;
+      if (!autoRepeatEnabledRef.current || repeatRemainingRef.current <= 0) return;
+      repeatRemainingRef.current -= 1;
+      setPlayCount((current) => current + 1);
+      setListenMessage(`第 ${nextPlay} 次播放中，可以繼續寫。`);
+      speak(currentQuestion.audioText);
+    }, listeningSettings.intervalSeconds * 1000);
+  };
 
   const resetListeningQuestion = (index = 0) => {
     clearListenTimers();
@@ -628,17 +661,11 @@ export default function Page() {
       setSecondsLeft((current) => (current <= 1 ? 0 : current - 1));
     }, 1000);
 
-    const repeatPlaybacks = Array.from({ length: listeningSettings.repeatCount - 1 }, (_, index) => window.setTimeout(() => {
-      setPlayCount((current) => current + 1);
-      setListenMessage(`第 ${index + 2} 次播放中，可以繼續寫，也可以修改剛剛的筆畫。`);
-      speak(currentQuestion.audioText);
-    }, (index + 1) * listeningSettings.intervalSeconds * 1000));
-
     const timeUp = window.setTimeout(() => finishListening(), 30000);
-    timeoutRefs.current = [...repeatPlaybacks, timeUp];
+    timeoutRefs.current = [timeUp];
 
     return clearListenTimers;
-  }, [clearListenTimers, currentQuestion.audioText, finishListening, listenIndex, listenPhase, listeningSettings, speak]);
+  }, [clearListenTimers, finishListening, listenIndex, listenPhase]);
 
   useEffect(() => {
     if (view !== "listen" || (listenPhase !== "active" && listenPhase !== "retry")) return;
@@ -666,6 +693,8 @@ export default function Page() {
   useEffect(() => () => { clearListenTimers(); stopPlayback(); }, [clearListenTimers, stopPlayback]);
 
   const startListening = () => {
+    repeatRemainingRef.current = listeningSettings.repeatCount - 1;
+    autoRepeatEnabledRef.current = true;
     setListenPhase("active");
     setSecondsLeft(30);
     setPlayCount(1);
@@ -676,6 +705,8 @@ export default function Page() {
   };
 
   const startRetryWriting = () => {
+    repeatRemainingRef.current = listeningSettings.repeatCount - 1;
+    autoRepeatEnabledRef.current = true;
     setHasInk(false);
     setWordInk([false, false]);
     setListenPhase("retry");
@@ -1102,14 +1133,14 @@ export default function Page() {
       </div></div>
       <div className="more-group"><h2>資訊與協助</h2><div className="more-settings-list">
         <button type="button" onClick={() => setMorePanel("help")}><span className="more-row-icon green"><Question size={21} aria-hidden="true" /></span><span><strong>使用說明</strong><small>課文默寫、聽寫與錯題重練</small></span><ArrowRight size={17} aria-hidden="true" /></button>
-        <button type="button" onClick={() => setMorePanel("versions")}><span className="more-row-icon orange"><Info size={21} aria-hidden="true" /></span><span><strong>版本</strong><small>目前 v20 · 查看每次更新內容</small></span><ArrowRight size={17} aria-hidden="true" /></button>
+        <button type="button" onClick={() => setMorePanel("versions")}><span className="more-row-icon orange"><Info size={21} aria-hidden="true" /></span><span><strong>版本</strong><small>目前 v23 · 查看每次更新內容</small></span><ArrowRight size={17} aria-hidden="true" /></button>
       </div></div>
       <p className="more-device-note">練習紀錄與設定只存在目前的裝置，不需要登入。</p>
     </section>;
 
     return <section className="page-section more-page more-detail-page">
       <button type="button" className="more-back" onClick={() => setMorePanel("home")}><ArrowLeft size={19} aria-hidden="true" /> 更多</button>
-      {morePanel === "listening" && <div id="listening-settings" className="more-detail-content"><h1>聽寫設定</h1><p className="more-detail-intro">每題第一次播放後開始倒數 30 秒。設定只留在這台裝置。</p><div className="more-setting-group"><fieldset><legend>每題播放幾次</legend><div className="settings-options">{([1, 2, 3] as const).map((count) => <button type="button" key={count} aria-pressed={listeningSettings.repeatCount === count} onClick={() => setListeningSettings((current) => ({ ...current, repeatCount: count }))}>{count} 次</button>)}</div></fieldset><fieldset><legend>兩次播放相隔多久</legend><div className="settings-options">{([5, 8, 10] as const).map((seconds) => <button type="button" key={seconds} aria-pressed={listeningSettings.intervalSeconds === seconds} onClick={() => setListeningSettings((current) => ({ ...current, intervalSeconds: seconds }))}>{seconds} 秒</button>)}</div></fieldset></div><p className="more-detail-footnote">作答時可按「再聽一次」；這不會改變上方設定。</p></div>}
+      {morePanel === "listening" && <div id="listening-settings" className="more-detail-content"><h1>聽寫設定</h1><p className="more-detail-intro">每題第一次播放後開始倒數 30 秒。設定只留在這台裝置。</p><div className="more-setting-group"><fieldset><legend>每題播放幾次</legend><div className="settings-options">{([1, 2, 3] as const).map((count) => <button type="button" key={count} aria-pressed={listeningSettings.repeatCount === count} onClick={() => setListeningSettings((current) => ({ ...current, repeatCount: count }))}>{count} 次</button>)}</div></fieldset><fieldset><legend>唸完後，隔多久再唸</legend><div className="settings-options">{([5, 8, 10] as const).map((seconds) => <button type="button" key={seconds} aria-pressed={listeningSettings.intervalSeconds === seconds} onClick={() => setListeningSettings((current) => ({ ...current, intervalSeconds: seconds }))}>{seconds} 秒</button>)}</div></fieldset></div><p className="more-detail-footnote">作答時可按「再聽一次」；這不會改變上方設定。</p></div>}
       {morePanel === "help" && <div className="more-detail-content"><h1>使用說明</h1><div className="help-steps"><section><span>01</span><div><h2>選一課開始</h2><p>每課有課文默寫與聽寫。可以先看課文預覽，再選要練的方式。</p></div></section><section><span>02</span><div><h2>課文默寫</h2><p>點空格寫完整注音。整篇完成後請家長對照；標記需要重寫的字會留在練習頁。</p></div></section><section><span>03</span><div><h2>聽寫與補強</h2><p>按「開始聽」播放題目，寫完交給家長檢查。需要補強的題目可現在練，也可稍後從練習頁重練。</p></div></section></div><button type="button" className="more-primary-link" onClick={() => setView("courses")}>前往課程 <ArrowRight size={18} aria-hidden="true" /></button></div>}
       {morePanel === "versions" && <div className="more-detail-content"><h1>版本</h1><p className="more-detail-intro">以下依網站公開版本整理更新內容；點開版本可看說明。</p><div className="version-list">{siteReleaseNotes.map(([version, title, description], index) => <details key={version} open={index === 0}><summary><span>v{version}</span><strong>{title}</strong><span className="version-chevron">⌄</span></summary><p>{description}</p></details>)}</div></div>}
     </section>;
@@ -1145,7 +1176,7 @@ export default function Page() {
     const choiceAnswers = currentQuestion.choices;
     return (
     <main className={`focus-shell phase-${listenPhase}`}>
-      <audio ref={playbackRef} preload="none" hidden aria-hidden="true" />
+      <audio ref={playbackRef} onEnded={() => playbackEndedRef.current()} preload="none" hidden aria-hidden="true" />
       <header className="focus-topbar"><button type="button" className="focus-exit" onClick={leaveFocus}>← <span>離開</span></button><div className="focus-question"><strong>{listenCategoryLabels[currentQuestion.category]}</strong><small>{sectionProgress}</small></div><div className="focus-meta"><span className={secondsLeft <= 8 && (listenPhase === "active" || listenPhase === "retry") ? "urgent" : ""}><Timer size={14} weight="bold" /> {listenPhase === "retry_ready" ? "待重寫" : listenPhase === "review" || listenPhase === "choice" ? "已交卷" : `${String(Math.floor(secondsLeft / 60)).padStart(2, "0")}:${String(secondsLeft % 60).padStart(2, "0")}`}</span><span aria-label={`已播放 ${playCount} 次`}><SpeakerHigh size={14} weight="bold" /> {playCount} 次</span></div></header>
       <div className="focus-content">
         <p className="sr-only" aria-live="polite">{listenMessage}</p>
@@ -1153,9 +1184,9 @@ export default function Page() {
         {audioError && <p className="audio-error" role="alert">音訊無法播放。請檢查音量或網路，再按「再聽一次」。</p>}
         {(listenPhase === "active" || listenPhase === "retry") && <button type="button" className="listen-replay-button" onClick={replayQuestion}><SpeakerHigh size={18} aria-hidden="true" /> 再聽一次</button>}
         {listenPhase === "active" && <button type="button" className="early-submit-button" onClick={() => finishListening(true)}>提早交卷</button>}
-        {listenPhase === "review" && <div className="parent-review"><div className="answer-reveal"><span>正確答案</span><AnswerDisplay answer={currentQuestion.answer} /></div><p>{hasCompleteInk ? "請家長依照孩子的手寫內容判定。" : isWordQuestion ? "兩格都寫完後，才可以判定答對；也可以選需要補強。" : "還沒有手寫內容；可以先按「需要補強」再練一次。"}</p><div className="review-actions"><button type="button" className="review-correct" disabled={!hasCompleteInk} onClick={() => handleParentDecision("correct")}>✓ 答對</button><button type="button" className="review-retry" onClick={() => handleParentDecision("needs_review")}>↻ 需要補強</button></div><button type="button" className={`review-save ${currentQuestionSaved ? "is-saved" : ""}`} aria-pressed={currentQuestionSaved} onClick={toggleCurrentQuestionSaved}>{currentQuestionSaved ? "★ 已收藏 · 取消收藏" : "☆ 收藏這題，之後再練"}</button></div>}
+        {listenPhase === "review" && <div className="parent-review"><div className="answer-reveal"><span>正確答案</span><AnswerDisplay answer={currentQuestion.answer} literalSymbols={currentQuestion.category === "symbols"} /></div><p>{hasCompleteInk ? "請家長依照孩子的手寫內容判定。" : isWordQuestion ? "兩格都寫完後，才可以判定答對；也可以選需要補強。" : "還沒有手寫內容；可以先按「需要補強」再練一次。"}</p><div className="review-actions"><button type="button" className="review-correct" disabled={!hasCompleteInk} onClick={() => handleParentDecision("correct")}>✓ 答對</button><button type="button" className="review-retry" onClick={() => handleParentDecision("needs_review")}>↻ 需要補強</button></div><button type="button" className={`review-save ${currentQuestionSaved ? "is-saved" : ""}`} aria-pressed={currentQuestionSaved} onClick={toggleCurrentQuestionSaved}>{currentQuestionSaved ? "★ 已收藏 · 取消收藏" : "☆ 收藏這題，之後再練"}</button></div>}
         {listenPhase === "remediation_offer" && <div className="remediation-offer"><strong>這題已加入待補強</strong><p>可以現在練，也可以先做下一題；稍後會留在「練習」。</p><div><button type="button" onClick={() => { setListenPhase("choice"); setRetryMessage(""); }}>現在補強</button><button type="button" onClick={deferRemediation}>稍後再練</button></div></div>}
-        {listenPhase === "choice" && <div className={`choice-panel ${isWordQuestion ? "is-word" : ""}`}><div className="choice-options">{choiceAnswers.map((answer) => <button type="button" key={answer} onClick={() => selectRemediation(answer)}><AnswerDisplay answer={answer} /></button>)}</div><p>{retryMessage || (isWordQuestion ? "選出你剛剛聽到的完整語詞注音。" : "選出你剛剛聽到的完整音節。")}</p><button type="button" className="remediation-later" onClick={deferRemediation}>稍後再練這題</button></div>}
+        {listenPhase === "choice" && <div className={`choice-panel ${isWordQuestion ? "is-word" : ""}`}><div className="choice-options">{choiceAnswers.map((answer) => <button type="button" key={answer} onClick={() => selectRemediation(answer)}><AnswerDisplay answer={answer} literalSymbols={currentQuestion.category === "symbols"} /></button>)}</div><p>{retryMessage || (isWordQuestion ? "選出你剛剛聽到的完整語詞注音。" : "選出你剛剛聽到的完整音節。")}</p><button type="button" className="remediation-later" onClick={deferRemediation}>稍後再練這題</button></div>}
         {listenPhase === "retry_ready" && <button type="button" className="remediation-later" onClick={deferRemediation}>稍後再練這題</button>}
         {listenPhase === "retry" && <div className="retry-actions"><button type="button" className="retry-submit" disabled={!hasCompleteInk} onClick={submitRetryWriting}>我寫好了，請家長看看 <span>→</span></button><button type="button" className="remediation-later" onClick={deferRemediation}>稍後再練</button></div>}
       </div>
@@ -1182,7 +1213,7 @@ export default function Page() {
 
   return (
     <div className="app-shell">
-      <audio ref={playbackRef} preload="none" hidden aria-hidden="true" />
+      <audio ref={playbackRef} onEnded={() => playbackEndedRef.current()} preload="none" hidden aria-hidden="true" />
       <AppHeader onHome={() => setView("home")} onBackToCourses={view === "lesson" ? () => setView("courses") : undefined} />
       <main className="main-content">{renderMain()}</main>
       <BottomNav active={view === "lesson" || view === "fill" || view === "result" ? "courses" : view} onNavigate={navigate} />

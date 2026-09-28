@@ -148,6 +148,9 @@ test("every listening prompt has an on-site audio clip and the settings pages ha
     assert.ok((await fs.stat(file)).size > 1024, `missing playable clip: ${text}`);
   }
   assert.match(page, /audio\.play\(\)\.catch/);
+  assert.match(page, /const isSymbol = literalSymbol && \/\^\[\\u3105-\\u3129\]\$\//);
+  assert.match(page, /isSymbol \? text : syllableGlyphs\[text\] \?\? text/);
+  assert.match(page, /literalSymbols=\{currentQuestion\.category === "symbols"\}/);
   assert.match(page, /morePanel === "help"/);
   assert.match(page, /morePanel === "versions"/);
   assert.doesNotMatch(page, /每天 5 分鐘，慢慢變熟悉/);
@@ -158,7 +161,10 @@ test("parent review, listening preferences, and deferred reinforcement remain av
   assert.match(page, /ListeningSettings = \{ repeatCount: 1 \| 2 \| 3; intervalSeconds: 5 \| 8 \| 10 \}/);
   assert.match(page, /listeningSettingsStorageKey/);
   assert.match(page, /listenPhase === "ready" \? <div className="listen-ready-card"/);
-  assert.match(page, /repeatPlaybacks = Array\.from/);
+  assert.match(page, /repeatTimeoutRef\.current = window\.setTimeout/);
+  assert.match(page, /listeningSettings\.intervalSeconds \* 1000/);
+  assert.match(page, /onEnded=\{\(\) => playbackEndedRef\.current\(\)\}/);
+  assert.doesNotMatch(page, /repeatPlaybacks = Array\.from/);
   assert.match(page, /needsPractice: true/);
   assert.match(page, /現在補強/);
   assert.match(page, /稍後再練/);
