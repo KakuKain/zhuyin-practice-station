@@ -25,17 +25,20 @@ const listeningSettingsStorageKey = "zhuyin-listening-settings-v1";
 const defaultListeningSettings: ListeningSettings = { repeatCount: 2, intervalSeconds: 8 };
 const previousPracticeStorageKey = "zhuyin-practice-state-v2";
 const firstPracticeStorageKey = "zhuyin-practice-state-v1";
+const lessonNumerals = ["一", "二", "三", "四"] as const;
 
 const lessons = [
   { title: "貓咪", lines: ["咪咪咪", "咪咪咪", "逼", "貓咪弟弟", "跑第一"], symbols: ["ㄅ", "ㄆ", "ㄇ", "ㄉ", "ㄧ", "ㄠ"] },
   { title: "鵝寶寶", lines: ["鵝鵝鵝", "鵝鵝鵝", "哈哈哈", "好得意", "孵出", "五隻鵝寶寶"], symbols: ["ㄈ", "ㄏ", "ㄓ", "ㄔ", "ㄨ", "ㄚ", "ㄜ"] },
   { title: "河馬和河狸", lines: ["河馬要去泡澡", "半路遇到河狸", "喔", "河狸", "忙著築巢"], symbols: ["ㄌ", "ㄑ", "ㄗ", "ㄩ", "ㄛ", "ㄢ", "ㄤ"] },
+  { title: "笑嘻嘻", lines: ["背著書包", "手拉手", "背著書包", "笑嘻嘻", "一二一", "好歡喜"], symbols: ["ㄒ", "ㄕ", "ㄟ", "ㄡ", "ㄦ", "ㄧㄠ", "ㄨㄢ"] },
 ] as const;
 
 // The font's first alternate reading is selected with IVS U+E01E1 in both preview modes.
 const previewPronunciationVariants: Record<number, Record<number, Record<number, string>>> = {
   0: { 3: { 3: "\u{E01E1}" } }, // 貓咪弟弟：第二個「弟」讀輕聲
   1: { 5: { 4: "\u{E01E1}" } }, // 五隻鵝寶寶：第二個「寶」依課本讀輕聲
+  3: { 0: { 0: "\u{E01E1}" }, 2: { 0: "\u{E01E1}" } }, // 背著書包：背讀ㄅㄟ
 };
 
 const firstLessonLines = [
@@ -59,6 +62,14 @@ const thirdLessonLines = [
   [{ character: "喔", zhuyin: "ㄛ" }],
   [{ character: "河", zhuyin: "ㄏㄜˊ" }, { character: "狸", zhuyin: "ㄌㄧˊ" }],
   [{ character: "忙", zhuyin: "ㄇㄤˊ" }, { character: "著", zhuyin: "˙ㄓㄜ" }, { character: "築", zhuyin: "ㄓㄨˊ" }, { character: "巢", zhuyin: "ㄔㄠˊ" }],
+] as const;
+const fourthLessonLines = [
+  [{ character: "背", zhuyin: "ㄅㄟ" }, { character: "著", zhuyin: "˙ㄓㄜ" }, { character: "書", zhuyin: "ㄕㄨ" }, { character: "包", zhuyin: "ㄅㄠ" }],
+  [{ character: "手", zhuyin: "ㄕㄡˇ" }, { character: "拉", zhuyin: "ㄌㄚ" }, { character: "手", zhuyin: "ㄕㄡˇ" }],
+  [{ character: "背", zhuyin: "ㄅㄟ" }, { character: "著", zhuyin: "˙ㄓㄜ" }, { character: "書", zhuyin: "ㄕㄨ" }, { character: "包", zhuyin: "ㄅㄠ" }],
+  [{ character: "笑", zhuyin: "ㄒㄧㄠˋ" }, { character: "嘻", zhuyin: "ㄒㄧ" }, { character: "嘻", zhuyin: "ㄒㄧ" }],
+  [{ character: "一", zhuyin: "ㄧ" }, { character: "二", zhuyin: "ㄦˋ" }, { character: "一", zhuyin: "ㄧ" }],
+  [{ character: "好", zhuyin: "ㄏㄠˇ" }, { character: "歡", zhuyin: "ㄏㄨㄢ" }, { character: "喜", zhuyin: "ㄒㄧˇ" }],
 ] as const;
 
 const firstListeningQuestions = [
@@ -97,14 +108,28 @@ const thirdListeningQuestions = [
   { category: "words", answer: "ㄏㄜˊ|ㄇㄚˇ", audioText: "河馬", distractors: ["ㄏㄜˊ|ㄌㄧˊ", "ㄇㄚˇ|ㄏㄜˊ"] },
   { category: "words", answer: "ㄏㄜˊ|ㄌㄧˊ", audioText: "河狸", distractors: ["ㄏㄜˊ|ㄇㄚˇ", "ㄌㄧˊ|ㄏㄜˊ"] },
 ] as const;
+const fourthListeningQuestions = [
+  { category: "symbols", answer: "ㄒ", audioText: "ㄒ", distractors: ["ㄕ", "ㄟ"] },
+  { category: "symbols", answer: "ㄕ", audioText: "ㄕ", distractors: ["ㄒ", "ㄦ"] },
+  { category: "symbols", answer: "ㄟ", audioText: "ㄟ", distractors: ["ㄡ", "ㄦ"] },
+  { category: "symbols", answer: "ㄡ", audioText: "ㄡ", distractors: ["ㄟ", "ㄦ"] },
+  { category: "characters", answer: "ㄅㄟ", audioText: "背", distractors: ["ㄅㄟˋ", "ㄅㄠ"] },
+  { category: "characters", answer: "ㄕㄨ", audioText: "書", distractors: ["ㄕㄡˇ", "ㄕㄨˋ"] },
+  { category: "characters", answer: "ㄒㄧㄠˋ", audioText: "笑", distractors: ["ㄒㄧ", "ㄒㄧㄠ"] },
+  { category: "characters", answer: "ㄏㄨㄢ", audioText: "歡", distractors: ["ㄏㄨㄢˊ", "ㄏㄠˇ"] },
+  { category: "words", answer: "ㄕㄨ|ㄅㄠ", audioText: "書包", distractors: ["ㄕㄡˇ|ㄅㄠ", "ㄕㄨ|ㄅㄟ"] },
+  { category: "words", answer: "ㄏㄨㄢ|ㄒㄧˇ", audioText: "歡喜", distractors: ["ㄏㄨㄢ|ㄒㄧ", "ㄏㄠˇ|ㄒㄧˇ"] },
+] as const;
 
 const exercises: Record<number, LessonExercise> = {
   0: { lines: firstLessonLines, questions: firstListeningQuestions },
   1: { lines: secondLessonLines, questions: secondListeningQuestions },
   2: { lines: thirdLessonLines, questions: thirdListeningQuestions },
+  3: { lines: fourthLessonLines, questions: fourthListeningQuestions },
 };
 
 const siteReleaseNotes = [
+  [25, "開放第四課《笑嘻嘻》", "加入第四課課文、注音預覽、逐格默寫與隨機聽寫，並校正「背著書包」的讀音。"],
   [24, "平板轉向時保持筆畫位置", "手寫格會隨畫面尺寸重新對齊，已寫的注音在直橫向切換後仍保留原位。"],
   [23, "依設定間隔重播", "每次只唸一遍；唸完後才開始計算重播間隔，並修正注音符號題的答案顯示。"],
   [22, "生字與語詞聽得更清楚", "生字和語詞也改為每次唸兩遍，中間留停頓。"],
@@ -172,6 +197,10 @@ const extraWordQuestions: Record<number, readonly ListeningSeed[]> = {
     { category: "words", answer: "ㄩˋ|ㄉㄠˋ", audioText: "遇到", distractors: ["ㄩˋ|ㄗㄠˇ", "ㄑㄩˋ|ㄉㄠˋ"] },
     { category: "words", answer: "ㄓㄨˊ|ㄔㄠˊ", audioText: "築巢", distractors: ["ㄓㄨˊ|ㄗㄠˇ", "ㄔㄠˊ|ㄓㄨˊ"] },
   ],
+  3: [
+    { category: "words", answer: "ㄅㄟ|˙ㄓㄜ", audioText: "背著", distractors: ["ㄅㄟˋ|˙ㄓㄜ", "ㄅㄟ|ㄕㄨ"] },
+    { category: "words", answer: "ㄌㄚ|ㄕㄡˇ", audioText: "拉手", distractors: ["ㄌㄚ|ㄕㄨ", "ㄕㄡˇ|ㄌㄚ"] },
+  ],
 };
 
 function shuffleItems<T>(items: readonly T[]): T[] {
@@ -232,7 +261,11 @@ const fallbackListeningQuestion: ListeningQuestion = { ...firstListeningQuestion
 // representative Han character. Rendering individual Bopomofo characters would
 // discard the font's built-in tone placement.
 const syllableGlyphs: Record<string, string> = {
-  ...Object.fromEntries([firstLessonLines, secondLessonLines, thirdLessonLines].flat(2).map(({ character, zhuyin }) => [zhuyin, character])),
+  ...Object.fromEntries([firstLessonLines, secondLessonLines, thirdLessonLines, fourthLessonLines].flat(2).map(({ character, zhuyin }) => [zhuyin, character])),
+  "ㄅㄟ": "背\u{E01E1}",
+  "ㄅㄟˋ": "背",
+  "ㄧㄠ": "腰",
+  "ㄨㄢ": "彎",
   "˙ㄅㄠ": "寶\u{E01E1}",
   "ㄇㄠˊ": "毛",
   "ㄇㄠˇ": "卯",
@@ -395,7 +428,7 @@ export default function Page() {
   const sectionProgress = singleQuestionPractice ? "收藏題目重練" : isWordQuestion ? `第 ${sectionQuestionIndex * 2 + 1}–${sectionQuestionIndex * 2 + 2} 格 / 4` : `第 ${sectionQuestionIndex + 1} 小題 / 4`;
   const isFocusMode = view === "listen";
   const lesson = lessons[selectedLesson];
-  const lessonNumber = ["一", "二", "三"][selectedLesson];
+  const lessonNumber = lessonNumerals[selectedLesson];
   const currentQuestionSaved = practiceState.savedQuestions.some((item) => item.lessonIndex === selectedLesson && item.questionId === currentQuestion.id);
   const pendingSessionCount = reviewedIndexes.filter((index) => practiceState.savedQuestions.some((item) => item.lessonIndex === selectedLesson && item.questionId === listeningQuestions[index]?.id && item.needsPractice)).length;
 
@@ -1047,7 +1080,7 @@ export default function Page() {
       </section>
 
       <section className="tip-card"><span className="tip-icon"><Lightbulb size={20} weight="duotone" /></span><span><strong>給陪練的大人</strong><small>聽寫時會先播放兩次，時間到才會請你幫忙判定，孩子可以安心慢慢寫。</small></span><button type="button" onClick={() => setView("more")} aria-label="查看陪練說明"><ArrowRight size={20} /></button></section>
-      <section className="quick-courses"><div className="section-title-row"><div><span className="eyebrow">CHOOSE A LESSON</span><h2>選擇課程</h2></div><button className="text-button" type="button" onClick={() => setView("courses")}>看全部 <ArrowRight size={15} aria-hidden="true" /></button></div><div className="quick-course-grid">{lessons.map((item, index) => <button type="button" key={item.title} onClick={() => openLesson(index)}><small>第{["一", "二", "三"][index]}課</small><strong>{item.title}</strong></button>)}</div></section>
+      <section className="quick-courses"><div className="section-title-row"><div><span className="eyebrow">CHOOSE A LESSON</span><h2>選擇課程</h2></div><button className="text-button" type="button" onClick={() => setView("courses")}>看全部 <ArrowRight size={15} aria-hidden="true" /></button></div><div className="quick-course-grid">{lessons.map((item, index) => <button type="button" key={item.title} onClick={() => openLesson(index)}><small>第{lessonNumerals[index]}課</small><strong>{item.title}</strong></button>)}</div></section>
     </>
   );
 
@@ -1059,9 +1092,10 @@ export default function Page() {
         {[
           ["02", "第二課", lessons[1].title, "默寫 · 聽寫"],
           ["03", "第三課", lessons[2].title, "默寫 · 聽寫"],
+          ["04", "第四課", lessons[3].title, "默寫 · 聽寫"],
         ].map(([number, title, subtitle, status], index) => <button className="course-tile" type="button" key={number} onClick={() => openLesson(index + 1)}><span className="course-tile-number">{number}</span><strong>{title}</strong><b>{subtitle}</b><small>{status}</small><span className="lock-icon">→</span></button>)}
       </div>
-      <div className="course-note"><span>☑</span><p><strong>三課都能練習</strong><br />每課都可以練課文默寫與隨機聽寫。</p></div>
+      <div className="course-note"><span>☑</span><p><strong>四課都能練習</strong><br />每課都可以練課文默寫與隨機聽寫。</p></div>
     </section>
   );
 
@@ -1084,7 +1118,7 @@ export default function Page() {
           {lesson.lines.map((line, lineIndex) => <div className="lesson-text-line" dir="ltr" key={lineIndex}>{Array.from(line).map((char, charIndex) => <span key={charIndex}>{char}{previewPronunciationVariants[selectedLesson]?.[lineIndex]?.[charIndex] ?? ""}</span>)}</div>)}
         </div>
         <div className="lesson-curriculum-heading"><strong>注音符號</strong></div>
-        <div className="lesson-symbols" dir="rtl" aria-label="本課注音符號">{lesson.symbols.map((symbol) => <span key={symbol}>{symbol}</span>)}</div>
+        <div className="lesson-symbols" dir="rtl" aria-label="本課注音符號">{lesson.symbols.map((symbol) => <span className={symbol.length > 1 ? "is-combination" : undefined} key={symbol}>{symbol}</span>)}</div>
       </div>
       {!exercises[selectedLesson] && <p className="lesson-upcoming">這一課的課文默寫與聽寫練習準備中。</p>}
     </section>
@@ -1143,7 +1177,7 @@ export default function Page() {
     const favorite = fillPracticeTarget;
     const location = fillLocation(favorite.lessonIndex, favorite.positions[0]);
     return <main className="fill-focus-shell fill-practice-shell">
-      <header className="fill-focus-header"><button type="button" onClick={() => { if (fillPracticePhase === "writing" && fillIsDirty && !window.confirm("這一格還沒交給家長檢查，要返回練習嗎？")) return; setView("practice"); }}><ArrowLeft size={19} aria-hidden="true" /> 回到練習</button><strong>錯字重練</strong><span>第{["一", "二", "三"][favorite.lessonIndex]}課</span></header>
+      <header className="fill-focus-header"><button type="button" onClick={() => { if (fillPracticePhase === "writing" && fillIsDirty && !window.confirm("這一格還沒交給家長檢查，要返回練習嗎？")) return; setView("practice"); }}><ArrowLeft size={19} aria-hidden="true" /> 回到練習</button><strong>錯字重練</strong><span>第{lessonNumerals[favorite.lessonIndex]}課</span></header>
       {fillPracticePhase === "writing" ? <div className="fill-focus-body"><div className="fill-practice-prompt"><small>{lessons[favorite.lessonIndex].title} · {location}</small><h1>寫出「{favorite.character}」的注音</h1><p>寫好後交給家長檢查，正確答案會在下一頁顯示。</p></div><div className="fill-writing-grid"><canvas ref={fillCanvasRef} onPointerDown={beginFillDrawing} onPointerMove={moveFillDrawing} onPointerUp={endFillDrawing} onPointerCancel={endFillDrawing} aria-label={`${favorite.character}注音手寫區`} /></div><div className="fill-writing-actions"><button type="button" className="fill-clear-button" onClick={clearFillDrawing}>清除重寫</button><button type="button" className="fill-save-button" disabled={!fillHasInk} onClick={() => { if (!fillDraftRef.current.length) return; setFillPracticeStrokes(fillDraftRef.current.map((stroke) => stroke.map((point) => ({ ...point })))); setFillPracticePhase("review"); }}>請家長檢查 <ArrowRight size={19} aria-hidden="true" /></button></div></div> : <div className="fill-review-body fill-practice-review"><h1>請家長一起檢查</h1><p>{lessons[favorite.lessonIndex].title} · {location} ·「{favorite.character}」</p><div className="fill-practice-compare"><div><small>孩子寫的</small><div className="fill-compare-ink"><InkPreview strokes={fillPracticeStrokes} /></div></div><div><small>正確注音</small><div className="fill-compare-answer"><ZhuyinStack text={favorite.zhuyin} /></div></div></div><div className="fill-review-actions"><button type="button" onClick={() => { setFillPracticePhase("writing"); setFillPracticeStrokes([]); setFillHasInk(false); }}>再寫一次</button><button type="button" onClick={() => removeFillFavorite(favorite, true)}>已掌握 · 移出收藏</button></div><button type="button" className="fill-practice-defer" onClick={() => { setFillFavorites((current) => current.map((item) => fillFavoriteKey(item) === fillFavoriteKey(favorite) ? { ...item, status: "review_later" } : item)); setPracticeNotice("已保留在錯字收藏，下次可以再練。"); setView("practice"); }}>稍後再練，保留收藏</button></div>}
     </main>;
   };
@@ -1156,7 +1190,7 @@ export default function Page() {
       <div className="section-title-row"><h2>課文默寫 · 錯字收藏</h2><span className="list-count">{fillFavorites.length} 個注音</span></div>
       {fillFavorites.length ? <div className="saved-question-list fill-favorite-list">{fillFavorites.map((favorite) => <div className="saved-question fill-favorite" key={fillFavoriteKey(favorite)}>
         <span className="saved-question-icon"><PencilLine size={24} weight="duotone" aria-hidden="true" /></span>
-        <div className="saved-question-copy"><strong>第{["一", "二", "三"][favorite.lessonIndex]}課 · {lessons[favorite.lessonIndex].title} · {favorite.character}</strong><small>{fillLocation(favorite.lessonIndex, favorite.positions[0])}{favorite.positions.length > 1 ? ` 等 ${favorite.positions.length} 格` : ""} · {favorite.status === "needs_rewrite" ? "待重寫" : "待複習"}</small></div>
+        <div className="saved-question-copy"><strong>第{lessonNumerals[favorite.lessonIndex]}課 · {lessons[favorite.lessonIndex].title} · {favorite.character}</strong><small>{fillLocation(favorite.lessonIndex, favorite.positions[0])}{favorite.positions.length > 1 ? ` 等 ${favorite.positions.length} 格` : ""} · {favorite.status === "needs_rewrite" ? "待重寫" : "待複習"}</small></div>
         <div className="saved-question-actions"><button type="button" className="saved-start" onClick={() => openFillFavorite(favorite)}>重練注音</button><button type="button" className="saved-remove" onClick={() => removeFillFavorite(favorite)}>取消收藏</button></div>
       </div>)}</div> : <div className="empty-reinforce"><span>✎</span><strong>目前沒有課文錯字收藏</strong><small>家長檢查默寫時標記「需要重寫」，就會自動加入這裡。</small></div>}
       <div className="section-title-row practice-list-heading"><h2>聽寫 · 待補強與收藏</h2><span className="list-count">{practiceState.savedQuestions.filter((item) => item.needsPractice).length} 題待補強</span></div>
@@ -1166,9 +1200,9 @@ export default function Page() {
           if (!question) return null;
           return <div className="saved-question" key={`${lessonIndex}-${questionId}`}>
             <span className="saved-question-icon"><Headphones size={24} weight="duotone" aria-hidden="true" /></span>
-            <div className="saved-question-copy"><strong>第{["一", "二", "三"][lessonIndex]}課 · {listenCategoryLabels[question.category]}</strong><small>{lessons[lessonIndex].title} · {needsPractice ? "待補強" : "已收藏"} · 題目 {savedIndex + 1}</small></div>
+            <div className="saved-question-copy"><strong>第{lessonNumerals[lessonIndex]}課 · {listenCategoryLabels[question.category]}</strong><small>{lessons[lessonIndex].title} · {needsPractice ? "待補強" : "已收藏"} · 題目 {savedIndex + 1}</small></div>
             <div className="saved-question-actions">
-              <button type="button" onClick={() => speak(question.audioText)} aria-label={`播放第${["一", "二", "三"][lessonIndex]}課收藏題目 ${savedIndex + 1}`}><SpeakerHigh size={18} aria-hidden="true" /> 播放</button>
+              <button type="button" onClick={() => speak(question.audioText)} aria-label={`播放第${lessonNumerals[lessonIndex]}課收藏題目 ${savedIndex + 1}`}><SpeakerHigh size={18} aria-hidden="true" /> 播放</button>
               <button type="button" className="saved-start" onClick={() => openSavedQuestion(lessonIndex, questionId)}>重練這題</button>
               <button type="button" className="saved-remove" onClick={() => removeQuestion(lessonIndex, questionId)}>取消收藏</button>
             </div>
@@ -1176,7 +1210,7 @@ export default function Page() {
         })}
       </div> : <div className="empty-reinforce"><span>☆</span><strong>目前沒有待補強或收藏題目</strong><small>聽寫時按「需要補強」會先記下題目，之後可以再練。</small></div>}
       <div className="practice-list"><div className="section-title-row"><h2>最近練習</h2><span className="list-count">{practiceState.recentLesson === null ? "0 個紀錄" : "1 個紀錄"}</span></div>
-        {practiceState.recentLesson === null ? <p className="practice-no-recent">還沒有練習紀錄，先選一課開始吧。</p> : <button className="practice-row" type="button" onClick={() => openLesson(practiceState.recentLesson!)}><span className="practice-row-icon">{String(practiceState.recentLesson + 1).padStart(2, "0")}</span><span><strong>第{["一", "二", "三"][practiceState.recentLesson]}課・{lessons[practiceState.recentLesson].title}</strong><small>回到課程</small></span><b>繼續 <span>→</span></b></button>}
+        {practiceState.recentLesson === null ? <p className="practice-no-recent">還沒有練習紀錄，先選一課開始吧。</p> : <button className="practice-row" type="button" onClick={() => openLesson(practiceState.recentLesson!)}><span className="practice-row-icon">{String(practiceState.recentLesson + 1).padStart(2, "0")}</span><span><strong>第{lessonNumerals[practiceState.recentLesson]}課・{lessons[practiceState.recentLesson].title}</strong><small>回到課程</small></span><b>繼續 <span>→</span></b></button>}
       </div>
     </section>
   );
@@ -1189,7 +1223,7 @@ export default function Page() {
       </div></div>
       <div className="more-group"><h2>資訊與協助</h2><div className="more-settings-list">
         <button type="button" onClick={() => setMorePanel("help")}><span className="more-row-icon green"><Question size={21} aria-hidden="true" /></span><span><strong>使用說明</strong><small>課文默寫、聽寫與錯題重練</small></span><ArrowRight size={17} aria-hidden="true" /></button>
-        <button type="button" onClick={() => setMorePanel("versions")}><span className="more-row-icon orange"><Info size={21} aria-hidden="true" /></span><span><strong>版本</strong><small>目前 v24 · 查看每次更新內容</small></span><ArrowRight size={17} aria-hidden="true" /></button>
+        <button type="button" onClick={() => setMorePanel("versions")}><span className="more-row-icon orange"><Info size={21} aria-hidden="true" /></span><span><strong>版本</strong><small>目前 v25 · 查看每次更新內容</small></span><ArrowRight size={17} aria-hidden="true" /></button>
       </div></div>
       <p className="more-device-note">練習紀錄與設定只存在目前的裝置，不需要登入。</p>
     </section>;

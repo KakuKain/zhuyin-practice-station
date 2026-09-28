@@ -565,3 +565,9 @@ body { background: #e7f2f9; }
 .version-list details[open] .version-chevron { transform: rotate(180deg); }
 .version-list p { margin: 0; padding: 0 15px 17px 66px; color: #607895; font-size: 14px; line-height: 1.6; }
 .more-settings-list button:focus-visible, .more-back:focus-visible, .more-primary-link:focus-visible, .version-list summary:focus-visible { outline: 3px solid #f0a341; outline-offset: -3px; }
+
+/* Four lessons remain balanced on phones while fitting one row on wider screens. */
+.quick-course-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.quick-course-grid button:nth-child(4) { background: #fff3f1; border-color: #f0c9c3; }
+.lesson-symbols span.is-combination { width: 58px; font-size: 20px; }
+@media (max-width: 760px) { .quick-course-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

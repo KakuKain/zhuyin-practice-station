@@ -26,6 +26,7 @@ test("server-renders the public zhuyin practice station", async () => {
   assert.match(html, /貓咪/);
   assert.match(html, /鵝寶寶/);
   assert.match(html, /河馬和河狸/);
+  assert.match(html, /笑嘻嘻/);
   assert.match(html, /不用登入也能練/);
 });
 
@@ -62,6 +63,7 @@ test("the source keeps the handoff interaction vocabulary", async () => {
   assert.match(page, /symbols: \["ㄅ", "ㄆ", "ㄇ", "ㄉ", "ㄧ", "ㄠ"\]/);
   assert.match(page, /symbols: \["ㄈ", "ㄏ", "ㄓ", "ㄔ", "ㄨ", "ㄚ", "ㄜ"\]/);
   assert.match(page, /symbols: \["ㄌ", "ㄑ", "ㄗ", "ㄩ", "ㄛ", "ㄢ", "ㄤ"\]/);
+  assert.match(page, /symbols: \["ㄒ", "ㄕ", "ㄟ", "ㄡ", "ㄦ", "ㄧㄠ", "ㄨㄢ"\]/);
   assert.doesNotMatch(page, /兩種方式，自己選一個開始|看直式注音格，把缺少的音節拖回去|聽聲音、自由手寫，最後交給家長判定/);
   assert.match(page, /lesson-symbols" dir="rtl"/);
   assert.match(css, /BpmfZihiSans-Regular\.ttf/);
@@ -93,20 +95,25 @@ test("fill mistakes stay in a separate collection until a parent removes them", 
   assert.match(page, /聽寫 · 待補強與收藏/);
 });
 
-test("all three lessons have three listening sections with four writing units each", async () => {
+test("all four lessons have three listening sections with four writing units each", async () => {
   const page = await (await import("node:fs/promises")).readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
   const css = await (await import("node:fs/promises")).readFile(new URL("../app/globals.css", import.meta.url), "utf8");
   assert.match(page, /const secondLessonLines = \[/);
   assert.match(page, /const thirdLessonLines = \[/);
+  assert.match(page, /const fourthLessonLines = \[/);
   assert.match(page, /character: "寶", zhuyin: "˙ㄅㄠ"/);
   assert.match(page, /character: "築", zhuyin: "ㄓㄨˊ"/);
   assert.match(page, /character: "著", zhuyin: "˙ㄓㄜ"/);
   assert.match(page, /1: \{ lines: secondLessonLines, questions: secondListeningQuestions \}/);
   assert.match(page, /2: \{ lines: thirdLessonLines, questions: thirdListeningQuestions \}/);
+  assert.match(page, /3: \{ lines: fourthLessonLines, questions: fourthListeningQuestions \}/);
+  assert.match(page, /lines: \["背著書包", "手拉手", "背著書包", "笑嘻嘻", "一二一", "好歡喜"\]/);
+  assert.match(page, /3: \{ 0: \{ 0: "\\u\{E01E1\}" \}, 2: \{ 0: "\\u\{E01E1\}" \} \}/);
   assert.match(page, /const exercise = exercises\[selectedLesson\]/);
   assert.match(page, /const listeningQuestions = sessionQuestions/);
   assert.match(page, /第三課", lessons\[2\]\.title, "默寫 · 聽寫"/);
-  for (const lesson of ["first", "second", "third"]) {
+  assert.match(page, /第四課", lessons\[3\]\.title, "默寫 · 聽寫"/);
+  for (const lesson of ["first", "second", "third", "fourth"]) {
     const questions = page.match(new RegExp(`const ${lesson}ListeningQuestions = \\[([\\s\\S]*?)\\] as const;`))?.[1];
     assert.ok(questions, `${lesson} listening questions exist`);
     assert.equal((questions.match(/category: "symbols"/g) ?? []).length, 4);
@@ -132,6 +139,7 @@ test("all three lessons have three listening sections with four writing units ea
   assert.doesNotMatch(page, /第二課先讀課文與注音符號|lessons\[1\]\.title, "閱讀課文"/);
   assert.match(page, /listeningCorrect: current\.listeningCorrect \+ currentQuestion\.answer\.split\("\|"\)\.length/);
   assert.match(page, /三大題 · \{sessionScore\.listeningCorrect\} \/ 12 格完成/);
+  assert.match(css, /\.quick-course-grid \{ grid-template-columns: repeat\(4, minmax\(0, 1fr\)\)/);
 });
 
 test("every listening prompt has an on-site audio clip and the settings pages have real destinations", async () => {
@@ -151,6 +159,9 @@ test("every listening prompt has an on-site audio clip and the settings pages ha
   assert.match(page, /const isSymbol = literalSymbol && \/\^\[\\u3105-\\u3129\]\$\//);
   assert.match(page, /isSymbol \? text : syllableGlyphs\[text\] \?\? text/);
   assert.match(page, /literalSymbols=\{currentQuestion\.category === "symbols"\}/);
+  assert.match(page, /"ㄅㄟ": "背\\u\{E01E1\}"/);
+  assert.match(page, /"ㄧㄠ": "腰"/);
+  assert.match(page, /"ㄨㄢ": "彎"/);
   assert.match(page, /morePanel === "help"/);
   assert.match(page, /morePanel === "versions"/);
   assert.doesNotMatch(page, /每天 5 分鐘，慢慢變熟悉/);

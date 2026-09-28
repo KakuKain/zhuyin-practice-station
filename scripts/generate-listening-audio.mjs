@@ -17,6 +17,13 @@ mkdirSync(output, { recursive: true });
 const temporary = mkdtempSync(join(tmpdir(), "zhuyin-audio-"));
 let created = 0;
 const refreshAll = process.argv.includes("--refresh-all");
+// Use unambiguous spoken equivalents for polyphonic characters and combined sounds.
+const spokenTextOverrides = new Map([
+  ["背", "揹"],
+  ["背著", "揹著"],
+  ["ㄧㄠ", "腰"],
+  ["ㄨㄢ", "彎"],
+]);
 
 try {
   for (const text of texts) {
@@ -25,7 +32,7 @@ try {
     if (existsSync(destination) && statSync(destination).size > 1024 && !refreshAll) continue;
     const sourceAudio = join(temporary, `${filename}.aiff`);
     // One clip is one reading. The app controls the gap between repetitions.
-    execFileSync("say", ["-v", "Meijia", "-r", "100", "-o", sourceAudio, text]);
+    execFileSync("say", ["-v", "Meijia", "-r", "100", "-o", sourceAudio, spokenTextOverrides.get(text) ?? text]);
     execFileSync("afconvert", ["-f", "m4af", "-d", "aac", "-b", "48000", sourceAudio, destination]);
     if (statSync(destination).size <= 1024) throw new Error(`Empty audio clip for ${text}`);
     created++;
