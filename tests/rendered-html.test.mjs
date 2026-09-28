@@ -170,3 +170,13 @@ test("parent review, listening preferences, and deferred reinforcement remain av
   assert.match(page, /稍後再練/);
   assert.match(page, /markQuestionPracticed\(selectedLesson, currentQuestion\.id\)/);
 });
+
+test("handwriting canvases resize with the layout without discarding ink", async () => {
+  const page = await (await import("node:fs/promises")).readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  assert.match(page, /const observer = new ResizeObserver\(resize\)/);
+  assert.match(page, /window\.addEventListener\("resize", resize\)/);
+  assert.match(page, /context\.setTransform\(ratio, 0, 0, ratio, 0, 0\)/);
+  assert.match(page, /context\.drawImage\(previous, 0, 0, previous\.width, previous\.height, 0, 0, rect\.width, rect\.height\)/);
+  assert.match(page, /for \(const stroke of fillDraftRef\.current\)/);
+  assert.match(page, /if \(!initialize && canvas\.width === width && canvas\.height === height\) return/);
+});

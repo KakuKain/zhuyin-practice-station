@@ -105,6 +105,7 @@ const exercises: Record<number, LessonExercise> = {
 };
 
 const siteReleaseNotes = [
+  [24, "平板轉向時保持筆畫位置", "手寫格會隨畫面尺寸重新對齊，已寫的注音在直橫向切換後仍保留原位。"],
   [23, "依設定間隔重播", "每次只唸一遍；唸完後才開始計算重播間隔，並修正注音符號題的答案顯示。"],
   [22, "生字與語詞聽得更清楚", "生字和語詞也改為每次唸兩遍，中間留停頓。"],
   [21, "注音符號聽得更清楚", "單個注音符號每次會唸兩遍，中間留停頓，讓孩子有時間辨音。"],
@@ -364,6 +365,8 @@ export default function Page() {
   const [hasInk, setHasInk] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wordCanvasRefs = useRef<(HTMLCanvasElement | null)[]>([]);
+  const listeningPointerIdRef = useRef<number | null>(null);
+  const listeningActiveCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const playbackRef = useRef<HTMLAudioElement>(null);
   const fillCanvasRef = useRef<HTMLCanvasElement>(null);
   const fillDraftRef = useRef<InkStroke[]>([]);
@@ -669,25 +672,46 @@ export default function Page() {
 
   useEffect(() => {
     if (view !== "listen" || (listenPhase !== "active" && listenPhase !== "retry")) return;
-    const frame = window.requestAnimationFrame(() => {
-      const canvases = currentQuestion.category === "words" ? wordCanvasRefs.current : [canvasRef.current];
-      for (const canvas of canvases) {
-        if (!canvas) continue;
-        const rect = canvas.getBoundingClientRect();
-        const ratio = Math.min(window.devicePixelRatio || 1, 2);
-        canvas.width = Math.max(1, Math.floor(rect.width * ratio));
-        canvas.height = Math.max(1, Math.floor(rect.height * ratio));
-        const context = canvas.getContext("2d");
-        if (!context) continue;
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        context.scale(ratio, ratio);
-        context.lineCap = "round";
-        context.lineJoin = "round";
-        context.lineWidth = 4;
-        context.strokeStyle = "#27463f";
+    const canvases = (currentQuestion.category === "words" ? wordCanvasRefs.current : [canvasRef.current]).filter((canvas): canvas is HTMLCanvasElement => canvas !== null);
+    const sizeCanvas = (canvas: HTMLCanvasElement, preserveInk: boolean) => {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      const ratio = Math.min(window.devicePixelRatio || 1, 2);
+      const width = Math.max(1, Math.round(rect.width * ratio));
+      const height = Math.max(1, Math.round(rect.height * ratio));
+      if (preserveInk && canvas.width === width && canvas.height === height) return;
+      const previous = document.createElement("canvas");
+      if (preserveInk) {
+        previous.width = canvas.width;
+        previous.height = canvas.height;
+        previous.getContext("2d")?.drawImage(canvas, 0, 0);
+        const pointerId = listeningPointerIdRef.current;
+        const activeCanvas = listeningActiveCanvasRef.current;
+        listeningPointerIdRef.current = null;
+        listeningActiveCanvasRef.current = null;
+        if (pointerId !== null && activeCanvas?.hasPointerCapture(pointerId)) activeCanvas.releasePointerCapture(pointerId);
+        setIsDrawing(false);
       }
-    });
-    return () => window.cancelAnimationFrame(frame);
+      canvas.width = width;
+      canvas.height = height;
+      const context = canvas.getContext("2d");
+      if (!context) return;
+      context.setTransform(ratio, 0, 0, ratio, 0, 0);
+      context.lineCap = "round";
+      context.lineJoin = "round";
+      context.lineWidth = 4;
+      context.strokeStyle = "#27463f";
+      if (preserveInk && previous.width && previous.height) context.drawImage(previous, 0, 0, previous.width, previous.height, 0, 0, rect.width, rect.height);
+    };
+    const resize = () => canvases.forEach((canvas) => sizeCanvas(canvas, true));
+    canvases.forEach((canvas) => sizeCanvas(canvas, false));
+    const observer = new ResizeObserver(resize);
+    canvases.forEach((canvas) => observer.observe(canvas));
+    window.addEventListener("resize", resize);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", resize);
+    };
   }, [view, listenPhase, listenIndex, currentQuestion.category]);
 
   useEffect(() => () => { clearListenTimers(); stopPlayback(); }, [clearListenTimers, stopPlayback]);
@@ -738,6 +762,8 @@ export default function Page() {
   const beginDrawing = (event: React.PointerEvent<HTMLCanvasElement>) => {
     if (listenPhase !== "active" && listenPhase !== "retry") return;
     event.currentTarget.setPointerCapture(event.pointerId);
+    listeningPointerIdRef.current = event.pointerId;
+    listeningActiveCanvasRef.current = event.currentTarget;
     const point = pointFromEvent(event);
     const context = event.currentTarget.getContext("2d");
     if (!context) return;
@@ -764,6 +790,8 @@ export default function Page() {
   const endDrawing = (event: React.PointerEvent<HTMLCanvasElement>) => {
     if (!isDrawing) return;
     if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+    listeningPointerIdRef.current = null;
+    listeningActiveCanvasRef.current = null;
     setIsDrawing(false);
   };
 
@@ -779,36 +807,64 @@ export default function Page() {
     if (!isPracticeWriting && (view !== "fill" || activeFillCell === null)) return;
     const canvas = fillCanvasRef.current;
     if (!canvas) return;
-    const rect = canvas.getBoundingClientRect();
-    const ratio = window.devicePixelRatio || 1;
-    canvas.width = Math.round(rect.width * ratio);
-    canvas.height = Math.round(rect.height * ratio);
-    const context = canvas.getContext("2d");
-    if (!context) return;
-    context.scale(ratio, ratio);
-    context.strokeStyle = "#17324f";
-    context.fillStyle = "#17324f";
-    context.lineWidth = Math.max(3, rect.width * .009);
-    context.lineCap = "round";
-    context.lineJoin = "round";
     const saved = isPracticeWriting ? [] : fillNeedsRetry.includes(activeFillCell!) ? [] : fillStrokes[activeFillCell!] ?? [];
-    fillDraftRef.current = saved.map((stroke) => stroke.map((point) => ({ ...point })));
-    fillActiveStrokeRef.current = null;
-    fillPointerIdRef.current = null;
-    setFillHasInk(saved.length > 0);
-    setFillIsDirty(false);
-    for (const stroke of saved) {
-      if (!stroke.length) continue;
-      context.beginPath();
-      context.moveTo(stroke[0].x * rect.width / 100, stroke[0].y * rect.height / 100);
-      if (stroke.length === 1) {
-        context.arc(stroke[0].x * rect.width / 100, stroke[0].y * rect.height / 100, context.lineWidth / 2, 0, Math.PI * 2);
-        context.fill();
-      } else {
-        for (const point of stroke.slice(1)) context.lineTo(point.x * rect.width / 100, point.y * rect.height / 100);
-        context.stroke();
+    let initialized = false;
+    const redraw = (resetDraft: boolean) => {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      const initialize = resetDraft || !initialized;
+      const ratio = window.devicePixelRatio || 1;
+      const width = Math.max(1, Math.round(rect.width * ratio));
+      const height = Math.max(1, Math.round(rect.height * ratio));
+      if (!initialize && canvas.width === width && canvas.height === height) return;
+      if (!initialize && fillActiveStrokeRef.current?.length) {
+        fillDraftRef.current.push(fillActiveStrokeRef.current);
+        fillActiveStrokeRef.current = null;
+        const pointerId = fillPointerIdRef.current;
+        fillPointerIdRef.current = null;
+        if (pointerId !== null && canvas.hasPointerCapture(pointerId)) canvas.releasePointerCapture(pointerId);
+        setFillHasInk(true);
       }
-    }
+      if (initialize) {
+        fillDraftRef.current = saved.map((stroke) => stroke.map((point) => ({ ...point })));
+        fillActiveStrokeRef.current = null;
+        fillPointerIdRef.current = null;
+        setFillHasInk(saved.length > 0);
+        setFillIsDirty(false);
+      }
+      canvas.width = width;
+      canvas.height = height;
+      initialized = true;
+      const context = canvas.getContext("2d");
+      if (!context) return;
+      context.setTransform(ratio, 0, 0, ratio, 0, 0);
+      context.strokeStyle = "#17324f";
+      context.fillStyle = "#17324f";
+      context.lineWidth = Math.max(3, rect.width * .009);
+      context.lineCap = "round";
+      context.lineJoin = "round";
+      for (const stroke of fillDraftRef.current) {
+        if (!stroke.length) continue;
+        context.beginPath();
+        context.moveTo(stroke[0].x * rect.width / 100, stroke[0].y * rect.height / 100);
+        if (stroke.length === 1) {
+          context.arc(stroke[0].x * rect.width / 100, stroke[0].y * rect.height / 100, context.lineWidth / 2, 0, Math.PI * 2);
+          context.fill();
+        } else {
+          for (const point of stroke.slice(1)) context.lineTo(point.x * rect.width / 100, point.y * rect.height / 100);
+          context.stroke();
+        }
+      }
+    };
+    redraw(true);
+    const resize = () => redraw(false);
+    const observer = new ResizeObserver(resize);
+    observer.observe(canvas);
+    window.addEventListener("resize", resize);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", resize);
+    };
   }, [view, activeFillCell, fillStrokes, fillNeedsRetry, fillPracticePhase, fillPracticeTarget]);
 
   const fillPoint = (event: React.PointerEvent<HTMLCanvasElement>): InkPoint => {
@@ -1133,7 +1189,7 @@ export default function Page() {
       </div></div>
       <div className="more-group"><h2>資訊與協助</h2><div className="more-settings-list">
         <button type="button" onClick={() => setMorePanel("help")}><span className="more-row-icon green"><Question size={21} aria-hidden="true" /></span><span><strong>使用說明</strong><small>課文默寫、聽寫與錯題重練</small></span><ArrowRight size={17} aria-hidden="true" /></button>
-        <button type="button" onClick={() => setMorePanel("versions")}><span className="more-row-icon orange"><Info size={21} aria-hidden="true" /></span><span><strong>版本</strong><small>目前 v23 · 查看每次更新內容</small></span><ArrowRight size={17} aria-hidden="true" /></button>
+        <button type="button" onClick={() => setMorePanel("versions")}><span className="more-row-icon orange"><Info size={21} aria-hidden="true" /></span><span><strong>版本</strong><small>目前 v24 · 查看每次更新內容</small></span><ArrowRight size={17} aria-hidden="true" /></button>
       </div></div>
       <p className="more-device-note">練習紀錄與設定只存在目前的裝置，不需要登入。</p>
     </section>;
