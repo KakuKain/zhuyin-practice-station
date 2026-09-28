@@ -452,6 +452,20 @@ body { background: #e7f2f9; }
 .fill-mark-retry { min-height: 42px; padding: 4px 6px; border: 1px solid #edb189; border-radius: 8px; background: #fff9f3; color: #a9562d; font-size: 12px; font-weight: 800; }
 .fill-mark-retry[aria-pressed="true"] { border-color: #dc7948; background: #df7845; color: white; }
 .fill-page .fill-cell:focus-visible, .fill-line-review-link:focus-visible, .fill-focus-shell button:focus-visible { outline: 3px solid #f0a341; outline-offset: 2px; }
+.practice-list-heading { margin-top: 26px !important; }
+.fill-favorite-list .saved-question-icon { background: #e9f5ff; color: var(--ref-blue); }
+.fill-favorite-list .saved-question-copy strong { font-size: 17px; }
+.fill-favorite-list .saved-question-actions .saved-start { flex: 1; }
+.fill-practice-prompt { text-align: center; }
+.fill-practice-prompt small { display: block; margin-bottom: 8px; color: #607895; font-size: 13px; font-weight: 700; }
+.fill-practice-prompt h1 { margin-bottom: 6px; }
+.fill-practice-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
+.fill-practice-compare > div { display: grid; gap: 8px; min-width: 0; }
+.fill-practice-compare small { color: #607895; font-size: 13px; font-weight: 800; text-align: center; }
+.fill-practice-compare .fill-compare-ink, .fill-practice-compare .fill-compare-answer { height: min(38vw, 190px); min-height: 145px; }
+.fill-practice-compare .ink-preview { width: 100%; height: 100%; }
+.fill-practice-compare .zhuyin-stack { font-size: 34px; }
+.fill-practice-defer { display: block; width: 100%; min-height: 48px; margin-top: 12px; border: 1px solid #bfd8e9; border-radius: 10px; background: white; color: var(--ref-navy); font-size: 14px; font-weight: 800; }
 @media (max-width: 430px) { .fill-page .syllable-row { gap: 4px; } .fill-page .fill-cell { min-height: 62px; } .fill-focus-header { grid-template-columns: 1fr auto; } .fill-focus-header > span { display: none; } }
 
 /* Listening has three four-cell sections; a two-character word shares one playback. */

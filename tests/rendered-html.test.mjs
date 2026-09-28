@@ -52,7 +52,7 @@ test("the source keeps the handoff interaction vocabulary", async () => {
   assert.match(page, /先寫完整篇，再請家長對照答案/);
   assert.match(page, /家長檢查完成/);
   assert.match(page, /需要重寫/);
-  assert.match(page, /fillNeedsRetry\.includes\(activeFillCell\) \? \[\] : fillStrokes\[activeFillCell\]/);
+  assert.match(page, /fillNeedsRetry\.includes\(activeFillCell!\) \? \[\] : fillStrokes\[activeFillCell!\]/);
   assert.doesNotMatch(page, /beginCardDrag|placeFillAnswer|draggable=\{false\}/);
   assert.doesNotMatch(page, /document\.elementFromPoint/);
   assert.match(page, /再播放一次題目/);
@@ -77,6 +77,20 @@ test("the source keeps the handoff interaction vocabulary", async () => {
   assert.match(css, /\.text-button \{ display: inline-flex; flex: none/);
   assert.match(css, /\.lesson-page \.mode-grid \{ display: grid; grid-template-columns: repeat\(2/);
   assert.doesNotMatch(page, /className="focus-intro"/);
+});
+
+test("fill mistakes stay in a separate collection until a parent removes them", async () => {
+  const page = await (await import("node:fs/promises")).readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  assert.match(page, /zhuyin-fill-favorites-v1/);
+  assert.match(page, /function validatedFillFavorites/);
+  assert.match(page, /fillFavoriteKey\(item: Pick<FillFavorite, "lessonIndex" \| "character" \| "zhuyin">\)/);
+  assert.match(page, /onClick=\{\(\) => markFillRetry\(index\)\}/);
+  assert.match(page, /status: "review_later"/);
+  assert.match(page, /課文默寫 · 錯字收藏/);
+  assert.match(page, /正確答案會在下一頁顯示/);
+  assert.match(page, /已掌握 · 移出收藏/);
+  assert.match(page, /稍後再練，保留收藏/);
+  assert.match(page, /聽寫 · 待補強與收藏/);
 });
 
 test("all three lessons have three listening sections with four writing units each", async () => {
