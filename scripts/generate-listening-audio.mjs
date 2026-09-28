@@ -20,17 +20,18 @@ mkdirSync(output, { recursive: true });
 const temporary = mkdtempSync(join(tmpdir(), "zhuyin-audio-"));
 let created = 0;
 const refreshSymbols = process.argv.includes("--refresh-symbols");
+const refreshAll = process.argv.includes("--refresh-all");
 
 try {
   for (const text of texts) {
     const filename = [...text].map((character) => character.codePointAt(0).toString(16)).join("-");
     const destination = join(output, `${filename}.m4a`);
     const isSymbol = symbols.has(text);
-    if (existsSync(destination) && statSync(destination).size > 1024 && !(refreshSymbols && isSymbol)) continue;
+    if (existsSync(destination) && statSync(destination).size > 1024 && !refreshAll && !(refreshSymbols && isSymbol)) continue;
     const sourceAudio = join(temporary, `${filename}.aiff`);
-    // A single synthesized symbol lasts only ~0.25 s. Two deliberate readings
-    // with a pause give beginning learners time to distinguish the sound.
-    execFileSync("say", ["-v", "Meijia", "-r", isSymbol ? "100" : "160", "-o", sourceAudio, isSymbol ? `${text}、${text}` : text]);
+    // Brief synthesized prompts are difficult for beginners to distinguish.
+    // Read every symbol, character, and word twice with a natural pause.
+    execFileSync("say", ["-v", "Meijia", "-r", "100", "-o", sourceAudio, `${text}、${text}`]);
     execFileSync("afconvert", ["-f", "m4af", "-d", "aac", "-b", "48000", sourceAudio, destination]);
     if (statSync(destination).size <= 1024) throw new Error(`Empty audio clip for ${text}`);
     created++;
