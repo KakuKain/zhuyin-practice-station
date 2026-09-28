@@ -117,8 +117,9 @@ test("all three lessons have three listening sections with four writing units ea
   assert.match(page, /第一大題 · 注音符號/);
   assert.match(page, /第二大題 · 生字/);
   assert.match(page, /第三大題 · 語詞/);
-  assert.match(page, /word-grid-guide/);
-  assert.match(css, /\.canvas-zone\.is-word \.canvas-paper/);
+  assert.match(page, /word-canvas-stack/);
+  assert.match(page, /data-word-index=\{index\}/);
+  assert.match(css, /\.canvas-zone\.is-word \.canvas-paper.*aspect-ratio: 1/);
   assert.match(page, /legacySavedQuestionIndexes/);
   assert.match(page, /lesson\.symbols\.map\(\(symbol\) =>/);
   assert.match(page, /new Map\(exercise\.lines\.flat\(\)\.map/);
@@ -131,6 +132,25 @@ test("all three lessons have three listening sections with four writing units ea
   assert.doesNotMatch(page, /第二課先讀課文與注音符號|lessons\[1\]\.title, "閱讀課文"/);
   assert.match(page, /listeningCorrect: current\.listeningCorrect \+ currentQuestion\.answer\.split\("\|"\)\.length/);
   assert.match(page, /三大題 · \{sessionScore\.listeningCorrect\} \/ 12 格完成/);
+});
+
+test("every listening prompt has an on-site audio clip and the settings pages have real destinations", async () => {
+  const fs = await import("node:fs/promises");
+  const page = await fs.readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const texts = new Set([
+    ...[...page.matchAll(/audioText: "([^"]+)"/g)].map((match) => match[1]),
+    ...[...page.matchAll(/character: "([^"]+)"/g)].map((match) => match[1]),
+    ...[...page.matchAll(/symbols: \[([^\]]+)\]/g)].flatMap((match) => [...match[1].matchAll(/"([^"]+)"/g)].map((symbol) => symbol[1])),
+  ]);
+  for (const text of texts) {
+    const name = [...text].map((character) => character.codePointAt(0).toString(16)).join("-");
+    const file = new URL(`../public/listening-audio/${name}.m4a`, import.meta.url);
+    assert.ok((await fs.stat(file)).size > 1024, `missing playable clip: ${text}`);
+  }
+  assert.match(page, /audio\.play\(\)\.catch/);
+  assert.match(page, /morePanel === "help"/);
+  assert.match(page, /morePanel === "versions"/);
+  assert.doesNotMatch(page, /每天 5 分鐘，慢慢變熟悉/);
 });
 
 test("parent review, listening preferences, and deferred reinforcement remain available", async () => {
