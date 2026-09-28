@@ -27,6 +27,7 @@ test("server-renders the public zhuyin practice station", async () => {
   assert.match(html, /鵝寶寶/);
   assert.match(html, /河馬和河狸/);
   assert.match(html, /笑嘻嘻/);
+  for (const title of ["翹翹板", "謝謝老師", "龜兔賽跑", "拔蘿蔔", "動物狂歡會"]) assert.match(html, new RegExp(title));
   assert.match(html, /不用登入也能練/);
 });
 
@@ -111,8 +112,7 @@ test("all four lessons have three listening sections with four writing units eac
   assert.match(page, /3: \{ 0: \{ 0: "\\u\{E01E1\}" \}, 2: \{ 0: "\\u\{E01E1\}" \} \}/);
   assert.match(page, /const exercise = exercises\[selectedLesson\]/);
   assert.match(page, /const listeningQuestions = sessionQuestions/);
-  assert.match(page, /第三課", lessons\[2\]\.title, "默寫 · 聽寫"/);
-  assert.match(page, /第四課", lessons\[3\]\.title, "默寫 · 聽寫"/);
+  assert.match(page, /lessons\.slice\(1\)\.map/);
   for (const lesson of ["first", "second", "third", "fourth"]) {
     const questions = page.match(new RegExp(`const ${lesson}ListeningQuestions = \\[([\\s\\S]*?)\\] as const;`))?.[1];
     assert.ok(questions, `${lesson} listening questions exist`);
@@ -139,7 +139,34 @@ test("all four lessons have three listening sections with four writing units eac
   assert.doesNotMatch(page, /第二課先讀課文與注音符號|lessons\[1\]\.title, "閱讀課文"/);
   assert.match(page, /listeningCorrect: current\.listeningCorrect \+ currentQuestion\.answer\.split\("\|"\)\.length/);
   assert.match(page, /三大題 · \{sessionScore\.listeningCorrect\} \/ 12 格完成/);
-  assert.match(css, /\.quick-course-grid \{ grid-template-columns: repeat\(4, minmax\(0, 1fr\)\)/);
+  assert.match(css, /\.quick-course-grid \{ grid-template-columns: repeat\(3, minmax\(0, 1fr\)\)/);
+});
+
+test("lessons five to nine preserve every line and offer randomized listening pools", async () => {
+  const page = await (await import("node:fs/promises")).readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const outlines = [
+    ["翹翹板", "好朋友", "飛飛飛"],
+    ["謝謝老師", "我要送老師", "教我畫畫"],
+    ["龜兔賽跑", "烏龜兔子來比賽", "追追追"],
+    ["拔蘿蔔", "菜園裡", "大家一起拔蘿蔔"],
+    ["動物狂歡會", "山崖下", "真精彩"],
+  ];
+  for (const [title, firstLine, lastLine] of outlines) {
+    assert.match(page, new RegExp(`title: "${title}"`));
+    assert.match(page, new RegExp(`"${firstLine}"`));
+    assert.match(page, new RegExp(`"${lastLine}"`));
+  }
+  for (const [number, name] of [[4, "fifth"], [5, "sixth"], [6, "seventh"], [7, "eighth"], [8, "ninth"]]) {
+    assert.match(page, new RegExp(`${number}: \\{ lines: ${name}LessonLines, questions: ${name}ListeningQuestions \\}`));
+    const pool = page.match(new RegExp(`const ${name}ListeningQuestions = \\[([\\s\\S]*?)\\];`))?.[1];
+    assert.ok(pool, `${name} word pool exists`);
+    assert.ok((pool.match(/wordQuestion\(/g) ?? []).length >= 4);
+  }
+  assert.match(page, /function annotateLessonLines/);
+  assert.match(page, /characters\.length !== sounds\.length/);
+  assert.match(page, /"ㄧㄞ", "ㄧㄣ", "ㄨㄣ", "ㄩㄝ", "ㄩㄣ"/);
+  assert.match(page, /"ㄕㄢ", "ㄧㄞˊ", "ㄒㄧㄚˋ"/);
+  assert.match(page, /"ㄨㄢˇ", "ㄒㄩㄥˊ"/);
 });
 
 test("every listening prompt has an on-site audio clip and the settings pages have real destinations", async () => {
@@ -147,7 +174,9 @@ test("every listening prompt has an on-site audio clip and the settings pages ha
   const page = await fs.readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
   const texts = new Set([
     ...[...page.matchAll(/audioText: "([^"]+)"/g)].map((match) => match[1]),
+    ...[...page.matchAll(/wordQuestion\("([^"]+)"/g)].map((match) => match[1]),
     ...[...page.matchAll(/character: "([^"]+)"/g)].map((match) => match[1]),
+    ...[...page.matchAll(/lines: \[([^\]]+)\]/g)].flatMap((match) => [...match[1].matchAll(/"([^"]+)"/g)].flatMap((line) => [...line[1]].filter((character) => character.trim()))),
     ...[...page.matchAll(/symbols: \[([^\]]+)\]/g)].flatMap((match) => [...match[1].matchAll(/"([^"]+)"/g)].map((symbol) => symbol[1])),
   ]);
   for (const text of texts) {
@@ -156,7 +185,7 @@ test("every listening prompt has an on-site audio clip and the settings pages ha
     assert.ok((await fs.stat(file)).size > 1024, `missing playable clip: ${text}`);
   }
   assert.match(page, /audio\.play\(\)\.catch/);
-  assert.match(page, /const isSymbol = literalSymbol && \/\^\[\\u3105-\\u3129\]\$\//);
+  assert.match(page, /const isSymbol = literalSymbol && \/\^\[\\u3105-\\u3129\]\+\$\//);
   assert.match(page, /isSymbol \? text : syllableGlyphs\[text\] \?\? text/);
   assert.match(page, /literalSymbols=\{currentQuestion\.category === "symbols"\}/);
   assert.match(page, /"ㄅㄟ": "背\\u\{E01E1\}"/);

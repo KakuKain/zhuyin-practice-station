@@ -25,13 +25,18 @@ const listeningSettingsStorageKey = "zhuyin-listening-settings-v1";
 const defaultListeningSettings: ListeningSettings = { repeatCount: 2, intervalSeconds: 8 };
 const previousPracticeStorageKey = "zhuyin-practice-state-v2";
 const firstPracticeStorageKey = "zhuyin-practice-state-v1";
-const lessonNumerals = ["一", "二", "三", "四"] as const;
+const lessonNumerals = ["一", "二", "三", "四", "五", "六", "七", "八", "九"] as const;
 
 const lessons = [
   { title: "貓咪", lines: ["咪咪咪", "咪咪咪", "逼", "貓咪弟弟", "跑第一"], symbols: ["ㄅ", "ㄆ", "ㄇ", "ㄉ", "ㄧ", "ㄠ"] },
   { title: "鵝寶寶", lines: ["鵝鵝鵝", "鵝鵝鵝", "哈哈哈", "好得意", "孵出", "五隻鵝寶寶"], symbols: ["ㄈ", "ㄏ", "ㄓ", "ㄔ", "ㄨ", "ㄚ", "ㄜ"] },
   { title: "河馬和河狸", lines: ["河馬要去泡澡", "半路遇到河狸", "喔", "河狸", "忙著築巢"], symbols: ["ㄌ", "ㄑ", "ㄗ", "ㄩ", "ㄛ", "ㄢ", "ㄤ"] },
   { title: "笑嘻嘻", lines: ["背著書包", "手拉手", "背著書包", "笑嘻嘻", "一二一", "好歡喜"], symbols: ["ㄒ", "ㄕ", "ㄟ", "ㄡ", "ㄦ", "ㄧㄠ", "ㄨㄢ"] },
+  { title: "翹翹板", lines: ["好朋友", "一起來玩", "翹翹板", "上上下下", "高高低低", "好像小鳥", "飛飛飛"], symbols: ["ㄋ", "ㄍ", "ㄞ", "ㄥ", "ㄧㄚ", "ㄧㄡ", "ㄧㄤ"] },
+  { title: "謝謝老師", lines: ["我要送老師", "一朵小紅花", "謝謝老師", "教我讀書", "也謝謝老師", "教我畫畫"], symbols: ["ㄐ", "ㄙ", "ㄝ", "ㄧㄝ", "ㄨㄚ", "ㄨㄛ", "ㄨㄥ"] },
+  { title: "龜兔賽跑", lines: ["烏龜兔子來比賽", "看誰跑得快", "兔子領先", "哈哈笑", "樹下睡午覺", "烏龜落後", "不氣餒", "跟在後面", "追追追"], symbols: ["ㄊ", "ㄎ", "ㄣ", "ㄧㄢ", "ㄧㄥ", "ㄨㄞ", "ㄨㄟ"] },
+  { title: "拔蘿蔔", lines: ["菜園裡", "長出大蘿蔔", "兔子拔不動", "大家快快來", "大象拉著黃牛", "黃牛拉著浣熊", "浣熊拉著兔子", "嘿喲嘿喲", "好熱鬧", "捲起袖子", "大家一起拔蘿蔔"], symbols: ["ㄖ", "ㄘ", "ㄧㄛ", "ㄨㄤ", "ㄩㄢ", "ㄩㄥ"] },
+  { title: "動物狂歡會", lines: ["山崖下", "動物狂歡會", "大家開心來慶祝", "小熊滾大球", "馴鹿敲大鼓", "孔雀變魔術", "青蛙大合唱", "嘓嘓嘓 咚咚咚", "大家的表演", "真精彩"], symbols: ["ㄧㄞ", "ㄧㄣ", "ㄨㄣ", "ㄩㄝ", "ㄩㄣ"] },
 ] as const;
 
 // The font's first alternate reading is selected with IVS U+E01E1 in both preview modes.
@@ -39,6 +44,10 @@ const previewPronunciationVariants: Record<number, Record<number, Record<number,
   0: { 3: { 3: "\u{E01E1}" } }, // 貓咪弟弟：第二個「弟」讀輕聲
   1: { 5: { 4: "\u{E01E1}" } }, // 五隻鵝寶寶：第二個「寶」依課本讀輕聲
   3: { 0: { 0: "\u{E01E1}" }, 2: { 0: "\u{E01E1}" } }, // 背著書包：背讀ㄅㄟ
+  4: { 1: { 0: "\u{E01E2}" } }, // 一起：一讀ㄧˋ
+  5: { 1: { 0: "\u{E01E2}" }, 2: { 1: "\u{E01E1}" }, 4: { 2: "\u{E01E1}" } }, // 一朵、謝謝
+  6: { 0: { 3: "\u{E01E1}" }, 1: { 3: "\u{E01E1}" }, 2: { 1: "\u{E01E1}" }, 4: { 4: "\u{E01E1}" }, 6: { 0: "\u{E01E1}" } }, // 子、得、覺、不
+  7: { 1: { 0: "\u{E01E1}", 4: "\u{E01E1}" }, 2: { 1: "\u{E01E1}", 3: "\u{E01E1}" }, 6: { 5: "\u{E01E1}" }, 9: { 3: "\u{E01E1}" }, 10: { 2: "\u{E01E2}", 6: "\u{E01E1}" } }, // 長、蔔、子、不、一
 };
 
 const firstLessonLines = [
@@ -71,6 +80,104 @@ const fourthLessonLines = [
   [{ character: "一", zhuyin: "ㄧ" }, { character: "二", zhuyin: "ㄦˋ" }, { character: "一", zhuyin: "ㄧ" }],
   [{ character: "好", zhuyin: "ㄏㄠˇ" }, { character: "歡", zhuyin: "ㄏㄨㄢ" }, { character: "喜", zhuyin: "ㄒㄧˇ" }],
 ] as const;
+
+function annotateLessonLines(lines: readonly string[], pronunciations: readonly (readonly string[])[]): SyllableItem[][] {
+  if (lines.length !== pronunciations.length) throw new Error("課文行數與注音行數不一致");
+  return lines.map((line, lineIndex) => {
+    const characters = Array.from(line).filter((character) => character.trim() !== "");
+    const sounds = pronunciations[lineIndex];
+    if (characters.length !== sounds.length) throw new Error(`第 ${lineIndex + 1} 行的課文與注音格數不一致`);
+    return characters.map((character, index) => ({ character, zhuyin: sounds[index] }));
+  });
+}
+
+const fifthLessonLines = annotateLessonLines(lessons[4].lines, [
+  ["ㄏㄠˇ", "ㄆㄥˊ", "ㄧㄡˇ"],
+  ["ㄧˋ", "ㄑㄧˇ", "ㄌㄞˊ", "ㄨㄢˊ"],
+  ["ㄑㄧㄠˋ", "ㄑㄧㄠˋ", "ㄅㄢˇ"],
+  ["ㄕㄤˋ", "ㄕㄤˋ", "ㄒㄧㄚˋ", "ㄒㄧㄚˋ"],
+  ["ㄍㄠ", "ㄍㄠ", "ㄉㄧ", "ㄉㄧ"],
+  ["ㄏㄠˇ", "ㄒㄧㄤˋ", "ㄒㄧㄠˇ", "ㄋㄧㄠˇ"],
+  ["ㄈㄟ", "ㄈㄟ", "ㄈㄟ"],
+]);
+const sixthLessonLines = annotateLessonLines(lessons[5].lines, [
+  ["ㄨㄛˇ", "ㄧㄠˋ", "ㄙㄨㄥˋ", "ㄌㄠˇ", "ㄕ"],
+  ["ㄧˋ", "ㄉㄨㄛˇ", "ㄒㄧㄠˇ", "ㄏㄨㄥˊ", "ㄏㄨㄚ"],
+  ["ㄒㄧㄝˋ", "˙ㄒㄧㄝ", "ㄌㄠˇ", "ㄕ"],
+  ["ㄐㄧㄠˋ", "ㄨㄛˇ", "ㄉㄨˊ", "ㄕㄨ"],
+  ["ㄧㄝˇ", "ㄒㄧㄝˋ", "˙ㄒㄧㄝ", "ㄌㄠˇ", "ㄕ"],
+  ["ㄐㄧㄠˋ", "ㄨㄛˇ", "ㄏㄨㄚˋ", "ㄏㄨㄚˋ"],
+]);
+const seventhLessonLines = annotateLessonLines(lessons[6].lines, [
+  ["ㄨ", "ㄍㄨㄟ", "ㄊㄨˋ", "˙ㄗ", "ㄌㄞˊ", "ㄅㄧˇ", "ㄙㄞˋ"],
+  ["ㄎㄢˋ", "ㄕㄟˊ", "ㄆㄠˇ", "˙ㄉㄜ", "ㄎㄨㄞˋ"],
+  ["ㄊㄨˋ", "˙ㄗ", "ㄌㄧㄥˇ", "ㄒㄧㄢ"],
+  ["ㄏㄚ", "ㄏㄚ", "ㄒㄧㄠˋ"],
+  ["ㄕㄨˋ", "ㄒㄧㄚˋ", "ㄕㄨㄟˋ", "ㄨˇ", "ㄐㄧㄠˋ"],
+  ["ㄨ", "ㄍㄨㄟ", "ㄌㄨㄛˋ", "ㄏㄡˋ"],
+  ["ㄅㄨˊ", "ㄑㄧˋ", "ㄋㄟˇ"],
+  ["ㄍㄣ", "ㄗㄞˋ", "ㄏㄡˋ", "ㄇㄧㄢˋ"],
+  ["ㄓㄨㄟ", "ㄓㄨㄟ", "ㄓㄨㄟ"],
+]);
+const eighthLessonLines = annotateLessonLines(lessons[7].lines, [
+  ["ㄘㄞˋ", "ㄩㄢˊ", "ㄌㄧˇ"],
+  ["ㄓㄤˇ", "ㄔㄨ", "ㄉㄚˋ", "ㄌㄨㄛˊ", "˙ㄅㄛ"],
+  ["ㄊㄨˋ", "˙ㄗ", "ㄅㄚˊ", "ㄅㄨˊ", "ㄉㄨㄥˋ"],
+  ["ㄉㄚˋ", "ㄐㄧㄚ", "ㄎㄨㄞˋ", "ㄎㄨㄞˋ", "ㄌㄞˊ"],
+  ["ㄉㄚˋ", "ㄒㄧㄤˋ", "ㄌㄚ", "˙ㄓㄜ", "ㄏㄨㄤˊ", "ㄋㄧㄡˊ"],
+  ["ㄏㄨㄤˊ", "ㄋㄧㄡˊ", "ㄌㄚ", "˙ㄓㄜ", "ㄨㄢˇ", "ㄒㄩㄥˊ"],
+  ["ㄨㄢˇ", "ㄒㄩㄥˊ", "ㄌㄚ", "˙ㄓㄜ", "ㄊㄨˋ", "˙ㄗ"],
+  ["ㄏㄟ", "ㄧㄛ", "ㄏㄟ", "ㄧㄛ"],
+  ["ㄏㄠˇ", "ㄖㄜˋ", "ㄋㄠˋ"],
+  ["ㄐㄩㄢˇ", "ㄑㄧˇ", "ㄒㄧㄡˋ", "˙ㄗ"],
+  ["ㄉㄚˋ", "ㄐㄧㄚ", "ㄧˋ", "ㄑㄧˇ", "ㄅㄚˊ", "ㄌㄨㄛˊ", "˙ㄅㄛ"],
+]);
+const ninthLessonLines = annotateLessonLines(lessons[8].lines, [
+  ["ㄕㄢ", "ㄧㄞˊ", "ㄒㄧㄚˋ"],
+  ["ㄉㄨㄥˋ", "ㄨˋ", "ㄎㄨㄤˊ", "ㄏㄨㄢ", "ㄏㄨㄟˋ"],
+  ["ㄉㄚˋ", "ㄐㄧㄚ", "ㄎㄞ", "ㄒㄧㄣ", "ㄌㄞˊ", "ㄑㄧㄥˋ", "ㄓㄨˋ"],
+  ["ㄒㄧㄠˇ", "ㄒㄩㄥˊ", "ㄍㄨㄣˇ", "ㄉㄚˋ", "ㄑㄧㄡˊ"],
+  ["ㄒㄩㄣˊ", "ㄌㄨˋ", "ㄑㄧㄠ", "ㄉㄚˋ", "ㄍㄨˇ"],
+  ["ㄎㄨㄥˇ", "ㄑㄩㄝˋ", "ㄅㄧㄢˋ", "ㄇㄛˊ", "ㄕㄨˋ"],
+  ["ㄑㄧㄥ", "ㄨㄚ", "ㄉㄚˋ", "ㄏㄜˊ", "ㄔㄤˋ"],
+  ["ㄍㄨㄛ", "ㄍㄨㄛ", "ㄍㄨㄛ", "ㄉㄨㄥ", "ㄉㄨㄥ", "ㄉㄨㄥ"],
+  ["ㄉㄚˋ", "ㄐㄧㄚ", "˙ㄉㄜ", "ㄅㄧㄠˇ", "ㄧㄢˇ"],
+  ["ㄓㄣ", "ㄐㄧㄥ", "ㄘㄞˇ"],
+]);
+
+function wordQuestion(audioText: string, answer: string, distractors: readonly [string, string]): ListeningSeed {
+  return { category: "words", audioText, answer, distractors };
+}
+const fifthListeningQuestions = [
+  wordQuestion("朋友", "ㄆㄥˊ|ㄧㄡˇ", ["ㄆㄥˊ|ㄧㄡ", "ㄆㄥˋ|ㄧㄡˇ"]),
+  wordQuestion("一起", "ㄧˋ|ㄑㄧˇ", ["ㄧ|ㄑㄧˇ", "ㄧˋ|ㄑㄧ"]),
+  wordQuestion("翹翹", "ㄑㄧㄠˋ|ㄑㄧㄠˋ", ["ㄑㄧㄠˊ|ㄑㄧㄠˋ", "ㄑㄧㄠˋ|ㄑㄧㄠˊ"]),
+  wordQuestion("小鳥", "ㄒㄧㄠˇ|ㄋㄧㄠˇ", ["ㄒㄧㄠˇ|ㄋㄧㄠˋ", "ㄒㄧㄠˋ|ㄋㄧㄠˇ"]),
+];
+const sixthListeningQuestions = [
+  wordQuestion("老師", "ㄌㄠˇ|ㄕ", ["ㄌㄠˋ|ㄕ", "ㄌㄠˇ|ㄕˋ"]),
+  wordQuestion("紅花", "ㄏㄨㄥˊ|ㄏㄨㄚ", ["ㄏㄨㄥˊ|ㄏㄨㄚˋ", "ㄏㄨㄥˋ|ㄏㄨㄚ"]),
+  wordQuestion("謝謝", "ㄒㄧㄝˋ|˙ㄒㄧㄝ", ["ㄒㄧㄝˋ|ㄒㄧㄝˋ", "ㄒㄧㄝˋ|ㄒㄧㄝ"]),
+  wordQuestion("讀書", "ㄉㄨˊ|ㄕㄨ", ["ㄉㄨˋ|ㄕㄨ", "ㄉㄨˊ|ㄕㄨˋ"]),
+];
+const seventhListeningQuestions = [
+  wordQuestion("烏龜", "ㄨ|ㄍㄨㄟ", ["ㄨˋ|ㄍㄨㄟ", "ㄨ|ㄍㄨㄟˋ"]),
+  wordQuestion("兔子", "ㄊㄨˋ|˙ㄗ", ["ㄊㄨˋ|ㄗˇ", "ㄊㄨˊ|˙ㄗ"]),
+  wordQuestion("比賽", "ㄅㄧˇ|ㄙㄞˋ", ["ㄅㄧˋ|ㄙㄞˋ", "ㄅㄧˇ|ㄙㄞ"]),
+  wordQuestion("午覺", "ㄨˇ|ㄐㄧㄠˋ", ["ㄨˇ|ㄐㄩㄝˊ", "ㄨˋ|ㄐㄧㄠˋ"]),
+];
+const eighthListeningQuestions = [
+  wordQuestion("菜園", "ㄘㄞˋ|ㄩㄢˊ", ["ㄘㄞˊ|ㄩㄢˊ", "ㄘㄞˋ|ㄩㄢˇ"]),
+  wordQuestion("蘿蔔", "ㄌㄨㄛˊ|˙ㄅㄛ", ["ㄌㄨㄛˊ|ㄅㄛˊ", "ㄌㄨㄛˋ|˙ㄅㄛ"]),
+  wordQuestion("黃牛", "ㄏㄨㄤˊ|ㄋㄧㄡˊ", ["ㄏㄨㄤˊ|ㄋㄧㄡˇ", "ㄏㄨㄤˋ|ㄋㄧㄡˊ"]),
+  wordQuestion("浣熊", "ㄨㄢˇ|ㄒㄩㄥˊ", ["ㄏㄨㄢˋ|ㄒㄩㄥˊ", "ㄨㄢˇ|ㄒㄩㄥˇ"]),
+];
+const ninthListeningQuestions = [
+  wordQuestion("山崖", "ㄕㄢ|ㄧㄞˊ", ["ㄕㄢ|ㄧㄚˊ", "ㄕㄢˋ|ㄧㄞˊ"]),
+  wordQuestion("動物", "ㄉㄨㄥˋ|ㄨˋ", ["ㄉㄨㄥ|ㄨˋ", "ㄉㄨㄥˋ|ㄨˇ"]),
+  wordQuestion("馴鹿", "ㄒㄩㄣˊ|ㄌㄨˋ", ["ㄒㄩㄣˋ|ㄌㄨˋ", "ㄒㄩㄣˊ|ㄌㄨˇ"]),
+  wordQuestion("精彩", "ㄐㄧㄥ|ㄘㄞˇ", ["ㄐㄧㄥˋ|ㄘㄞˇ", "ㄐㄧㄥ|ㄘㄞˋ"]),
+];
 
 const firstListeningQuestions = [
   { category: "symbols", answer: "ㄅ", audioText: "ㄅ", distractors: ["ㄆ", "ㄇ"] },
@@ -126,9 +233,15 @@ const exercises: Record<number, LessonExercise> = {
   1: { lines: secondLessonLines, questions: secondListeningQuestions },
   2: { lines: thirdLessonLines, questions: thirdListeningQuestions },
   3: { lines: fourthLessonLines, questions: fourthListeningQuestions },
+  4: { lines: fifthLessonLines, questions: fifthListeningQuestions },
+  5: { lines: sixthLessonLines, questions: sixthListeningQuestions },
+  6: { lines: seventhLessonLines, questions: seventhListeningQuestions },
+  7: { lines: eighthLessonLines, questions: eighthListeningQuestions },
+  8: { lines: ninthLessonLines, questions: ninthListeningQuestions },
 };
 
 const siteReleaseNotes = [
+  [26, "開放第五至第九課", "新增《翹翹板》到《動物狂歡會》的課文、完整注音預覽、逐格默寫及隨機聽寫。"],
   [25, "開放第四課《笑嘻嘻》", "加入第四課課文、注音預覽、逐格默寫與隨機聽寫，並校正「背著書包」的讀音。"],
   [24, "平板轉向時保持筆畫位置", "手寫格會隨畫面尺寸重新對齊，已寫的注音在直橫向切換後仍保留原位。"],
   [23, "依設定間隔重播", "每次只唸一遍；唸完後才開始計算重播間隔，並修正注音符號題的答案顯示。"],
@@ -227,7 +340,10 @@ function questionSeedsForLesson(lessonIndex: number): Record<ListenCategory, Lis
     category: "symbols", answer: symbol, audioText: symbol,
     distractors: lesson.symbols.filter((other) => other !== symbol).slice(0, 2),
   }));
-  const uniqueCharacters = [...new Map(exercise.lines.flat().map((item) => [item.character, item])).values()];
+  // Neutral-tone and sandhi readings need their surrounding word; do not ask
+  // children to identify them from an isolated character recording.
+  const uniqueCharacters = [...new Map(exercise.lines.flat().map((item) => [item.character, item])).values()]
+    .filter((item) => !item.zhuyin.startsWith("˙") && !(item.character === "一" && item.zhuyin !== "ㄧ") && !(item.character === "不" && item.zhuyin === "ㄅㄨˊ"));
   const uniqueSounds = [...new Set(uniqueCharacters.map((item) => item.zhuyin))];
   const characters: ListeningSeed[] = uniqueCharacters.map((item) => ({
     category: "characters", answer: item.zhuyin, audioText: item.character,
@@ -261,12 +377,21 @@ const fallbackListeningQuestion: ListeningQuestion = { ...firstListeningQuestion
 // representative Han character. Rendering individual Bopomofo characters would
 // discard the font's built-in tone placement.
 const syllableGlyphs: Record<string, string> = {
-  ...Object.fromEntries([firstLessonLines, secondLessonLines, thirdLessonLines, fourthLessonLines].flat(2).map(({ character, zhuyin }) => [zhuyin, character])),
+  ...Object.fromEntries([firstLessonLines, secondLessonLines, thirdLessonLines, fourthLessonLines, fifthLessonLines, sixthLessonLines, seventhLessonLines, eighthLessonLines, ninthLessonLines].flat(2).map(({ character, zhuyin }) => [zhuyin, character])),
   "ㄅㄟ": "背\u{E01E1}",
   "ㄅㄟˋ": "背",
   "ㄧㄠ": "腰",
   "ㄨㄢ": "彎",
   "˙ㄅㄠ": "寶\u{E01E1}",
+  "˙ㄒㄧㄝ": "謝\u{E01E1}",
+  "˙ㄗ": "子\u{E01E1}",
+  "˙ㄉㄜ": "得\u{E01E1}",
+  "˙ㄅㄛ": "蔔\u{E01E1}",
+  "ㄐㄧㄠˋ": "覺\u{E01E1}",
+  "ㄅㄨˊ": "不\u{E01E1}",
+  "ㄓㄤˇ": "長\u{E01E1}",
+  "ㄧˋ": "一\u{E01E2}",
+  "ㄧㄛ": "唷",
   "ㄇㄠˊ": "毛",
   "ㄇㄠˇ": "卯",
   "ㄇㄧˊ": "迷",
@@ -282,10 +407,10 @@ const syllableGlyphs: Record<string, string> = {
 };
 
 function ZhuyinStack({ text, literalSymbol = false }: { text: string; literalSymbol?: boolean }) {
-  const isSymbol = literalSymbol && /^[\u3105-\u3129]$/.test(text);
+  const isSymbol = literalSymbol && /^[\u3105-\u3129]+$/.test(text);
   return (
     <span className="zhuyin-stack" aria-label={text}>
-      <span className={`zhuyin-glyph ${text === "˙ㄉㄧ" ? "is-neutral-di" : ""} ${isSymbol ? "is-symbol" : ""}`} aria-hidden="true">{isSymbol ? text : syllableGlyphs[text] ?? text}</span>
+      <span className={`zhuyin-glyph ${text === "˙ㄉㄧ" ? "is-neutral-di" : ""} ${isSymbol ? "is-symbol" : ""} ${isSymbol && text.length > 1 ? "is-symbol-combination" : ""}`} aria-hidden="true">{isSymbol ? text : syllableGlyphs[text] ?? text}</span>
     </span>
   );
 }
@@ -1089,13 +1214,9 @@ export default function Page() {
       <SectionHeading eyebrow="COURSES" title="選擇課程" description="每一課都從一小段注音開始，按自己的步調練習就好。" />
       <div className="course-grid">
         <button className="course-tile featured" type="button" onClick={() => openLesson(0)}><span className="course-badge">現在練習</span><span className="course-tile-number">01</span><strong>第一課</strong><b>{lessons[0].title}</b><small>默寫 · 聽寫</small><span className="tile-arrow">→</span></button>
-        {[
-          ["02", "第二課", lessons[1].title, "默寫 · 聽寫"],
-          ["03", "第三課", lessons[2].title, "默寫 · 聽寫"],
-          ["04", "第四課", lessons[3].title, "默寫 · 聽寫"],
-        ].map(([number, title, subtitle, status], index) => <button className="course-tile" type="button" key={number} onClick={() => openLesson(index + 1)}><span className="course-tile-number">{number}</span><strong>{title}</strong><b>{subtitle}</b><small>{status}</small><span className="lock-icon">→</span></button>)}
+        {lessons.slice(1).map((item, index) => <button className="course-tile" type="button" key={item.title} onClick={() => openLesson(index + 1)}><span className="course-tile-number">{String(index + 2).padStart(2, "0")}</span><strong>第{lessonNumerals[index + 1]}課</strong><b>{item.title}</b><small>默寫 · 聽寫</small><span className="lock-icon">→</span></button>)}
       </div>
-      <div className="course-note"><span>☑</span><p><strong>四課都能練習</strong><br />每課都可以練課文默寫與隨機聽寫。</p></div>
+      <div className="course-note"><span>☑</span><p><strong>九課都能練習</strong><br />每課都可以練課文默寫與隨機聽寫。</p></div>
     </section>
   );
 
@@ -1115,7 +1236,7 @@ export default function Page() {
           </div>
         </div>
         <div className={`lesson-text-lines ${previewMode === "zhuyin" ? "is-zhuyin-only" : ""}`} dir="rtl" aria-label={`${lesson.title}課文，${previewMode === "zhuyin" ? "純注音" : "國字加注音"}`}>
-          {lesson.lines.map((line, lineIndex) => <div className="lesson-text-line" dir="ltr" key={lineIndex}>{Array.from(line).map((char, charIndex) => <span key={charIndex}>{char}{previewPronunciationVariants[selectedLesson]?.[lineIndex]?.[charIndex] ?? ""}</span>)}</div>)}
+          {lesson.lines.map((line, lineIndex) => <div className="lesson-text-line" dir="ltr" key={lineIndex}>{Array.from(line).map((char, charIndex) => selectedLesson === 7 && char === "喲" ? (previewMode === "annotated" ? <ruby className="lesson-ruby-fix" key={charIndex}>喲<rt>ㄧㄛ</rt></ruby> : <span className="lesson-zhuyin-fix" key={charIndex}>ㄧㄛ</span>) : <span key={charIndex}>{char}{previewPronunciationVariants[selectedLesson]?.[lineIndex]?.[charIndex] ?? ""}</span>)}</div>)}
         </div>
         <div className="lesson-curriculum-heading"><strong>注音符號</strong></div>
         <div className="lesson-symbols" dir="rtl" aria-label="本課注音符號">{lesson.symbols.map((symbol) => <span className={symbol.length > 1 ? "is-combination" : undefined} key={symbol}>{symbol}</span>)}</div>
@@ -1223,7 +1344,7 @@ export default function Page() {
       </div></div>
       <div className="more-group"><h2>資訊與協助</h2><div className="more-settings-list">
         <button type="button" onClick={() => setMorePanel("help")}><span className="more-row-icon green"><Question size={21} aria-hidden="true" /></span><span><strong>使用說明</strong><small>課文默寫、聽寫與錯題重練</small></span><ArrowRight size={17} aria-hidden="true" /></button>
-        <button type="button" onClick={() => setMorePanel("versions")}><span className="more-row-icon orange"><Info size={21} aria-hidden="true" /></span><span><strong>版本</strong><small>目前 v25 · 查看每次更新內容</small></span><ArrowRight size={17} aria-hidden="true" /></button>
+        <button type="button" onClick={() => setMorePanel("versions")}><span className="more-row-icon orange"><Info size={21} aria-hidden="true" /></span><span><strong>版本</strong><small>目前 v26 · 查看每次更新內容</small></span><ArrowRight size={17} aria-hidden="true" /></button>
       </div></div>
       <p className="more-device-note">練習紀錄與設定只存在目前的裝置，不需要登入。</p>
     </section>;

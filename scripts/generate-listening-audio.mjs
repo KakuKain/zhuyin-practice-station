@@ -9,7 +9,9 @@ const root = resolve(import.meta.dirname, "..");
 const source = readFileSync(join(root, "app/page.tsx"), "utf8");
 const texts = new Set([
   ...[...source.matchAll(/audioText: "([^"]+)"/g)].map((match) => match[1]),
+  ...[...source.matchAll(/wordQuestion\("([^"]+)"/g)].map((match) => match[1]),
   ...[...source.matchAll(/character: "([^"]+)"/g)].map((match) => match[1]),
+  ...[...source.matchAll(/lines: \[([^\]]+)\]/g)].flatMap((match) => [...match[1].matchAll(/"([^"]+)"/g)].flatMap((line) => [...line[1]].filter((character) => character.trim()))),
   ...[...source.matchAll(/symbols: \[([^\]]+)\]/g)].flatMap((match) => [...match[1].matchAll(/"([^"]+)"/g)].map((symbol) => symbol[1])),
 ]);
 const output = join(root, "public/listening-audio");
@@ -23,6 +25,12 @@ const spokenTextOverrides = new Map([
   ["背著", "揹著"],
   ["ㄧㄠ", "腰"],
   ["ㄨㄢ", "彎"],
+  ["ㄧㄚ", "鴨"], ["ㄧㄡ", "悠"], ["ㄧㄤ", "央"],
+  ["ㄧㄝ", "椰"], ["ㄨㄚ", "蛙"], ["ㄨㄛ", "窩"], ["ㄨㄥ", "翁"],
+  ["ㄧㄢ", "煙"], ["ㄧㄥ", "英"], ["ㄨㄞ", "歪"], ["ㄨㄟ", "威"],
+  ["ㄧㄛ", "唷"], ["ㄨㄤ", "汪"], ["ㄩㄢ", "冤"], ["ㄩㄥ", "雍"],
+  ["ㄧㄞ", "崖"], ["ㄧㄣ", "音"], ["ㄨㄣ", "溫"], ["ㄩㄝ", "約"], ["ㄩㄣ", "暈"],
+  ["翹", "俏"], ["覺", "叫"], ["浣", "碗"], ["蔔", "伯"], ["喲", "唷"], ["長", "漲"],
 ]);
 
 try {
