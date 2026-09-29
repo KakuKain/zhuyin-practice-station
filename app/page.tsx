@@ -66,7 +66,7 @@ const lessons = [
   { title: "拔蘿蔔", lines: ["菜園裡", "長出大蘿蔔", "兔子拔不動", "大家快快來", "大象拉著黃牛", "黃牛拉著浣熊", "浣熊拉著兔子", "嘿喲嘿喲", "好熱鬧", "捲起袖子", "大家一起拔蘿蔔"], symbols: ["ㄖ", "ㄘ", "ㄧㄛ", "ㄨㄤ", "ㄩㄢ", "ㄩㄥ"] },
   { title: "動物狂歡會", lines: ["山崖下", "動物狂歡會", "大家開心來慶祝", "小熊滾大球", "馴鹿敲大鼓", "孔雀變魔術", "青蛙大合唱", "嘓嘓嘓 咚咚咚", "大家的表演", "真精彩"], symbols: ["ㄧㄞ", "ㄧㄣ", "ㄨㄣ", "ㄩㄝ", "ㄩㄣ"] },
 ] as const;
-const courseArtwork = ["cat", "goose", "river", "happy", "seesaw", "teacher", "race", "radish", "festival"] as const;
+const courseArtwork = ["cat", "swan-riding-family", "river", "happy", "seesaw", "teacher", "race", "radish", "festival"] as const;
 
 // The font's first alternate reading is selected with IVS U+E01E1 in both preview modes.
 const previewPronunciationVariants: Record<number, Record<number, Record<number, string>>> = {

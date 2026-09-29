@@ -867,19 +867,31 @@ body { background: #e7f2f9; }
 
 /* Course page: follow the selected watercolor storybook reference. */
 .app-shell.is-courses { background: url("/course-art/course-journey-footer-v2.png") center calc(100% - 30px) / 100% 200px no-repeat, #fcfeff; }
-.app-shell.is-courses .app-header { z-index: 2; height: 99px; padding: 42px 22px 16px; border: 0; background: transparent; backdrop-filter: none; }
-.is-courses .logo-mark { width: 36px; height: 36px; }
-.is-courses .logo-mark span { font-size: 19px; }
-.is-courses .brand-button { gap: 11px; }
-.is-courses .brand-button strong { font-size: 16px; }
-.is-courses .brand-button small { font-size: 10px; letter-spacing: .13em; }
+.app-shell:is(.is-courses, .is-practice, .is-more) { overflow: clip; }
+.app-shell:is(.is-courses, .is-practice, .is-more) .app-header {
+  position: sticky;
+  top: 0;
+  z-index: 35;
+  height: 56px;
+  padding: 8px 22px;
+  border: 0;
+  border-bottom: 1px solid rgba(172, 199, 207, .45);
+  background: rgba(252, 254, 255, .91);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+.app-shell:is(.is-courses, .is-practice, .is-more) .logo-mark { width: 29px; height: 29px; border-radius: 9px 9px 9px 3px; }
+.app-shell:is(.is-courses, .is-practice, .is-more) .logo-mark span { font-size: 16px; }
+.app-shell:is(.is-courses, .is-practice, .is-more) .brand-button { gap: 8px; }
+.app-shell:is(.is-courses, .is-practice, .is-more) .brand-button strong { font-size: 13px; letter-spacing: .025em; }
+.app-shell:is(.is-courses, .is-practice, .is-more) .brand-button small { display: none; }
 .app-shell.is-courses .main-content { min-height: 0; padding-bottom: calc(90px + env(safe-area-inset-bottom)); }
 .is-courses .course-journey { padding-top: 0; padding-bottom: 0; }
-.is-courses .journey-heading { min-height: 130px; margin: 0 -14px; padding: 0 14px; overflow: visible; border: 0; border-radius: 0; background: none; }
-.is-courses .journey-heading-copy { padding: 16px 0 0 10px; }
+.is-courses .journey-heading { min-height: 112px; margin: 0 -14px; padding: 0 14px; overflow: visible; border: 0; border-radius: 0; background: none; }
+.is-courses .journey-heading-copy { padding: 12px 0 0 10px; }
 .is-courses .journey-heading h1 { font-size: clamp(32px, 9vw, 40px); letter-spacing: .055em; line-height: 1.15; box-shadow: inset 0 -8px #ffe8a0; }
-.is-courses .journey-heading p { margin-top: 12px; color: #637897; font-size: 14px; letter-spacing: .065em; }
-.is-courses .journey-heading img { top: 0; right: 0; width: min(65vw, 255px); height: auto; max-width: none; }
+.is-courses .journey-heading p { margin-top: 7px; color: #637897; font-size: 13px; letter-spacing: .065em; }
+.is-courses .journey-heading img { top: -17px; right: -3px; width: min(49vw, 205px); height: auto; max-width: none; }
 .is-courses .journey-list { gap: 10px; margin: 0 4px 0 20px; padding: 0; }
 .is-courses .journey-list::before { top: 34px; bottom: 39px; left: 20px; border-left-color: #80b5f1; }
 .is-courses .journey-step { grid-template-columns: 42px minmax(0, 1fr); gap: 14px; }
@@ -896,6 +908,7 @@ body { background: #e7f2f9; }
 .is-courses .journey-card-copy strong { margin-top: 6px; font-size: clamp(19px, 5.7vw, 24px); letter-spacing: .02em; }
 .is-courses .journey-card-copy em { margin-top: 4px; padding: 2px 7px; font-size: 10px; }
 .is-courses .journey-art { z-index: 1; right: 46px; bottom: -2px; width: 116px; height: 94px; }
+.is-courses .journey-step:nth-child(2) .journey-art { right: 39px; width: 134px; }
 .is-courses .journey-arrow { width: 36px; height: 36px; box-shadow: none; }
 .is-courses .journey-footer { position: relative; height: 100px; margin: 0 -14px; }
 .is-courses .journey-footer img { position: absolute; top: -12px; left: 0; width: 130px; height: 100px; object-fit: contain; }
@@ -906,11 +919,12 @@ body { background: #e7f2f9; }
   .is-courses .journey-step { gap: 10px; }
   .is-courses .journey-card { padding-left: 14px; }
   .is-courses .journey-art { right: 36px; width: 89px; }
+  .is-courses .journey-step:nth-child(2) .journey-art { right: 32px; width: 105px; }
 }
 @media (min-width: 700px) {
   .is-courses .journey-heading { margin-inline: -20px; padding-inline: 20px; }
   .is-courses .journey-heading-copy { padding-left: 10px; }
-  .is-courses .journey-heading img { width: 315px; right: 0; }
+  .is-courses .journey-heading img { width: 228px; right: 0; }
   .is-courses .journey-list { margin-inline: 30px 0; }
   .is-courses .journey-footer { margin-inline: -80px; }
 }
@@ -919,29 +933,17 @@ body { background: #e7f2f9; }
 .app-shell:is(.is-practice, .is-more) {
   background: url("/course-art/course-journey-footer-v2.png") center calc(100% - 30px) / 100% 200px no-repeat, #fcfeff;
 }
-.app-shell:is(.is-practice, .is-more) .app-header {
-  z-index: 2;
-  height: 99px;
-  padding: 42px 22px 16px;
-  border: 0;
-  background: transparent;
-  backdrop-filter: none;
-}
 .app-shell:is(.is-practice, .is-more) .main-content {
   min-height: 0;
   padding-bottom: calc(100px + env(safe-area-inset-bottom));
 }
-.app-shell:is(.is-practice, .is-more) .logo-mark { width: 36px; height: 36px; }
-.app-shell:is(.is-practice, .is-more) .brand-button { gap: 11px; }
-.app-shell:is(.is-practice, .is-more) .brand-button strong { font-size: 16px; }
-.app-shell:is(.is-practice, .is-more) .brand-button small { font-size: 10px; letter-spacing: .13em; }
 .app-shell:is(.is-practice, .is-more) .bottom-nav { border-color: #e1e9e7; border-radius: 22px 22px 0 0; background: rgba(255, 255, 255, .97); }
 
 .is-practice .practice-page { padding-top: 0; }
 .is-practice .practice-page .section-heading {
-  min-height: 105px;
-  margin: 0 -14px 8px;
-  padding: 16px 24px 0;
+  min-height: 94px;
+  margin: 0 -14px 4px;
+  padding: 12px 24px 0;
   overflow: visible;
   border-radius: 0;
   background: none;
@@ -1025,7 +1027,7 @@ body { background: #e7f2f9; }
 
 .is-more .more-page:not(.more-detail-page) { padding-top: 0; }
 .is-more .more-page:not(.more-detail-page) .more-title {
-  min-height: 92px;
+  min-height: 80px;
   margin: 0 -14px 2px;
   padding: 0 24px;
   overflow: visible;
@@ -1036,7 +1038,7 @@ body { background: #e7f2f9; }
   letter-spacing: .055em;
 }
 .is-more .more-page:not(.more-detail-page) .more-title::before { position: absolute; right: -10px; bottom: -4px; width: 160px; height: 92px; border-radius: 50%; background: radial-gradient(ellipse, rgba(224, 242, 225, .84), transparent 72%); content: ""; pointer-events: none; }
-.is-more .more-page:not(.more-detail-page) .more-title::after { right: 20px; bottom: 1px; width: 82px; height: 82px; }
+.is-more .more-page:not(.more-detail-page) .more-title::after { right: 16px; bottom: 0; width: 102px; height: 84px; background-image: url("/course-art/swan-riding-family-watercolor.png"); }
 .is-more .more-page:not(.more-detail-page) .more-title span { position: relative; z-index: 1; box-shadow: inset 0 -8px #ffe8a0; }
 .is-more .more-group { margin-bottom: 23px; }
 .is-more .more-group > h2 { margin: 0 5px 11px; color: var(--ref-navy); font-size: 18px; font-weight: 900; letter-spacing: .02em; }
@@ -1070,6 +1072,7 @@ body { background: #e7f2f9; }
   background: none;
 }
 .is-more .more-detail-content > h1 { width: fit-content; font-size: clamp(30px, 8vw, 38px); letter-spacing: .05em; box-shadow: inset 0 -7px #ffe8a0; }
+.lesson-heading-art[src*="swan-riding-family"] { right: 4%; width: 58%; height: 75%; }
 .is-more .more-setting-group,
 .is-more .help-steps,
 .is-more .version-list { border: 0; border-radius: 24px; background: #f3faff; box-shadow: none; }
