@@ -1144,3 +1144,131 @@ body { background: #e7f2f9; }
   .fill-page .syllable-row { gap: 2px; }
   .fill-page .fill-cell { min-height: 56px; }
 }
+
+/* Keep the lesson brand the same compact size as the main tabs. */
+.is-lesson .app-header .logo-mark { width: 29px; height: 29px; border-radius: 9px 9px 9px 3px; }
+.is-lesson .app-header .logo-mark span { font-size: 16px; }
+.is-lesson .app-header .brand-button { gap: 8px; }
+.is-lesson .app-header .brand-button strong { font-size: 13px; letter-spacing: .025em; }
+.is-lesson .app-header .brand-button small { display: none; }
+
+/* The pencil belongs outside the practice paper, without clipping the lesson. */
+.is-fill .zhuyin-sheet { overflow: visible; }
+.is-fill .fill-pencil-art { z-index: 2; right: -10px; bottom: -56px; width: 137px; height: 137px; }
+.is-fill .fill-page > .fill-begin-button,
+.is-fill .fill-check-actions { margin-top: 66px; }
+
+/* Focus screens share the lesson's quiet watercolor-paper treatment. */
+.fill-focus-shell,
+.focus-shell {
+  background: #f8fcfa url('/course-art/lesson-watercolor-paper.png') center bottom / 100% auto no-repeat;
+}
+.fill-focus-header,
+.focus-topbar {
+  position: relative;
+  z-index: 1;
+  border-bottom: 1px solid rgba(173, 207, 217, .7);
+  background: rgba(255, 253, 248, .92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.fill-focus-header button,
+.focus-exit { min-height: 40px; color: #2868b9; }
+.fill-focus-header > strong,
+.focus-question strong { color: #173763; }
+.fill-focus-body {
+  min-height: 0;
+  justify-content: center;
+  padding: 18px 18px max(24px, env(safe-area-inset-bottom));
+  overflow-y: auto;
+}
+.fill-focus-intro { display: flex; min-height: 114px; align-items: end; justify-content: space-between; gap: 5px; width: 100%; max-width: 440px; margin: 0 auto 13px; }
+.fill-focus-intro > div { position: relative; z-index: 1; }
+.writing-kicker { display: block; margin-bottom: 7px; color: #5684b8; font-size: 12px; font-weight: 850; letter-spacing: .08em; }
+.fill-focus-intro h1 { margin: 0 0 5px; font-size: clamp(24px, 7vw, 31px); letter-spacing: .035em; }
+.fill-focus-intro p { margin: 0; font-size: 13px; }
+.fill-focus-intro img { flex: none; width: clamp(88px, 27vw, 130px); max-height: 108px; object-fit: contain; object-position: bottom; }
+.fill-writing-grid {
+  width: min(100%, 49dvh, 440px);
+  border: 3px solid #a9d1c1;
+  border-radius: 19px;
+  background: #fffefa;
+  box-shadow: 7px 8px 0 rgba(175, 220, 198, .62), 0 12px 24px rgba(47, 96, 104, .08);
+}
+.fill-writing-grid::before { border-left-color: #bed8e4; }
+.fill-writing-grid::after { border-top-color: #bed8e4; }
+.fill-writing-actions { width: 100%; max-width: 440px; margin: 20px auto 0; }
+.fill-writing-actions button { min-height: 52px; border-radius: 14px; }
+.fill-clear-button { border-color: #c0dce8; background: #fffdfa; }
+.fill-save-button { background: #2274e8; box-shadow: 0 4px 0 #d9eaf9; }
+.fill-review-body { border-radius: 24px; background: rgba(255, 253, 248, .68); }
+
+.focus-content { background: transparent; }
+.phase-ready .focus-content { justify-content: center; }
+.listen-ready-card {
+  position: relative;
+  justify-items: stretch;
+  gap: 14px;
+  width: min(100%, 430px);
+  padding: 22px 21px 21px;
+  border: 1px solid #d9e6e3;
+  border-radius: 24px;
+  background: #fffcf4 url('/course-art/course-card-paper-v1.png') center / 512px 512px repeat;
+  box-shadow: 0 12px 26px rgba(36, 81, 112, .1), 0 3px 0 rgba(175, 214, 195, .38);
+  text-align: left;
+}
+.listen-ready-heading { display: flex; min-height: 128px; align-items: end; justify-content: space-between; gap: 5px; }
+.listen-ready-heading > div { position: relative; z-index: 1; }
+.listen-ready-icon { width: 52px; height: 52px; margin-bottom: 8px; border-radius: 17px; background: #e3f3ff; color: #2274e8; }
+.listen-ready-card h1 { font-size: clamp(26px, 7vw, 31px); letter-spacing: .04em; }
+.listen-ready-art { width: clamp(94px, 29vw, 136px); max-height: 128px; object-fit: contain; object-position: bottom; }
+.listen-ready-card p { font-size: 14px; }
+.listen-ready-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; width: 100%; margin: 4px 0; }
+.listen-ready-summary span { display: grid; justify-items: center; gap: 3px; padding: 9px 4px; border: 1px solid #d9e8f2; border-radius: 12px; background: rgba(238, 248, 255, .84); color: #617b95; font-size: 12px; white-space: nowrap; }
+.listen-ready-summary strong { font-size: 15px; }
+.listen-ready-card .listen-start-button { min-height: 62px; border-radius: 15px; box-shadow: 0 4px 0 #bad7f4; }
+.listen-ready-card .listen-start-button strong { font-size: 17px; }
+.listen-ready-card .listen-start-button small { font-size: 11px; }
+.canvas-paper { border-color: #a9d1c1; border-radius: 17px; box-shadow: 6px 7px 0 rgba(175, 220, 198, .65); }
+.canvas-zone.is-locked .canvas-paper { border-color: #c7dcd4; box-shadow: 5px 6px 0 rgba(183, 211, 197, .6); }
+.listen-replay-button { border-radius: 13px; background: rgba(255, 253, 248, .92); }
+.early-submit-button { border-radius: 13px; background: #fff3e5; }
+.canvas-toolbar button { min-height: 33px; border-radius: 10px; background: #fffdfa; }
+.parent-review,
+.choice-panel,
+.remediation-offer { border-radius: 17px; background: rgba(255, 253, 248, .96); box-shadow: 0 8px 20px rgba(33, 81, 106, .07); }
+
+/* Reusable in-app warning and resume card. */
+.fill-dialog-backdrop { z-index: 120; background: rgba(17, 43, 67, .5); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
+.fill-dialog {
+  position: relative;
+  gap: 11px;
+  overflow: hidden;
+  width: min(100%, 390px);
+  padding: 28px 23px 24px;
+  border: 1px solid #d8e6df;
+  border-radius: 25px;
+  background: #fffcf4 url('/course-art/course-card-paper-v1.png') center / 512px 512px repeat;
+  box-shadow: 0 24px 60px rgba(16, 43, 68, .26);
+}
+.fill-dialog::before { position: absolute; top: -38px; right: -27px; width: 124px; height: 124px; border-radius: 50%; background: rgba(204, 233, 201, .42); content: ''; pointer-events: none; }
+.fill-dialog > * { position: relative; }
+.fill-dialog-icon { width: 61px; height: 61px; border: 1px solid #cbe3f5; border-radius: 20px; background: #e8f5ff; }
+.fill-dialog h2 { font-size: 23px; letter-spacing: .025em; }
+.fill-dialog p { margin-bottom: 7px; font-size: 14px; }
+.fill-dialog button { min-height: 51px; border-radius: 13px; }
+.fill-dialog-primary { background: #2274e8; }
+.fill-dialog-secondary { background: rgba(255, 255, 255, .83); }
+
+@media (max-height: 720px) {
+  .fill-focus-body { justify-content: flex-start; }
+  .fill-focus-intro { min-height: 88px; }
+  .fill-focus-intro img { max-height: 86px; }
+  .fill-writing-grid { width: min(100%, 46dvh, 440px); }
+}
+@media (max-width: 350px) {
+  .fill-focus-body { padding-inline: 13px; }
+  .fill-focus-intro img { width: 76px; }
+  .listen-ready-card { padding-inline: 16px; }
+  .listen-ready-art { width: 80px; }
+}

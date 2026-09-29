@@ -547,6 +547,8 @@ export default function Page() {
   const [listenIndex, setListenIndex] = useState(0);
   const [sessionQuestions, setSessionQuestions] = useState<ListeningQuestion[]>([]);
   const [listenPhase, setListenPhase] = useState<ListenPhase>("ready");
+  const [listenExitOpen, setListenExitOpen] = useState(false);
+  const [fillPracticeExitOpen, setFillPracticeExitOpen] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(30);
   const [playCount, setPlayCount] = useState(0);
   const [listenMessage, setListenMessage] = useState("按下「開始聽」才會播放題目。時間會從這裡開始倒數。 ");
@@ -663,11 +665,13 @@ export default function Page() {
   }, [view, fillDraftReady, fillResumeDraft, fillParentChecked, hasFillDraft]);
 
   useEffect(() => {
-    if (!fillResumeDraft && !fillExitTarget) return;
+    if (!fillResumeDraft && !fillExitTarget && !listenExitOpen && !fillPracticeExitOpen) return;
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         event.preventDefault();
         if (fillExitTarget) setFillExitTarget(null);
+        if (listenExitOpen) setListenExitOpen(false);
+        if (fillPracticeExitOpen) setFillPracticeExitOpen(false);
       }
       if (event.key !== "Tab") return;
       const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>(".fill-dialog button"));
@@ -679,7 +683,7 @@ export default function Page() {
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [fillResumeDraft, fillExitTarget]);
+  }, [fillResumeDraft, fillExitTarget, listenExitOpen, fillPracticeExitOpen]);
 
   useEffect(() => {
     try {
@@ -857,6 +861,7 @@ export default function Page() {
   const resetListeningQuestion = (index = 0) => {
     clearListenTimers();
     stopPlayback();
+    setListenExitOpen(false);
     const canvas = canvasRef.current;
     if (canvas) canvas.getContext("2d")?.clearRect(0, 0, canvas.width, canvas.height);
     setListenIndex(index);
@@ -973,9 +978,19 @@ export default function Page() {
   };
 
   const leaveFocus = () => {
-    if (listenPhase === "active" && !window.confirm("這一題尚未完成，要先離開嗎？")) return;
+    if (listenPhase === "active" || listenPhase === "retry") {
+      clearListenTimers();
+      stopPlayback();
+      setListenExitOpen(true);
+      return;
+    }
+    confirmLeaveFocus();
+  };
+
+  const confirmLeaveFocus = () => {
     clearListenTimers();
     stopPlayback();
+    setListenExitOpen(false);
     setView(singleQuestionPractice ? "practice" : "lesson");
     setListenPhase("ready");
   };
@@ -989,17 +1004,17 @@ export default function Page() {
   }, [clearListenTimers, stopPlayback]);
 
   useEffect(() => {
-    if (listenPhase !== "active" && listenPhase !== "retry") return;
+    if (listenExitOpen || (listenPhase !== "active" && listenPhase !== "retry")) return;
 
     timerRef.current = window.setInterval(() => {
       setSecondsLeft((current) => (current <= 1 ? 0 : current - 1));
     }, 1000);
 
-    const timeUp = window.setTimeout(() => finishListening(), questionDuration * 1000);
+    const timeUp = window.setTimeout(() => finishListening(), secondsLeft * 1000);
     timeoutRefs.current = [timeUp];
 
     return clearListenTimers;
-  }, [clearListenTimers, finishListening, listenIndex, listenPhase, questionDuration]);
+  }, [clearListenTimers, finishListening, listenIndex, listenPhase, questionDuration, listenExitOpen]);
 
   useEffect(() => {
     if (view !== "listen" || (listenPhase !== "active" && listenPhase !== "retry")) return;
@@ -1384,8 +1399,8 @@ export default function Page() {
   };
 
   const renderFillDialog = () => {
-    if (fillResumeDraft) return <div className="fill-dialog-backdrop"><div className="fill-dialog" role="alertdialog" aria-modal="true" aria-labelledby="fill-resume-title" aria-describedby="fill-resume-description"><span className="fill-dialog-icon" aria-hidden="true">✎</span><h2 id="fill-resume-title">要繼續上次的默寫嗎？</h2><p id="fill-resume-description">第{lessonNumber}課「{lesson.title}」的筆跡已保存在這台裝置。</p><button className="fill-dialog-primary" type="button" autoFocus onClick={resumeFillDraft}>繼續默寫</button><button className="fill-dialog-secondary" type="button" onClick={restartFillDraft}>重新開始</button></div></div>;
-    if (fillExitTarget) return <div className="fill-dialog-backdrop"><div className="fill-dialog" role="alertdialog" aria-modal="true" aria-labelledby="fill-exit-title" aria-describedby="fill-exit-description"><span className="fill-dialog-icon" aria-hidden="true">✎</span><h2 id="fill-exit-title">要先離開默寫嗎？</h2><p id="fill-exit-description">{storageError ? "這台裝置目前無法保存筆跡，離開後可能會消失。" : "目前寫好的內容已自動保存。下次進來，可以繼續寫。"}</p><button className="fill-dialog-primary" type="button" autoFocus onClick={() => setFillExitTarget(null)}>留下繼續寫</button><button className="fill-dialog-secondary" type="button" onClick={leaveFill}>{storageError ? "仍要離開" : "儲存並離開"}</button></div></div>;
+    if (fillResumeDraft) return <div className="fill-dialog-backdrop"><div className="fill-dialog" role="alertdialog" aria-modal="true" aria-labelledby="fill-resume-title" aria-describedby="fill-resume-description"><span className="fill-dialog-icon" aria-hidden="true"><PencilLine size={29} weight="duotone" /></span><h2 id="fill-resume-title">要繼續上次的默寫嗎？</h2><p id="fill-resume-description">第{lessonNumber}課「{lesson.title}」的筆跡已保存在這台裝置。</p><button className="fill-dialog-primary" type="button" autoFocus onClick={resumeFillDraft}>繼續默寫</button><button className="fill-dialog-secondary" type="button" onClick={restartFillDraft}>重新開始</button></div></div>;
+    if (fillExitTarget) return <div className="fill-dialog-backdrop"><div className="fill-dialog" role="alertdialog" aria-modal="true" aria-labelledby="fill-exit-title" aria-describedby="fill-exit-description"><span className="fill-dialog-icon" aria-hidden="true"><PencilLine size={29} weight="duotone" /></span><h2 id="fill-exit-title">要先離開默寫嗎？</h2><p id="fill-exit-description">{storageError ? "這台裝置目前無法保存筆跡，離開後可能會消失。" : "目前寫好的內容已自動保存。下次進來，可以繼續寫。"}</p><button className="fill-dialog-primary" type="button" autoFocus onClick={() => setFillExitTarget(null)}>留下繼續寫</button><button className="fill-dialog-secondary" type="button" onClick={leaveFill}>{storageError ? "仍要離開" : "儲存並離開"}</button></div></div>;
     return null;
   };
 
@@ -1501,7 +1516,7 @@ export default function Page() {
     const position = activeFillCell - fillLineStarts[lineIndex] + 1;
     return <main className="fill-focus-shell">
       <header className="fill-focus-header"><button type="button" onClick={leaveFillCell}><ArrowLeft size={19} aria-hidden="true" /> 回到課文</button><strong>第 {lineIndex + 1} 行 · 第 {position} 格</strong><span>{writtenCount} / {lessonItems.length}</span></header>
-      <div className="fill-focus-body"><h1>寫出完整注音</h1><p>記得寫聲調，寫好後按「完成這格」。</p><div className="fill-writing-grid"><canvas ref={fillCanvasRef} onPointerDown={beginFillDrawing} onPointerMove={moveFillDrawing} onPointerUp={endFillDrawing} onPointerCancel={endFillDrawing} aria-label={`第 ${lineIndex + 1} 行第 ${position} 格手寫區`} /></div><div className="fill-writing-actions"><button type="button" className="fill-clear-button" onClick={clearFillDrawing}>清除重寫</button><button type="button" className="fill-save-button" disabled={!fillHasInk} onClick={saveFillDrawing}>完成這格 <ArrowRight size={19} aria-hidden="true" /></button></div></div>
+      <div className="fill-focus-body"><div className="fill-focus-intro"><div><span className="writing-kicker">第{lessonNumber}課 · {lesson.title}</span><h1>寫出完整注音</h1><p>記得寫聲調，寫好後按「完成這格」。</p></div><img src={selectedLesson === 7 ? "/course-art/radish-story.png" : `/course-art/${courseArtwork[selectedLesson]}-watercolor.png`} alt="" /></div><div className="fill-writing-grid"><canvas ref={fillCanvasRef} onPointerDown={beginFillDrawing} onPointerMove={moveFillDrawing} onPointerUp={endFillDrawing} onPointerCancel={endFillDrawing} aria-label={`第 ${lineIndex + 1} 行第 ${position} 格手寫區`} /></div><div className="fill-writing-actions"><button type="button" className="fill-clear-button" onClick={clearFillDrawing}>清除重寫</button><button type="button" className="fill-save-button" disabled={!fillHasInk} onClick={saveFillDrawing}>完成這格 <ArrowRight size={19} aria-hidden="true" /></button></div></div>
     </main>;
   };
 
@@ -1524,8 +1539,9 @@ export default function Page() {
     const favorite = fillPracticeTarget;
     const location = fillLocation(favorite.lessonIndex, favorite.positions[0]);
     return <main className="fill-focus-shell fill-practice-shell">
-      <header className="fill-focus-header"><button type="button" onClick={() => { if (fillPracticePhase === "writing" && fillIsDirty && !window.confirm("這一格還沒交給家長檢查，要返回練習嗎？")) return; setView("practice"); }}><ArrowLeft size={19} aria-hidden="true" /> 回到練習</button><strong>錯字重練</strong><span>第{lessonNumerals[favorite.lessonIndex]}課</span></header>
+      <header className="fill-focus-header"><button type="button" onClick={() => { if (fillPracticePhase === "writing" && fillIsDirty) { setFillPracticeExitOpen(true); return; } setView("practice"); }}><ArrowLeft size={19} aria-hidden="true" /> 回到練習</button><strong>錯字重練</strong><span>第{lessonNumerals[favorite.lessonIndex]}課</span></header>
       {fillPracticePhase === "writing" ? <div className="fill-focus-body"><div className="fill-practice-prompt"><small>{lessons[favorite.lessonIndex].title} · {location}</small><h1>寫出「{favorite.character}」的注音</h1><p>寫好後交給家長檢查，正確答案會在下一頁顯示。</p></div><div className="fill-writing-grid"><canvas ref={fillCanvasRef} onPointerDown={beginFillDrawing} onPointerMove={moveFillDrawing} onPointerUp={endFillDrawing} onPointerCancel={endFillDrawing} aria-label={`${favorite.character}注音手寫區`} /></div><div className="fill-writing-actions"><button type="button" className="fill-clear-button" onClick={clearFillDrawing}>清除重寫</button><button type="button" className="fill-save-button" disabled={!fillHasInk} onClick={() => { if (!fillDraftRef.current.length) return; setFillPracticeStrokes(fillDraftRef.current.map((stroke) => stroke.map((point) => ({ ...point })))); setFillPracticePhase("review"); }}>請家長檢查 <ArrowRight size={19} aria-hidden="true" /></button></div></div> : <div className="fill-review-body fill-practice-review"><h1>請家長一起檢查</h1><p>{lessons[favorite.lessonIndex].title} · {location} ·「{favorite.character}」</p><div className="fill-practice-compare"><div><small>孩子寫的</small><div className="fill-compare-ink"><InkPreview strokes={fillPracticeStrokes} /></div></div><div><small>正確注音</small><div className="fill-compare-answer"><ZhuyinStack text={favorite.zhuyin} /></div></div></div><div className="fill-review-actions"><button type="button" onClick={() => { setFillPracticePhase("writing"); setFillPracticeStrokes([]); setFillHasInk(false); }}>再寫一次</button><button type="button" onClick={() => removeFillFavorite(favorite, true)}>已掌握 · 移出收藏</button></div><button type="button" className="fill-practice-defer" onClick={() => { setFillFavorites((current) => current.map((item) => fillFavoriteKey(item) === fillFavoriteKey(favorite) ? { ...item, status: "review_later" } : item)); setPracticeNotice("已保留在錯字收藏，下次可以再練。"); setView("practice"); }}>稍後再練，保留收藏</button></div>}
+      {fillPracticeExitOpen && <div className="fill-dialog-backdrop"><div className="fill-dialog" role="alertdialog" aria-modal="true" aria-labelledby="practice-exit-title" aria-describedby="practice-exit-description"><span className="fill-dialog-icon" aria-hidden="true"><PencilLine size={29} weight="duotone" /></span><h2 id="practice-exit-title">這格還沒寫完</h2><p id="practice-exit-description">現在離開會失去這次筆跡；錯字收藏仍會保留，可以之後再練。</p><button className="fill-dialog-primary" type="button" autoFocus onClick={() => setFillPracticeExitOpen(false)}>繼續寫</button><button className="fill-dialog-secondary" type="button" onClick={() => { setFillPracticeExitOpen(false); setView("practice"); }}>離開這格</button></div></div>}
     </main>;
   };
 
@@ -1617,7 +1633,7 @@ export default function Page() {
       <header className="focus-topbar"><button type="button" className="focus-exit" onClick={leaveFocus}>← <span>離開</span></button><div className="focus-question"><strong>{listenCategoryLabels[currentQuestion.category]}</strong><small>{sectionProgress}</small></div><div className="focus-meta"><span className={secondsLeft <= 8 && (listenPhase === "active" || listenPhase === "retry") ? "urgent" : ""}><Timer size={14} weight="bold" /> {listenPhase === "retry_ready" ? "待重寫" : listenPhase === "review" || listenPhase === "choice" ? "已交卷" : `${String(Math.floor((listenPhase === "ready" ? questionDuration : secondsLeft) / 60)).padStart(2, "0")}:${String((listenPhase === "ready" ? questionDuration : secondsLeft) % 60).padStart(2, "0")}`}</span><span aria-label={`已播放 ${playCount} 次`}><SpeakerHigh size={14} weight="bold" /> {playCount} 次</span></div></header>
       <div className="focus-content">
         <p className="sr-only" aria-live="polite">{listenMessage}</p>
-        {listenPhase === "ready" ? <div className="listen-ready-card"><span className="listen-ready-icon"><Headphones size={42} weight="duotone" aria-hidden="true" /></span><h1>準備聽寫</h1><p>{isWordQuestion ? "聽一個圈詞，每格寫一個字的注音。" : "聽題目，在田字格寫下完整注音。"}</p><div className="listen-ready-summary"><span>播放 <strong>{listeningSettings.repeatCount} 次</strong></span><span>間隔 <strong>{listeningSettings.intervalSeconds} 秒</strong></span><span>作答 <strong>{questionDuration} 秒</strong></span></div><button type="button" className="listen-start-button" onClick={startListening}><span className="play-circle"><Play size={17} weight="fill" /></span><span><strong>開始聽</strong><small>按下後播放，並開始倒數</small></span><b><ArrowRight size={19} /></b></button></div> : renderListeningCanvas()}
+        {listenPhase === "ready" ? <div className="listen-ready-card"><div className="listen-ready-heading"><div><span className="writing-kicker">第{lessonNumber}課 · {lesson.title}</span><span className="listen-ready-icon"><Headphones size={31} weight="duotone" aria-hidden="true" /></span><h1>準備聽寫</h1></div><img className="listen-ready-art" src={selectedLesson === 7 ? "/course-art/radish-story.png" : `/course-art/${courseArtwork[selectedLesson]}-watercolor.png`} alt="" /></div><p>{isWordQuestion ? "聽一個圈詞，每格寫一個字的注音。" : "聽題目，在田字格寫下完整注音。"}</p><div className="listen-ready-summary"><span>播放 <strong>{listeningSettings.repeatCount} 次</strong></span><span>間隔 <strong>{listeningSettings.intervalSeconds} 秒</strong></span><span>作答 <strong>{questionDuration} 秒</strong></span></div><button type="button" className="listen-start-button" onClick={startListening}><span className="play-circle"><Play size={17} weight="fill" /></span><span><strong>開始聽</strong><small>按下後播放，並開始倒數</small></span><b><ArrowRight size={19} /></b></button></div> : renderListeningCanvas()}
         {audioError && <p className="audio-error" role="alert">音訊無法播放。請檢查音量或網路，再按「再聽一次」。</p>}
         {(listenPhase === "active" || listenPhase === "retry") && <button type="button" className="listen-replay-button" onClick={replayQuestion}><SpeakerHigh size={18} aria-hidden="true" /> 再聽一次</button>}
         {listenPhase === "active" && <button type="button" className="early-submit-button" onClick={() => finishListening(true)}>提早交卷</button>}
@@ -1627,6 +1643,7 @@ export default function Page() {
         {listenPhase === "retry_ready" && <button type="button" className="remediation-later" onClick={deferRemediation}>稍後再練這題</button>}
         {listenPhase === "retry" && <div className="retry-actions"><button type="button" className="retry-submit" disabled={!hasCompleteInk} onClick={submitRetryWriting}>我寫好了，請家長看看 <span>→</span></button><button type="button" className="remediation-later" onClick={deferRemediation}>稍後再練</button></div>}
       </div>
+      {listenExitOpen && <div className="fill-dialog-backdrop"><div className="fill-dialog" role="alertdialog" aria-modal="true" aria-labelledby="listen-exit-title" aria-describedby="listen-exit-description"><span className="fill-dialog-icon" aria-hidden="true"><Headphones size={29} weight="duotone" /></span><h2 id="listen-exit-title">要先離開聽寫嗎？</h2><p id="listen-exit-description">倒數已暫停。繼續作答時可按「再聽一次」；離開後這一題的筆跡不會保留。</p><button className="fill-dialog-primary" type="button" autoFocus onClick={() => setListenExitOpen(false)}>繼續作答</button><button className="fill-dialog-secondary" type="button" onClick={confirmLeaveFocus}>離開本題</button></div></div>}
     </main>
     );
   };

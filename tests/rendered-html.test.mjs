@@ -133,6 +133,21 @@ test("the source keeps the handoff interaction vocabulary", async () => {
   assert.doesNotMatch(page, /className="focus-intro"/);
 });
 
+test("handwriting and listening exits use the watercolor in-app warning", async () => {
+  const fs = await import("node:fs/promises");
+  const page = await fs.readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const css = await fs.readFile(new URL("../app/globals.css", import.meta.url), "utf8");
+  assert.doesNotMatch(page, /window\.confirm\(/);
+  assert.match(page, /setListenExitOpen\(true\)/);
+  assert.match(page, /if \(listenExitOpen \|\| \(listenPhase !== "active"/);
+  assert.match(page, /role="alertdialog" aria-modal="true" aria-labelledby="listen-exit-title"/);
+  assert.match(page, /倒數已暫停/);
+  assert.match(page, /setFillPracticeExitOpen\(true\)/);
+  assert.match(css, /\.is-lesson \.app-header \.logo-mark \{ width: 29px; height: 29px/);
+  assert.match(css, /\.is-fill \.zhuyin-sheet \{ overflow: visible; \}/);
+  assert.match(css, /\.is-fill \.fill-pencil-art \{[^}]*bottom: -56px/);
+});
+
 test("fill mistakes stay in a separate collection until a parent removes them", async () => {
   const page = await (await import("node:fs/promises")).readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
   assert.match(page, /zhuyin-fill-favorites-v1/);

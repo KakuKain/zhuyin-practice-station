@@ -132,3 +132,15 @@ final result: passed
 - Functionality: all nine `.journey-step` elements are present and unhidden; no middle `journey-break` remains. The ninth card's bottom measured 731.8px while the fixed navigation begins at 855px, so it is fully reachable. The ninth lesson opened and returned successfully.
 - Fidelity surfaces: title hierarchy, card colors and role illustrations stay unchanged from v41; card cadence and left numbered route remain continuous through nine. Footer art is a single background on `.app-shell.is-courses`, with one decorative sign after the ninth card. The three-item navigation remains intentional per the earlier user decision to remove Home.
 - No P0/P1/P2 visual or interaction findings remain. Previous v41 notes describe the earlier six-plus-reveal implementation and are retained as version history, not the current behavior.
+
+## 默寫、聽寫聚焦頁與警示卡（2026-09-30）
+
+final result: passed
+
+- Source: 使用者提供的四張現況截圖，涵蓋默寫手寫頁、聽寫準備頁、聽寫作答頁，以及原生離開警示；既有課次頁的水彩紙張與角色畫風作為視覺基準。
+- Browser evidence: Codex in-app browser `http://localhost:3001/`，依序檢查第一課的課次頁、默寫紙張與手寫格、聽寫準備卡、聽寫作答格及站內離開警示。畫面擷取於瀏覽器工具輸出，沒有另存本機檔案。
+- Logo: 課次頁品牌圖示為 29 × 29px，與課程、練習、更多頁相同；品牌名稱仍在右上角。
+- 視覺：聚焦頁沿用淡色水彩草地、米白紙張、課次角色與既有藍綠操作色；田字格保持近白底與清楚格線，裝飾不進入書寫區。
+- 默寫鉛筆：解除紙張容器裁切，鉛筆從右下角跨出紙框，下面保留足夠的按鈕間距。捲動後檢查，鉛筆完整可見且未遮住格子或開始按鈕。
+- 警示：聽寫離開改為可鍵盤操作的站內對話框；開啟時倒數由 `00:02` 保持在 `00:02`，選「離開本題」回到課次。錯字重練的離開警示也不再使用瀏覽器原生確認框；草稿恢復與離開卡同步換成水彩紙張風格。
+- 視窗與錯誤：在瀏覽器目前的桌面視窗中，480px 寬的 App 畫面沒有橫向溢出；console 未見 warning 或 error。`npm test` 通過 12 項測試。
