@@ -1552,20 +1552,20 @@ export default function Page() {
         })}
       </div> : <div className="empty-reinforce"><span><Headphones size={28} weight="duotone" aria-hidden="true" /></span><strong>目前沒有待補強或收藏題目</strong><small>聽寫時按「需要補強」會先記下題目，之後可以再練。</small></div>}
       <div className="practice-list"><div className="section-title-row"><h2>最近練習</h2><span className="list-count">{practiceState.recentLesson === null ? "0 個紀錄" : "1 個紀錄"}</span></div>
-        {practiceState.recentLesson === null ? <p className="practice-no-recent">還沒有練習紀錄，先選一課開始吧。</p> : <button className="practice-row" type="button" onClick={() => openLesson(practiceState.recentLesson!)}><span className="practice-row-icon">{String(practiceState.recentLesson + 1).padStart(2, "0")}</span><span><strong>第{lessonNumerals[practiceState.recentLesson]}課・{lessons[practiceState.recentLesson].title}</strong><small>回到課程</small></span><b>繼續 <span>→</span></b></button>}
+        {practiceState.recentLesson === null ? <p className="practice-no-recent">還沒有練習紀錄，先選一課開始吧。</p> : <button className="practice-row" type="button" onClick={() => openLesson(practiceState.recentLesson!)}><span className="practice-row-icon">{String(practiceState.recentLesson + 1).padStart(2, "0")}</span><span><strong>第{lessonNumerals[practiceState.recentLesson]}課・{lessons[practiceState.recentLesson].title}</strong><small>回到課程</small></span><span className="journey-arrow" aria-hidden="true"><ArrowRight size={21} weight="bold" /></span></button>}
       </div>
     </section>
   );
 
   const renderMore = () => {
     if (morePanel === "home") return <section className="page-section more-page">
-      <h1 className="more-title">更多</h1>
+      <h1 className="more-title"><span>更多</span></h1>
       <div className="more-group"><h2>練習設定</h2><div className="more-settings-list">
-        <button type="button" onClick={() => setMorePanel("listening")}><span className="more-row-icon blue"><MusicNotes size={21} aria-hidden="true" /></span><span><strong>聽寫設定</strong><small>播放 {listeningSettings.repeatCount} 次 · 間隔 {listeningSettings.intervalSeconds} 秒</small></span><ArrowRight size={17} aria-hidden="true" /></button>
+        <button type="button" onClick={() => setMorePanel("listening")}><span className="more-row-icon blue"><MusicNotes size={21} aria-hidden="true" /></span><span><strong>聽寫設定</strong><small>播放 {listeningSettings.repeatCount} 次 · 間隔 {listeningSettings.intervalSeconds} 秒</small></span><span className="more-arrow" aria-hidden="true"><ArrowRight size={21} weight="bold" /></span></button>
       </div></div>
       <div className="more-group"><h2>資訊與協助</h2><div className="more-settings-list">
-        <button type="button" onClick={() => setMorePanel("help")}><span className="more-row-icon green"><Question size={21} aria-hidden="true" /></span><span><strong>使用說明</strong><small>課文默寫、聽寫與錯題重練</small></span><ArrowRight size={17} aria-hidden="true" /></button>
-        <button type="button" onClick={() => setMorePanel("versions")}><span className="more-row-icon orange"><Info size={21} aria-hidden="true" /></span><span><strong>版本</strong><small>目前 {siteReleaseNotes[0][0]} · Beta 測試版</small></span><ArrowRight size={17} aria-hidden="true" /></button>
+        <button type="button" onClick={() => setMorePanel("help")}><span className="more-row-icon green"><Question size={21} aria-hidden="true" /></span><span><strong>使用說明</strong><small>課文默寫、聽寫與錯題重練</small></span><span className="more-arrow" aria-hidden="true"><ArrowRight size={21} weight="bold" /></span></button>
+        <button type="button" onClick={() => setMorePanel("versions")}><span className="more-row-icon orange"><Info size={21} aria-hidden="true" /></span><span><strong>版本</strong><small>目前 {siteReleaseNotes[0][0]} · Beta 測試版</small></span><span className="more-arrow" aria-hidden="true"><ArrowRight size={21} weight="bold" /></span></button>
       </div></div>
       <p className="more-device-note">練習紀錄與設定只存在目前的裝置，不需要登入。</p>
     </section>;

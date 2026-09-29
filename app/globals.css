@@ -914,3 +914,175 @@ body { background: #e7f2f9; }
   .is-courses .journey-list { margin-inline: 30px 0; }
   .is-courses .journey-footer { margin-inline: -80px; }
 }
+
+/* The other main tabs use the same open, paper-soft storybook language as Courses. */
+.app-shell:is(.is-practice, .is-more) {
+  background: url("/course-art/course-journey-footer-v2.png") center calc(100% - 30px) / 100% 200px no-repeat, #fcfeff;
+}
+.app-shell:is(.is-practice, .is-more) .app-header {
+  z-index: 2;
+  height: 99px;
+  padding: 42px 22px 16px;
+  border: 0;
+  background: transparent;
+  backdrop-filter: none;
+}
+.app-shell:is(.is-practice, .is-more) .main-content {
+  min-height: 0;
+  padding-bottom: calc(100px + env(safe-area-inset-bottom));
+}
+.app-shell:is(.is-practice, .is-more) .logo-mark { width: 36px; height: 36px; }
+.app-shell:is(.is-practice, .is-more) .brand-button { gap: 11px; }
+.app-shell:is(.is-practice, .is-more) .brand-button strong { font-size: 16px; }
+.app-shell:is(.is-practice, .is-more) .brand-button small { font-size: 10px; letter-spacing: .13em; }
+.app-shell:is(.is-practice, .is-more) .bottom-nav { border-color: #e1e9e7; border-radius: 22px 22px 0 0; background: rgba(255, 255, 255, .97); }
+
+.is-practice .practice-page { padding-top: 0; }
+.is-practice .practice-page .section-heading {
+  min-height: 126px;
+  margin: 0 -14px 11px;
+  padding: 8px 24px 0;
+  overflow: visible;
+  border-radius: 0;
+  background: linear-gradient(90deg, #fcfeff 0%, rgba(252, 254, 255, .86) 48%, rgba(252, 254, 255, .2) 100%), url("/course-art/lesson-watercolor-landscape.png") right 56% / cover no-repeat;
+}
+.is-practice .practice-page .section-heading::after { right: 10px; bottom: 0; width: 112px; height: 115px; }
+.is-practice .practice-page .section-heading > * { max-width: 75%; }
+.is-practice .practice-page .section-heading .eyebrow { display: none; }
+.is-practice .practice-page .section-heading h1 {
+  width: fit-content;
+  margin: 0;
+  font-size: clamp(34px, 9.9vw, 42px);
+  font-weight: 900;
+  letter-spacing: -.055em;
+  line-height: 1.15;
+  box-shadow: inset 0 -8px #ffe8a0;
+}
+.is-practice .practice-page .section-heading p { max-width: 280px; margin-top: 12px; color: #637897; font-size: 14px; font-weight: 700; line-height: 1.55; }
+.is-practice .practice-page > .section-title-row,
+.is-practice .practice-list .section-title-row { margin: 23px 5px 11px; align-items: center; }
+.is-practice .practice-page .section-title-row h2 { font-size: 18px; font-weight: 900; letter-spacing: -.04em; }
+.is-practice .list-count { padding: 5px 9px; background: #eaf4ff; color: #326da9; font-size: 12px; font-weight: 800; white-space: nowrap; }
+.is-practice .practice-list-heading .list-count { background: #eaf7ee; color: #288351; }
+.is-practice .empty-reinforce {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  justify-items: start;
+  align-content: center;
+  column-gap: 14px;
+  min-height: 112px;
+  padding: 17px 18px;
+  border: 0;
+  border-radius: 24px;
+  background: linear-gradient(110deg, #f3faff, #e6f3ff 74%, #eff8ff);
+  box-shadow: none;
+  text-align: left;
+}
+.is-practice .practice-list-heading + .empty-reinforce { border: 0; background: linear-gradient(110deg, #f4fcf7, #e5f6eb 74%, #effbf3); }
+.is-practice .empty-reinforce > span { grid-row: 1 / 3; width: 48px; height: 48px; border-radius: 50%; background: #fff; }
+.is-practice .empty-reinforce strong { align-self: end; font-size: 16px; }
+.is-practice .empty-reinforce small { align-self: start; margin-top: 4px; font-size: 13px; line-height: 1.45; }
+.is-practice .saved-question-list { gap: 10px; }
+.is-practice .saved-question,
+.is-practice .practice-row {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 0;
+  border-radius: 24px;
+  background: linear-gradient(110deg, #f3faff, #e6f3ff 74%, #eff8ff);
+  box-shadow: none;
+}
+.is-practice .saved-question:nth-child(3n + 2) { background: linear-gradient(110deg, #f4fcf7, #e5f6eb 74%, #effbf3); }
+.is-practice .saved-question:nth-child(3n) { background: linear-gradient(110deg, #fffdf5, #fff4dc 74%, #fff9ea); }
+.is-practice .saved-question::before,
+.is-practice .practice-row::before,
+.is-more .more-settings-list button::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: url("/course-art/course-card-paper-v1.png") center / 210px repeat;
+  mix-blend-mode: multiply;
+  opacity: .24;
+  pointer-events: none;
+  content: "";
+}
+.is-practice .saved-question { padding: 16px; }
+.is-practice .saved-question-icon { border-radius: 50%; background: #fff; }
+.is-practice .saved-question-actions { margin-top: 4px; }
+.is-practice .saved-question-actions button { min-height: 44px; border-radius: 13px; }
+.is-practice .saved-question-actions .saved-start { border-color: #236de0; background: #236de0; }
+.is-practice .practice-list { margin-top: 20px; }
+.is-practice .practice-row { min-height: 86px; padding: 13px 15px; }
+.is-practice .practice-row-icon { width: 43px; height: 43px; border-radius: 50%; background: #fff; font-size: 17px; }
+.is-practice .practice-row strong { font-size: 16px; }
+.is-practice .practice-row small { font-size: 13px; }
+.is-practice .practice-row .journey-arrow { width: 36px; height: 36px; }
+.is-practice .practice-no-recent { border: 0; border-radius: 24px; background: linear-gradient(110deg, #fffdf5, #fff4dc 74%, #fff9ea); }
+
+.is-more .more-page:not(.more-detail-page) { padding-top: 0; }
+.is-more .more-page:not(.more-detail-page) .more-title {
+  min-height: 126px;
+  margin: 0 -14px 10px;
+  padding: 8px 24px 0;
+  overflow: visible;
+  border-radius: 0;
+  background: linear-gradient(90deg, #fcfeff 0%, rgba(252, 254, 255, .84) 49%, rgba(252, 254, 255, .18) 100%), url("/course-art/lesson-watercolor-landscape.png") right 56% / cover no-repeat;
+  font-size: clamp(34px, 9.9vw, 42px);
+  font-weight: 900;
+  letter-spacing: -.055em;
+}
+.is-more .more-page:not(.more-detail-page) .more-title::after { right: 17px; bottom: 2px; width: 118px; height: 119px; }
+.is-more .more-page:not(.more-detail-page) .more-title span { position: relative; z-index: 1; box-shadow: inset 0 -8px #ffe8a0; }
+.is-more .more-group { margin-bottom: 23px; }
+.is-more .more-group > h2 { margin: 0 5px 11px; color: var(--ref-navy); font-size: 18px; font-weight: 900; letter-spacing: -.04em; }
+.is-more .more-settings-list { display: grid; gap: 10px; overflow: visible; border: 0; border-radius: 0; background: none; box-shadow: none; }
+.is-more .more-settings-list button {
+  position: relative;
+  isolation: isolate;
+  grid-template-columns: 48px minmax(0, 1fr) 36px;
+  min-height: 86px;
+  gap: 13px;
+  padding: 13px 15px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 24px;
+  background: linear-gradient(110deg, #f3faff, #e6f3ff 74%, #eff8ff);
+  box-shadow: none;
+}
+.is-more .more-group:nth-of-type(2) .more-settings-list button:first-child { background: linear-gradient(110deg, #f4fcf7, #e5f6eb 74%, #effbf3); }
+.is-more .more-group:nth-of-type(2) .more-settings-list button:last-child { background: linear-gradient(110deg, #fffdf5, #fff4dc 74%, #fff9ea); }
+.is-more .more-row-icon { width: 46px; height: 46px; border-radius: 50%; background: #fff; }
+.is-more .more-settings-list strong { font-size: 17px; font-weight: 900; }
+.is-more .more-settings-list small { font-size: 13px; }
+.is-more .more-arrow { display: grid; width: 36px; height: 36px; place-items: center; border-radius: 50%; background: #fff; color: #286ad7; }
+.is-more .more-device-note { margin: 28px 9px 20px; padding: 0; background: none; font-size: 13px; }
+.is-more .more-detail-page { padding-top: 11px; }
+.is-more .more-back { min-height: 44px; padding: 0 12px; border: 1px solid #c9e3f5; border-radius: 12px; background: #f0f8ff; }
+.is-more .more-detail-content {
+  min-height: 135px;
+  margin: 12px -14px 0;
+  padding: 26px 24px 0;
+  background: linear-gradient(90deg, #fcfeff 0%, rgba(252, 254, 255, .87) 51%, rgba(252, 254, 255, .3) 100%), url("/course-art/lesson-watercolor-landscape.png") right top / 100% 132px no-repeat;
+}
+.is-more .more-detail-content > h1 { width: fit-content; font-size: clamp(30px, 8vw, 38px); box-shadow: inset 0 -7px #ffe8a0; }
+.is-more .more-setting-group,
+.is-more .help-steps,
+.is-more .version-list { border: 0; border-radius: 24px; background: #f3faff; box-shadow: none; }
+.is-more .more-setting-group fieldset,
+.is-more .help-steps section,
+.is-more .version-list details { border-color: #dce9ef; }
+
+@media (max-width: 380px) {
+  .is-practice .practice-page .section-heading::after { right: -8px; width: 96px; }
+  .is-practice .practice-page .section-heading > * { max-width: 78%; }
+  .is-practice .practice-page .section-heading p { font-size: 13px; }
+  .is-more .more-page:not(.more-detail-page) .more-title::after { right: 0; width: 106px; }
+}
+@media (min-width: 700px) {
+  .is-practice .practice-page .section-heading,
+  .is-more .more-page:not(.more-detail-page) .more-title { margin-inline: -20px; padding-inline: 30px; }
+  .is-practice .practice-page .section-heading::after { right: 45px; }
+  .is-more .more-page:not(.more-detail-page) .more-title::after { right: 45px; }
+  .is-more .more-detail-content { margin-inline: -20px; padding-inline: 30px; }
+}
