@@ -478,14 +478,21 @@ body { background: #e7f2f9; }
 .canvas-zone.is-word { width: min(100%, 260px, max(150px, calc((100dvh - 250px) / 2))); }
 .word-canvas-stack { display: grid; gap: 8px; }
 .canvas-zone.is-word .canvas-paper { width: 100%; height: auto; min-height: 0; aspect-ratio: 1; background-image: none; }
+.canvas-zone.is-word.is-long-word { width: min(100%, 370px); }
+.is-long-word .word-canvas-stack { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .word-paper-label { position: absolute; z-index: 3; top: 7px; left: 8px; padding: 3px 7px; border-radius: 6px; background: rgba(236, 247, 255, .9); color: #537590; font-size: 12px; font-weight: 800; pointer-events: none; }
 .phase-review .canvas-zone.is-word, .phase-choice .canvas-zone.is-word, .phase-remediation_offer .canvas-zone.is-word, .phase-retry_ready .canvas-zone.is-word { width: min(100%, 180px, max(120px, calc((100dvh - 390px) / 2))); }
+.phase-review .canvas-zone.is-long-word, .phase-choice .canvas-zone.is-long-word, .phase-remediation_offer .canvas-zone.is-long-word, .phase-retry_ready .canvas-zone.is-long-word { width: min(100%, 300px); }
 .listen-replay-button { display: inline-flex; width: min(100%, 430px); min-height: 42px; align-items: center; justify-content: center; gap: 8px; border: 1px solid #b8d9ef; border-radius: 10px; background: #fff; color: var(--ref-blue); font-size: 14px; font-weight: 800; }
 .audio-error { width: min(100%, 430px); margin: 0; padding: 9px 11px; border: 1px solid #f3b485; border-radius: 9px; background: #fff5e9; color: #9f4822; font-size: 13px; line-height: 1.5; }
 .choice-panel.is-word .choice-options { grid-template-columns: 1fr; }
 .choice-panel.is-word .choice-options button { min-height: 76px; }
 .choice-panel.is-word .answer-display.is-word { gap: 28px; }
 .choice-panel.is-word .answer-display.is-word .zhuyin-stack { min-width: 38px; font-size: 25px; }
+.answer-display.is-word { max-width: 100%; flex-wrap: wrap; }
+.answer-reveal { flex-wrap: wrap; gap: 8px; }
+.choice-panel.is-word .answer-display.is-word { gap: 6px; }
+.choice-panel.is-word .answer-display.is-word .zhuyin-stack { min-width: 0; font-size: 19px; }
 .answer-display .zhuyin-glyph.is-symbol { font-family: "PingFang TC", sans-serif; font-size: 34px; transform: translate(-50%, -50%); }
 @media (max-width: 430px) { .focus-question strong { font-size: 12px; } .focus-question small { font-size: 10px; } }
 

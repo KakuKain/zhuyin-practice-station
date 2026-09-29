@@ -96,7 +96,7 @@ test("fill mistakes stay in a separate collection until a parent removes them", 
   assert.match(page, /聽寫 · 待補強與收藏/);
 });
 
-test("all four lessons have three listening sections with four writing units each", async () => {
+test("all lessons retain three listening sections and complete circled-word writing", async () => {
   const page = await (await import("node:fs/promises")).readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
   const css = await (await import("node:fs/promises")).readFile(new URL("../app/globals.css", import.meta.url), "utf8");
   assert.match(page, /const secondLessonLines = \[/);
@@ -129,7 +129,8 @@ test("all four lessons have three listening sections with four writing units eac
   assert.match(css, /\.canvas-zone\.is-word \.canvas-paper.*aspect-ratio: 1/);
   assert.match(page, /legacySavedQuestionIndexes/);
   assert.match(page, /lesson\.symbols\.map\(\(symbol\) =>/);
-  assert.match(page, /new Map\(exercise\.lines\.flat\(\)\.map/);
+  assert.match(page, /const terms = circledVocabulary\[lessonIndex\]/);
+  assert.match(page, /const seenCharacters = new Map/);
   assert.match(page, /shuffleItems\(pools\.symbols\)\.slice\(0, 4\)/);
   assert.match(page, /shuffleItems\(pools\.characters\)\.slice\(0, 4\)/);
   assert.match(page, /shuffleItems\(pools\.words\)\.slice\(0, 2\)/);
@@ -138,8 +139,34 @@ test("all four lessons have three listening sections with four writing units eac
   assert.match(page, /firstPracticeStorageKey/);
   assert.doesNotMatch(page, /第二課先讀課文與注音符號|lessons\[1\]\.title, "閱讀課文"/);
   assert.match(page, /listeningCorrect: current\.listeningCorrect \+ currentQuestion\.answer\.split\("\|"\)\.length/);
-  assert.match(page, /三大題 · \{sessionScore\.listeningCorrect\} \/ 12 格完成/);
+  assert.match(page, /三大題 · \{sessionScore\.listeningCorrect\} \/ \{sessionWritingUnits\} 格完成/);
+  assert.match(page, /Array\.from\(\{ length: wordLength \}/);
   assert.match(css, /\.quick-course-grid \{ grid-template-columns: repeat\(3, minmax\(0, 1fr\)\)/);
+});
+
+test("each lesson draws only from its teacher-selected circled vocabulary", async () => {
+  const { circledVocabulary } = await import("../app/circled-vocabulary.ts");
+  const expected = [
+    ["逼", "貓咪", "弟弟", "跑第一"],
+    ["哈", "孵出", "五隻", "鵝媽媽", "好得意"],
+    ["半路", "忙著", "築巢", "河狸", "泡澡"],
+    ["笑嘻嘻", "背書包", "手拉手", "一二一", "好歡喜"],
+    ["朋友", "上下", "高低", "好像", "小鳥", "翹翹板"],
+    ["也", "謝謝", "讀書", "送老師", "一朵紅花", "教我畫畫"],
+    ["烏龜", "兔子", "領先", "落後", "睡午覺", "看誰跑得快", "跟在後面追"],
+    ["菜園", "黃牛", "浣熊", "嘿喲", "好熱鬧", "拔不動", "長出蘿蔔", "捲起袖子"],
+    ["山崖", "開心", "表演", "馴鹿", "孔雀", "慶祝", "小熊", "滾大球", "真精彩"],
+  ];
+  assert.equal(circledVocabulary.length, expected.length);
+  circledVocabulary.forEach((terms, lessonIndex) => {
+    assert.deepEqual(terms.map((term) => term.text), expected[lessonIndex]);
+    for (const term of terms) assert.equal([...term.text].length, term.syllables.length, term.text);
+    assert.ok(terms.filter((term) => term.syllables.length > 1).length >= 2);
+  });
+  const page = await (await import("node:fs/promises")).readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  assert.match(page, /terms\.filter\(\(term\) => term\.syllables\.length > 1\)/);
+  assert.match(page, /Math\.max\(30, wordLength \* 12\)/);
+  assert.match(page, /wordInk\.length === wordLength && wordInk\.every\(Boolean\)/);
 });
 
 test("lessons five to nine preserve every line and offer randomized listening pools", async () => {
@@ -172,7 +199,11 @@ test("lessons five to nine preserve every line and offer randomized listening po
 test("every listening prompt has an on-site audio clip and the settings pages have real destinations", async () => {
   const fs = await import("node:fs/promises");
   const page = await fs.readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const vocabulary = await fs.readFile(new URL("../app/circled-vocabulary.ts", import.meta.url), "utf8");
+  const circledTexts = [...vocabulary.matchAll(/term\("([^"]+)"/g)].map((match) => match[1]);
   const texts = new Set([
+    ...circledTexts,
+    ...circledTexts.flatMap((term) => [...term]),
     ...[...page.matchAll(/audioText: "([^"]+)"/g)].map((match) => match[1]),
     ...[...page.matchAll(/wordQuestion\("([^"]+)"/g)].map((match) => match[1]),
     ...[...page.matchAll(/character: "([^"]+)"/g)].map((match) => match[1]),

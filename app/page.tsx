@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, BookOpenText, Gear, Headphones, House, Info, Lightbulb, MusicNotes, Notebook, PencilLine, Play, Question, SpeakerHigh, Timer } from "@phosphor-icons/react";
+import { circledVocabulary } from "./circled-vocabulary";
 
 type View = "home" | "courses" | "practice" | "more" | "lesson" | "fill" | "fill-practice" | "listen" | "result";
 type ListenPhase = "ready" | "active" | "review" | "remediation_offer" | "choice" | "retry_ready" | "retry";
@@ -241,6 +242,7 @@ const exercises: Record<number, LessonExercise> = {
 };
 
 const siteReleaseNotes = [
+  [27, "聽寫依圈詞抽題", "第二大題只考本課圈詞中的生字；第三大題抽完整圈詞，較長的詞會增加手寫格與作答時間。"],
   [26, "開放第五至第九課", "新增《翹翹板》到《動物狂歡會》的課文、完整注音預覽、逐格默寫及隨機聽寫。"],
   [25, "開放第四課《笑嘻嘻》", "加入第四課課文、注音預覽、逐格默寫與隨機聽寫，並校正「背著書包」的讀音。"],
   [24, "平板轉向時保持筆畫位置", "手寫格會隨畫面尺寸重新對齊，已寫的注音在直橫向切換後仍保留原位。"],
@@ -335,21 +337,38 @@ function listeningAudioUrl(text: string): string {
 
 function questionSeedsForLesson(lessonIndex: number): Record<ListenCategory, ListeningSeed[]> {
   const lesson = lessons[lessonIndex] ?? lessons[0];
-  const exercise = exercises[lessonIndex] ?? exercises[0];
+  const terms = circledVocabulary[lessonIndex] ?? circledVocabulary[0];
   const symbols: ListeningSeed[] = lesson.symbols.map((symbol) => ({
     category: "symbols", answer: symbol, audioText: symbol,
     distractors: lesson.symbols.filter((other) => other !== symbol).slice(0, 2),
   }));
+  const seenCharacters = new Map<string, SyllableItem>();
+  for (const term of terms) {
+    Array.from(term.text).forEach((character, index) => {
+      if (!seenCharacters.has(character)) seenCharacters.set(character, { character, zhuyin: term.syllables[index] });
+    });
+  }
   // Neutral-tone and sandhi readings need their surrounding word; do not ask
   // children to identify them from an isolated character recording.
-  const uniqueCharacters = [...new Map(exercise.lines.flat().map((item) => [item.character, item])).values()]
+  const uniqueCharacters = [...seenCharacters.values()]
     .filter((item) => !item.zhuyin.startsWith("˙") && !(item.character === "一" && item.zhuyin !== "ㄧ") && !(item.character === "不" && item.zhuyin === "ㄅㄨˊ"));
   const uniqueSounds = [...new Set(uniqueCharacters.map((item) => item.zhuyin))];
   const characters: ListeningSeed[] = uniqueCharacters.map((item) => ({
     category: "characters", answer: item.zhuyin, audioText: item.character,
     distractors: uniqueSounds.filter((sound) => sound !== item.zhuyin).slice(0, 2),
   }));
-  const words = [...exercise.questions.filter((question) => question.category === "words"), ...(extraWordQuestions[lessonIndex] ?? [])];
+  const wordSounds = [...new Set(terms.flatMap((term) => term.syllables))];
+  const words: ListeningSeed[] = terms.filter((term) => term.syllables.length > 1).map((term) => {
+    const answer = [...term.syllables];
+    const alternative = (original: string) => wordSounds.find((sound) => sound !== original) ?? original;
+    return {
+      category: "words", audioText: term.text, answer: answer.join("|"),
+      distractors: [
+        [alternative(answer[0]), ...answer.slice(1)].join("|"),
+        [...answer.slice(0, -1), alternative(answer[answer.length - 1])].join("|"),
+      ],
+    };
+  });
   return { symbols, characters, words };
 }
 
@@ -368,7 +387,18 @@ function buildListeningSession(lessonIndex: number): ListeningQuestion[] {
 
 function findQuestionSeed(lessonIndex: number, id: string): ListeningSeed | undefined {
   const pools = questionSeedsForLesson(lessonIndex);
-  return [...pools.symbols, ...pools.characters, ...pools.words].find((question) => questionId(question) === id);
+  const current = [...pools.symbols, ...pools.characters, ...pools.words].find((question) => questionId(question) === id);
+  if (current) return current;
+  // Previously saved questions remain available even when they are outside
+  // the teacher's new exam range; they no longer appear in fresh sessions.
+  const exercise = exercises[lessonIndex];
+  if (!exercise) return undefined;
+  const legacyCharacter = exercise.lines.flat().find((item) => id === `characters:${item.character}`);
+  if (legacyCharacter) {
+    const sounds = [...new Set(exercise.lines.flat().map((item) => item.zhuyin))];
+    return { category: "characters", audioText: legacyCharacter.character, answer: legacyCharacter.zhuyin, distractors: sounds.filter((sound) => sound !== legacyCharacter.zhuyin).slice(0, 2) };
+  }
+  return [...exercise.questions, ...(extraWordQuestions[lessonIndex] ?? [])].find((question) => questionId(question) === id);
 }
 
 const fallbackListeningQuestion: ListeningQuestion = { ...firstListeningQuestions[0], id: "symbols:ㄅ", choices: ["ㄅ", "ㄆ", "ㄇ"] };
@@ -378,11 +408,13 @@ const fallbackListeningQuestion: ListeningQuestion = { ...firstListeningQuestion
 // discard the font's built-in tone placement.
 const syllableGlyphs: Record<string, string> = {
   ...Object.fromEntries([firstLessonLines, secondLessonLines, thirdLessonLines, fourthLessonLines, fifthLessonLines, sixthLessonLines, seventhLessonLines, eighthLessonLines, ninthLessonLines].flat(2).map(({ character, zhuyin }) => [zhuyin, character])),
+  ...Object.fromEntries(circledVocabulary.flatMap((terms) => terms.flatMap((term) => Array.from(term.text).map((character, index) => [term.syllables[index], character])))),
   "ㄅㄟ": "背\u{E01E1}",
   "ㄅㄟˋ": "背",
   "ㄧㄠ": "腰",
   "ㄨㄢ": "彎",
   "˙ㄅㄠ": "寶\u{E01E1}",
+  "˙ㄇㄚ": "媽\u{E01E1}",
   "˙ㄒㄧㄝ": "謝\u{E01E1}",
   "˙ㄗ": "子\u{E01E1}",
   "˙ㄉㄜ": "得\u{E01E1}",
@@ -506,7 +538,7 @@ export default function Page() {
   const [playCount, setPlayCount] = useState(0);
   const [listenMessage, setListenMessage] = useState("按下「開始聽」才會播放題目。時間會從這裡開始倒數。 ");
   const [audioError, setAudioError] = useState(false);
-  const [wordInk, setWordInk] = useState<[boolean, boolean]>([false, false]);
+  const [wordInk, setWordInk] = useState<boolean[]>([]);
   const [retryMessage, setRetryMessage] = useState("");
   const [sessionScore, setSessionScore] = useState({ listeningCorrect: 0 });
   const [reviewedIndexes, setReviewedIndexes] = useState<number[]>([]);
@@ -548,9 +580,12 @@ export default function Page() {
   const listeningQuestions = sessionQuestions;
   const currentQuestion = listeningQuestions[listenIndex] ?? fallbackListeningQuestion;
   const isWordQuestion = currentQuestion.category === "words";
-  const hasCompleteInk = isWordQuestion ? wordInk.every(Boolean) : hasInk;
+  const wordLength = currentQuestion.answer.split("|").length;
+  const questionDuration = isWordQuestion ? Math.max(30, wordLength * 12) : 30;
+  const hasCompleteInk = isWordQuestion ? wordInk.length === wordLength && wordInk.every(Boolean) : hasInk;
   const sectionQuestionIndex = listenIndex - (currentQuestion.category === "symbols" ? 0 : currentQuestion.category === "characters" ? 4 : 8);
-  const sectionProgress = singleQuestionPractice ? "收藏題目重練" : isWordQuestion ? `第 ${sectionQuestionIndex * 2 + 1}–${sectionQuestionIndex * 2 + 2} 格 / 4` : `第 ${sectionQuestionIndex + 1} 小題 / 4`;
+  const sectionProgress = singleQuestionPractice ? "收藏題目重練" : isWordQuestion ? `第 ${sectionQuestionIndex + 1} 詞 / 2 · ${wordLength} 字` : `第 ${sectionQuestionIndex + 1} 小題 / 4`;
+  const sessionWritingUnits = listeningQuestions.reduce((count, question) => count + question.answer.split("|").length, 0);
   const isFocusMode = view === "listen";
   const lesson = lessons[selectedLesson];
   const lessonNumber = lessonNumerals[selectedLesson];
@@ -720,7 +755,7 @@ export default function Page() {
     setSecondsLeft(30);
     setPlayCount(0);
     setHasInk(false);
-    setWordInk([false, false]);
+    setWordInk([]);
     setAudioError(false);
     setRetryMessage("");
     setListenMessage("按下「開始聽」才會播放題目。時間會從這裡開始倒數。 ");
@@ -822,11 +857,11 @@ export default function Page() {
       setSecondsLeft((current) => (current <= 1 ? 0 : current - 1));
     }, 1000);
 
-    const timeUp = window.setTimeout(() => finishListening(), 30000);
+    const timeUp = window.setTimeout(() => finishListening(), questionDuration * 1000);
     timeoutRefs.current = [timeUp];
 
     return clearListenTimers;
-  }, [clearListenTimers, finishListening, listenIndex, listenPhase]);
+  }, [clearListenTimers, finishListening, listenIndex, listenPhase, questionDuration]);
 
   useEffect(() => {
     if (view !== "listen" || (listenPhase !== "active" && listenPhase !== "retry")) return;
@@ -878,10 +913,10 @@ export default function Page() {
     repeatRemainingRef.current = listeningSettings.repeatCount - 1;
     autoRepeatEnabledRef.current = true;
     setListenPhase("active");
-    setSecondsLeft(30);
+    setSecondsLeft(questionDuration);
     setPlayCount(1);
     setHasInk(false);
-    setWordInk([false, false]);
+    setWordInk([]);
     setListenMessage("第一次播放中，Canvas 已開放，可以邊聽邊寫。 ");
     speak(currentQuestion.audioText);
   };
@@ -890,9 +925,9 @@ export default function Page() {
     repeatRemainingRef.current = listeningSettings.repeatCount - 1;
     autoRepeatEnabledRef.current = true;
     setHasInk(false);
-    setWordInk([false, false]);
+    setWordInk([]);
     setListenPhase("retry");
-    setSecondsLeft(30);
+    setSecondsLeft(questionDuration);
     setPlayCount((current) => current + 1);
     setListenMessage("題目正在播放，請重新寫一次；需要時可按重播。 ");
     speak(currentQuestion.audioText);
@@ -909,7 +944,7 @@ export default function Page() {
       if (canvas && context) context.clearRect(0, 0, canvas.width, canvas.height);
     }
     setHasInk(false);
-    setWordInk([false, false]);
+    setWordInk([]);
   };
 
   const pointFromEvent = (event: React.PointerEvent<HTMLCanvasElement>) => {
@@ -929,7 +964,7 @@ export default function Page() {
     context.moveTo(point.x, point.y);
     if (isWordQuestion) {
       const wordIndex = Number(event.currentTarget.dataset.wordIndex);
-      setWordInk((current) => current.map((value, index) => index === wordIndex ? true : value) as [boolean, boolean]);
+      setWordInk((current) => Array.from({ length: wordLength }, (_, index) => index === wordIndex || Boolean(current[index])));
     }
     setHasInk(true);
     setIsDrawing(true);
@@ -1344,14 +1379,14 @@ export default function Page() {
       </div></div>
       <div className="more-group"><h2>資訊與協助</h2><div className="more-settings-list">
         <button type="button" onClick={() => setMorePanel("help")}><span className="more-row-icon green"><Question size={21} aria-hidden="true" /></span><span><strong>使用說明</strong><small>課文默寫、聽寫與錯題重練</small></span><ArrowRight size={17} aria-hidden="true" /></button>
-        <button type="button" onClick={() => setMorePanel("versions")}><span className="more-row-icon orange"><Info size={21} aria-hidden="true" /></span><span><strong>版本</strong><small>目前 v26 · 查看每次更新內容</small></span><ArrowRight size={17} aria-hidden="true" /></button>
+        <button type="button" onClick={() => setMorePanel("versions")}><span className="more-row-icon orange"><Info size={21} aria-hidden="true" /></span><span><strong>版本</strong><small>目前 v27 · 查看每次更新內容</small></span><ArrowRight size={17} aria-hidden="true" /></button>
       </div></div>
       <p className="more-device-note">練習紀錄與設定只存在目前的裝置，不需要登入。</p>
     </section>;
 
     return <section className="page-section more-page more-detail-page">
       <button type="button" className="more-back" onClick={() => setMorePanel("home")}><ArrowLeft size={19} aria-hidden="true" /> 更多</button>
-      {morePanel === "listening" && <div id="listening-settings" className="more-detail-content"><h1>聽寫設定</h1><p className="more-detail-intro">每題第一次播放後開始倒數 30 秒。設定只留在這台裝置。</p><div className="more-setting-group"><fieldset><legend>每題播放幾次</legend><div className="settings-options">{([1, 2, 3] as const).map((count) => <button type="button" key={count} aria-pressed={listeningSettings.repeatCount === count} onClick={() => setListeningSettings((current) => ({ ...current, repeatCount: count }))}>{count} 次</button>)}</div></fieldset><fieldset><legend>唸完後，隔多久再唸</legend><div className="settings-options">{([5, 8, 10] as const).map((seconds) => <button type="button" key={seconds} aria-pressed={listeningSettings.intervalSeconds === seconds} onClick={() => setListeningSettings((current) => ({ ...current, intervalSeconds: seconds }))}>{seconds} 秒</button>)}</div></fieldset></div><p className="more-detail-footnote">作答時可按「再聽一次」；這不會改變上方設定。</p></div>}
+      {morePanel === "listening" && <div id="listening-settings" className="more-detail-content"><h1>聽寫設定</h1><p className="more-detail-intro">一般題 30 秒；較長的圈詞會有更多書寫時間。設定只留在這台裝置。</p><div className="more-setting-group"><fieldset><legend>每題播放幾次</legend><div className="settings-options">{([1, 2, 3] as const).map((count) => <button type="button" key={count} aria-pressed={listeningSettings.repeatCount === count} onClick={() => setListeningSettings((current) => ({ ...current, repeatCount: count }))}>{count} 次</button>)}</div></fieldset><fieldset><legend>唸完後，隔多久再唸</legend><div className="settings-options">{([5, 8, 10] as const).map((seconds) => <button type="button" key={seconds} aria-pressed={listeningSettings.intervalSeconds === seconds} onClick={() => setListeningSettings((current) => ({ ...current, intervalSeconds: seconds }))}>{seconds} 秒</button>)}</div></fieldset></div><p className="more-detail-footnote">作答時可按「再聽一次」；這不會改變上方設定。</p></div>}
       {morePanel === "help" && <div className="more-detail-content"><h1>使用說明</h1><div className="help-steps"><section><span>01</span><div><h2>選一課開始</h2><p>每課有課文默寫與聽寫。可以先看課文預覽，再選要練的方式。</p></div></section><section><span>02</span><div><h2>課文默寫</h2><p>點空格寫完整注音。整篇完成後請家長對照；標記需要重寫的字會留在練習頁。</p></div></section><section><span>03</span><div><h2>聽寫與補強</h2><p>按「開始聽」播放題目，寫完交給家長檢查。需要補強的題目可現在練，也可稍後從練習頁重練。</p></div></section></div><button type="button" className="more-primary-link" onClick={() => setView("courses")}>前往課程 <ArrowRight size={18} aria-hidden="true" /></button></div>}
       {morePanel === "versions" && <div className="more-detail-content"><h1>版本</h1><p className="more-detail-intro">以下依網站公開版本整理更新內容；點開版本可看說明。</p><div className="version-list">{siteReleaseNotes.map(([version, title, description], index) => <details key={version} open={index === 0}><summary><span>v{version}</span><strong>{title}</strong><span className="version-chevron">⌄</span></summary><p>{description}</p></details>)}</div></div>}
     </section>;
@@ -1361,17 +1396,17 @@ export default function Page() {
     <section className="page-section result-page">
       <div className="result-celebration"><span className="result-spark">✦</span><div className="result-check">✓</div><span className="result-spark right">✦</span></div>
       <span className="eyebrow">PRACTICE COMPLETE</span><h1>練習完成！</h1><p className="result-intro">今天的第{lessonNumber}課，你已經往前走了一小步。</p>
-      <div className="result-card"><div><span className="result-icon fill"><PencilLine size={22} weight="duotone" /></span><span><strong>課文默寫</strong><small>直式注音格 · {completedFillLessons.includes(selectedLesson) ? "已完成" : "尚未練習"}</small></span><b>{completedFillLessons.includes(selectedLesson) ? "✓" : "—"}</b></div><div><span className="result-icon listen"><Headphones size={22} weight="duotone" /></span><span><strong>聽寫</strong><small>三大題 · {sessionScore.listeningCorrect} / 12 格完成</small></span><b>✓</b></div></div>
+      <div className="result-card"><div><span className="result-icon fill"><PencilLine size={22} weight="duotone" /></span><span><strong>課文默寫</strong><small>直式注音格 · {completedFillLessons.includes(selectedLesson) ? "已完成" : "尚未練習"}</small></span><b>{completedFillLessons.includes(selectedLesson) ? "✓" : "—"}</b></div><div><span className="result-icon listen"><Headphones size={22} weight="duotone" /></span><span><strong>聽寫</strong><small>三大題 · {sessionScore.listeningCorrect} / {sessionWritingUnits} 格完成</small></span><b>✓</b></div></div>
       <div className="result-note"><span>☼</span><p><strong>待補強：{pendingSessionCount} 題</strong><small>{pendingSessionCount ? "題目已留在「練習」，可以稍後單題重練。" : "這次沒有待補強的題目；收藏的題目仍可在「練習」重練。"}</small></p></div>
       <div className="result-actions"><button className="primary-button" type="button" onClick={openListening}>再練一次 <span>↻</span></button><button className="secondary-button" type="button" onClick={() => setView("practice")}>查看收藏</button><button className="secondary-button" type="button" onClick={() => setView("lesson")}>回到課次</button></div>
     </section>
   );
 
   const renderListeningCanvas = () => (
-    <div className={`canvas-zone ${isWordQuestion ? "is-word" : ""} ${["review", "remediation_offer", "choice", "retry_ready"].includes(listenPhase) ? "is-locked" : ""}`}>
+    <div className={`canvas-zone ${isWordQuestion ? "is-word" : ""} ${isWordQuestion && wordLength > 2 ? "is-long-word" : ""} ${["review", "remediation_offer", "choice", "retry_ready"].includes(listenPhase) ? "is-locked" : ""}`}>
       <div className="canvas-surface">
-        {isWordQuestion ? <div className="word-canvas-stack" aria-label="語詞上下兩格田字格">
-          {([0, 1] as const).map((index) => <div className="canvas-paper word-paper" key={index}>
+        {isWordQuestion ? <div className="word-canvas-stack" aria-label={`語詞 ${wordLength} 格田字格`}>
+          {Array.from({ length: wordLength }, (_, index) => <div className="canvas-paper word-paper" key={index}>
             <span className="word-paper-label" aria-hidden="true">第 {index + 1} 字</span>
             <canvas ref={(element) => { wordCanvasRefs.current[index] = element; }} data-word-index={index} onPointerDown={beginDrawing} onPointerMove={draw} onPointerUp={endDrawing} onPointerCancel={endDrawing} onPointerLeave={endDrawing} aria-label={`語詞第 ${index + 1} 字田字格手寫區`} />
           </div>)}
@@ -1379,7 +1414,7 @@ export default function Page() {
         {listenPhase === "choice" && <div className="canvas-replay-overlay"><button type="button" className="canvas-replay-button" onClick={replayQuestion} aria-label="再播放一次題目"><Play size={30} weight="fill" aria-hidden="true" /></button><span>點一下，再聽一次</span></div>}
         {listenPhase === "retry_ready" && <div className="canvas-replay-overlay retry-ready-overlay"><strong>答對了！再聽一次，重新寫。</strong><button type="button" onClick={startRetryWriting}><Play size={22} weight="fill" aria-hidden="true" /> 再聽一次並重寫</button></div>}
       </div>
-      <div className="canvas-toolbar"><span>{isWordQuestion ? "上格第一字，下格第二字" : "田字格"}</span><button type="button" onClick={clearCanvas} disabled={listenPhase !== "active" && listenPhase !== "retry"}>清除</button></div>
+      <div className="canvas-toolbar"><span>{isWordQuestion ? "依序每格寫一個字的注音" : "田字格"}</span><button type="button" onClick={clearCanvas} disabled={listenPhase !== "active" && listenPhase !== "retry"}>清除</button></div>
     </div>
   );
 
@@ -1388,14 +1423,14 @@ export default function Page() {
     return (
     <main className={`focus-shell phase-${listenPhase}`}>
       <audio ref={playbackRef} onEnded={() => playbackEndedRef.current()} preload="none" hidden aria-hidden="true" />
-      <header className="focus-topbar"><button type="button" className="focus-exit" onClick={leaveFocus}>← <span>離開</span></button><div className="focus-question"><strong>{listenCategoryLabels[currentQuestion.category]}</strong><small>{sectionProgress}</small></div><div className="focus-meta"><span className={secondsLeft <= 8 && (listenPhase === "active" || listenPhase === "retry") ? "urgent" : ""}><Timer size={14} weight="bold" /> {listenPhase === "retry_ready" ? "待重寫" : listenPhase === "review" || listenPhase === "choice" ? "已交卷" : `${String(Math.floor(secondsLeft / 60)).padStart(2, "0")}:${String(secondsLeft % 60).padStart(2, "0")}`}</span><span aria-label={`已播放 ${playCount} 次`}><SpeakerHigh size={14} weight="bold" /> {playCount} 次</span></div></header>
+      <header className="focus-topbar"><button type="button" className="focus-exit" onClick={leaveFocus}>← <span>離開</span></button><div className="focus-question"><strong>{listenCategoryLabels[currentQuestion.category]}</strong><small>{sectionProgress}</small></div><div className="focus-meta"><span className={secondsLeft <= 8 && (listenPhase === "active" || listenPhase === "retry") ? "urgent" : ""}><Timer size={14} weight="bold" /> {listenPhase === "retry_ready" ? "待重寫" : listenPhase === "review" || listenPhase === "choice" ? "已交卷" : `${String(Math.floor((listenPhase === "ready" ? questionDuration : secondsLeft) / 60)).padStart(2, "0")}:${String((listenPhase === "ready" ? questionDuration : secondsLeft) % 60).padStart(2, "0")}`}</span><span aria-label={`已播放 ${playCount} 次`}><SpeakerHigh size={14} weight="bold" /> {playCount} 次</span></div></header>
       <div className="focus-content">
         <p className="sr-only" aria-live="polite">{listenMessage}</p>
-        {listenPhase === "ready" ? <div className="listen-ready-card"><span className="listen-ready-icon"><Headphones size={42} weight="duotone" aria-hidden="true" /></span><h1>準備聽寫</h1><p>{isWordQuestion ? "聽一個語詞，從上到下各寫一個字的注音。" : "聽題目，在田字格寫下完整注音。"}</p><div className="listen-ready-summary"><span>播放 <strong>{listeningSettings.repeatCount} 次</strong></span><span>間隔 <strong>{listeningSettings.intervalSeconds} 秒</strong></span><span>作答 <strong>30 秒</strong></span></div><button type="button" className="listen-start-button" onClick={startListening}><span className="play-circle"><Play size={17} weight="fill" /></span><span><strong>開始聽</strong><small>按下後播放，並開始倒數</small></span><b><ArrowRight size={19} /></b></button></div> : renderListeningCanvas()}
+        {listenPhase === "ready" ? <div className="listen-ready-card"><span className="listen-ready-icon"><Headphones size={42} weight="duotone" aria-hidden="true" /></span><h1>準備聽寫</h1><p>{isWordQuestion ? "聽一個圈詞，每格寫一個字的注音。" : "聽題目，在田字格寫下完整注音。"}</p><div className="listen-ready-summary"><span>播放 <strong>{listeningSettings.repeatCount} 次</strong></span><span>間隔 <strong>{listeningSettings.intervalSeconds} 秒</strong></span><span>作答 <strong>{questionDuration} 秒</strong></span></div><button type="button" className="listen-start-button" onClick={startListening}><span className="play-circle"><Play size={17} weight="fill" /></span><span><strong>開始聽</strong><small>按下後播放，並開始倒數</small></span><b><ArrowRight size={19} /></b></button></div> : renderListeningCanvas()}
         {audioError && <p className="audio-error" role="alert">音訊無法播放。請檢查音量或網路，再按「再聽一次」。</p>}
         {(listenPhase === "active" || listenPhase === "retry") && <button type="button" className="listen-replay-button" onClick={replayQuestion}><SpeakerHigh size={18} aria-hidden="true" /> 再聽一次</button>}
         {listenPhase === "active" && <button type="button" className="early-submit-button" onClick={() => finishListening(true)}>提早交卷</button>}
-        {listenPhase === "review" && <div className="parent-review"><div className="answer-reveal"><span>正確答案</span><AnswerDisplay answer={currentQuestion.answer} literalSymbols={currentQuestion.category === "symbols"} /></div><p>{hasCompleteInk ? "請家長依照孩子的手寫內容判定。" : isWordQuestion ? "兩格都寫完後，才可以判定答對；也可以選需要補強。" : "還沒有手寫內容；可以先按「需要補強」再練一次。"}</p><div className="review-actions"><button type="button" className="review-correct" disabled={!hasCompleteInk} onClick={() => handleParentDecision("correct")}>✓ 答對</button><button type="button" className="review-retry" onClick={() => handleParentDecision("needs_review")}>↻ 需要補強</button></div><button type="button" className={`review-save ${currentQuestionSaved ? "is-saved" : ""}`} aria-pressed={currentQuestionSaved} onClick={toggleCurrentQuestionSaved}>{currentQuestionSaved ? "★ 已收藏 · 取消收藏" : "☆ 收藏這題，之後再練"}</button></div>}
+        {listenPhase === "review" && <div className="parent-review"><div className="answer-reveal"><span>正確答案</span><AnswerDisplay answer={currentQuestion.answer} literalSymbols={currentQuestion.category === "symbols"} /></div><p>{hasCompleteInk ? "請家長依照孩子的手寫內容判定。" : isWordQuestion ? `${wordLength} 格都寫完後，才可以判定答對；也可以選需要補強。` : "還沒有手寫內容；可以先按「需要補強」再練一次。"}</p><div className="review-actions"><button type="button" className="review-correct" disabled={!hasCompleteInk} onClick={() => handleParentDecision("correct")}>✓ 答對</button><button type="button" className="review-retry" onClick={() => handleParentDecision("needs_review")}>↻ 需要補強</button></div><button type="button" className={`review-save ${currentQuestionSaved ? "is-saved" : ""}`} aria-pressed={currentQuestionSaved} onClick={toggleCurrentQuestionSaved}>{currentQuestionSaved ? "★ 已收藏 · 取消收藏" : "☆ 收藏這題，之後再練"}</button></div>}
         {listenPhase === "remediation_offer" && <div className="remediation-offer"><strong>這題已加入待補強</strong><p>可以現在練，也可以先做下一題；稍後會留在「練習」。</p><div><button type="button" onClick={() => { setListenPhase("choice"); setRetryMessage(""); }}>現在補強</button><button type="button" onClick={deferRemediation}>稍後再練</button></div></div>}
         {listenPhase === "choice" && <div className={`choice-panel ${isWordQuestion ? "is-word" : ""}`}><div className="choice-options">{choiceAnswers.map((answer) => <button type="button" key={answer} onClick={() => selectRemediation(answer)}><AnswerDisplay answer={answer} literalSymbols={currentQuestion.category === "symbols"} /></button>)}</div><p>{retryMessage || (isWordQuestion ? "選出你剛剛聽到的完整語詞注音。" : "選出你剛剛聽到的完整音節。")}</p><button type="button" className="remediation-later" onClick={deferRemediation}>稍後再練這題</button></div>}
         {listenPhase === "retry_ready" && <button type="button" className="remediation-later" onClick={deferRemediation}>稍後再練這題</button>}
