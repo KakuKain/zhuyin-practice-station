@@ -1,10 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, BookOpenText, Gear, Headphones, House, Info, Lightbulb, MusicNotes, Notebook, PencilLine, Play, Question, SpeakerHigh, Timer } from "@phosphor-icons/react";
+import { ArrowLeft, ArrowRight, BookOpenText, Gear, Headphones, Info, MusicNotes, PencilLine, Play, Question, SpeakerHigh, Timer } from "@phosphor-icons/react";
 import { circledVocabulary } from "./circled-vocabulary";
 
-type View = "home" | "courses" | "practice" | "more" | "lesson" | "fill" | "fill-practice" | "listen" | "result";
+type View = "courses" | "practice" | "more" | "lesson" | "fill" | "fill-practice" | "listen" | "result";
 type ListenPhase = "ready" | "active" | "review" | "remediation_offer" | "choice" | "retry_ready" | "retry";
 type ParentResult = "correct" | "needs_review" | null;
 type PreviewMode = "annotated" | "zhuyin";
@@ -66,6 +66,7 @@ const lessons = [
   { title: "拔蘿蔔", lines: ["菜園裡", "長出大蘿蔔", "兔子拔不動", "大家快快來", "大象拉著黃牛", "黃牛拉著浣熊", "浣熊拉著兔子", "嘿喲嘿喲", "好熱鬧", "捲起袖子", "大家一起拔蘿蔔"], symbols: ["ㄖ", "ㄘ", "ㄧㄛ", "ㄨㄤ", "ㄩㄢ", "ㄩㄥ"] },
   { title: "動物狂歡會", lines: ["山崖下", "動物狂歡會", "大家開心來慶祝", "小熊滾大球", "馴鹿敲大鼓", "孔雀變魔術", "青蛙大合唱", "嘓嘓嘓 咚咚咚", "大家的表演", "真精彩"], symbols: ["ㄧㄞ", "ㄧㄣ", "ㄨㄣ", "ㄩㄝ", "ㄩㄣ"] },
 ] as const;
+const courseArtwork = ["cat", "goose", "river", "happy", "seesaw", "teacher", "race", "radish", "festival"] as const;
 
 // The font's first alternate reading is selected with IVS U+E01E1 in both preview modes.
 const previewPronunciationVariants: Record<number, Record<number, Record<number, string>>> = {
@@ -269,6 +270,22 @@ const exercises: Record<number, LessonExercise> = {
 };
 
 const siteReleaseNotes = [
+  [44, "注音讀音更清楚", "單個注音符號改用教育部《國語注音符號手冊》的真人讀音，並放慢注音題的播放速度；兩次播放之間仍依設定間隔等待。"],
+  [43, "課程路線的小草旗與水彩紙卡片", "第一課的路線起點加入水彩小草旗；九張課程卡片改用藍、綠、米色的柔和漸層，並疊上淡淡的紙張紋理。"],
+  [42, "九課連續呈現", "課程列表可直接往下滑看到全部九課，草地背景只在第九課後的頁尾出現一次。"],
+  [41, "課程故事書版面", "課程頁改用參考圖的木牌、六站時間軸與頁尾草地；點「繼續探索」可查看第七至九課。"],
+  [40, "課程成為起點", "移除獨立首頁，開站直接進入課程；課程、練習與更多頁統一為柔和的水彩故事書風格。"],
+  [39, "課次頁底部水彩銜接", "注音符號區由暖白色漸層接到頁尾水彩草地，頁尾景色也柔和淡入，避免背景在交界處突然換圖。"],
+  [38, "校正「嘿喲嘿喲」讀音", "第八課的「嘿喲嘿喲」逐字標為 ㄏㄟ、ㄧㄛ、ㄏㄟ、ㄧㄛ；只修正「喲」的字體注音，不改變相鄰課文的字形與排版。"],
+  [37, "統一《拔蘿蔔》課文字體", "「嘿喲嘿喲」改回與相鄰欄位相同的內建注音字體，國字加注音與純注音兩種預覽都維持一致。"],
+  [36, "修正《拔蘿蔔》嘿喲注音", "「嘿喲嘿喲」四個字改用同一套直排注音標示，避免「嘿」與「喲」混用字體造成大小與位置不一致。"],
+  [35, "直排課文翻頁方向", "翻頁圓點改為從右往左排列，右側是第 1 頁，往左依序前進，與課文閱讀方向一致。"],
+  [34, "課文翻頁與間距調整", "課名與課文字距更舒展、頁首水彩背景更精簡；同課各頁維持固定高度，翻頁按鈕與頁碼靠近課文並輕覆水彩底緣。"],
+  [33, "課次頁閱讀與背景細節", "課名區保留 LESSON 並縮小角色；課文背景延伸滿寬，移除會碰到注音的分隔線。注音符號採 48px 方格、56px 點擊範圍，裝飾留在字卡外。"],
+  [32, "課次頁版面更緊湊", "縮短上方水彩場景與兩關卡片的高度，關卡圖示和文字改為左右排列；手機和平板都保留清楚的開始按鈕。"],
+  [31, "課次頁水彩故事書版型", "課名區改為融入場景的水彩主視覺，課文換上淡色水彩紙背景，兩關入口與翻頁、注音卡片也一起調整。第八課加入兔子拔蘿蔔插畫。"],
+  [30, "九課水彩角色插畫", "九課角色改為同系列透明水彩插畫，課程列表與課程內頁同步使用；課名區加入柔和的水彩場景。"],
+  [29, "課文預覽響應式翻頁", "手機每頁顯示六個完整直排欄位，平板顯示八欄；可左右滑動或按圓形按鈕翻頁。注音符號可點擊聽發音，平板會顯示更多欄。"],
   [28, "默寫防止誤觸遺失", "離開默寫前先提醒；每格筆跡會存在這台裝置，重新進入時可選擇繼續默寫或重新開始。"],
   [27, "聽寫依圈詞抽題", "第二大題只考本課圈詞中的生字；第三大題抽完整圈詞，較長的詞會增加手寫格與作答時間。"],
   [26, "開放第五至第九課", "新增《翹翹板》到《動物狂歡會》的課文、完整注音預覽、逐格默寫及隨機聽寫。"],
@@ -360,7 +377,9 @@ function questionId(question: ListeningSeed): string {
 }
 
 function listeningAudioUrl(text: string): string {
-  return `/listening-audio/${[...text].map((character) => character.codePointAt(0)!.toString(16)).join("-")}.m4a`;
+  const filename = [...text].map((character) => character.codePointAt(0)!.toString(16)).join("-");
+  // These 37 clips changed source in v44; the query bypasses older browser caches.
+  return `/listening-audio/${filename}.m4a${/^[\u3105-\u3129]$/.test(text) ? "?v=44" : ""}`;
 }
 
 function questionSeedsForLesson(lessonIndex: number): Record<ListenCategory, ListeningSeed[]> {
@@ -497,11 +516,11 @@ function Logo() {
   );
 }
 
-function AppHeader({ onHome, onBackToCourses }: { onHome: () => void; onBackToCourses?: () => void }) {
+function AppHeader({ onCourses, onBackToCourses }: { onCourses: () => void; onBackToCourses?: () => void }) {
   return (
     <header className={`app-header ${onBackToCourses ? "has-back" : ""}`}>
       {onBackToCourses && <button className="header-back" type="button" onClick={onBackToCourses}><ArrowLeft size={18} weight="bold" aria-hidden="true" /><span>回到課程</span></button>}
-      <button className="brand-button" type="button" onClick={onHome} aria-label="回到首頁">
+      <button className="brand-button" type="button" onClick={onCourses} aria-label="前往課程">
         <Logo />
         <span>
           <strong>注音小練習</strong>
@@ -515,7 +534,6 @@ function AppHeader({ onHome, onBackToCourses }: { onHome: () => void; onBackToCo
 
 function BottomNav({ active, onNavigate }: { active: View; onNavigate: (view: View) => void }) {
   const items = [
-    { id: "home" as View, Icon: House, label: "首頁" },
     { id: "courses" as View, Icon: BookOpenText, label: "課程" },
     { id: "practice" as View, Icon: PencilLine, label: "練習" },
     { id: "more" as View, Icon: Gear, label: "更多" },
@@ -544,9 +562,15 @@ function SectionHeading({ eyebrow, title, description }: { eyebrow?: string; tit
 }
 
 export default function Page() {
-  const [view, setView] = useState<View>("home");
+  const [view, setView] = useState<View>("courses");
   const [selectedLesson, setSelectedLesson] = useState(0);
   const [previewMode, setPreviewMode] = useState<PreviewMode>("annotated");
+  const [previewPage, setPreviewPage] = useState(0);
+  const [previewColumns, setPreviewColumns] = useState(6);
+  const [playingSymbol, setPlayingSymbol] = useState<string | null>(null);
+  const previewColumnsRef = useRef(6);
+  const previewPointerStartRef = useRef<{ x: number; y: number } | null>(null);
+  const previewWheelAtRef = useRef(0);
   const [fillStrokes, setFillStrokes] = useState<Record<number, InkStroke[]>>({});
   const [fillPendingCells, setFillPendingCells] = useState<Record<number, InkStroke[]>>({});
   const [fillDraftReady, setFillDraftReady] = useState(false);
@@ -622,6 +646,8 @@ export default function Page() {
   const sessionWritingUnits = listeningQuestions.reduce((count, question) => count + question.answer.split("|").length, 0);
   const isFocusMode = view === "listen";
   const lesson = lessons[selectedLesson];
+  const previewPageCount = Math.ceil(lesson.lines.length / previewColumns);
+  const previewVisibleLines = lesson.lines.slice(previewPage * previewColumns, (previewPage + 1) * previewColumns);
   const lessonNumber = lessonNumerals[selectedLesson];
   const currentQuestionSaved = practiceState.savedQuestions.some((item) => item.lessonIndex === selectedLesson && item.questionId === currentQuestion.id);
   const pendingSessionCount = reviewedIndexes.filter((index) => practiceState.savedQuestions.some((item) => item.lessonIndex === selectedLesson && item.questionId === listeningQuestions[index]?.id && item.needsPractice)).length;
@@ -640,6 +666,21 @@ export default function Page() {
     } catch { setStorageError(true); }
   };
   persistFillRef.current = () => persistFillDraft(true);
+
+  useEffect(() => {
+    const media = window.matchMedia("(min-width: 700px)");
+    const updateColumns = () => {
+      const next = media.matches ? 8 : 6;
+      const previous = previewColumnsRef.current;
+      if (next === previous) return;
+      previewColumnsRef.current = next;
+      setPreviewPage((page) => Math.floor(page * previous / next));
+      setPreviewColumns(next);
+    };
+    updateColumns();
+    media.addEventListener("change", updateColumns);
+    return () => media.removeEventListener("change", updateColumns);
+  }, []);
 
   useEffect(() => {
     if (view === "fill" && fillDraftReady && !fillResumeDraft) persistFillDraft();
@@ -774,6 +815,8 @@ export default function Page() {
   const openLesson = (index: number) => {
     setSelectedLesson(index);
     setPreviewMode("annotated");
+    setPreviewPage(0);
+    setPlayingSymbol(null);
     setPracticeState((current) => ({ ...current, recentLesson: index }));
     setView("lesson");
   };
@@ -804,15 +847,27 @@ export default function Page() {
     stopPlayback();
     const playbackToken = playbackTokenRef.current;
     setAudioError(false);
+    const isZhuyinPrompt = /^[\u3105-\u3129]+$/.test(text);
+    // Keep one natural reading per clip; the listening timer controls repeats.
+    // Slowing only the symbol clips lets children hear the complete sound.
+    audio.playbackRate = isZhuyinPrompt ? 0.84 : 1;
     audio.src = listeningAudioUrl(text);
     audio.play().catch(() => {
       if (playbackToken !== playbackTokenRef.current) return;
+      if (isZhuyinPrompt) {
+        setAudioError(true);
+        if (view === "practice") setPracticeNotice("注音讀音無法播放，請重新整理後再試。");
+        return;
+      }
       if ("speechSynthesis" in window) {
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = "zh-TW";
         utterance.rate = 0.82;
         utterance.onend = () => {
-          if (playbackToken === playbackTokenRef.current) playbackEndedRef.current();
+          if (playbackToken === playbackTokenRef.current) {
+            setPlayingSymbol(null);
+            playbackEndedRef.current();
+          }
         };
         window.speechSynthesis.speak(utterance);
       } else {
@@ -821,6 +876,12 @@ export default function Page() {
       }
     });
   }, [stopPlayback, view]);
+
+  const playPreviewSymbol = (symbol: string) => {
+    autoRepeatEnabledRef.current = false;
+    setPlayingSymbol(symbol);
+    speak(symbol);
+  };
 
   playbackEndedRef.current = () => {
     if (!autoRepeatEnabledRef.current || repeatRemainingRef.current <= 0) return;
@@ -1371,50 +1432,35 @@ export default function Page() {
     return null;
   };
 
-  const renderHome = () => (
-    <>
-      <section className="home-hero">
-        <div className="hero-illustration">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/zhuyin-children-hero.jpg" alt="兩位孩子一起練習注音" />
-        </div>
-      </section>
-
-      <section className="home-stats" aria-label="練習摘要">
-        <div><span className="stat-icon coral">✎</span><span><small>今日練習</small><strong>1 <em>/ 2</em></strong></span></div>
-        <div><span className="stat-icon mint">◌</span><span><small>最近課程</small><strong>第一課</strong></span></div>
-        <div><span className="stat-icon sky">↗</span><span><small>練習方式</small><strong>自己操作</strong></span></div>
-      </section>
-
-      <section className="content-section">
-        <div className="section-title-row"><div><span className="eyebrow">Pick up where you left off</span><h2>最近練習</h2></div><button className="text-button" type="button" onClick={() => setView("courses")}>看全部課程 <span>→</span></button></div>
-        <button className="recent-card" type="button" onClick={() => openLesson(0)}>
-          <span className="lesson-number"><Notebook size={25} weight="duotone" /></span><span className="recent-copy"><small>第一課</small><strong>貓咪</strong></span><span className="progress-ring"><b>2/5</b><small>進度</small></span><span className="card-arrow"><ArrowRight size={21} /></span>
-        </button>
-      </section>
-
-      <section className="tip-card"><span className="tip-icon"><Lightbulb size={20} weight="duotone" /></span><span><strong>給陪練的大人</strong><small>聽寫時會先播放兩次，時間到才會請你幫忙判定，孩子可以安心慢慢寫。</small></span><button type="button" onClick={() => setView("more")} aria-label="查看陪練說明"><ArrowRight size={20} /></button></section>
-      <section className="quick-courses"><div className="section-title-row"><div><span className="eyebrow">CHOOSE A LESSON</span><h2>選擇課程</h2></div><button className="text-button" type="button" onClick={() => setView("courses")}>看全部 <ArrowRight size={15} aria-hidden="true" /></button></div><div className="quick-course-grid">{lessons.map((item, index) => <button type="button" key={item.title} onClick={() => openLesson(index)}><small>第{lessonNumerals[index]}課</small><strong>{item.title}</strong></button>)}</div></section>
-    </>
-  );
-
   const renderCourses = () => (
-    <section className="page-section">
-      <SectionHeading eyebrow="COURSES" title="選擇課程" description="每一課都從一小段注音開始，按自己的步調練習就好。" />
-      <div className="course-grid">
-        <button className="course-tile featured" type="button" onClick={() => openLesson(0)}><span className="course-badge">現在練習</span><span className="course-tile-number">01</span><strong>第一課</strong><b>{lessons[0].title}</b><small>默寫 · 聽寫</small><span className="tile-arrow">→</span></button>
-        {lessons.slice(1).map((item, index) => <button className="course-tile" type="button" key={item.title} onClick={() => openLesson(index + 1)}><span className="course-tile-number">{String(index + 2).padStart(2, "0")}</span><strong>第{lessonNumerals[index + 1]}課</strong><b>{item.title}</b><small>默寫 · 聽寫</small><span className="lock-icon">→</span></button>)}
+    <section className="page-section course-journey">
+      <div className="journey-heading">
+        <div className="journey-heading-copy"><h1>選擇課程</h1><p>跟著注音，一步一步探索吧！</p></div>
+        <img src="/course-art/course-journey-hero-v2.png" alt="" aria-hidden="true" />
       </div>
-      <div className="course-note"><span>☑</span><p><strong>九課都能練習</strong><br />每課都可以練課文默寫與隨機聽寫。</p></div>
+      <div className="journey-list">
+        {lessons.map((item, index) => {
+          const isRecent = practiceState.recentLesson === index;
+          return <div className={`journey-step journey-step-${index % 3}`} key={item.title} id={`course-lesson-${index + 1}`}>
+            <span className="journey-station" aria-hidden="true">{index === 0 && <img className="journey-flag-scene" src="/course-art/course-flag-grass-v1.png" alt="" />}{index + 1}</span>
+            <button className="journey-card" type="button" onClick={() => openLesson(index)} aria-label={`第${lessonNumerals[index]}課，${item.title}${isRecent ? "，上次練習" : ""}`}>
+              <span className="journey-card-copy"><small>第{lessonNumerals[index]}課</small><strong>{item.title}</strong>{isRecent && <em>上次練習</em>}</span>
+              <img className="journey-art" src={`/course-art/${courseArtwork[index]}-watercolor.png`} alt="" aria-hidden="true" loading={index > 3 ? "lazy" : "eager"} />
+              <span className="journey-arrow" aria-hidden="true"><ArrowRight size={23} weight="bold" /></span>
+            </button>
+          </div>;
+        })}
+      </div>
+      <div className="journey-footer" aria-hidden="true"><img src="/course-art/course-journey-footer-sign-v2.png" alt="" /></div>
     </section>
   );
 
   const renderLesson = () => (
     <section className="page-section lesson-page">
-      <div className="lesson-heading"><div><span className="eyebrow">LESSON {String(selectedLesson + 1).padStart(2, "0")}</span><h1>{lesson.title}</h1></div><span className="lesson-stamp">{exercises[selectedLesson] ? <>先看<br />再寫</> : <>先讀<br />課文</>}</span></div>
+      <div className={`lesson-heading${selectedLesson === 7 ? " is-radish" : ""}`}><div><span className="eyebrow">LESSON {String(selectedLesson + 1).padStart(2, "0")}</span><h1>{lesson.title}</h1></div><img className="lesson-heading-art" src={selectedLesson === 7 ? "/course-art/radish-story.png" : `/course-art/${courseArtwork[selectedLesson]}-watercolor.png`} alt="" /></div>
       {exercises[selectedLesson] && <div className="mode-grid">
-        <button className="mode-card fill-mode" type="button" onClick={openFill}><span className="mode-icon" aria-hidden="true"><PencilLine size={26} weight="duotone" /></span><small>第一關</small><strong>課文默寫</strong></button>
-        <button className="mode-card listen-mode" type="button" onClick={openListening}><span className="mode-icon" aria-hidden="true"><Headphones size={26} weight="duotone" /></span><small>第二關</small><strong>聽寫</strong></button>
+        <button className="mode-card fill-mode" type="button" onClick={openFill}><span className="mode-icon" aria-hidden="true"><PencilLine size={28} weight="duotone" /></span><span className="lesson-mode-copy"><small>第一關</small><strong>課文默寫</strong></span><span className="lesson-mode-cta">開始 <ArrowRight size={19} weight="bold" aria-hidden="true" /></span></button>
+        <button className="mode-card listen-mode" type="button" onClick={openListening}><span className="mode-icon" aria-hidden="true"><Headphones size={28} weight="duotone" /></span><span className="lesson-mode-copy"><small>第二關</small><strong>聽寫</strong></span><span className="lesson-mode-cta">開始 <ArrowRight size={19} weight="bold" aria-hidden="true" /></span></button>
       </div>}
       <div className="lesson-curriculum">
         <div className="lesson-curriculum-heading">
@@ -1424,12 +1470,40 @@ export default function Page() {
             <button type="button" aria-pressed={previewMode === "zhuyin"} onClick={() => setPreviewMode("zhuyin")}>純注音</button>
           </div>
         </div>
-        <div className={`lesson-text-lines ${previewMode === "zhuyin" ? "is-zhuyin-only" : ""}`} dir="rtl" aria-label={`${lesson.title}課文，${previewMode === "zhuyin" ? "純注音" : "國字加注音"}`}>
-          {lesson.lines.map((line, lineIndex) => <div className="lesson-text-line" dir="ltr" key={lineIndex}>{Array.from(line).map((char, charIndex) => selectedLesson === 7 && char === "喲" ? (previewMode === "annotated" ? <ruby className="lesson-ruby-fix" key={charIndex}>喲<rt>ㄧㄛ</rt></ruby> : <span className="lesson-zhuyin-fix" key={charIndex}>ㄧㄛ</span>) : <span key={charIndex}>{char}{previewPronunciationVariants[selectedLesson]?.[lineIndex]?.[charIndex] ?? ""}</span>)}</div>)}
+        <div className={`lesson-text-lines ${previewMode === "zhuyin" ? "is-zhuyin-only" : ""}`} dir="rtl" aria-label={`${lesson.title}課文，第 ${previewPage + 1} 頁，共 ${previewPageCount} 頁，由右向左閱讀`} style={{ "--preview-columns": previewColumns, "--preview-max-chars": Math.max(...lesson.lines.map((line) => Array.from(line).length)) } as React.CSSProperties}
+          onPointerDown={(event) => {
+            previewPointerStartRef.current = { x: event.clientX, y: event.clientY };
+            event.currentTarget.setPointerCapture(event.pointerId);
+          }}
+          onPointerCancel={() => { previewPointerStartRef.current = null; }}
+          onPointerUp={(event) => {
+            const start = previewPointerStartRef.current;
+            previewPointerStartRef.current = null;
+            if (!start) return;
+            const dx = event.clientX - start.x;
+            const dy = event.clientY - start.y;
+            if (Math.abs(dx) < 45 || Math.abs(dx) < Math.abs(dy) * 1.3) return;
+            setPreviewPage((page) => Math.max(0, Math.min(previewPageCount - 1, page + (dx > 0 ? 1 : -1))));
+          }}
+          onWheel={(event) => {
+            if (Math.abs(event.deltaX) < 35 || Math.abs(event.deltaX) < Math.abs(event.deltaY) * 1.3 || Date.now() - previewWheelAtRef.current < 450) return;
+            previewWheelAtRef.current = Date.now();
+            setPreviewPage((page) => Math.max(0, Math.min(previewPageCount - 1, page + (event.deltaX < 0 ? 1 : -1))));
+          }}>
+          {previewVisibleLines.map((line, pageLineIndex) => {
+            const lineIndex = previewPage * previewColumns + pageLineIndex;
+            return <div className="lesson-text-line" dir="ltr" key={lineIndex}>{Array.from(line).map((char, charIndex) => <span key={charIndex}>{char}{previewPronunciationVariants[selectedLesson]?.[lineIndex]?.[charIndex] ?? ""}</span>)}</div>;
+          })}
         </div>
+        {previewPageCount > 1 && <div className="lesson-page-controls" aria-label="課文翻頁">
+          <div className="lesson-page-action"><button type="button" className="lesson-page-circle" onClick={() => setPreviewPage((page) => Math.min(previewPageCount - 1, page + 1))} disabled={previewPage >= previewPageCount - 1} aria-label="下一頁"><ArrowLeft size={27} weight="bold" aria-hidden="true" /></button><small>下一頁</small></div>
+          <div className="lesson-page-position"><div className="lesson-page-dots" aria-hidden="true">{Array.from({ length: previewPageCount }, (_, index) => <i className={index === previewPage ? "is-current" : ""} key={index} />)}</div><span className="lesson-page-counter" aria-live="polite">第 {previewPage + 1} / {previewPageCount} 頁</span></div>
+          <div className="lesson-page-action"><button type="button" className="lesson-page-circle" onClick={() => setPreviewPage((page) => Math.max(0, page - 1))} disabled={previewPage === 0} aria-label="上一頁"><ArrowRight size={27} weight="bold" aria-hidden="true" /></button><small>上一頁</small></div>
+        </div>}
         <div className="lesson-curriculum-heading"><strong>注音符號</strong></div>
-        <div className="lesson-symbols" dir="rtl" aria-label="本課注音符號">{lesson.symbols.map((symbol) => <span className={symbol.length > 1 ? "is-combination" : undefined} key={symbol}>{symbol}</span>)}</div>
+        <div className="lesson-symbols" dir="rtl" aria-label="本課注音符號，點選可聽發音">{lesson.symbols.map((symbol) => <button type="button" className={`${symbol.length > 1 ? "is-combination " : ""}${playingSymbol === symbol ? "is-playing" : ""}`} key={symbol} onClick={() => playPreviewSymbol(symbol)} aria-label={`播放注音符號 ${symbol}`}><span>{symbol}</span><SpeakerHigh size={15} weight="fill" aria-hidden="true" /></button>)}</div>
       </div>
+      <div className="lesson-meadow-footer" aria-hidden="true" />
       {!exercises[selectedLesson] && <p className="lesson-upcoming">這一課的課文默寫與聽寫練習準備中。</p>}
     </section>
   );
@@ -1503,7 +1577,7 @@ export default function Page() {
         <span className="saved-question-icon"><PencilLine size={24} weight="duotone" aria-hidden="true" /></span>
         <div className="saved-question-copy"><strong>第{lessonNumerals[favorite.lessonIndex]}課 · {lessons[favorite.lessonIndex].title} · {favorite.character}</strong><small>{fillLocation(favorite.lessonIndex, favorite.positions[0])}{favorite.positions.length > 1 ? ` 等 ${favorite.positions.length} 格` : ""} · {favorite.status === "needs_rewrite" ? "待重寫" : "待複習"}</small></div>
         <div className="saved-question-actions"><button type="button" className="saved-start" onClick={() => openFillFavorite(favorite)}>重練注音</button><button type="button" className="saved-remove" onClick={() => removeFillFavorite(favorite)}>取消收藏</button></div>
-      </div>)}</div> : <div className="empty-reinforce"><span>✎</span><strong>目前沒有課文錯字收藏</strong><small>家長檢查默寫時標記「需要重寫」，就會自動加入這裡。</small></div>}
+      </div>)}</div> : <div className="empty-reinforce"><span><PencilLine size={28} weight="duotone" aria-hidden="true" /></span><strong>目前沒有課文錯字收藏</strong><small>家長檢查默寫時標記「需要重寫」，就會自動加入這裡。</small></div>}
       <div className="section-title-row practice-list-heading"><h2>聽寫 · 待補強與收藏</h2><span className="list-count">{practiceState.savedQuestions.filter((item) => item.needsPractice).length} 題待補強</span></div>
       {practiceState.savedQuestions.length ? <div className="saved-question-list">
         {[...practiceState.savedQuestions].sort((a, b) => Number(Boolean(b.needsPractice)) - Number(Boolean(a.needsPractice))).map(({ lessonIndex, questionId, needsPractice }, savedIndex) => {
@@ -1519,7 +1593,7 @@ export default function Page() {
             </div>
           </div>;
         })}
-      </div> : <div className="empty-reinforce"><span>☆</span><strong>目前沒有待補強或收藏題目</strong><small>聽寫時按「需要補強」會先記下題目，之後可以再練。</small></div>}
+      </div> : <div className="empty-reinforce"><span><Headphones size={28} weight="duotone" aria-hidden="true" /></span><strong>目前沒有待補強或收藏題目</strong><small>聽寫時按「需要補強」會先記下題目，之後可以再練。</small></div>}
       <div className="practice-list"><div className="section-title-row"><h2>最近練習</h2><span className="list-count">{practiceState.recentLesson === null ? "0 個紀錄" : "1 個紀錄"}</span></div>
         {practiceState.recentLesson === null ? <p className="practice-no-recent">還沒有練習紀錄，先選一課開始吧。</p> : <button className="practice-row" type="button" onClick={() => openLesson(practiceState.recentLesson!)}><span className="practice-row-icon">{String(practiceState.recentLesson + 1).padStart(2, "0")}</span><span><strong>第{lessonNumerals[practiceState.recentLesson]}課・{lessons[practiceState.recentLesson].title}</strong><small>回到課程</small></span><b>繼續 <span>→</span></b></button>}
       </div>
@@ -1534,7 +1608,7 @@ export default function Page() {
       </div></div>
       <div className="more-group"><h2>資訊與協助</h2><div className="more-settings-list">
         <button type="button" onClick={() => setMorePanel("help")}><span className="more-row-icon green"><Question size={21} aria-hidden="true" /></span><span><strong>使用說明</strong><small>課文默寫、聽寫與錯題重練</small></span><ArrowRight size={17} aria-hidden="true" /></button>
-        <button type="button" onClick={() => setMorePanel("versions")}><span className="more-row-icon orange"><Info size={21} aria-hidden="true" /></span><span><strong>版本</strong><small>目前 v28 · 查看每次更新內容</small></span><ArrowRight size={17} aria-hidden="true" /></button>
+        <button type="button" onClick={() => setMorePanel("versions")}><span className="more-row-icon orange"><Info size={21} aria-hidden="true" /></span><span><strong>版本</strong><small>目前 v{siteReleaseNotes[0][0]} · 查看每次更新內容</small></span><ArrowRight size={17} aria-hidden="true" /></button>
       </div></div>
       <p className="more-device-note">練習紀錄與設定只存在目前的裝置，不需要登入。</p>
     </section>;
@@ -1543,7 +1617,7 @@ export default function Page() {
       <button type="button" className="more-back" onClick={() => setMorePanel("home")}><ArrowLeft size={19} aria-hidden="true" /> 更多</button>
       {morePanel === "listening" && <div id="listening-settings" className="more-detail-content"><h1>聽寫設定</h1><p className="more-detail-intro">一般題 30 秒；較長的圈詞會有更多書寫時間。設定只留在這台裝置。</p><div className="more-setting-group"><fieldset><legend>每題播放幾次</legend><div className="settings-options">{([1, 2, 3] as const).map((count) => <button type="button" key={count} aria-pressed={listeningSettings.repeatCount === count} onClick={() => setListeningSettings((current) => ({ ...current, repeatCount: count }))}>{count} 次</button>)}</div></fieldset><fieldset><legend>唸完後，隔多久再唸</legend><div className="settings-options">{([5, 8, 10] as const).map((seconds) => <button type="button" key={seconds} aria-pressed={listeningSettings.intervalSeconds === seconds} onClick={() => setListeningSettings((current) => ({ ...current, intervalSeconds: seconds }))}>{seconds} 秒</button>)}</div></fieldset></div><p className="more-detail-footnote">作答時可按「再聽一次」；這不會改變上方設定。</p></div>}
       {morePanel === "help" && <div className="more-detail-content"><h1>使用說明</h1><div className="help-steps"><section><span>01</span><div><h2>選一課開始</h2><p>每課有課文默寫與聽寫。可以先看課文預覽，再選要練的方式。</p></div></section><section><span>02</span><div><h2>課文默寫</h2><p>點空格寫完整注音。整篇完成後請家長對照；標記需要重寫的字會留在練習頁。</p></div></section><section><span>03</span><div><h2>聽寫與補強</h2><p>按「開始聽」播放題目，寫完交給家長檢查。需要補強的題目可現在練，也可稍後從練習頁重練。</p></div></section></div><button type="button" className="more-primary-link" onClick={() => setView("courses")}>前往課程 <ArrowRight size={18} aria-hidden="true" /></button></div>}
-      {morePanel === "versions" && <div className="more-detail-content"><h1>版本</h1><p className="more-detail-intro">以下依網站公開版本整理更新內容；點開版本可看說明。</p><div className="version-list">{siteReleaseNotes.map(([version, title, description], index) => <details key={version} open={index === 0}><summary><span>v{version}</span><strong>{title}</strong><span className="version-chevron">⌄</span></summary><p>{description}</p></details>)}</div></div>}
+      {morePanel === "versions" && <div className="more-detail-content"><h1>版本</h1><p className="more-detail-intro">以下依網站公開版本整理更新內容；點開版本可看說明。</p><div className="version-list">{siteReleaseNotes.map(([version, title, description], index) => <details key={version} open={index === 0}><summary><span>v{version}</span><strong>{title}</strong><span className="version-chevron">⌄</span></summary><p>{description}</p></details>)}</div><p className="more-audio-credit">單個注音符號讀音來源：<a href="https://language.moe.gov.tw/001/Upload/files/site_content/M0001/juyin/" target="_blank" rel="noopener noreferrer">教育部《國語注音符號手冊》</a>，依 <a href="https://creativecommons.org/licenses/by/4.0/deed.zh_TW" target="_blank" rel="noopener noreferrer">CC BY 4.0</a> 授權使用；網站已轉為 M4A 並調整播放速度。</p></div>}
     </section>;
   };
 
@@ -1577,7 +1651,7 @@ export default function Page() {
     const choiceAnswers = currentQuestion.choices;
     return (
     <main className={`focus-shell phase-${listenPhase}`}>
-      <audio ref={playbackRef} onEnded={() => playbackEndedRef.current()} preload="none" hidden aria-hidden="true" />
+      <audio ref={playbackRef} onEnded={() => { setPlayingSymbol(null); playbackEndedRef.current(); }} preload="none" hidden aria-hidden="true" />
       <header className="focus-topbar"><button type="button" className="focus-exit" onClick={leaveFocus}>← <span>離開</span></button><div className="focus-question"><strong>{listenCategoryLabels[currentQuestion.category]}</strong><small>{sectionProgress}</small></div><div className="focus-meta"><span className={secondsLeft <= 8 && (listenPhase === "active" || listenPhase === "retry") ? "urgent" : ""}><Timer size={14} weight="bold" /> {listenPhase === "retry_ready" ? "待重寫" : listenPhase === "review" || listenPhase === "choice" ? "已交卷" : `${String(Math.floor((listenPhase === "ready" ? questionDuration : secondsLeft) / 60)).padStart(2, "0")}:${String((listenPhase === "ready" ? questionDuration : secondsLeft) % 60).padStart(2, "0")}`}</span><span aria-label={`已播放 ${playCount} 次`}><SpeakerHigh size={14} weight="bold" /> {playCount} 次</span></div></header>
       <div className="focus-content">
         <p className="sr-only" aria-live="polite">{listenMessage}</p>
@@ -1603,7 +1677,7 @@ export default function Page() {
       case "lesson": return renderLesson();
       case "fill": return renderFillBlank();
       case "result": return renderResult();
-      default: return renderHome();
+      default: return renderCourses();
     }
   };
 
@@ -1613,9 +1687,9 @@ export default function Page() {
   if (view === "fill" && fillReviewOpen) return <>{renderFillReview()}{renderFillDialog()}</>;
 
   return (
-    <div className="app-shell">
-      <audio ref={playbackRef} onEnded={() => playbackEndedRef.current()} preload="none" hidden aria-hidden="true" />
-      <AppHeader onHome={() => navigate("home")} onBackToCourses={view === "lesson" ? () => navigate("courses") : undefined} />
+    <div className={`app-shell is-${view}`}>
+      <audio ref={playbackRef} onEnded={() => { setPlayingSymbol(null); playbackEndedRef.current(); }} preload="none" hidden aria-hidden="true" />
+      <AppHeader onCourses={() => navigate("courses")} onBackToCourses={view === "lesson" ? () => navigate("courses") : undefined} />
       <main className="main-content">{renderMain()}</main>
       <BottomNav active={view === "lesson" || view === "fill" || view === "result" ? "courses" : view} onNavigate={navigate} />
       {view === "fill" && renderFillDialog()}

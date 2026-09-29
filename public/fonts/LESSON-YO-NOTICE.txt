@@ -1,0 +1,10 @@
+KidLessonYoSans.woff2 and KidLessonYoOnly.woff2 are modified copies of
+BpmfZihiSans-Regular.ttf and BpmfZihiOnly-R.ttf. The modification changes
+the 喲 annotation component from z_yao1 (ㄧㄠ) to z_yo1 (ㄧㄛ); all other
+glyphs continue to use the unmodified bundled fonts.
+
+Original fonts: Copyright 2020 But Ko; BpmfZihiSans also contains Source Han
+Sans, Copyright Adobe. The original fonts are licensed under SIL Open Font
+License 1.1. See BpmfZihiSans-LICENSE.txt and BpmfZihiOnly-LICENSE.txt.
+The modified fonts use distinct family names to respect the original
+reserved font names. Build script: scripts/build-yo-fonts.py.

@@ -29,6 +29,28 @@ test("server-renders the public zhuyin practice station", async () => {
   assert.match(html, /笑嘻嘻/);
   for (const title of ["翹翹板", "謝謝老師", "龜兔賽跑", "拔蘿蔔", "動物狂歡會"]) assert.match(html, new RegExp(title));
   assert.match(html, /不用登入也能練/);
+  assert.match(html, /選擇課程/);
+  assert.match(html, /class="journey-footer"/);
+  assert.doesNotMatch(html, /id="course-lesson-7" hidden/);
+  assert.match(html, /主要導覽/);
+  assert.doesNotMatch(html, /首頁/);
+});
+
+test("individual Zhuyin prompts use the official clips at a gentler playback rate", async () => {
+  const fs = await import("node:fs/promises");
+  const page = await fs.readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const generator = await fs.readFile(new URL("../scripts/generate-listening-audio.mjs", import.meta.url), "utf8");
+  const symbols = [..."ㄅㄆㄇㄈㄉㄊㄋㄌㄍㄎㄏㄐㄑㄒㄓㄔㄕㄖㄗㄘㄙㄚㄛㄜㄝㄞㄟㄠㄡㄢㄣㄤㄥㄦㄧㄨㄩ"];
+  assert.equal(symbols.length, 37);
+  assert.match(generator, /officialAudioBase.*language\.moe\.gov\.tw/);
+  assert.match(generator, /F\$\{officialIndex \+ 1\}\.WAV/);
+  assert.match(page, /audio\.playbackRate = isZhuyinPrompt \? 0\.84 : 1/);
+  assert.match(page, /\?v=44/);
+  for (const symbol of symbols) {
+    const filename = symbol.codePointAt(0).toString(16);
+    const clip = await fs.stat(new URL(`../public/listening-audio/${filename}.m4a`, import.meta.url));
+    assert.ok(clip.size > 1024, `${symbol} has a bundled audio clip`);
+  }
 });
 
 test("the source keeps the handoff interaction vocabulary", async () => {
@@ -65,17 +87,34 @@ test("the source keeps the handoff interaction vocabulary", async () => {
   assert.match(page, /symbols: \["ㄈ", "ㄏ", "ㄓ", "ㄔ", "ㄨ", "ㄚ", "ㄜ"\]/);
   assert.match(page, /symbols: \["ㄌ", "ㄑ", "ㄗ", "ㄩ", "ㄛ", "ㄢ", "ㄤ"\]/);
   assert.match(page, /symbols: \["ㄒ", "ㄕ", "ㄟ", "ㄡ", "ㄦ", "ㄧㄠ", "ㄨㄢ"\]/);
+  assert.match(page, /\["ㄏㄟ", "ㄧㄛ", "ㄏㄟ", "ㄧㄛ"\]/);
+  assert.match(page, /return <div className="lesson-text-line" dir="ltr" key=\{lineIndex\}>\{Array\.from\(line\)\.map\(\(char, charIndex\) => <span key=\{charIndex\}>/);
+  assert.doesNotMatch(page, /chantZhuyin|lesson-ruby-fix|lesson-zhuyin-fix/);
+  assert.doesNotMatch(page, /selectedLesson === 7 && char === "喲"/);
   assert.doesNotMatch(page, /兩種方式，自己選一個開始|看直式注音格，把缺少的音節拖回去|聽聲音、自由手寫，最後交給家長判定/);
   assert.match(page, /lesson-symbols" dir="rtl"/);
+  assert.match(css, /\.lesson-symbols \{[^}]*linear-gradient\(180deg, #fffefb 0%, #fffdf6 38%, #fffdfa 68%, #fff 100%\)/);
+  assert.match(css, /\.lesson-meadow-footer::before \{[^}]*linear-gradient\(to bottom, #fff 0%/);
   assert.match(css, /BpmfZihiSans-Regular\.ttf/);
   assert.match(css, /BpmfZihiOnly-R\.ttf/);
+  assert.match(css, /font-family: "KidLessonYoSans", "BpmfZihiSans"/);
+  assert.match(css, /font-family: "KidLessonYoOnly", "BpmfZihiOnly"/);
+  assert.match(css, /KidLessonYoSans\.woff2/);
+  assert.match(css, /KidLessonYoOnly\.woff2/);
+  for (const fileName of ["KidLessonYoSans.woff2", "KidLessonYoOnly.woff2"]) {
+    const font = await (await import("node:fs/promises")).readFile(new URL(`../public/fonts/${fileName}`, import.meta.url));
+    assert.equal(font.toString("ascii", 0, 4), "wOF2");
+  }
   assert.match(page, /國字＋注音/);
   assert.match(page, /純注音/);
   assert.match(page, /setPreviewMode\("annotated"\)/);
+  assert.match(page, /"--preview-max-chars": Math\.max\(\.\.\.lesson\.lines\.map/);
+  assert.match(page, /className="lesson-page-counter" aria-live="polite">第 \{previewPage \+ 1\} \/ \{previewPageCount\} 頁/);
   assert.match(page, /\\u\{E01E1\}/);
   assert.match(page, /1: \{ 5: \{ 4: "\\u\{E01E1\}" \} \}/);
   assert.match(page, /完成這格/);
   assert.match(css, /lesson-text-lines\.is-zhuyin-only/);
+  assert.match(css, /\.lesson-page-dots \{ display: flex; flex-direction: row-reverse;/);
   assert.match(css, /object-fit: cover/);
   assert.match(css, /\.text-button \{ display: inline-flex; flex: none/);
   assert.match(css, /\.lesson-page \.mode-grid \{ display: grid; grid-template-columns: repeat\(2/);
@@ -112,7 +151,9 @@ test("all lessons retain three listening sections and complete circled-word writ
   assert.match(page, /3: \{ 0: \{ 0: "\\u\{E01E1\}" \}, 2: \{ 0: "\\u\{E01E1\}" \} \}/);
   assert.match(page, /const exercise = exercises\[selectedLesson\]/);
   assert.match(page, /const listeningQuestions = sessionQuestions/);
-  assert.match(page, /lessons\.slice\(1\)\.map/);
+  assert.match(page, /lessons\.map\(\(item, index\) =>/);
+  assert.match(page, /practiceState\.recentLesson === index/);
+  assert.match(page, /courseArtwork\[index\]/);
   for (const lesson of ["first", "second", "third", "fourth"]) {
     const questions = page.match(new RegExp(`const ${lesson}ListeningQuestions = \\[([\\s\\S]*?)\\] as const;`))?.[1];
     assert.ok(questions, `${lesson} listening questions exist`);
@@ -141,7 +182,14 @@ test("all lessons retain three listening sections and complete circled-word writ
   assert.match(page, /listeningCorrect: current\.listeningCorrect \+ currentQuestion\.answer\.split\("\|"\)\.length/);
   assert.match(page, /三大題 · \{sessionScore\.listeningCorrect\} \/ \{sessionWritingUnits\} 格完成/);
   assert.match(page, /Array\.from\(\{ length: wordLength \}/);
-  assert.match(css, /\.quick-course-grid \{ grid-template-columns: repeat\(3, minmax\(0, 1fr\)\)/);
+  assert.match(page, /useState<View>\("courses"\)/);
+  assert.doesNotMatch(page, /showAllCourses|hidden=\{!showAllCourses/);
+  assert.doesNotMatch(page, /journey-break|showAllCourses/);
+  assert.match(page, /className="journey-footer"/);
+  assert.match(page, /course-flag-grass-v1\.png/);
+  assert.match(css, /course-card-paper-v1\.png/);
+  assert.doesNotMatch(page, /renderHome|id: "home" as View/);
+  assert.match(css, /\.bottom-nav \{ grid-template-columns: repeat\(3, 1fr\)/);
 });
 
 test("each lesson draws only from its teacher-selected circled vocabulary", async () => {
@@ -234,7 +282,7 @@ test("parent review, listening preferences, and deferred reinforcement remain av
   assert.match(page, /listenPhase === "ready" \? <div className="listen-ready-card"/);
   assert.match(page, /repeatTimeoutRef\.current = window\.setTimeout/);
   assert.match(page, /listeningSettings\.intervalSeconds \* 1000/);
-  assert.match(page, /onEnded=\{\(\) => playbackEndedRef\.current\(\)\}/);
+  assert.match(page, /onEnded=\{\(\) => \{ setPlayingSymbol\(null\); playbackEndedRef\.current\(\); \}\}/);
   assert.doesNotMatch(page, /repeatPlaybacks = Array\.from/);
   assert.match(page, /needsPractice: true/);
   assert.match(page, /現在補強/);

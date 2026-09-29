@@ -24,3 +24,9 @@ npm run dev
 ## 字體
 
 課文、卡片和聽寫答案使用使用者既有專案中的 `BpmfZihiOnly-R.ttf`（ㄅ字嗨注音而已），並隨網站載入，讓其他裝置也能顯示相同字形。字體出自 [But Ko 的注音 IVS 字型專案](https://github.com/ButTaiwan/bpmfvs)，以 SIL Open Font License 1.1 授權；相關著作權與授權文字見 `public/fonts/BpmfZihiSans-LICENSE.txt`。
+
+第八課課文預覽另載入同字體的修正版 WOFF2，將「喲」的內建注音從 ㄧㄠ 校正為 ㄧㄛ，保留原字形與直排位置。來源、修改紀錄與授權見 `public/fonts/LESSON-YO-NOTICE.txt`；可用 `python3 scripts/build-yo-fonts.py` 重建（需 fontTools 與 brotli）。
+
+## 聽寫音檔
+
+單個注音符號的讀音使用教育部《國語注音符號手冊》F1–F37 錄音，原始 WAV 轉為網站使用的 M4A；播放時再稍微放慢。音檔依 CC BY 4.0 授權使用，詳細來源與修改說明見 `public/listening-audio/ATTRIBUTION.md`。其餘生字、語詞與複合韻音檔仍由 `scripts/generate-listening-audio.mjs` 產生。可用 `node scripts/generate-listening-audio.mjs --refresh-symbols` 更新官方符號音檔。

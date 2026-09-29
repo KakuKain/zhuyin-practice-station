@@ -23,6 +23,11 @@ mkdirSync(output, { recursive: true });
 const temporary = mkdtempSync(join(tmpdir(), "zhuyin-audio-"));
 let created = 0;
 const refreshAll = process.argv.includes("--refresh-all");
+const refreshSymbols = process.argv.includes("--refresh-symbols");
+// F1–F37 follow the symbol order in the Ministry of Education's Bopomofo manual.
+// Its individual audio files are CC BY 4.0; attribution is in public/listening-audio/ATTRIBUTION.md.
+const officialSymbols = [..."ㄅㄆㄇㄈㄉㄊㄋㄌㄍㄎㄏㄐㄑㄒㄓㄔㄕㄖㄗㄘㄙㄚㄛㄜㄝㄞㄟㄠㄡㄢㄣㄤㄥㄦㄧㄨㄩ"];
+const officialAudioBase = "https://language.moe.gov.tw/001/Upload/files/site_content/M0001/juyin/html_ch/audio";
 // Use unambiguous spoken equivalents for polyphonic characters and combined sounds.
 const spokenTextOverrides = new Map([
   ["背", "揹"],
@@ -42,10 +47,15 @@ try {
   for (const text of texts) {
     const filename = [...text].map((character) => character.codePointAt(0).toString(16)).join("-");
     const destination = join(output, `${filename}.m4a`);
-    if (existsSync(destination) && statSync(destination).size > 1024 && !refreshAll) continue;
-    const sourceAudio = join(temporary, `${filename}.aiff`);
+    const officialIndex = officialSymbols.indexOf(text);
+    if (existsSync(destination) && statSync(destination).size > 1024 && !refreshAll && !(refreshSymbols && officialIndex >= 0)) continue;
+    const sourceAudio = join(temporary, `${filename}.${officialIndex >= 0 ? "wav" : "aiff"}`);
     // One clip is one reading. The app controls the gap between repetitions.
-    execFileSync("say", ["-v", "Meijia", "-r", "100", "-o", sourceAudio, spokenTextOverrides.get(text) ?? text]);
+    if (officialIndex >= 0) {
+      execFileSync("curl", ["-fLsS", `${officialAudioBase}/F${officialIndex + 1}.WAV`, "-o", sourceAudio]);
+    } else {
+      execFileSync("say", ["-v", "Meijia", "-r", "100", "-o", sourceAudio, spokenTextOverrides.get(text) ?? text]);
+    }
     execFileSync("afconvert", ["-f", "m4af", "-d", "aac", "-b", "48000", sourceAudio, destination]);
     if (statSync(destination).size <= 1024) throw new Error(`Empty audio clip for ${text}`);
     created++;
