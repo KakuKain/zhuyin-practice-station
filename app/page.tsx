@@ -1526,7 +1526,7 @@ export default function Page() {
 
   const renderPractice = () => (
     <section className="page-section practice-page">
-      <SectionHeading eyebrow="YOUR PRACTICE" title="練習紀錄" description="待補強與收藏題目留在這台裝置，可以隨時重練。" />
+      <SectionHeading eyebrow="YOUR PRACTICE" title="練習紀錄" description="收藏與待補強，隨時重練。" />
       {storageError && <p className="practice-storage-error" role="alert">這個瀏覽器目前無法儲存收藏；關閉頁面後，紀錄可能會消失。</p>}
       {practiceNotice && <p className="practice-notice" role="status">{practiceNotice}</p>}
       <div className="section-title-row"><h2>課文默寫 · 錯字收藏</h2><span className="list-count">{fillFavorites.length} 個注音</span></div>
