@@ -410,7 +410,9 @@ body { background: #e7f2f9; }
 .fill-page .fill-cell { width: 100%; min-height: 74px; padding: 3px; cursor: pointer; }
 .fill-page .fill-cell.is-target { border: 1px dashed #9cccac; background: #fafffb; }
 .fill-page .fill-cell.is-filled { border: 1px solid #63b685; background: #f1fff5; }
+.fill-page .fill-cell.is-in-progress { border: 2px solid #e6a45f; background: #fff9ed; }
 .fill-page .fill-cell.is-needs-retry { border: 2px solid #ed925f; background: #fff3e9; }
+.fill-storage-error { margin: 10px 0 0; padding: 10px 12px; border-radius: 9px; background: #fff1e8; color: #8a3c22; font-size: 14px; line-height: 1.5; }
 .fill-check-actions { display: grid; gap: 8px; margin-top: 13px; }
 .fill-check-actions .fill-begin-button { margin-top: 0; }
 .fill-check-actions .fill-begin-button:first-child:not(:last-child) { background: #e87943; }
@@ -466,6 +468,15 @@ body { background: #e7f2f9; }
 .fill-practice-compare .ink-preview { width: 100%; height: 100%; }
 .fill-practice-compare .zhuyin-stack { font-size: 34px; }
 .fill-practice-defer { display: block; width: 100%; min-height: 48px; margin-top: 12px; border: 1px solid #bfd8e9; border-radius: 10px; background: white; color: var(--ref-navy); font-size: 14px; font-weight: 800; }
+.fill-dialog-backdrop { position: fixed; z-index: 100; inset: 0; display: grid; place-items: center; padding: 20px; background: rgba(18, 39, 65, .58); }
+.fill-dialog { display: grid; width: min(100%, 380px); gap: 10px; padding: 26px 22px 22px; border: 1px solid #c9dfec; border-radius: 22px; background: white; box-shadow: 0 22px 60px rgba(12, 38, 66, .3); color: var(--ref-navy); text-align: center; }
+.fill-dialog-icon { display: grid; width: 54px; height: 54px; place-items: center; justify-self: center; margin-bottom: 2px; border-radius: 16px; background: #eaf5ff; color: var(--ref-blue); font-size: 30px; }
+.fill-dialog h2 { margin: 0; font-size: 21px; line-height: 1.4; }
+.fill-dialog p { margin: 0 0 8px; color: #5d7891; font-size: 15px; line-height: 1.5; }
+.fill-dialog button { min-height: 48px; border-radius: 11px; font-size: 16px; font-weight: 800; }
+.fill-dialog-primary { border: 0; background: var(--ref-blue); color: white; }
+.fill-dialog-secondary { border: 1px solid #bfd8e9; background: white; color: var(--ref-navy); }
+.fill-dialog button:focus-visible { outline: 3px solid #f0a341; outline-offset: 2px; }
 @media (max-width: 430px) { .fill-page .syllable-row { gap: 4px; } .fill-page .fill-cell { min-height: 62px; } .fill-focus-header { grid-template-columns: 1fr auto; } .fill-focus-header > span { display: none; } }
 
 /* Listening has three four-cell sections; a two-character word shares one playback. */

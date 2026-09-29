@@ -15,6 +15,7 @@ type ListeningQuestion = ListeningSeed & { id: string; choices: readonly string[
 type LessonExercise = { lines: readonly (readonly SyllableItem[])[]; questions: readonly ListeningSeed[] };
 type InkPoint = { x: number; y: number };
 type InkStroke = InkPoint[];
+type FillDraft = { version: 1; lessonIndex: number; savedAt: number; strokes: Record<number, InkStroke[]>; pendingCells: Record<number, InkStroke[]>; needsRetry: number[]; reviewOpen: boolean };
 type SavedQuestion = { lessonIndex: number; questionId: string; needsPractice?: boolean };
 type FillFavorite = { lessonIndex: number; character: string; zhuyin: string; positions: number[]; status: "needs_rewrite" | "review_later" };
 type PracticeState = { savedQuestions: SavedQuestion[]; recentLesson: number | null; completedSessions: number };
@@ -22,6 +23,32 @@ type ListeningSettings = { repeatCount: 1 | 2 | 3; intervalSeconds: 5 | 8 | 10 }
 type MorePanel = "home" | "help" | "listening" | "versions";
 const practiceStorageKey = "zhuyin-practice-state-v3";
 const fillFavoritesStorageKey = "zhuyin-fill-favorites-v1";
+const fillDraftStorageKey = (lessonIndex: number) => `zhuyin-fill-draft-v1-${lessonIndex}`;
+const fillDraftCookieKey = (lessonIndex: number) => `zhuyin_fill_draft_${lessonIndex}`;
+const validInkStrokes = (value: unknown): value is InkStroke[] => Array.isArray(value) && value.length <= 200 && value.every((stroke) => Array.isArray(stroke) && stroke.length > 0 && stroke.length <= 2000 && stroke.every((point) => point && typeof point.x === "number" && typeof point.y === "number" && Number.isFinite(point.x) && Number.isFinite(point.y) && point.x >= 0 && point.x <= 100 && point.y >= 0 && point.y <= 100));
+
+function readFillDraft(lessonIndex: number, cellCount: number): FillDraft | null {
+  try {
+    const raw = window.localStorage.getItem(fillDraftStorageKey(lessonIndex));
+    if (!raw) return null;
+    const draft: FillDraft = JSON.parse(raw);
+    if (draft?.version !== 1 || draft.lessonIndex !== lessonIndex || !draft.strokes || typeof draft.strokes !== "object" || Array.isArray(draft.strokes)) return null;
+    if (!Object.entries(draft.strokes).every(([key, strokes]) => Number.isInteger(Number(key)) && Number(key) >= 0 && Number(key) < cellCount && validInkStrokes(strokes))) return null;
+    if (!draft.pendingCells || typeof draft.pendingCells !== "object" || Array.isArray(draft.pendingCells) || !Object.entries(draft.pendingCells).every(([key, strokes]) => Number.isInteger(Number(key)) && Number(key) >= 0 && Number(key) < cellCount && validInkStrokes(strokes))) return null;
+    if (!Array.isArray(draft.needsRetry) || !draft.needsRetry.every((index) => Number.isInteger(index) && index >= 0 && index < cellCount) || typeof draft.reviewOpen !== "boolean") return null;
+    return Object.keys(draft.strokes).length || Object.keys(draft.pendingCells).length ? draft : null;
+  } catch { return null; }
+}
+
+function writeFillDraft(draft: FillDraft) {
+  window.localStorage.setItem(fillDraftStorageKey(draft.lessonIndex), JSON.stringify(draft));
+  document.cookie = `${fillDraftCookieKey(draft.lessonIndex)}=1; Max-Age=2592000; Path=/; SameSite=Lax`;
+}
+
+function clearFillDraft(lessonIndex: number) {
+  window.localStorage.removeItem(fillDraftStorageKey(lessonIndex));
+  document.cookie = `${fillDraftCookieKey(lessonIndex)}=; Max-Age=0; Path=/; SameSite=Lax`;
+}
 const listeningSettingsStorageKey = "zhuyin-listening-settings-v1";
 const defaultListeningSettings: ListeningSettings = { repeatCount: 2, intervalSeconds: 8 };
 const previousPracticeStorageKey = "zhuyin-practice-state-v2";
@@ -242,6 +269,7 @@ const exercises: Record<number, LessonExercise> = {
 };
 
 const siteReleaseNotes = [
+  [28, "默寫防止誤觸遺失", "離開默寫前先提醒；每格筆跡會存在這台裝置，重新進入時可選擇繼續默寫或重新開始。"],
   [27, "聽寫依圈詞抽題", "第二大題只考本課圈詞中的生字；第三大題抽完整圈詞，較長的詞會增加手寫格與作答時間。"],
   [26, "開放第五至第九課", "新增《翹翹板》到《動物狂歡會》的課文、完整注音預覽、逐格默寫及隨機聽寫。"],
   [25, "開放第四課《笑嘻嘻》", "加入第四課課文、注音預覽、逐格默寫與隨機聽寫，並校正「背著書包」的讀音。"],
@@ -520,6 +548,10 @@ export default function Page() {
   const [selectedLesson, setSelectedLesson] = useState(0);
   const [previewMode, setPreviewMode] = useState<PreviewMode>("annotated");
   const [fillStrokes, setFillStrokes] = useState<Record<number, InkStroke[]>>({});
+  const [fillPendingCells, setFillPendingCells] = useState<Record<number, InkStroke[]>>({});
+  const [fillDraftReady, setFillDraftReady] = useState(false);
+  const [fillResumeDraft, setFillResumeDraft] = useState<FillDraft | null>(null);
+  const [fillExitTarget, setFillExitTarget] = useState<View | null>(null);
   const [activeFillCell, setActiveFillCell] = useState<number | null>(null);
   const [fillReviewOpen, setFillReviewOpen] = useState(false);
   const [fillNeedsRetry, setFillNeedsRetry] = useState<number[]>([]);
@@ -562,6 +594,7 @@ export default function Page() {
   const fillDraftRef = useRef<InkStroke[]>([]);
   const fillActiveStrokeRef = useRef<InkStroke | null>(null);
   const fillPointerIdRef = useRef<number | null>(null);
+  const persistFillRef = useRef<() => void>(() => {});
   const fillReviewBaselineRef = useRef<Map<string, FillFavorite | null>>(new Map());
   const timerRef = useRef<number | null>(null);
   const timeoutRefs = useRef<number[]>([]);
@@ -577,6 +610,7 @@ export default function Page() {
   const fillLineStarts = lessonLines.map((_, lineIndex) => lessonLines.slice(0, lineIndex).reduce((count, line) => count + line.length, 0));
   const writtenCount = lessonItems.filter((_, index) => fillStrokes[index]?.length).length;
   const fillComplete = writtenCount === lessonItems.length;
+  const hasFillDraft = writtenCount > 0 || Object.keys(fillPendingCells).length > 0 || (view === "fill" && fillDraftRef.current.length > 0);
   const listeningQuestions = sessionQuestions;
   const currentQuestion = listeningQuestions[listenIndex] ?? fallbackListeningQuestion;
   const isWordQuestion = currentQuestion.category === "words";
@@ -591,6 +625,63 @@ export default function Page() {
   const lessonNumber = lessonNumerals[selectedLesson];
   const currentQuestionSaved = practiceState.savedQuestions.some((item) => item.lessonIndex === selectedLesson && item.questionId === currentQuestion.id);
   const pendingSessionCount = reviewedIndexes.filter((index) => practiceState.savedQuestions.some((item) => item.lessonIndex === selectedLesson && item.questionId === listeningQuestions[index]?.id && item.needsPractice)).length;
+
+  const persistFillDraft = (includeCanvas = false) => {
+    if (view !== "fill" || !fillDraftReady || fillResumeDraft) return;
+    try {
+      if (fillParentChecked) { clearFillDraft(selectedLesson); return; }
+      const pendingCells = { ...fillPendingCells };
+      if (includeCanvas && activeFillCell !== null) {
+        const strokes = [...fillDraftRef.current, ...(fillActiveStrokeRef.current?.length ? [fillActiveStrokeRef.current] : [])];
+        if (strokes.length) pendingCells[activeFillCell] = strokes;
+      }
+      if (!Object.keys(fillStrokes).length && !Object.keys(pendingCells).length) { clearFillDraft(selectedLesson); return; }
+      writeFillDraft({ version: 1, lessonIndex: selectedLesson, savedAt: Date.now(), strokes: fillStrokes, pendingCells, needsRetry: fillNeedsRetry, reviewOpen: fillReviewOpen });
+    } catch { setStorageError(true); }
+  };
+  persistFillRef.current = () => persistFillDraft(true);
+
+  useEffect(() => {
+    if (view === "fill" && fillDraftReady && !fillResumeDraft) persistFillDraft();
+  }, [view, fillDraftReady, fillResumeDraft, fillStrokes, fillPendingCells, fillNeedsRetry, fillReviewOpen, fillParentChecked, selectedLesson]);
+
+  useEffect(() => {
+    const flush = () => persistFillRef.current();
+    const onVisibilityChange = () => { if (document.visibilityState === "hidden") flush(); };
+    const onBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (view !== "fill" || !fillDraftReady || fillResumeDraft || fillParentChecked || (!hasFillDraft && !fillActiveStrokeRef.current?.length)) return;
+      flush();
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("pagehide", flush);
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => {
+      window.removeEventListener("pagehide", flush);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      window.removeEventListener("beforeunload", onBeforeUnload);
+    };
+  }, [view, fillDraftReady, fillResumeDraft, fillParentChecked, hasFillDraft]);
+
+  useEffect(() => {
+    if (!fillResumeDraft && !fillExitTarget) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        if (fillExitTarget) setFillExitTarget(null);
+      }
+      if (event.key !== "Tab") return;
+      const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>(".fill-dialog button"));
+      if (!buttons.length) return;
+      const first = buttons[0];
+      const last = buttons[buttons.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [fillResumeDraft, fillExitTarget]);
 
   useEffect(() => {
     try {
@@ -782,13 +873,42 @@ export default function Page() {
   };
 
   const openFill = () => {
+    const draft = readFillDraft(selectedLesson, lessonItems.length);
     setFillStrokes({});
+    setFillPendingCells({});
     setActiveFillCell(null);
     setFillReviewOpen(false);
     setFillNeedsRetry([]);
     setFillParentChecked(false);
+    setFillHasInk(false);
+    fillDraftRef.current = [];
+    setFillResumeDraft(draft);
+    setFillDraftReady(!draft);
     setCompletedFillLessons((current) => current.filter((index) => index !== selectedLesson));
     setView("fill");
+  };
+
+  const resumeFillDraft = () => {
+    if (!fillResumeDraft) return;
+    setFillStrokes(fillResumeDraft.strokes);
+    setFillPendingCells(fillResumeDraft.pendingCells);
+    setFillNeedsRetry(fillResumeDraft.needsRetry);
+    setFillReviewOpen(fillResumeDraft.reviewOpen);
+    setActiveFillCell(null);
+    setFillResumeDraft(null);
+    setFillDraftReady(true);
+  };
+
+  const restartFillDraft = () => {
+    try { clearFillDraft(selectedLesson); } catch { setStorageError(true); }
+    setFillStrokes({});
+    setFillPendingCells({});
+    setFillNeedsRetry([]);
+    setFillReviewOpen(false);
+    setActiveFillCell(null);
+    fillDraftRef.current = [];
+    setFillResumeDraft(null);
+    setFillDraftReady(true);
   };
 
   const openFillReview = () => {
@@ -1000,7 +1120,7 @@ export default function Page() {
     if (!isPracticeWriting && (view !== "fill" || activeFillCell === null)) return;
     const canvas = fillCanvasRef.current;
     if (!canvas) return;
-    const saved = isPracticeWriting ? [] : fillNeedsRetry.includes(activeFillCell!) ? [] : fillStrokes[activeFillCell!] ?? [];
+    const saved = isPracticeWriting ? [] : fillPendingCells[activeFillCell!] ?? (fillNeedsRetry.includes(activeFillCell!) ? [] : fillStrokes[activeFillCell!] ?? []);
     let initialized = false;
     const redraw = (resetDraft: boolean) => {
       const rect = canvas.getBoundingClientRect();
@@ -1071,6 +1191,10 @@ export default function Page() {
     event.currentTarget.setPointerCapture(event.pointerId);
     fillPointerIdRef.current = event.pointerId;
     setFillIsDirty(true);
+    if (view === "fill" && fillParentChecked) {
+      setFillParentChecked(false);
+      setCompletedFillLessons((current) => current.filter((index) => index !== selectedLesson));
+    }
     const point = fillPoint(event);
     fillActiveStrokeRef.current = [point];
     const context = event.currentTarget.getContext("2d");
@@ -1104,6 +1228,10 @@ export default function Page() {
     fillActiveStrokeRef.current = null;
     fillPointerIdRef.current = null;
     setFillHasInk(fillDraftRef.current.length > 0);
+    if (view === "fill" && activeFillCell !== null) {
+      setFillPendingCells((current) => ({ ...current, [activeFillCell]: fillDraftRef.current.map((stroke) => stroke.map((point) => ({ ...point }))) }));
+      persistFillRef.current();
+    }
   };
 
   const clearFillDrawing = () => {
@@ -1111,6 +1239,7 @@ export default function Page() {
     const context = canvas?.getContext("2d");
     if (canvas && context) context.clearRect(0, 0, canvas.width, canvas.height);
     fillDraftRef.current = [];
+    if (view === "fill" && activeFillCell !== null) setFillPendingCells((current) => { const next = { ...current }; delete next[activeFillCell]; return next; });
     setFillHasInk(false);
     setFillIsDirty(true);
   };
@@ -1121,7 +1250,9 @@ export default function Page() {
     const lineIndex = fillLineForCell(index);
     const wasFilled = Boolean(fillStrokes[index]?.length);
     const next = { ...fillStrokes, [index]: fillDraftRef.current.map((stroke) => stroke.map((point) => ({ ...point }))) };
+    fillDraftRef.current = [];
     setFillStrokes(next);
+    setFillPendingCells((current) => { const pending = { ...current }; delete pending[index]; return pending; });
     setActiveFillCell(null);
     setFillParentChecked(false);
     setCompletedFillLessons((current) => current.filter((item) => item !== selectedLesson));
@@ -1150,7 +1281,10 @@ export default function Page() {
   };
 
   const leaveFillCell = () => {
-    if (fillIsDirty && !window.confirm("這一格還沒儲存，要返回課文嗎？")) return;
+    if (fillDraftRef.current.length && activeFillCell !== null) {
+      setFillPendingCells((current) => ({ ...current, [activeFillCell]: fillDraftRef.current.map((stroke) => stroke.map((point) => ({ ...point }))) }));
+      persistFillRef.current();
+    }
     setActiveFillCell(null);
   };
 
@@ -1212,9 +1346,29 @@ export default function Page() {
   };
 
   const navigate = (next: View) => {
+    if (view === "fill" && next !== "fill" && !fillParentChecked && hasFillDraft) {
+      persistFillRef.current();
+      setFillExitTarget(next);
+      return;
+    }
     if (next !== "listen") clearListenTimers();
     if (next === "more") setMorePanel("home");
     setView(next);
+  };
+
+  const leaveFill = () => {
+    if (!fillExitTarget) return;
+    persistFillRef.current();
+    const target = fillExitTarget;
+    setFillExitTarget(null);
+    if (target === "more") setMorePanel("home");
+    setView(target);
+  };
+
+  const renderFillDialog = () => {
+    if (fillResumeDraft) return <div className="fill-dialog-backdrop"><div className="fill-dialog" role="alertdialog" aria-modal="true" aria-labelledby="fill-resume-title" aria-describedby="fill-resume-description"><span className="fill-dialog-icon" aria-hidden="true">✎</span><h2 id="fill-resume-title">要繼續上次的默寫嗎？</h2><p id="fill-resume-description">第{lessonNumber}課「{lesson.title}」的筆跡已保存在這台裝置。</p><button className="fill-dialog-primary" type="button" autoFocus onClick={resumeFillDraft}>繼續默寫</button><button className="fill-dialog-secondary" type="button" onClick={restartFillDraft}>重新開始</button></div></div>;
+    if (fillExitTarget) return <div className="fill-dialog-backdrop"><div className="fill-dialog" role="alertdialog" aria-modal="true" aria-labelledby="fill-exit-title" aria-describedby="fill-exit-description"><span className="fill-dialog-icon" aria-hidden="true">✎</span><h2 id="fill-exit-title">要先離開默寫嗎？</h2><p id="fill-exit-description">{storageError ? "這台裝置目前無法保存筆跡，離開後可能會消失。" : "目前寫好的內容已自動保存。下次進來，可以繼續寫。"}</p><button className="fill-dialog-primary" type="button" autoFocus onClick={() => setFillExitTarget(null)}>留下繼續寫</button><button className="fill-dialog-secondary" type="button" onClick={leaveFill}>{storageError ? "仍要離開" : "儲存並離開"}</button></div></div>;
+    return null;
   };
 
   const renderHome = () => (
@@ -1282,17 +1436,18 @@ export default function Page() {
 
   const renderFillBlank = () => (
     <section className={`page-section fill-page ${fillParentChecked ? "is-complete" : ""}`}>
-      <button className="back-link" type="button" onClick={() => setView("lesson")}>← 回到第{lessonNumber}課</button>
+      <button className="back-link" type="button" onClick={() => navigate("lesson")}>← 回到第{lessonNumber}課</button>
       <div className="zhuyin-sheet">
         <div className="sheet-top"><h1>{lesson.title}</h1><small>{fillParentChecked ? "家長已檢查" : `已寫 ${writtenCount} / ${lessonItems.length} 格`}</small></div>
         <p className="fill-sheet-help">{fillParentChecked ? "家長已檢查。修改任何一格後，需要再檢查一次。" : "先寫完整篇，再請家長對照答案。"}{fillNeedsRetry.length > 0 && `有 ${fillNeedsRetry.length} 格待重寫。`}</p>
+        {storageError && <p className="fill-storage-error" role="alert">這台裝置目前無法保存默寫；請先不要關閉頁面，檢查瀏覽器的儲存設定。</p>}
         <div className="syllable-row" dir="rtl" aria-label="課文直排注音，從右向左閱讀">
           {lessonLines.map((line, lineIndex) => {
             const lineStart = fillLineStarts[lineIndex];
             return <div className="syllable-column" role="group" aria-label={`第 ${lineIndex + 1} 行`} key={lineIndex}>
               {line.map((_, itemIndex) => {
                 const index = lineStart + itemIndex;
-                return <button className={`syllable-cell fill-cell ${fillStrokes[index]?.length ? "is-filled" : "is-target"} ${fillNeedsRetry.includes(index) ? "is-needs-retry" : ""}`} key={index} type="button" aria-label={`第 ${lineIndex + 1} 行第 ${itemIndex + 1} 格，${fillNeedsRetry.includes(index) ? "待重寫" : fillStrokes[index]?.length ? "修改注音" : "寫注音"}`} onClick={() => openFillCell(index)}>{fillStrokes[index]?.length ? <InkPreview strokes={fillStrokes[index]} /> : <span className="fill-cell-plus" aria-hidden="true">＋</span>}</button>;
+                return <button className={`syllable-cell fill-cell ${fillStrokes[index]?.length ? "is-filled" : "is-target"} ${fillPendingCells[index]?.length ? "is-in-progress" : ""} ${fillNeedsRetry.includes(index) ? "is-needs-retry" : ""}`} key={index} type="button" aria-label={`第 ${lineIndex + 1} 行第 ${itemIndex + 1} 格，${fillPendingCells[index]?.length ? "尚未完成，繼續寫注音" : fillNeedsRetry.includes(index) ? "待重寫" : fillStrokes[index]?.length ? "修改注音" : "寫注音"}`} onClick={() => openFillCell(index)}>{fillPendingCells[index]?.length ? <InkPreview strokes={fillPendingCells[index]} /> : fillStrokes[index]?.length ? <InkPreview strokes={fillStrokes[index]} /> : <span className="fill-cell-plus" aria-hidden="true">＋</span>}</button>;
               })}
             </div>;
           })}
@@ -1379,7 +1534,7 @@ export default function Page() {
       </div></div>
       <div className="more-group"><h2>資訊與協助</h2><div className="more-settings-list">
         <button type="button" onClick={() => setMorePanel("help")}><span className="more-row-icon green"><Question size={21} aria-hidden="true" /></span><span><strong>使用說明</strong><small>課文默寫、聽寫與錯題重練</small></span><ArrowRight size={17} aria-hidden="true" /></button>
-        <button type="button" onClick={() => setMorePanel("versions")}><span className="more-row-icon orange"><Info size={21} aria-hidden="true" /></span><span><strong>版本</strong><small>目前 v27 · 查看每次更新內容</small></span><ArrowRight size={17} aria-hidden="true" /></button>
+        <button type="button" onClick={() => setMorePanel("versions")}><span className="more-row-icon orange"><Info size={21} aria-hidden="true" /></span><span><strong>版本</strong><small>目前 v28 · 查看每次更新內容</small></span><ArrowRight size={17} aria-hidden="true" /></button>
       </div></div>
       <p className="more-device-note">練習紀錄與設定只存在目前的裝置，不需要登入。</p>
     </section>;
@@ -1454,15 +1609,16 @@ export default function Page() {
 
   if (isFocusMode) return renderFocusMode();
   if (view === "fill-practice") return renderFillPractice();
-  if (view === "fill" && activeFillCell !== null) return renderFillWriting();
-  if (view === "fill" && fillReviewOpen) return renderFillReview();
+  if (view === "fill" && activeFillCell !== null) return <>{renderFillWriting()}{renderFillDialog()}</>;
+  if (view === "fill" && fillReviewOpen) return <>{renderFillReview()}{renderFillDialog()}</>;
 
   return (
     <div className="app-shell">
       <audio ref={playbackRef} onEnded={() => playbackEndedRef.current()} preload="none" hidden aria-hidden="true" />
-      <AppHeader onHome={() => setView("home")} onBackToCourses={view === "lesson" ? () => setView("courses") : undefined} />
+      <AppHeader onHome={() => navigate("home")} onBackToCourses={view === "lesson" ? () => navigate("courses") : undefined} />
       <main className="main-content">{renderMain()}</main>
       <BottomNav active={view === "lesson" || view === "fill" || view === "result" ? "courses" : view} onNavigate={navigate} />
+      {view === "fill" && renderFillDialog()}
     </div>
   );
 }
