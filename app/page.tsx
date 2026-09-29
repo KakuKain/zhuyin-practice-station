@@ -473,10 +473,10 @@ function Logo() {
   );
 }
 
-function AppHeader({ onCourses, onBackToCourses }: { onCourses: () => void; onBackToCourses?: () => void }) {
+function AppHeader({ onCourses, onBack, backLabel }: { onCourses: () => void; onBack?: () => void; backLabel?: string }) {
   return (
-    <header className={`app-header ${onBackToCourses ? "has-back" : ""}`}>
-      {onBackToCourses && <button className="header-back" type="button" onClick={onBackToCourses}><ArrowLeft size={18} weight="bold" aria-hidden="true" /><span>回到課程</span></button>}
+    <header className={`app-header ${onBack ? "has-back" : ""}`}>
+      {onBack && <button className="header-back" type="button" onClick={onBack}><ArrowLeft size={18} weight="bold" aria-hidden="true" /><span>{backLabel}</span></button>}
       <button className="brand-button" type="button" onClick={onCourses} aria-label="前往課程">
         <Logo />
         <span>
@@ -484,7 +484,7 @@ function AppHeader({ onCourses, onBackToCourses }: { onCourses: () => void; onBa
           <small>一年級學習站</small>
         </span>
       </button>
-      {!onBackToCourses && <div className="header-chip"><span className="status-dot" /> 不用登入也能練</div>}
+      {!onBack && <div className="header-chip"><span className="status-dot" /> 不用登入也能練</div>}
     </header>
   );
 }
@@ -1467,15 +1467,18 @@ export default function Page() {
 
   const renderFillBlank = () => (
     <section className={`page-section fill-page ${fillParentChecked ? "is-complete" : ""}`}>
-      <button className="back-link" type="button" onClick={() => navigate("lesson")}>← 回到第{lessonNumber}課</button>
+      <div className="fill-story-heading">
+        <div className="fill-story-copy"><span className="fill-story-kicker">第{lessonNumber}課 · 課文默寫</span><h1>{lesson.title}</h1><p className="fill-sheet-help">{fillParentChecked ? "家長已檢查。修改任何一格後，需要再檢查一次。" : "先寫完整篇，再請家長對照答案。"}{fillNeedsRetry.length > 0 && `有 ${fillNeedsRetry.length} 格待重寫。`}</p></div>
+        <img className="fill-story-art" src={selectedLesson === 7 ? "/course-art/radish-story.png" : `/course-art/${courseArtwork[selectedLesson]}-watercolor.png`} alt="" />
+      </div>
+      <div className="fill-status-line"><span>{fillParentChecked ? "家長已檢查" : `已寫 ${writtenCount} / ${lessonItems.length} 格`}</span>{lessonLines.length > 5 && <small>左右滑動看其他行</small>}</div>
+      {storageError && <p className="fill-storage-error" role="alert">這台裝置目前無法保存默寫；請先不要關閉頁面，檢查瀏覽器的儲存設定。</p>}
       <div className="zhuyin-sheet">
-        <div className="sheet-top"><h1>{lesson.title}</h1><small>{fillParentChecked ? "家長已檢查" : `已寫 ${writtenCount} / ${lessonItems.length} 格`}</small></div>
-        <p className="fill-sheet-help">{fillParentChecked ? "家長已檢查。修改任何一格後，需要再檢查一次。" : "先寫完整篇，再請家長對照答案。"}{fillNeedsRetry.length > 0 && `有 ${fillNeedsRetry.length} 格待重寫。`}</p>
-        {storageError && <p className="fill-storage-error" role="alert">這台裝置目前無法保存默寫；請先不要關閉頁面，檢查瀏覽器的儲存設定。</p>}
-        <div className="syllable-row" dir="rtl" aria-label="課文直排注音，從右向左閱讀">
+        <div className={`syllable-row ${lessonLines.length > 5 ? "has-many-lines" : ""}`} dir="rtl" aria-label="課文直排注音，從右向左閱讀">
           {lessonLines.map((line, lineIndex) => {
             const lineStart = fillLineStarts[lineIndex];
             return <div className="syllable-column" role="group" aria-label={`第 ${lineIndex + 1} 行`} key={lineIndex}>
+              <span className="fill-line-label">第{lineIndex + 1}行</span>
               {line.map((_, itemIndex) => {
                 const index = lineStart + itemIndex;
                 return <button className={`syllable-cell fill-cell ${fillStrokes[index]?.length ? "is-filled" : "is-target"} ${fillPendingCells[index]?.length ? "is-in-progress" : ""} ${fillNeedsRetry.includes(index) ? "is-needs-retry" : ""}`} key={index} type="button" aria-label={`第 ${lineIndex + 1} 行第 ${itemIndex + 1} 格，${fillPendingCells[index]?.length ? "尚未完成，繼續寫注音" : fillNeedsRetry.includes(index) ? "待重寫" : fillStrokes[index]?.length ? "修改注音" : "寫注音"}`} onClick={() => openFillCell(index)}>{fillPendingCells[index]?.length ? <InkPreview strokes={fillPendingCells[index]} /> : fillStrokes[index]?.length ? <InkPreview strokes={fillStrokes[index]} /> : <span className="fill-cell-plus" aria-hidden="true">＋</span>}</button>;
@@ -1483,10 +1486,12 @@ export default function Page() {
             </div>;
           })}
         </div>
+        <img className="fill-pencil-art" src="/course-art/blue-watercolor-pencil.png" alt="" />
       </div>
-      {!fillComplete && <button className="fill-begin-button" type="button" onClick={() => openFillCell(lessonItems.findIndex((_, index) => !fillStrokes[index]?.length))}>從第一個空格開始 <ArrowRight size={19} aria-hidden="true" /></button>}
+      {!fillComplete && <button className="fill-begin-button" type="button" onClick={() => openFillCell(lessonItems.findIndex((_, index) => !fillStrokes[index]?.length))}>{writtenCount ? "從下一格繼續" : "從第一格開始"} <ArrowRight size={19} aria-hidden="true" /></button>}
       {fillComplete && !fillParentChecked && <div className="fill-check-actions">{fillNeedsRetry.length > 0 && <button type="button" className="fill-begin-button" onClick={() => openFillCell(fillNeedsRetry[0])}>重寫待補強的 {fillNeedsRetry.length} 格 <ArrowRight size={19} aria-hidden="true" /></button>}<button type="button" className="fill-begin-button" onClick={openFillReview}>請家長檢查 <ArrowRight size={19} aria-hidden="true" /></button></div>}
       {fillParentChecked && <div className="completion-banner"><span>✓</span><p><strong>家長檢查完成！</strong><small>全部注音都已對照；也可以點格子修改。</small></p><button type="button" className="primary-button" onClick={openListening}>進入聽寫 <span>→</span></button></div>}
+      {!fillParentChecked && <p className="fill-parent-cue">完成後請家長檢查</p>}
     </section>
   );
 
@@ -1646,7 +1651,7 @@ export default function Page() {
   return (
     <div className={`app-shell is-${view}`}>
       <audio ref={playbackRef} onEnded={() => { setPlayingSymbol(null); playbackEndedRef.current(); }} preload="none" hidden aria-hidden="true" />
-      <AppHeader onCourses={() => navigate("courses")} onBackToCourses={view === "lesson" ? () => navigate("courses") : undefined} />
+      <AppHeader onCourses={() => navigate("courses")} onBack={view === "lesson" ? () => navigate("courses") : view === "fill" ? () => navigate("lesson") : undefined} backLabel={view === "fill" ? `回到第${lessonNumber}課` : "回到課程"} />
       <main className="main-content">{renderMain()}</main>
       <BottomNav active={view === "lesson" || view === "fill" || view === "result" ? "courses" : view} onNavigate={navigate} />
       {view === "fill" && renderFillDialog()}

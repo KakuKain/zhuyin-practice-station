@@ -2,6 +2,18 @@
 
 final result: passed
 
+## 第二版課文默寫練習簿與統一右側 Logo（2026-09-29）
+
+final result: passed
+
+- Source visual truth: `/Users/kaoru/.codex/generated_images/01a0e36a-2a5d-7a41-a4db-32106955bcf6/exec-bc3f838f-c53c-47b1-b5d2-29c7fbf230bf.png`。使用者選定第二版，並明確改為返回鍵與 Logo 同列、Logo 置右。
+- Implementation evidence: Codex in-app browser at `http://localhost:3001/`; inspected the full first-lesson dictation screenshot at the default viewport, then measured a 390 × 844 phone viewport. The first lesson's notebook held all 14 interactive cells in five right-to-left columns, without page-wide horizontal overflow.
+- Visual comparison: restored the soft watercolor heading, lesson-specific character art (cat for lesson one), colored vertical line tabs, textured paper, dashed writing cells, blue primary action and matching decorative watercolor pencil. The header is deliberately shorter and the Logo smaller than the conceptual image so both back action and brand fit on one row. Authentic lesson content and functioning UI remain live HTML, not baked into the image.
+- Long-content comparison: lesson eight displayed 11 columns and 54 cells. Its writing grid measured 744px scroll width inside a 338px viewport, while the document stayed 390px wide; the explicit swipe cue remains visible. The cells are not shrunk to fit all lines at once.
+- Header alignment: checked lesson back+brand on the same row at 390px; checked brand-right alignment on course, practice and more pages. Dictation back navigation returns to the selected lesson.
+- Interaction: tapping the first empty cell opened the existing handwriting canvas, and returning restored the notebook. Parent review, draft/resume, filled/needs-retry states, and listening entry remain on their existing paths.
+- Console/build: no browser warning/error entries; `npm test` passed 11/11, including the production build. No P0/P1/P2 visual findings remain.
+
 ## Source visual truth
 
 - Source image: `/var/folders/l7/tdmqctxx3_d7fmvk0h6n4r180000gn/T/codex-clipboard-9b4cb745-acb1-42cd-8340-9920db6c4064.png`

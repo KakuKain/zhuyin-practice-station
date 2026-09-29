@@ -1093,3 +1093,54 @@ body { background: #e7f2f9; }
   .is-more .more-page:not(.more-detail-page) .more-title::after { right: 45px; }
   .is-more .more-detail-content { margin-inline: -20px; padding-inline: 30px; }
 }
+
+/* The small site brand always anchors the right edge of the header. */
+.app-header .brand-button { margin-left: auto; }
+
+/* Dictation: the selected watercolor practice-notebook direction. */
+.app-shell.is-fill { overflow: clip; background: #f6fbff; }
+.is-fill .app-header { position: sticky; top: 0; z-index: 35; display: flex; width: 100%; height: 56px; padding: 8px 16px; border: 0; border-bottom: 1px solid #dce9f3; background: rgba(250, 253, 255, .94); backdrop-filter: blur(12px); }
+.is-fill .app-header .logo-mark { width: 29px; height: 29px; border-radius: 9px 9px 9px 3px; }
+.is-fill .app-header .logo-mark span { font-size: 16px; }
+.is-fill .app-header .brand-button { gap: 7px; }
+.is-fill .app-header .brand-button strong { font-size: 12px; letter-spacing: .02em; }
+.is-fill .app-header .brand-button small { display: none; }
+.is-fill .header-back { min-height: 36px; padding-inline: 8px; background: #f1f8ff; }
+.is-fill .main-content { width: 100%; min-height: 0; padding: 0 14px calc(92px + env(safe-area-inset-bottom)); }
+.fill-page, .fill-page.is-complete { padding: 0; }
+.fill-story-heading { position: relative; display: flex; min-height: 146px; align-items: end; margin: 0 -14px; padding: 18px 20px 12px; overflow: hidden; background: url('/course-art/lesson-watercolor-paper.png') center 35% / cover no-repeat; }
+.fill-story-copy { position: relative; z-index: 1; width: min(70%, 340px); }
+.fill-story-kicker { color: #5276a3; font-size: 11px; font-weight: 800; letter-spacing: .08em; }
+.fill-story-heading h1 { width: fit-content; margin: 8px 0 7px; color: var(--ref-navy); font-size: clamp(33px, 9vw, 42px); font-weight: 900; line-height: 1.13; letter-spacing: .04em; box-shadow: inset 0 -7px #ffe7a3; }
+.fill-story-heading .fill-sheet-help { max-width: 320px; margin: 0; color: #607897; font-size: 12px; font-weight: 700; line-height: 1.5; }
+.fill-story-art { position: absolute; right: 9px; bottom: -5px; width: clamp(105px, 34vw, 150px); height: auto; max-height: 140px; object-fit: contain; object-position: bottom right; pointer-events: none; }
+.fill-status-line { display: flex; min-height: 50px; align-items: center; justify-content: space-between; gap: 8px; color: #5b7290; }
+.fill-status-line span { display: inline-flex; min-height: 30px; align-items: center; padding: 4px 12px; border-radius: 999px; background: #e6f0f9; font-size: 12px; font-weight: 800; white-space: nowrap; }
+.fill-status-line small { font-size: 11px; font-weight: 700; text-align: right; }
+.is-fill .zhuyin-sheet { position: relative; min-height: 410px; padding: 14px 11px 112px; overflow: hidden; border: 1px solid #e5e9e7; border-radius: 22px; background: #fffdf7 url('/course-art/course-card-paper-v1.png') center / 512px 512px repeat; box-shadow: 0 11px 25px rgba(34, 77, 120, .09); }
+.fill-page .syllable-row { position: relative; z-index: 1; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; margin: 0; padding: 0 0 8px; direction: rtl; overflow-x: auto; overscroll-behavior-inline: contain; }
+.fill-page .syllable-row.has-many-lines { grid-template-columns: none; grid-auto-columns: minmax(64px, 70px); grid-auto-flow: column; }
+.fill-page .syllable-column { min-width: 0; gap: 6px; padding-inline: 2px; border-inline-start: 1px solid #d5e7f3; }
+.fill-page .syllable-column:last-child { border-inline-start: 0; }
+.fill-line-label { display: grid; min-height: 28px; place-items: center; margin-bottom: 4px; border-radius: 99px; background: #dfedfd; color: var(--ref-navy); font-size: 11px; font-weight: 900; white-space: nowrap; }
+.fill-page .syllable-column:nth-child(5n + 2) .fill-line-label { background: #e3f4e7; }
+.fill-page .syllable-column:nth-child(5n + 3) .fill-line-label { background: #fff1c9; }
+.fill-page .syllable-column:nth-child(5n + 4) .fill-line-label { background: #ffe2e3; }
+.fill-page .syllable-column:nth-child(5n + 5) .fill-line-label { background: #eee1f7; }
+.fill-page .fill-cell { width: 100%; min-height: 60px; aspect-ratio: 1; padding: 3px; border-radius: 9px; }
+.fill-page .fill-cell.is-target { border: 1.5px dashed #a8bed0; background: rgba(255,255,255,.79); }
+.fill-page .fill-cell.is-filled { border: 2px solid #71b99b; background: rgba(235, 251, 239, .95); }
+.fill-page .fill-cell.is-in-progress { border: 2px solid #e6a45f; background: #fff9ed; }
+.fill-page .fill-cell.is-needs-retry { border: 2px solid #ed925f; background: #fff3e9; }
+.fill-page .fill-cell-plus { color: #9daebe; font-size: 26px; }
+.fill-pencil-art { position: absolute; right: -16px; bottom: -18px; width: 143px; height: 143px; object-fit: contain; pointer-events: none; }
+.fill-page .fill-begin-button { min-height: 56px; margin-top: 17px; border-radius: 15px; background: #2570e9; box-shadow: 0 5px 0 #dbe9ff; font-size: 17px; }
+.fill-page .fill-begin-button svg { flex: none; }
+.fill-parent-cue { margin: 15px 0 0; color: #687f9d; font-size: 12px; font-weight: 750; text-align: center; }
+@media (max-width: 350px) {
+  .fill-story-copy { width: 72%; }
+  .fill-story-art { right: -18px; width: 112px; }
+  .is-fill .zhuyin-sheet { padding-inline: 7px; }
+  .fill-page .syllable-row { gap: 2px; }
+  .fill-page .fill-cell { min-height: 56px; }
+}
