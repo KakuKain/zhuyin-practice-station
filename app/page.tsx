@@ -270,50 +270,7 @@ const exercises: Record<number, LessonExercise> = {
 };
 
 const siteReleaseNotes = [
-  [44, "注音讀音更清楚", "單個注音符號改用教育部《國語注音符號手冊》的真人讀音，並放慢注音題的播放速度；兩次播放之間仍依設定間隔等待。"],
-  [43, "課程路線的小草旗與水彩紙卡片", "第一課的路線起點加入水彩小草旗；九張課程卡片改用藍、綠、米色的柔和漸層，並疊上淡淡的紙張紋理。"],
-  [42, "九課連續呈現", "課程列表可直接往下滑看到全部九課，草地背景只在第九課後的頁尾出現一次。"],
-  [41, "課程故事書版面", "課程頁改用參考圖的木牌、六站時間軸與頁尾草地；點「繼續探索」可查看第七至九課。"],
-  [40, "課程成為起點", "移除獨立首頁，開站直接進入課程；課程、練習與更多頁統一為柔和的水彩故事書風格。"],
-  [39, "課次頁底部水彩銜接", "注音符號區由暖白色漸層接到頁尾水彩草地，頁尾景色也柔和淡入，避免背景在交界處突然換圖。"],
-  [38, "校正「嘿喲嘿喲」讀音", "第八課的「嘿喲嘿喲」逐字標為 ㄏㄟ、ㄧㄛ、ㄏㄟ、ㄧㄛ；只修正「喲」的字體注音，不改變相鄰課文的字形與排版。"],
-  [37, "統一《拔蘿蔔》課文字體", "「嘿喲嘿喲」改回與相鄰欄位相同的內建注音字體，國字加注音與純注音兩種預覽都維持一致。"],
-  [36, "修正《拔蘿蔔》嘿喲注音", "「嘿喲嘿喲」四個字改用同一套直排注音標示，避免「嘿」與「喲」混用字體造成大小與位置不一致。"],
-  [35, "直排課文翻頁方向", "翻頁圓點改為從右往左排列，右側是第 1 頁，往左依序前進，與課文閱讀方向一致。"],
-  [34, "課文翻頁與間距調整", "課名與課文字距更舒展、頁首水彩背景更精簡；同課各頁維持固定高度，翻頁按鈕與頁碼靠近課文並輕覆水彩底緣。"],
-  [33, "課次頁閱讀與背景細節", "課名區保留 LESSON 並縮小角色；課文背景延伸滿寬，移除會碰到注音的分隔線。注音符號採 48px 方格、56px 點擊範圍，裝飾留在字卡外。"],
-  [32, "課次頁版面更緊湊", "縮短上方水彩場景與兩關卡片的高度，關卡圖示和文字改為左右排列；手機和平板都保留清楚的開始按鈕。"],
-  [31, "課次頁水彩故事書版型", "課名區改為融入場景的水彩主視覺，課文換上淡色水彩紙背景，兩關入口與翻頁、注音卡片也一起調整。第八課加入兔子拔蘿蔔插畫。"],
-  [30, "九課水彩角色插畫", "九課角色改為同系列透明水彩插畫，課程列表與課程內頁同步使用；課名區加入柔和的水彩場景。"],
-  [29, "課文預覽響應式翻頁", "手機每頁顯示六個完整直排欄位，平板顯示八欄；可左右滑動或按圓形按鈕翻頁。注音符號可點擊聽發音，平板會顯示更多欄。"],
-  [28, "默寫防止誤觸遺失", "離開默寫前先提醒；每格筆跡會存在這台裝置，重新進入時可選擇繼續默寫或重新開始。"],
-  [27, "聽寫依圈詞抽題", "第二大題只考本課圈詞中的生字；第三大題抽完整圈詞，較長的詞會增加手寫格與作答時間。"],
-  [26, "開放第五至第九課", "新增《翹翹板》到《動物狂歡會》的課文、完整注音預覽、逐格默寫及隨機聽寫。"],
-  [25, "開放第四課《笑嘻嘻》", "加入第四課課文、注音預覽、逐格默寫與隨機聽寫，並校正「背著書包」的讀音。"],
-  [24, "平板轉向時保持筆畫位置", "手寫格會隨畫面尺寸重新對齊，已寫的注音在直橫向切換後仍保留原位。"],
-  [23, "依設定間隔重播", "每次只唸一遍；唸完後才開始計算重播間隔，並修正注音符號題的答案顯示。"],
-  [22, "生字與語詞聽得更清楚", "生字和語詞也改為每次唸兩遍，中間留停頓。"],
-  [21, "注音符號聽得更清楚", "單個注音符號每次會唸兩遍，中間留停頓，讓孩子有時間辨音。"],
-  [20, "聽寫聲音與操作介面", "加入網站內建題目音檔；語詞改為上下兩個正方形田字格；重整「更多」與練習紀錄頁。"],
-  [19, "課文錯字收藏", "家長標記需要重寫時自動收藏；孩子可單題重練，家長確認掌握後移除。"],
-  [18, "家長檢查與聽寫設定", "課文默寫增加家長逐格檢查；聽寫可設定播放次數與間隔，補強也可稍後再做。"],
-  [17, "每次重新抽題", "聽寫從各課注音、生字與語詞重新抽題，並打亂題目選項。"],
-  [16, "聽寫分成三大題", "改為注音符號、生字、語詞三部分；每部分各有四個書寫格。"],
-  [15, "默寫改成逐格手寫", "課文注音改為孩子點空格、在田字格手寫，再回到課文繼續。"],
-  [14, "聽寫收藏與補強", "需要補強的題目可留在練習頁，選對注音後可再聽一次並重寫。"],
-  [13, "改善拖曳放卡", "修正課文注音卡片拖曳後無法放入空格的問題。"],
-  [12, "開放第三課練習", "第三課《河馬和河狸》加入課文默寫與聽寫。"],
-  [11, "修正課文操作", "改善注音卡片與填空格的拖曳判定，並校正課文讀音。"],
-  [10, "課文預覽切換", "課文可切換國字加注音、純注音；首頁與課程卡片同步整理。"],
-  [9, "返回課程按鈕", "調整課次頁的返回圖示與操作位置。"],
-  [8, "校正前三課內容", "修正《貓咪》、《鵝寶寶》、《河馬和河狸》的課文與注音符號。"],
-  [7, "補強重播", "三選一補強畫面加入再播放題目的按鈕。"],
-  [6, "聽寫手寫格", "聽寫改用田字格，並加入提早交卷。"],
-  [5, "簡化課次畫面", "把《貓咪》作為第一課標題，刪除多餘的默寫說明。"],
-  [4, "課文直式閱讀", "課文改為由右往左的直排呈現。"],
-  [3, "校正注音聲調", "改用字體原生注音字形，改善直式聲調位置。"],
-  [2, "加入注音字體", "網站內嵌注音字體，讓不同裝置能顯示完整注音。"],
-  [1, "建立練習站", "完成手機版首頁、課程、課文與聽寫的基本操作畫面。"],
+  ["0.1.0-beta.1", "首個公開測試版", "收錄一至九課，提供直式課文預覽、逐格手寫默寫與家長檢查；聽寫會隨機抽題，並支援間隔重播、補強和錯題收藏。單個注音符號使用教育部錄音。"],
 ] as const;
 
 function fillFavoriteKey(item: Pick<FillFavorite, "lessonIndex" | "character" | "zhuyin">): string {
@@ -1608,7 +1565,7 @@ export default function Page() {
       </div></div>
       <div className="more-group"><h2>資訊與協助</h2><div className="more-settings-list">
         <button type="button" onClick={() => setMorePanel("help")}><span className="more-row-icon green"><Question size={21} aria-hidden="true" /></span><span><strong>使用說明</strong><small>課文默寫、聽寫與錯題重練</small></span><ArrowRight size={17} aria-hidden="true" /></button>
-        <button type="button" onClick={() => setMorePanel("versions")}><span className="more-row-icon orange"><Info size={21} aria-hidden="true" /></span><span><strong>版本</strong><small>目前 v{siteReleaseNotes[0][0]} · 查看每次更新內容</small></span><ArrowRight size={17} aria-hidden="true" /></button>
+        <button type="button" onClick={() => setMorePanel("versions")}><span className="more-row-icon orange"><Info size={21} aria-hidden="true" /></span><span><strong>版本</strong><small>目前 {siteReleaseNotes[0][0]} · Beta 測試版</small></span><ArrowRight size={17} aria-hidden="true" /></button>
       </div></div>
       <p className="more-device-note">練習紀錄與設定只存在目前的裝置，不需要登入。</p>
     </section>;
@@ -1617,7 +1574,7 @@ export default function Page() {
       <button type="button" className="more-back" onClick={() => setMorePanel("home")}><ArrowLeft size={19} aria-hidden="true" /> 更多</button>
       {morePanel === "listening" && <div id="listening-settings" className="more-detail-content"><h1>聽寫設定</h1><p className="more-detail-intro">一般題 30 秒；較長的圈詞會有更多書寫時間。設定只留在這台裝置。</p><div className="more-setting-group"><fieldset><legend>每題播放幾次</legend><div className="settings-options">{([1, 2, 3] as const).map((count) => <button type="button" key={count} aria-pressed={listeningSettings.repeatCount === count} onClick={() => setListeningSettings((current) => ({ ...current, repeatCount: count }))}>{count} 次</button>)}</div></fieldset><fieldset><legend>唸完後，隔多久再唸</legend><div className="settings-options">{([5, 8, 10] as const).map((seconds) => <button type="button" key={seconds} aria-pressed={listeningSettings.intervalSeconds === seconds} onClick={() => setListeningSettings((current) => ({ ...current, intervalSeconds: seconds }))}>{seconds} 秒</button>)}</div></fieldset></div><p className="more-detail-footnote">作答時可按「再聽一次」；這不會改變上方設定。</p></div>}
       {morePanel === "help" && <div className="more-detail-content"><h1>使用說明</h1><div className="help-steps"><section><span>01</span><div><h2>選一課開始</h2><p>每課有課文默寫與聽寫。可以先看課文預覽，再選要練的方式。</p></div></section><section><span>02</span><div><h2>課文默寫</h2><p>點空格寫完整注音。整篇完成後請家長對照；標記需要重寫的字會留在練習頁。</p></div></section><section><span>03</span><div><h2>聽寫與補強</h2><p>按「開始聽」播放題目，寫完交給家長檢查。需要補強的題目可現在練，也可稍後從練習頁重練。</p></div></section></div><button type="button" className="more-primary-link" onClick={() => setView("courses")}>前往課程 <ArrowRight size={18} aria-hidden="true" /></button></div>}
-      {morePanel === "versions" && <div className="more-detail-content"><h1>版本</h1><p className="more-detail-intro">以下依網站公開版本整理更新內容；點開版本可看說明。</p><div className="version-list">{siteReleaseNotes.map(([version, title, description], index) => <details key={version} open={index === 0}><summary><span>v{version}</span><strong>{title}</strong><span className="version-chevron">⌄</span></summary><p>{description}</p></details>)}</div><p className="more-audio-credit">單個注音符號讀音來源：<a href="https://language.moe.gov.tw/001/Upload/files/site_content/M0001/juyin/" target="_blank" rel="noopener noreferrer">教育部《國語注音符號手冊》</a>，依 <a href="https://creativecommons.org/licenses/by/4.0/deed.zh_TW" target="_blank" rel="noopener noreferrer">CC BY 4.0</a> 授權使用；網站已轉為 M4A 並調整播放速度。</p></div>}
+      {morePanel === "versions" && <div className="more-detail-content"><h1>版本</h1><p className="more-detail-intro">網站目前仍在 Beta 測試階段，版本依 SemVer 格式記錄。開發過程中的細項更新可在 <a href="https://github.com/KakuKain/zhuyin-practice-station/commits/main/" target="_blank" rel="noopener noreferrer">GitHub 提交紀錄</a>查看。</p><div className="version-list">{siteReleaseNotes.map(([version, title, description], index) => <details key={version} open={index === 0}><summary><span>{version}</span><strong>{title}</strong><span className="version-chevron">⌄</span></summary><p>{description}</p></details>)}</div><p className="more-audio-credit">單個注音符號讀音來源：<a href="https://language.moe.gov.tw/001/Upload/files/site_content/M0001/juyin/" target="_blank" rel="noopener noreferrer">教育部《國語注音符號手冊》</a>，依 <a href="https://creativecommons.org/licenses/by/4.0/deed.zh_TW" target="_blank" rel="noopener noreferrer">CC BY 4.0</a> 授權使用；網站已轉為 M4A 並調整播放速度。</p></div>}
     </section>;
   };
 

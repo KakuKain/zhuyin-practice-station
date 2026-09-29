@@ -614,13 +614,14 @@ body { background: #e7f2f9; }
 .version-list { overflow: hidden; border: 1px solid #d5e5ef; border-radius: 13px; background: white; }
 .version-list details { border-bottom: 1px solid #e7eff5; }
 .version-list details:last-child { border-bottom: 0; }
-.version-list summary { display: grid; grid-template-columns: 44px minmax(0, 1fr) 16px; align-items: center; gap: 9px; min-height: 60px; padding: 10px 13px; color: var(--ref-navy); cursor: pointer; list-style: none; }
+.version-list summary { display: grid; grid-template-columns: minmax(105px, max-content) minmax(0, 1fr) 16px; align-items: center; gap: 9px; min-height: 60px; padding: 10px 13px; color: var(--ref-navy); cursor: pointer; list-style: none; }
 .version-list summary::-webkit-details-marker { display: none; }
-.version-list summary > span:first-child { color: var(--ref-blue); font-size: 14px; font-weight: 900; }
+.version-list summary > span:first-child { color: var(--ref-blue); font-size: 12px; font-weight: 900; white-space: nowrap; }
 .version-list summary strong { font-size: 14px; }
 .version-list .version-chevron { color: #8598a9; font-size: 18px; transition: transform .15s; }
 .version-list details[open] .version-chevron { transform: rotate(180deg); }
-.version-list p { margin: 0; padding: 0 15px 17px 66px; color: #607895; font-size: 14px; line-height: 1.6; }
+.version-list p { margin: 0; padding: 0 15px 17px; color: #607895; font-size: 14px; line-height: 1.6; }
+.more-detail-intro a { color: #1768cf; text-underline-offset: 2px; }
 .more-audio-credit { margin: 16px 2px 0; color: #607895; font-size: 12px; line-height: 1.6; }
 .more-audio-credit a { color: #1768cf; text-underline-offset: 2px; }
 .more-settings-list button:focus-visible, .more-back:focus-visible, .more-primary-link:focus-visible, .version-list summary:focus-visible { outline: 3px solid #f0a341; outline-offset: -3px; }

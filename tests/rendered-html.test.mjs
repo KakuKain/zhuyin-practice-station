@@ -53,6 +53,18 @@ test("individual Zhuyin prompts use the official clips at a gentler playback rat
   }
 });
 
+test("the public changelog uses one SemVer beta release", async () => {
+  const fs = await import("node:fs/promises");
+  const page = await fs.readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const pkg = JSON.parse(await fs.readFile(new URL("../package.json", import.meta.url), "utf8"));
+  const lock = JSON.parse(await fs.readFile(new URL("../package-lock.json", import.meta.url), "utf8"));
+  assert.equal(pkg.version, "0.1.0-beta.1");
+  assert.equal(lock.version, pkg.version);
+  assert.equal(lock.packages[""].version, pkg.version);
+  assert.match(page, /\["0\.1\.0-beta\.1", "首個公開測試版"/);
+  assert.doesNotMatch(page, /\[44, "注音讀音更清楚"/);
+});
+
 test("the source keeps the handoff interaction vocabulary", async () => {
   const page = await (await import("node:fs/promises")).readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
   const css = await (await import("node:fs/promises")).readFile(new URL("../app/globals.css", import.meta.url), "utf8");
