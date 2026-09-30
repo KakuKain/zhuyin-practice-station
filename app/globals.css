@@ -1150,10 +1150,34 @@ body { background: #e7f2f9; }
 .fill-status-line { display: flex; min-height: 50px; align-items: center; justify-content: space-between; gap: 8px; color: #5b7290; }
 .fill-status-line span { display: inline-flex; min-height: 30px; align-items: center; padding: 4px 12px; border-radius: 999px; background: #e6f0f9; font-size: 12px; font-weight: 800; white-space: nowrap; }
 .fill-status-line small { font-size: 11px; font-weight: 700; text-align: right; }
-.is-fill .zhuyin-sheet { position: relative; min-height: 410px; padding: 14px 11px 112px; overflow: hidden; border: 1px solid #e5e9e7; border-radius: 22px; background: #fffdf7 url('/course-art/course-card-paper-v1.png') center / 512px 512px repeat; box-shadow: 0 11px 25px rgba(34, 77, 120, .09); }
+.is-fill .zhuyin-sheet {
+  position: relative;
+  isolation: isolate;
+  min-height: 410px;
+  padding: 14px 11px 112px;
+  overflow: hidden;
+  border: 1px solid #e4ebe8;
+  border-radius: 22px;
+  background:
+    radial-gradient(ellipse at 8% 8%, rgba(220, 239, 250, .28), transparent 42%),
+    radial-gradient(ellipse at 96% 94%, rgba(237, 246, 213, .32), transparent 46%),
+    #fffdfa;
+  box-shadow: 0 10px 25px rgba(34, 77, 120, .065);
+}
+.is-fill .zhuyin-sheet::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  border-radius: inherit;
+  background: url('/course-art/course-card-paper-v1.png') center / 512px 512px repeat;
+  opacity: .14;
+  filter: blur(1.1px);
+  content: '';
+  pointer-events: none;
+}
 .fill-page .syllable-row { position: relative; z-index: 1; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; margin: 0; padding: 0 0 8px; direction: rtl; overflow-x: auto; overscroll-behavior-inline: contain; }
 .fill-page .syllable-row.has-many-lines { grid-template-columns: none; grid-auto-columns: minmax(64px, 70px); grid-auto-flow: column; }
-.fill-page .syllable-column { min-width: 0; gap: 6px; padding-inline: 2px; border-inline-start: 1px solid #d5e7f3; }
+.fill-page .syllable-column { min-width: 0; gap: 6px; padding-inline: 2px; border-inline-start: 1px solid #dce9ed; }
 .fill-page .syllable-column:last-child { border-inline-start: 0; }
 .fill-line-label { display: grid; min-height: 28px; place-items: center; margin-bottom: 4px; border-radius: 99px; background: #dfedfd; color: var(--ref-navy); font-size: 11px; font-weight: 900; white-space: nowrap; }
 .fill-page .syllable-column:nth-child(5n + 2) .fill-line-label { background: #e3f4e7; }
@@ -1161,11 +1185,11 @@ body { background: #e7f2f9; }
 .fill-page .syllable-column:nth-child(5n + 4) .fill-line-label { background: #ffe2e3; }
 .fill-page .syllable-column:nth-child(5n + 5) .fill-line-label { background: #eee1f7; }
 .fill-page .fill-cell { width: 100%; min-height: 60px; aspect-ratio: 1; padding: 3px; border-radius: 9px; }
-.fill-page .fill-cell.is-target { border: 1.5px dashed #a8bed0; background: rgba(255,255,255,.79); }
+.fill-page .fill-cell.is-target { border: 1.5px dashed #b5c9d1; background: rgba(255,255,255,.7); }
 .fill-page .fill-cell.is-filled { border: 2px solid #71b99b; background: rgba(235, 251, 239, .95); }
 .fill-page .fill-cell.is-in-progress { border: 2px solid #e6a45f; background: #fff9ed; }
 .fill-page .fill-cell.is-needs-retry { border: 2px solid #ed925f; background: #fff3e9; }
-.fill-page .fill-cell-plus { color: #9daebe; font-size: 26px; }
+.fill-page .fill-cell-plus { color: #a7b9c4; font-size: 26px; }
 .fill-pencil-art { position: absolute; right: -16px; bottom: -18px; width: 143px; height: 143px; object-fit: contain; pointer-events: none; }
 .fill-page .fill-begin-button { min-height: 56px; margin-top: 17px; border-radius: 15px; background: #2570e9; box-shadow: 0 5px 0 #dbe9ff; font-size: 17px; }
 .fill-page .fill-begin-button svg { flex: none; }
