@@ -160,7 +160,7 @@ body { background: #e7f2f9; }
 
 @font-face {
   font-family: "BpmfZihiOnly";
-  src: url("/fonts/BpmfZihiOnly-R.ttf") format("truetype");
+  src: url("/fonts/BpmfZihiOnly-R.woff2") format("woff2");
   font-style: normal;
   font-weight: 400;
   font-display: swap;

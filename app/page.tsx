@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, BookOpenText, Gear, Headphones, Info, MusicNotes, PencilLine, Play, Question, SpeakerHigh, Star, Timer } from "@phosphor-icons/react";
+import { createAudioPreloader } from "./audio-preload";
 import { circledVocabulary } from "./circled-vocabulary";
 
 type View = "courses" | "practice" | "more" | "lesson" | "fill" | "fill-practice" | "listen" | "result";
@@ -578,6 +579,7 @@ export default function Page() {
   const listeningPointerIdRef = useRef<number | null>(null);
   const listeningActiveCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const playbackRef = useRef<HTMLAudioElement>(null);
+  const audioPreloaderRef = useRef<ReturnType<typeof createAudioPreloader> | null>(null);
   const fillCanvasRef = useRef<HTMLCanvasElement>(null);
   const fillDraftRef = useRef<InkStroke[]>([]);
   const fillActiveStrokeRef = useRef<InkStroke | null>(null);
@@ -644,6 +646,40 @@ export default function Page() {
     media.addEventListener("change", updateColumns);
     return () => media.removeEventListener("change", updateColumns);
   }, []);
+
+  useEffect(() => {
+    // The annotated preview font is sizeable; fetch it only after the first
+    // screen is idle so the course list stays responsive.
+    const loadFont = () => { void document.fonts.load('400 29px "KidLessonYoSans"').catch(() => {}); };
+    const idleWindow = window as Window & { requestIdleCallback?: (callback: () => void) => number; cancelIdleCallback?: (id: number) => void };
+    if (idleWindow.requestIdleCallback) {
+      const id = idleWindow.requestIdleCallback(loadFont);
+      return () => idleWindow.cancelIdleCallback?.(id);
+    }
+    const id = window.setTimeout(loadFont, 250);
+    return () => window.clearTimeout(id);
+  }, []);
+
+  useEffect(() => {
+    // Recreate the cache during React's development effect replay as well.
+    const preloader = createAudioPreloader();
+    audioPreloaderRef.current = preloader;
+    return () => {
+      preloader.dispose();
+      if (audioPreloaderRef.current === preloader) audioPreloaderRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (view !== "lesson") return;
+    void document.fonts.load('400 48px "KidLessonYoOnly"').catch(() => {});
+    audioPreloaderRef.current?.warm(lesson.symbols.map(listeningAudioUrl));
+  }, [view, selectedLesson, lesson.symbols]);
+
+  useEffect(() => {
+    if (view !== "listen") return;
+    audioPreloaderRef.current?.warm(sessionQuestions.map((question) => listeningAudioUrl(question.audioText)));
+  }, [view, sessionQuestions]);
 
   useEffect(() => {
     if (view === "fill" && fillDraftReady && !fillResumeDraft) persistFillDraft();
@@ -816,7 +852,8 @@ export default function Page() {
     // Keep one natural reading per clip; the listening timer controls repeats.
     // Slowing only the symbol clips lets children hear the complete sound.
     audio.playbackRate = isZhuyinPrompt ? 0.84 : 1;
-    audio.src = listeningAudioUrl(text);
+    const url = listeningAudioUrl(text);
+    audio.src = audioPreloaderRef.current?.playbackUrl(url) ?? url;
     audio.play().catch(() => {
       if (playbackToken !== playbackTokenRef.current) return;
       if (isZhuyinPrompt) {

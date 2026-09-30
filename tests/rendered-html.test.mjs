@@ -111,12 +111,12 @@ test("the source keeps the handoff interaction vocabulary", async () => {
   assert.match(page, /event\.type === "pointerup" && fillActiveStrokeRef\.current\?\.length/);
   assert.match(page, /writeFillDraft\(\{ version: 1, lessonIndex: selectedLesson, savedAt: Date\.now\(\), strokes: next, pendingCells: pending, needsRetry: remainingRetry, reviewOpen: false \}\)/);
   assert.match(css, /BpmfZihiSans-Regular\.ttf/);
-  assert.match(css, /BpmfZihiOnly-R\.ttf/);
+  assert.match(css, /BpmfZihiOnly-R\.woff2/);
   assert.match(css, /font-family: "KidLessonYoSans", "BpmfZihiSans"/);
   assert.match(css, /font-family: "KidLessonYoOnly", "BpmfZihiOnly"/);
   assert.match(css, /KidLessonYoSans\.woff2/);
   assert.match(css, /KidLessonYoOnly\.woff2/);
-  for (const fileName of ["KidLessonYoSans.woff2", "KidLessonYoOnly.woff2"]) {
+  for (const fileName of ["KidLessonYoSans.woff2", "KidLessonYoOnly.woff2", "BpmfZihiOnly-R.woff2"]) {
     const font = await (await import("node:fs/promises")).readFile(new URL(`../public/fonts/${fileName}`, import.meta.url));
     assert.equal(font.toString("ascii", 0, 4), "wOF2");
   }
@@ -134,6 +134,33 @@ test("the source keeps the handoff interaction vocabulary", async () => {
   assert.match(css, /\.text-button \{ display: inline-flex; flex: none/);
   assert.match(css, /\.lesson-page \.mode-grid \{ display: grid; grid-template-columns: repeat\(2/);
   assert.doesNotMatch(page, /className="focus-intro"/);
+});
+
+test("background audio uses cached bytes for playback and falls back when unavailable", async (t) => {
+  const { createAudioPreloader } = await import("../app/audio-preload.ts");
+  const fetched = [];
+  const revoked = [];
+  t.mock.method(globalThis, "fetch", async (url) => {
+    fetched.push(url);
+    if (url === "/missing.m4a") throw new Error("offline");
+    return new Response(new Blob(["audio"], { type: "audio/mp4" }));
+  });
+  t.mock.method(URL, "createObjectURL", () => `blob:clip-${fetched.length}`);
+  t.mock.method(URL, "revokeObjectURL", (url) => revoked.push(url));
+  const preloader = createAudioPreloader(1);
+  preloader.warm(["/first.m4a", "/first.m4a"]);
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  assert.deepEqual(fetched, ["/first.m4a"]);
+  assert.equal(preloader.playbackUrl("/first.m4a"), "blob:clip-1");
+  preloader.warm(["/missing.m4a"]);
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  assert.equal(preloader.playbackUrl("/missing.m4a"), "/missing.m4a");
+  preloader.warm(["/second.m4a"]);
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  assert.equal(preloader.playbackUrl("/second.m4a"), "blob:clip-3");
+  assert.deepEqual(revoked, ["blob:clip-1"]);
+  preloader.dispose();
+  assert.deepEqual(revoked, ["blob:clip-1", "blob:clip-3"]);
 });
 
 test("handwriting and listening exits use the watercolor in-app warning", async () => {
