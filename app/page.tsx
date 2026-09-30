@@ -36,6 +36,11 @@ function readFillDraft(lessonIndex: number, cellCount: number): FillDraft | null
     if (!Object.entries(draft.strokes).every(([key, strokes]) => Number.isInteger(Number(key)) && Number(key) >= 0 && Number(key) < cellCount && validInkStrokes(strokes))) return null;
     if (!draft.pendingCells || typeof draft.pendingCells !== "object" || Array.isArray(draft.pendingCells) || !Object.entries(draft.pendingCells).every(([key, strokes]) => Number.isInteger(Number(key)) && Number(key) >= 0 && Number(key) < cellCount && validInkStrokes(strokes))) return null;
     if (!Array.isArray(draft.needsRetry) || !draft.needsRetry.every((index) => Number.isInteger(index) && index >= 0 && index < cellCount) || typeof draft.reviewOpen !== "boolean") return null;
+    // An interrupted save can leave a completed cell in both collections.
+    // The duplicate pending copy must not mask the completed preview.
+    for (const [key, pending] of Object.entries(draft.pendingCells)) {
+      if (draft.strokes[Number(key)] && JSON.stringify(draft.strokes[Number(key)]) === JSON.stringify(pending)) delete draft.pendingCells[Number(key)];
+    }
     return Object.keys(draft.strokes).length || Object.keys(draft.pendingCells).length ? draft : null;
   } catch { return null; }
 }
@@ -460,7 +465,7 @@ const legacySavedQuestionIndexes: Record<number, readonly number[]> = { 0: [4, 5
 
 function InkPreview({ strokes }: { strokes: InkStroke[] }) {
   return <svg viewBox="0 0 100 100" className="ink-preview" aria-hidden="true">{strokes.map((stroke, index) => stroke.length === 1
-    ? <circle key={index} cx={stroke[0].x} cy={stroke[0].y} r="1.5" />
+    ? <circle key={index} cx={stroke[0].x} cy={stroke[0].y} r=".75" />
     : <polyline key={index} points={stroke.map((point) => `${point.x},${point.y}`).join(" ")} />)}</svg>;
 }
 
@@ -1256,6 +1261,21 @@ export default function Page() {
 
   const endFillDrawing = (event: React.PointerEvent<HTMLCanvasElement>) => {
     if (fillPointerIdRef.current !== event.pointerId) return;
+    // A quick mouse or pen flick may have no final pointermove event. Keep its
+    // pointerup position so the saved miniature matches the stroke on canvas.
+    if (event.type === "pointerup" && fillActiveStrokeRef.current?.length) {
+      const last = fillActiveStrokeRef.current[fillActiveStrokeRef.current.length - 1];
+      const point = fillPoint(event);
+      if (Math.hypot(point.x - last.x, point.y - last.y) > .05) {
+        fillActiveStrokeRef.current.push(point);
+        const context = event.currentTarget.getContext("2d");
+        const rect = event.currentTarget.getBoundingClientRect();
+        if (context) {
+          context.lineTo(point.x * rect.width / 100, point.y * rect.height / 100);
+          context.stroke();
+        }
+      }
+    }
     if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
     if (fillActiveStrokeRef.current?.length) fillDraftRef.current.push(fillActiveStrokeRef.current);
     fillActiveStrokeRef.current = null;
@@ -1283,13 +1303,18 @@ export default function Page() {
     const lineIndex = fillLineForCell(index);
     const wasFilled = Boolean(fillStrokes[index]?.length);
     const next = { ...fillStrokes, [index]: fillDraftRef.current.map((stroke) => stroke.map((point) => ({ ...point }))) };
+    const pending = { ...fillPendingCells };
+    delete pending[index];
+    const remainingRetry = fillNeedsRetry.filter((item) => item !== index);
+    try {
+      writeFillDraft({ version: 1, lessonIndex: selectedLesson, savedAt: Date.now(), strokes: next, pendingCells: pending, needsRetry: remainingRetry, reviewOpen: false });
+    } catch { setStorageError(true); }
     fillDraftRef.current = [];
     setFillStrokes(next);
-    setFillPendingCells((current) => { const pending = { ...current }; delete pending[index]; return pending; });
+    setFillPendingCells(pending);
     setActiveFillCell(null);
     setFillParentChecked(false);
     setCompletedFillLessons((current) => current.filter((item) => item !== selectedLesson));
-    const remainingRetry = fillNeedsRetry.filter((item) => item !== index);
     setFillNeedsRetry(remainingRetry);
     if (fillNeedsRetry.includes(index)) {
       const item = lessonItems[index];

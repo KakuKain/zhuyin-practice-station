@@ -457,7 +457,7 @@ body { background: #e7f2f9; }
 .fill-check-actions .fill-begin-button:first-child:not(:last-child) { background: #e87943; }
 .fill-cell-plus { color: #a4ceb1; font-size: 25px; font-weight: 300; }
 .ink-preview { display: block; width: 100%; height: 100%; min-height: 60px; overflow: visible; }
-.ink-preview polyline { fill: none; stroke: #17324f; stroke-width: 3.4; stroke-linecap: round; stroke-linejoin: round; }
+.ink-preview polyline { fill: none; stroke: #17324f; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
 .ink-preview circle { fill: #17324f; }
 .fill-line-review-link { min-height: 35px; margin-top: 4px; border: 1px solid #bedacb; border-radius: 7px; background: #eaf8f0; color: #237348; font-size: 11px; font-weight: 800; }
 .fill-begin-button { display: flex; width: 100%; min-height: 48px; align-items: center; justify-content: center; gap: 10px; margin-top: 13px; border: 0; border-radius: 10px; background: var(--ref-blue); color: white; font-size: 15px; font-weight: 800; }
@@ -752,6 +752,8 @@ body { background: #e7f2f9; }
 .lesson-curriculum { padding-inline: var(--lesson-inset); }
 .lesson-curriculum-heading { margin-block: 24px 12px; font-size: clamp(20px, 3vw, 32px); font-weight: 900; }
 .lesson-text-lines {
+  position: relative;
+  isolation: isolate;
   min-height: calc(var(--preview-max-chars) * 1.24em + 125px);
   column-gap: 10px;
   margin-inline: calc(-1 * var(--lesson-inset));
@@ -760,7 +762,8 @@ body { background: #e7f2f9; }
   color: #123c30;
   font-size: clamp(23px, 5.5vw, 45px);
 }
-.lesson-text-line { position: relative; padding-inline: 0; font-weight: 500; letter-spacing: 2px; }
+.lesson-text-lines::after { position: absolute; z-index: 0; right: 0; bottom: 0; left: 0; height: clamp(78px, 12vw, 112px); background: linear-gradient(to bottom, rgba(255, 254, 251, 0), #fffefb 93%); content: ""; pointer-events: none; }
+.lesson-text-line { position: relative; z-index: 1; padding-inline: 0; font-weight: 500; letter-spacing: 2px; }
 .lesson-text-line + .lesson-text-line { border-right: 0; }
 .lesson-page-controls { position: relative; z-index: 2; width: min(100%, 470px); margin: -42px auto 24px; }
 .lesson-page-action { display: grid; justify-items: center; gap: 4px; color: #647996; }
@@ -771,8 +774,8 @@ body { background: #e7f2f9; }
 .lesson-page-dots { display: flex; flex-direction: row-reverse; gap: 7px; }
 .lesson-page-dots i { width: 11px; height: 11px; border-radius: 50%; background: #c5d1dd; }
 .lesson-page-dots i.is-current { background: #1680f4; }
-.lesson-symbols { display: flex; flex-wrap: wrap; align-content: flex-start; justify-content: flex-start; gap: 9px; margin-inline: calc(-1 * var(--lesson-inset)); padding: 14px var(--lesson-inset) 30px; background: radial-gradient(circle at 8% 80%, rgba(166, 219, 166, .10), transparent 25%), radial-gradient(circle at 91% 20%, rgba(165, 211, 239, .12), transparent 29%), linear-gradient(180deg, #fffefb 0%, #fffdf6 38%, #fffdfa 68%, #fff 100%); }
-.lesson-symbols button { position: relative; display: grid; flex: 0 0 56px; place-items: center; width: 56px; max-width: 56px; aspect-ratio: 1; height: 56px; min-height: 56px; padding: 6px; border-radius: 16px; background: transparent; color: var(--ref-navy); font-size: 24px; }
+.lesson-symbols { position: relative; display: flex; flex-wrap: wrap; align-content: flex-start; justify-content: flex-start; gap: 9px; margin-inline: calc(-1 * var(--lesson-inset)); padding: 14px var(--lesson-inset) 30px; background: transparent; }
+.lesson-symbols button { position: relative; z-index: 1; display: grid; flex: 0 0 56px; place-items: center; width: 56px; max-width: 56px; aspect-ratio: 1; height: 56px; min-height: 56px; padding: 6px; border-radius: 16px; background: transparent; color: var(--ref-navy); font-size: 24px; }
 .lesson-symbols button::before { position: absolute; inset: 4px; border-radius: 13px; background: #e9f6ff; content: ""; pointer-events: none; }
 .lesson-symbols button > span { position: relative; z-index: 1; }
 .lesson-symbols button > span { font-family: "PingFang TC", "Noto Sans TC", sans-serif; }
@@ -783,7 +786,7 @@ body { background: #e7f2f9; }
 .lesson-symbols button.is-playing { background: transparent; box-shadow: none; }
 .lesson-symbols button.is-playing::before { background: #d9edff; box-shadow: inset 0 0 0 2px #83c5ff; }
 .lesson-meadow-footer { position: relative; flex: none; width: 100%; height: clamp(150px, 20vw, 190px); margin-top: auto; background: url("/course-art/lesson-watercolor-footer.png") center bottom / 100% 250px no-repeat; pointer-events: none; }
-.lesson-meadow-footer::before { position: absolute; inset: 0 0 auto; height: 64px; background: linear-gradient(to bottom, #fff 0%, rgba(255, 255, 255, .82) 38%, rgba(255, 255, 255, 0) 100%); content: ""; }
+.lesson-meadow-footer::before { position: absolute; inset: 0 0 auto; height: 90px; background: linear-gradient(to bottom, #fffefb 0%, rgba(255, 254, 251, .84) 32%, rgba(255, 254, 251, 0) 100%); content: ""; }
 @media (min-width: 700px) {
   .lesson-page .lesson-heading > div { bottom: 45px; }
   .lesson-page .mode-card { grid-template-columns: 66px minmax(0, 1fr); min-height: 150px; gap: 8px 15px; padding: 17px 20px; }

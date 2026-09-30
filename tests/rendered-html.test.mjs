@@ -105,8 +105,11 @@ test("the source keeps the handoff interaction vocabulary", async () => {
   assert.doesNotMatch(page, /selectedLesson === 7 && char === "喲"/);
   assert.doesNotMatch(page, /兩種方式，自己選一個開始|看直式注音格，把缺少的音節拖回去|聽聲音、自由手寫，最後交給家長判定/);
   assert.match(page, /lesson-symbols" dir="rtl"/);
-  assert.match(css, /\.lesson-symbols \{[^}]*linear-gradient\(180deg, #fffefb 0%, #fffdf6 38%, #fffdfa 68%, #fff 100%\)/);
-  assert.match(css, /\.lesson-meadow-footer::before \{[^}]*linear-gradient\(to bottom, #fff 0%/);
+  assert.match(css, /\.lesson-text-lines::after \{[^}]*linear-gradient\(to bottom, rgba\(255, 254, 251, 0\), #fffefb 93%\)/);
+  assert.match(css, /\.lesson-symbols \{[^}]*background: transparent;/);
+  assert.match(css, /\.lesson-meadow-footer::before \{[^}]*linear-gradient\(to bottom, #fffefb 0%/);
+  assert.match(page, /event\.type === "pointerup" && fillActiveStrokeRef\.current\?\.length/);
+  assert.match(page, /writeFillDraft\(\{ version: 1, lessonIndex: selectedLesson, savedAt: Date\.now\(\), strokes: next, pendingCells: pending, needsRetry: remainingRetry, reviewOpen: false \}\)/);
   assert.match(css, /BpmfZihiSans-Regular\.ttf/);
   assert.match(css, /BpmfZihiOnly-R\.ttf/);
   assert.match(css, /font-family: "KidLessonYoSans", "BpmfZihiSans"/);
