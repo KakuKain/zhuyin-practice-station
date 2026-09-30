@@ -156,7 +156,9 @@ test("fill mistakes stay in a separate collection until a parent removes them", 
   assert.match(page, /zhuyin-fill-favorites-v1/);
   assert.match(page, /function validatedFillFavorites/);
   assert.match(page, /fillFavoriteKey\(item: Pick<FillFavorite, "lessonIndex" \| "character" \| "zhuyin">\)/);
-  assert.match(page, /onClick=\{\(\) => markFillRetry\(index\)\}/);
+  assert.match(page, /aria-pressed=\{saved\} onClick=\{\(\) => toggleFillFavorite\(index\)\}/);
+  assert.match(page, /onClick=\{\(\) => rewriteFillCell\(index\)\}/);
+  assert.doesNotMatch(page, /重寫 \$\{fillNeedsRetry\.length\} 格/);
   assert.match(page, /status: "review_later"/);
   assert.match(page, /課文默寫 · 錯字收藏/);
   assert.match(page, /正確答案會在下一頁顯示/);

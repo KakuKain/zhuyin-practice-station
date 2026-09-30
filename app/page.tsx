@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, BookOpenText, Gear, Headphones, Info, MusicNotes, PencilLine, Play, Question, SpeakerHigh, Timer } from "@phosphor-icons/react";
+import { ArrowLeft, ArrowRight, BookOpenText, Gear, Headphones, Info, MusicNotes, PencilLine, Play, Question, SpeakerHigh, Star, Timer } from "@phosphor-icons/react";
 import { circledVocabulary } from "./circled-vocabulary";
 
 type View = "courses" | "practice" | "more" | "lesson" | "fill" | "fill-practice" | "listen" | "result";
@@ -583,7 +583,6 @@ export default function Page() {
   const fillActiveStrokeRef = useRef<InkStroke | null>(null);
   const fillPointerIdRef = useRef<number | null>(null);
   const persistFillRef = useRef<() => void>(() => {});
-  const fillReviewBaselineRef = useRef<Map<string, FillFavorite | null>>(new Map());
   const timerRef = useRef<number | null>(null);
   const timeoutRefs = useRef<number[]>([]);
   const repeatTimeoutRef = useRef<number | null>(null);
@@ -940,27 +939,24 @@ export default function Page() {
   };
 
   const openFillReview = () => {
-    fillReviewBaselineRef.current.clear();
     setFillReviewOpen(true);
   };
 
-  const markFillRetry = (index: number) => {
+  const toggleFillFavorite = (index: number) => {
     const item = lessonItems[index];
     const key = fillFavoriteKey({ lessonIndex: selectedLesson, ...item });
-    const nextRetry = fillNeedsRetry.includes(index) ? fillNeedsRetry.filter((position) => position !== index) : [...fillNeedsRetry, index];
-    if (!fillReviewBaselineRef.current.has(key)) fillReviewBaselineRef.current.set(key, fillFavorites.find((favorite) => fillFavoriteKey(favorite) === key) ?? null);
-    const baseline = fillReviewBaselineRef.current.get(key);
-    const markedPositions = nextRetry.filter((position) => lessonItems[position].character === item.character && lessonItems[position].zhuyin === item.zhuyin);
-    setFillNeedsRetry(nextRetry);
     setFillFavorites((current) => {
-      const others = current.filter((favorite) => fillFavoriteKey(favorite) !== key);
-      if (!baseline && !markedPositions.length) return others;
-      return [...others, {
-        lessonIndex: selectedLesson, character: item.character, zhuyin: item.zhuyin,
-        positions: [...new Set([...(baseline?.positions ?? []), ...markedPositions])].sort((a, b) => a - b),
-        status: markedPositions.length ? "needs_rewrite" : baseline!.status,
-      }];
+      const existing = current.find((favorite) => fillFavoriteKey(favorite) === key);
+      if (!existing) return [...current, { lessonIndex: selectedLesson, character: item.character, zhuyin: item.zhuyin, positions: [index], status: "review_later" }];
+      const positions = existing.positions.includes(index) ? existing.positions.filter((position) => position !== index) : [...existing.positions, index].sort((a, b) => a - b);
+      if (!positions.length) return current.filter((favorite) => fillFavoriteKey(favorite) !== key);
+      return current.map((favorite) => fillFavoriteKey(favorite) === key ? { ...favorite, positions } : favorite);
     });
+  };
+
+  const rewriteFillCell = (index: number) => {
+    setFillNeedsRetry((current) => current.includes(index) ? current : [...current, index]);
+    openFillCell(index);
   };
 
   const openFillFavorite = (favorite: FillFavorite) => {
@@ -1548,15 +1544,35 @@ export default function Page() {
   const renderFillReview = () => {
     if (!fillReviewOpen) return null;
     const confirmFillReview = () => {
+      if (fillNeedsRetry.length) return;
       setFillReviewOpen(false);
-      if (fillNeedsRetry.length) {
-        openFillCell(fillNeedsRetry[0]);
-      } else {
-        setFillParentChecked(true);
-        setCompletedFillLessons((current) => current.includes(selectedLesson) ? current : [...current, selectedLesson]);
-      }
+      setFillParentChecked(true);
+      setCompletedFillLessons((current) => current.includes(selectedLesson) ? current : [...current, selectedLesson]);
     };
-    return <main className="fill-focus-shell fill-review-shell"><header className="fill-focus-header"><button type="button" onClick={() => setFillReviewOpen(false)}><ArrowLeft size={19} aria-hidden="true" /> 回到課文</button><strong>家長檢查</strong><span>{fillNeedsRetry.length} 格待重寫</span></header><div className="fill-review-body"><h1>一起對照整篇課文</h1><p>請家長逐格看筆跡和正確注音；標記「需要重寫」會加入錯字收藏，重寫後仍會留在練習頁，直到家長確認掌握。</p><div className="fill-compare-list">{lessonLines.map((line, lineIndex) => <section className="fill-review-line" key={lineIndex}><h2>第 {lineIndex + 1} 行</h2>{line.map((item, offset) => { const index = fillLineStarts[lineIndex] + offset; const needsRetry = fillNeedsRetry.includes(index); return <div className={`fill-compare-row ${needsRetry ? "is-needs-retry" : ""}`} key={index}><span>{offset + 1}</span><div className="fill-compare-ink"><InkPreview strokes={fillStrokes[index] ?? []} /></div><div className="fill-compare-answer"><ZhuyinStack text={item.zhuyin} /></div><button type="button" className="fill-mark-retry" aria-pressed={needsRetry} onClick={() => markFillRetry(index)}>{needsRetry ? "已標記 · 取消" : "需要重寫"}</button></div>; })}</section>)}</div><div className="fill-review-actions"><button type="button" onClick={() => setFillReviewOpen(false)}>稍後檢查</button><button type="button" onClick={confirmFillReview}>{fillNeedsRetry.length ? `重寫 ${fillNeedsRetry.length} 格` : "確認檢查完成"} <ArrowRight size={19} aria-hidden="true" /></button></div></div></main>;
+    const savedCount = fillFavorites.filter((favorite) => favorite.lessonIndex === selectedLesson).reduce((count, favorite) => count + favorite.positions.length, 0);
+    return <main className="fill-focus-shell fill-review-shell">
+      <header className="fill-focus-header"><button type="button" onClick={() => setFillReviewOpen(false)}><ArrowLeft size={19} aria-hidden="true" /> 回到課文</button><strong>家長檢查</strong><img className="fill-review-corner" src="/course-art/review-corner-leaves-watercolor-v2.png" alt="" /></header>
+      <div className="fill-review-body">
+        <div className="fill-review-intro"><div><h1>第{lessonNumber}課 · {lesson.title}</h1><small>已寫 {lessonItems.length} / {lessonItems.length} 格 · 已收藏 {savedCount} 格{fillNeedsRetry.length ? ` · ${fillNeedsRetry.length} 格待重寫` : ""}</small></div><img src={selectedLesson === 0 ? "/course-art/review-sleeping-cat-watercolor-v2.png" : selectedLesson === 7 ? "/course-art/radish-story.png" : `/course-art/${courseArtwork[selectedLesson]}-watercolor.png`} alt="" /></div>
+        <div className="fill-compare-list">{lessonLines.map((line, lineIndex) => <section className="fill-review-line" key={lineIndex} aria-label={`第 ${lineIndex + 1} 行`}>
+          <h2>第 {lineIndex + 1} 行</h2>
+          {line.map((item, offset) => {
+            const index = fillLineStarts[lineIndex] + offset;
+            const key = fillFavoriteKey({ lessonIndex: selectedLesson, ...item });
+            const saved = fillFavorites.some((favorite) => fillFavoriteKey(favorite) === key && favorite.positions.includes(index));
+            const needsRetry = fillNeedsRetry.includes(index);
+            return <div className={`fill-compare-row ${saved ? "is-saved" : ""} ${needsRetry ? "is-needs-retry" : ""}`} key={index}>
+              <span className="fill-compare-number">{offset + 1}</span>
+              <div className="fill-compare-sample"><div className="fill-compare-ink"><InkPreview strokes={fillStrokes[index] ?? []} /></div><small>孩子筆跡</small></div>
+              <div className="fill-compare-sample"><div className="fill-compare-answer"><ZhuyinStack text={item.zhuyin} /></div><small>正確注音</small></div>
+              <button type="button" className="fill-favorite-toggle" aria-label={`${saved ? "取消收藏" : "收藏"}第 ${lineIndex + 1} 行第 ${offset + 1} 格`} aria-pressed={saved} onClick={() => toggleFillFavorite(index)}><Star size={25} weight={saved ? "fill" : "regular"} aria-hidden="true" /></button>
+              <button type="button" className="fill-rewrite-cell" onClick={() => rewriteFillCell(index)} aria-label={`重寫第 ${lineIndex + 1} 行第 ${offset + 1} 格`}><PencilLine size={18} aria-hidden="true" /><span>重寫這格</span></button>
+            </div>;
+          })}
+        </section>)}</div>
+        <div className="fill-review-footer">{fillNeedsRetry.length > 0 && <p role="status">請先點上方對應的「重寫這格」，完成後再確認檢查。</p>}<div className="fill-review-actions"><button type="button" onClick={() => setFillReviewOpen(false)}>稍後檢查</button><button type="button" disabled={fillNeedsRetry.length > 0} onClick={confirmFillReview}>完成檢查 <ArrowRight size={19} aria-hidden="true" /></button></div></div>
+      </div>
+    </main>;
   };
 
   const renderFillPractice = () => {

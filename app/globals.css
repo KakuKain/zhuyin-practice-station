@@ -479,19 +479,49 @@ body { background: #e7f2f9; }
 .fill-clear-button, .fill-review-actions button:first-child { flex: 0 0 35%; border: 1px solid #bfd8e9; background: white; color: var(--ref-navy); }
 .fill-save-button, .fill-review-actions button:last-child { flex: 1; border: 0; background: var(--ref-blue); color: white; }
 .fill-save-button:disabled { opacity: .48; cursor: not-allowed; }
-.fill-review-body { width: 100%; max-width: 480px; margin: auto; padding: 24px 16px; }
-.fill-compare-list { display: grid; max-height: 63dvh; gap: 15px; overflow-y: auto; padding-right: 3px; }
-.fill-review-line { display: grid; gap: 7px; }
-.fill-review-line h2 { margin: 0; color: var(--ref-navy); font-size: 15px; }
-.fill-compare-row { display: grid; grid-template-columns: 18px minmax(0, 1fr) minmax(0, 1fr) 94px; align-items: center; gap: 6px; min-height: 76px; }
-.fill-compare-row.is-needs-retry { border-radius: 9px; background: #fff1e8; }
-.fill-compare-row > span { color: #8196a6; font-size: 12px; }
-.fill-compare-ink, .fill-compare-answer { display: grid; place-items: center; height: 76px; padding: 4px; border: 1px solid #bddcc8; border-radius: 8px; background: #fff; }
-.fill-compare-answer { background: #f2fbf5; }
+.fill-review-shell { position: relative; height: 100dvh; overflow: hidden; background: #fffdf7; }
+.fill-review-shell::before { position: absolute; right: 0; bottom: 60px; left: 0; height: 120px; content: ""; pointer-events: none; opacity: .65; background: url('/course-art/review-bottom-garden-watercolor-v2.png') center bottom / 100% auto no-repeat; }
+.fill-review-shell > * { position: relative; z-index: 1; }
+.fill-review-shell .fill-focus-header { position: relative; display: flex; min-height: 54px; padding: max(7px, env(safe-area-inset-top)) 16px 7px; background: rgba(255, 253, 248, .94); }
+.fill-review-shell .fill-focus-header > strong { position: absolute; left: 50%; z-index: 1; font-size: 17px; transform: translateX(-50%); }
+.fill-review-shell .fill-focus-header > button { position: relative; z-index: 2; font-size: 13px; }
+.fill-review-corner { position: absolute; top: -4px; right: -4px; width: 120px; height: 60px; object-fit: contain; object-position: right top; pointer-events: none; }
+.fill-review-body { display: flex; width: 100%; max-width: 480px; min-height: 0; flex: 1; flex-direction: column; margin: 0 auto; padding: 13px 14px 0; }
+.fill-review-intro { display: flex; flex: none; align-items: flex-start; justify-content: space-between; gap: 6px; min-height: 91px; padding: 0; }
+.fill-review-intro > div { position: relative; z-index: 1; min-width: 0; padding-left: 16px; }
+.fill-review-intro h1 { margin: 5px 0 8px; font-size: clamp(21px, 5.9vw, 26px); font-weight: 900; line-height: 1.22; letter-spacing: .05em; }
+.fill-review-intro small { display: block; color: #69819a; font-size: 12px; font-weight: 750; }
+.fill-review-intro img { flex: none; width: clamp(135px, 39vw, 180px); max-height: 90px; margin-top: -6px; object-fit: contain; object-position: right top; }
+.fill-compare-list { display: grid; min-height: 0; flex: 1; align-content: start; gap: 5px; max-height: none; overflow-y: auto; padding: 0 2px 12px; scrollbar-width: thin; }
+.fill-review-line { display: grid; gap: 0; }
+.fill-review-line h2 { position: relative; isolation: isolate; display: flex; align-items: center; width: 140px; min-height: 32px; margin: 0 0 3px; padding: 0 0 0 42px; color: var(--ref-navy); font-size: 16px; font-weight: 850; letter-spacing: .06em; }
+.fill-review-line h2::before, .fill-review-line h2::after { position: absolute; z-index: -1; content: ""; pointer-events: none; background-repeat: no-repeat; background-size: contain; }
+.fill-review-line h2::before { top: 1px; left: 18px; width: 122px; height: 30px; background-image: url('/course-art/review-line-pink-wash-v3.png'); background-position: center; }
+.fill-review-line h2::after { bottom: -2px; left: 10px; width: 28px; height: 34px; background-image: url('/course-art/review-line-grass-v3.png'); background-position: left bottom; }
+.fill-compare-row { --review-square: clamp(56px, 19.2vw, 78px); display: grid; grid-template-columns: 37px var(--review-square) var(--review-square) 52px minmax(70px, 1fr); align-items: center; gap: 6px; min-height: calc(var(--review-square) + 20px); padding: 1px 1px 17px; border-bottom: 1px solid #e0e9e6; }
+.fill-compare-row.is-saved { background: transparent; }
+.fill-compare-row.is-needs-retry { border-left: 3px solid #e5a33d; }
+.fill-compare-number { color: #6e84a0; font-size: 15px; font-weight: 700; text-align: center; }
+.fill-compare-sample { position: relative; width: var(--review-square); height: var(--review-square); min-width: 0; }
+.fill-compare-sample small { position: absolute; top: calc(100% + 3px); left: 0; width: 100%; color: #7187a1; font-size: 9px; line-height: 1.1; text-align: center; white-space: nowrap; }
+.fill-compare-ink, .fill-compare-answer { display: grid; place-items: center; width: var(--review-square, 76px); height: var(--review-square, 76px); min-width: 0; aspect-ratio: 1; padding: 4px; overflow: hidden; border: 1px solid #bdd9d0; border-radius: 6px; background: #fffefa; }
+.fill-compare-answer { background: #eff9f2; }
 .fill-compare-ink .ink-preview { width: 66px; height: 66px; }
+.fill-review-shell .fill-compare-ink .ink-preview { width: 100%; height: 100%; min-height: 0; }
+.fill-practice-compare .fill-compare-ink, .fill-practice-compare .fill-compare-answer { width: 100%; aspect-ratio: auto; }
 .fill-compare-answer .zhuyin-stack { font-size: 22px; }
-.fill-mark-retry { min-height: 42px; padding: 4px 6px; border: 1px solid #edb189; border-radius: 8px; background: #fff9f3; color: #a9562d; font-size: 12px; font-weight: 800; }
-.fill-mark-retry[aria-pressed="true"] { border-color: #dc7948; background: #df7845; color: white; }
+.fill-review-shell .fill-compare-answer .zhuyin-stack { font-size: clamp(13px, 4.2vw, 18px); }
+.fill-favorite-toggle { display: grid; place-items: center; width: 52px; height: 44px; padding: 0; border: 0; border-right: 1px solid #d6e0de; border-radius: 0; background: transparent; color: #657e9f; cursor: pointer; }
+.fill-favorite-toggle[aria-pressed="true"] { color: #e8a936; }
+.fill-favorite-toggle:hover { color: #e8a936; }
+.fill-rewrite-cell { display: inline-flex; align-items: center; justify-content: center; gap: 4px; min-height: 44px; padding: 4px; border: 1px solid #bdd7f0; border-radius: 8px; background: #f3f8ff; color: #275d9b; font-size: 12px; font-weight: 800; white-space: nowrap; cursor: pointer; }
+.fill-rewrite-cell svg { flex: none; }
+.fill-review-footer { flex: none; padding: 5px 0 max(5px, env(safe-area-inset-bottom)); border-top: 1px solid #e1eae7; background: rgba(255, 253, 248, .96); }
+.fill-review-footer > p { margin: 0 0 7px; color: #a05c2f; font-size: 11px; }
+.fill-review-actions { margin-top: 0; }
+.fill-review-footer .fill-review-actions button:first-child { flex-basis: 45%; border-color: #2a83f2; color: #174d95; }
+.fill-review-actions button:disabled { opacity: .5; cursor: not-allowed; }
+@media (max-width: 350px) { .fill-review-intro > div { padding-left: 3px; } .fill-review-intro img { width: 113px; } .fill-review-intro h1 { font-size: 19px; } .fill-review-intro small { font-size: 10px; } .fill-compare-row { gap: 3px; grid-template-columns: 27px var(--review-square) var(--review-square) 44px minmax(65px, 1fr); } .fill-favorite-toggle { width: 44px; } .fill-rewrite-cell { font-size: 10px; } }
 .fill-page .fill-cell:focus-visible, .fill-line-review-link:focus-visible, .fill-focus-shell button:focus-visible { outline: 3px solid #f0a341; outline-offset: 2px; }
 .practice-list-heading { margin-top: 26px !important; }
 .fill-favorite-list .saved-question-icon { background: #e9f5ff; color: var(--ref-blue); }
@@ -1166,6 +1196,7 @@ body { background: #e7f2f9; }
 .focus-shell {
   background: #f8fcfa url('/course-art/lesson-watercolor-paper.png') center bottom / 100% auto no-repeat;
 }
+.fill-review-shell { background: #fffdf7; }
 .fill-focus-header,
 .focus-topbar {
   position: relative;
@@ -1205,6 +1236,7 @@ body { background: #e7f2f9; }
 .fill-clear-button { border-color: #c0dce8; background: #fffdfa; }
 .fill-save-button { background: #2274e8; box-shadow: 0 4px 0 #d9eaf9; }
 .fill-review-body { border-radius: 24px; background: rgba(255, 253, 248, .68); }
+.fill-review-shell .fill-review-body { border-radius: 0; background: transparent; }
 
 .focus-content { background: transparent; }
 .phase-ready .focus-content { justify-content: center; }
