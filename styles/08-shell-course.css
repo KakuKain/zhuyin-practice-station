@@ -1,36 +1,36 @@
 /* Main navigation pages share the lesson reader's airy watercolor world. */
 
-.app-shell:is(.is-courses, .is-practice, .is-more) {
+.app-shell:is(.is-courses, .is-symbols, .is-practice, .is-more) {
   background:
     url("/course-art/lesson-watercolor-footer.webp") center bottom / 100% 165px no-repeat,
     radial-gradient(circle at 92% 24%, rgba(214, 238, 246, 0.35), transparent 34%),
     linear-gradient(180deg, #fffefa, #fffdf6 68%, #fff);
 }
 
-.app-shell:is(.is-courses, .is-practice, .is-more) .main-content {
+.app-shell:is(.is-courses, .is-symbols, .is-practice, .is-more) .main-content {
   padding-bottom: 145px;
 }
 
-.app-shell:is(.is-courses, .is-practice, .is-more) .app-header {
+.app-shell:is(.is-courses, .is-symbols, .is-practice, .is-more) .app-header {
   border-bottom-color: #e7eee9;
   background: rgba(255, 254, 250, 0.95);
 }
 
-.app-shell:is(.is-courses, .is-practice, .is-more) .bottom-nav {
+.app-shell:is(.is-courses, .is-symbols, .is-practice, .is-more) .bottom-nav {
   border-color: #dceae5;
   background: rgba(255, 255, 255, 0.95);
   box-shadow: 0 -8px 27px rgba(55, 103, 79, 0.09);
 }
 
-.app-shell:is(.is-courses, .is-practice, .is-more) .bottom-nav button {
+.app-shell:is(.is-courses, .is-symbols, .is-practice, .is-more) .bottom-nav button {
   font-size: 12px;
 }
 
-.app-shell:is(.is-courses, .is-practice, .is-more) .nav-icon {
+.app-shell:is(.is-courses, .is-symbols, .is-practice, .is-more) .nav-icon {
   height: 24px;
 }
 
-.app-shell:is(.is-courses, .is-practice, .is-more) button:focus-visible {
+.app-shell:is(.is-courses, .is-symbols, .is-practice, .is-more) button:focus-visible {
   outline-color: #e39a4d;
 }
 
@@ -269,14 +269,14 @@
 }
 
 @media (min-width: 700px) {
-  .app-shell:is(.is-courses, .is-practice, .is-more) {
+  .app-shell:is(.is-courses, .is-symbols, .is-practice, .is-more) {
     max-width: 760px;
   }
-  .app-shell:is(.is-courses, .is-practice, .is-more) .main-content {
+  .app-shell:is(.is-courses, .is-symbols, .is-practice, .is-more) .main-content {
     width: min(100%, 660px);
     margin-inline: auto;
   }
-  .app-shell:is(.is-courses, .is-practice, .is-more) .bottom-nav {
+  .app-shell:is(.is-courses, .is-symbols, .is-practice, .is-more) .bottom-nav {
     width: min(100%, 760px);
     max-width: 760px;
   }
@@ -296,11 +296,11 @@
     #fcfeff;
 }
 
-.app-shell:is(.is-courses, .is-practice, .is-more) {
+.app-shell:is(.is-courses, .is-symbols, .is-practice, .is-more) {
   overflow: clip;
 }
 
-.app-shell:is(.is-courses, .is-practice, .is-more) .app-header {
+.app-shell:is(.is-courses, .is-symbols, .is-practice, .is-more) .app-header {
   position: sticky;
   top: 0;
   z-index: 35;
@@ -313,26 +313,26 @@
   -webkit-backdrop-filter: blur(14px);
 }
 
-.app-shell:is(.is-courses, .is-practice, .is-more) .logo-mark {
+.app-shell:is(.is-courses, .is-symbols, .is-practice, .is-more) .logo-mark {
   width: 29px;
   height: 29px;
   border-radius: 9px 9px 9px 3px;
 }
 
-.app-shell:is(.is-courses, .is-practice, .is-more) .logo-mark span {
+.app-shell:is(.is-courses, .is-symbols, .is-practice, .is-more) .logo-mark span {
   font-size: 16px;
 }
 
-.app-shell:is(.is-courses, .is-practice, .is-more) .brand-button {
+.app-shell:is(.is-courses, .is-symbols, .is-practice, .is-more) .brand-button {
   gap: 8px;
 }
 
-.app-shell:is(.is-courses, .is-practice, .is-more) .brand-button strong {
+.app-shell:is(.is-courses, .is-symbols, .is-practice, .is-more) .brand-button strong {
   font-size: 13px;
   letter-spacing: 0.025em;
 }
 
-.app-shell:is(.is-courses, .is-practice, .is-more) .brand-button small {
+.app-shell:is(.is-courses, .is-symbols, .is-practice, .is-more) .brand-button small {
   display: none;
 }
 
@@ -414,10 +414,11 @@
   height: 54px;
 }
 
-.is-courses .journey-card,
-.is-courses .journey-step-1 .journey-card,
-.is-courses .journey-step-2 .journey-card {
+.is-courses .journey-card {
   isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 80px 36px;
+  gap: 6px;
   min-height: 85px;
   padding: 10px 10px 10px 22px;
   border: 0;
@@ -448,14 +449,22 @@
   pointer-events: none;
 }
 
+.is-courses .journey-card-copy {
+  min-width: 0;
+  max-width: none;
+}
+
 .is-courses .journey-card-copy small {
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .is-courses .journey-card-copy strong {
   margin-top: 6px;
   font-size: clamp(19px, 5.7vw, 24px);
   letter-spacing: 0.02em;
+  white-space: normal;
+  text-wrap: balance;
+  line-height: 1.25;
 }
 
 .is-courses .journey-card-copy em {
@@ -465,16 +474,14 @@
 }
 
 .is-courses .journey-art {
+  position: static;
   z-index: 1;
-  right: 46px;
-  bottom: -2px;
-  width: 116px;
-  height: 94px;
+  width: 80px;
+  height: 82px;
 }
 
 .is-courses .journey-step:nth-child(2) .journey-art {
-  right: 39px;
-  width: 134px;
+  width: 80px;
 }
 
 .is-courses .journey-arrow {
@@ -513,15 +520,20 @@
     gap: 10px;
   }
   .is-courses .journey-card {
+    grid-template-columns: minmax(0, 1fr) 64px 30px;
+    gap: 4px;
     padding-left: 14px;
   }
   .is-courses .journey-art {
-    right: 36px;
-    width: 89px;
+    width: 64px;
+    height: 78px;
   }
   .is-courses .journey-step:nth-child(2) .journey-art {
-    right: 32px;
-    width: 105px;
+    width: 64px;
+  }
+  .is-courses .journey-arrow {
+    width: 30px;
+    height: 30px;
   }
 }
 

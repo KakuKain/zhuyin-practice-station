@@ -50,9 +50,10 @@ export function useAudioPlayer({
   }, []);
 
   useEffect(() => {
-    if (view !== "lesson") return;
+    if (view !== "lesson" && view !== "symbols") return;
     void document.fonts.load('400 48px "KidLessonYoOnly"').catch(() => {});
-    audioPreloaderRef.current?.warm(lessonSymbols.map(listeningAudioUrl));
+    // The full chart loads clips on demand, avoiding 37 downloads on slower phones.
+    if (view === "lesson") audioPreloaderRef.current?.warm(lessonSymbols.map(listeningAudioUrl));
   }, [view, lessonSymbols]);
 
   useEffect(() => {
@@ -74,7 +75,9 @@ export function useAudioPlayer({
       audio.currentTime = 0;
     }
     if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+    setPlayingSymbol(null);
     setAudioLoading(false);
+    setAudioError(false);
   }, [onStopRepeat]);
 
   const finishPlayback = useCallback(() => {
@@ -100,8 +103,9 @@ export function useAudioPlayer({
       stopPlayback();
       const playbackToken = playbackTokenRef.current;
       setAudioError(false);
-      setAudioLoading(view === "listen");
+      setAudioLoading(true);
       const isZhuyinPrompt = /^[\u3105-\u3129]+$/.test(text);
+      setPlayingSymbol(isZhuyinPrompt ? text : null);
       // Keep one natural reading per clip; the listening timer controls repeats.
       // Symbols stay at normal speed; only generated character/word clips are slower.
       audio.playbackRate = isZhuyinPrompt ? zhuyinPlaybackRate : audioPlaybackRate;
@@ -117,6 +121,7 @@ export function useAudioPlayer({
         .catch(() => {
           if (playbackToken !== playbackTokenRef.current) return;
           if (isZhuyinPrompt) {
+            setPlayingSymbol(null);
             setAudioLoading(false);
             setAudioError(true);
             if (view === "practice") setPracticeNotice("注音讀音無法播放，請重新整理後再試。");
@@ -144,11 +149,10 @@ export function useAudioPlayer({
   );
 
   const playPreviewSymbol = (symbol: string) => {
-    onStopRepeat();
-    setPlayingSymbol(symbol);
     speak(symbol);
   };
-  useEffect(() => () => stopPlayback(), [stopPlayback]);
+  // Navigation cancels both the audio and stale play promises / repeat callbacks.
+  useEffect(() => () => stopPlayback(), [view, stopPlayback]);
   return {
     playingSymbol,
     setPlayingSymbol,

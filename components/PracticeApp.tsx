@@ -14,6 +14,7 @@ import { PracticeList } from "../features/practice/PracticeList";
 import { SettingsScreen } from "../features/settings/SettingsScreen";
 import { ListeningResult } from "../features/listening/ListeningResult";
 import { ListeningScreen } from "../features/listening/ListeningScreen";
+import { SymbolChart } from "../features/symbols/SymbolChart";
 
 const subscribeToHydration = () => () => {};
 const clientReady = () => true;
@@ -36,6 +37,8 @@ export function PracticeApp() {
     switch (view) {
       case "courses":
         return <CourseList app={app} />;
+      case "symbols":
+        return <SymbolChart app={app} />;
       case "practice":
         return <PracticeList app={app} />;
       case "more":

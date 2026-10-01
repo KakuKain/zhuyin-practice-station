@@ -1,5 +1,13 @@
 export type View =
-  "courses" | "practice" | "more" | "lesson" | "fill" | "fill-practice" | "listen" | "result";
+  | "courses"
+  | "symbols"
+  | "practice"
+  | "more"
+  | "lesson"
+  | "fill"
+  | "fill-practice"
+  | "listen"
+  | "result";
 
 export type ListenPhase =
   "ready" | "active" | "review" | "remediation_offer" | "choice" | "retry_ready" | "retry";

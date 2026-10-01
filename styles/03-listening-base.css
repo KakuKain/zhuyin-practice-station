@@ -211,7 +211,7 @@
   font-size: 15px;
 }
 
-.lesson-curriculum-heading span {
+.lesson-curriculum-heading > span:not(.annotated-text) {
   color: #6b859e;
   font-size: 12px;
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import type { InkStroke, View } from "../features/types";
-import { ArrowLeft, BookOpenText, Gear, PencilLine } from "@phosphor-icons/react";
+import { ArrowLeft, BookOpenText, Gear, PencilLine, SquaresFour } from "@phosphor-icons/react";
 
 export function InkPreview({ strokes }: { strokes: InkStroke[] }) {
   return (
@@ -68,6 +68,7 @@ export function BottomNav({
 }) {
   const items = [
     { id: "courses" as View, Icon: BookOpenText, label: "課程" },
+    { id: "symbols" as View, Icon: SquaresFour, label: "注音" },
     { id: "practice" as View, Icon: PencilLine, label: "練習" },
     { id: "more" as View, Icon: Gear, label: "更多" },
   ];
@@ -79,6 +80,7 @@ export function BottomNav({
           key={item.id}
           type="button"
           className={active === item.id ? "active" : ""}
+          aria-current={active === item.id ? "page" : undefined}
           onClick={() => onNavigate(item.id)}
         >
           <span className="nav-icon" aria-hidden="true">

@@ -3,6 +3,8 @@
 import type { AppController } from "../usePracticeApp";
 import { courseArtwork, lessonNumerals, lessons } from "./course-data";
 import { ArrowRight } from "@phosphor-icons/react";
+import { AnnotatedText } from "../../components/AnnotatedText";
+import { lessonTitleVariants } from "../lesson/annotated-text";
 
 export function CourseList({ app }: { app: Pick<AppController, "openLesson" | "practiceState"> }) {
   const { openLesson, practiceState } = app;
@@ -41,8 +43,12 @@ export function CourseList({ app }: { app: Pick<AppController, "openLesson" | "p
                 aria-label={`第${lessonNumerals[index]}課，${item.title}${isRecent ? "，上次練習" : ""}`}
               >
                 <span className="journey-card-copy">
-                  <small>第{lessonNumerals[index]}課</small>
-                  <strong>{item.title}</strong>
+                  <small>
+                    <AnnotatedText text={`第${lessonNumerals[index]}課`} />
+                  </small>
+                  <strong>
+                    <AnnotatedText text={item.title} variants={lessonTitleVariants[index]} />
+                  </strong>
                   {isRecent && <em>上次練習</em>}
                 </span>
                 <img

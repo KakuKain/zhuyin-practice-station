@@ -1,7 +1,14 @@
 "use client";
 
 import type { AppController } from "../usePracticeApp";
-import { courseArtwork, exercises, previewPronunciationVariants } from "../courses/course-data";
+import {
+  courseArtwork,
+  exercises,
+  lessonNumerals,
+  previewPronunciationVariants,
+} from "../courses/course-data";
+import { AnnotatedText } from "../../components/AnnotatedText";
+import { lessonTitleVariants } from "./annotated-text";
 import { ArrowLeft, ArrowRight, Headphones, PencilLine, SpeakerHigh } from "@phosphor-icons/react";
 
 export function LessonReader({
@@ -47,8 +54,12 @@ export function LessonReader({
     <section className="page-section lesson-page">
       <div className={`lesson-heading${selectedLesson === 7 ? " is-radish" : ""}`}>
         <div>
-          <span className="eyebrow">LESSON {String(selectedLesson + 1).padStart(2, "0")}</span>
-          <h1>{lesson.title}</h1>
+          <span className="eyebrow">
+            <AnnotatedText text={`第${lessonNumerals[selectedLesson]}課`} />
+          </span>
+          <h1>
+            <AnnotatedText text={lesson.title} variants={lessonTitleVariants[selectedLesson]} />
+          </h1>
         </div>
         <img
           className="lesson-heading-art"
@@ -67,11 +78,16 @@ export function LessonReader({
               <PencilLine size={28} weight="duotone" />
             </span>
             <span className="lesson-mode-copy">
-              <small>第一關</small>
-              <strong>課文默寫</strong>
+              <small>
+                <AnnotatedText text="第一關" />
+              </small>
+              <strong>
+                <AnnotatedText text="課文默寫" />
+              </strong>
             </span>
             <span className="lesson-mode-cta">
-              開始 <ArrowRight size={19} weight="bold" aria-hidden="true" />
+              <AnnotatedText text="開始" />{" "}
+              <ArrowRight size={19} weight="bold" aria-hidden="true" />
             </span>
           </button>
           <button className="mode-card listen-mode" type="button" onClick={openListening}>
@@ -79,32 +95,39 @@ export function LessonReader({
               <Headphones size={28} weight="duotone" />
             </span>
             <span className="lesson-mode-copy">
-              <small>第二關</small>
-              <strong>聽寫</strong>
+              <small>
+                <AnnotatedText text="第二關" />
+              </small>
+              <strong>
+                <AnnotatedText text="聽寫" />
+              </strong>
             </span>
             <span className="lesson-mode-cta">
-              開始 <ArrowRight size={19} weight="bold" aria-hidden="true" />
+              <AnnotatedText text="開始" />{" "}
+              <ArrowRight size={19} weight="bold" aria-hidden="true" />
             </span>
           </button>
         </div>
       )}
       <div className="lesson-curriculum">
         <div className="lesson-curriculum-heading">
-          <strong>課文</strong>
+          <strong>
+            <AnnotatedText text="課文" />
+          </strong>
           <div className="lesson-preview-switch" role="group" aria-label="課文顯示方式">
             <button
               type="button"
               aria-pressed={previewMode === "annotated"}
               onClick={() => setPreviewMode("annotated")}
             >
-              國字＋注音
+              <AnnotatedText text="國字＋注音" />
             </button>
             <button
               type="button"
               aria-pressed={previewMode === "zhuyin"}
               onClick={() => setPreviewMode("zhuyin")}
             >
-              純注音
+              <AnnotatedText text="純注音" />
             </button>
           </div>
         </div>
@@ -204,7 +227,9 @@ export function LessonReader({
           </div>
         )}
         <div className="lesson-curriculum-heading">
-          <strong>注音符號</strong>
+          <strong>
+            <AnnotatedText text="注音符號" />
+          </strong>
         </div>
         <div className="lesson-symbols" dir="rtl" aria-label="本課注音符號，點選可聽發音">
           {lesson.symbols.map((symbol) => (

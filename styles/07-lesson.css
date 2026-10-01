@@ -276,7 +276,7 @@
 .lesson-page .lesson-heading .eyebrow {
   margin-bottom: 6px;
   color: #d45836;
-  font-size: clamp(11px, 1.8vw, 18px);
+  font-size: clamp(16px, 2.2vw, 20px);
   letter-spacing: 0.1em;
 }
 
@@ -366,7 +366,7 @@
 
 .lesson-page .mode-card .lesson-mode-copy small {
   color: #57739a;
-  font-size: 10px;
+  font-size: 14px;
   font-weight: 800;
 }
 
@@ -377,8 +377,8 @@
 .lesson-page .mode-card .lesson-mode-copy strong {
   color: var(--ref-navy);
   font-size: clamp(15px, 4.3vw, 24px);
-  line-height: 1.18;
-  white-space: nowrap;
+  line-height: 1.45;
+  white-space: normal;
 }
 
 .lesson-mode-cta {
@@ -394,7 +394,7 @@
   border-radius: 99px;
   background: var(--ref-blue);
   color: white;
-  font-size: 14px;
+  font-size: 17px;
   font-weight: 900;
 }
 

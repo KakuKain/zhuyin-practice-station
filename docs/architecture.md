@@ -5,7 +5,8 @@ app/                       路由、metadata、樣式匯入入口
 components/                App shell、導覽、Loading、筆跡縮圖、注音呈現
 features/
   courses/                 九課資料、圈詞、課程列表
-  lesson/                  閱讀頁、IVS 字形表
+  lesson/                  閱讀頁、IVS 字形表與標題讀音校正
+  symbols/                 37 符號分組、點選發音表
   fill/                    默寫／檢查／重練 UI、Canvas、草稿驗證與保存
   listening/               抽題、題目 ID／音檔 URL、Canvas、聽寫／結果 UI
   practice/                收藏列表、驗證、舊版收藏遷移
@@ -29,6 +30,10 @@ examples/                  未啟用的後端／登入範例
 ## 資料與狀態
 
 課文先改 `course-data.ts`、`circled-vocabulary.ts`，再檢查注音／IVS 與音檔。題目 ID 維持 `類別:朗讀文字`，避免破壞收藏。舊收藏仍可取用舊題庫，但不抽入新的教師圈詞範圍。
+
+課名與課文頁標題使用共用 `AnnotatedText`，由既有國字注音字體繪製；標題輕聲由 `lesson/annotated-text.ts` 校正，無障礙名稱保持原始國字。課文的逐字 IVS 與純注音切換維持既有規則。
+
+注音表資料只含 37 個基本符號（聲符 21、韻符 16，韻符包含 ㄧ／ㄨ／ㄩ）。沿用同一音訊播放器、正常速度與教育部錄音，不另建播放元件或合成音；音檔按需載入，切頁或再點另一格會取消舊播放與回呼。
 
 Canvas 用 0–100 座標保存，尺寸改變時重畫；pending 草稿與已完成格分開。Canvas 不隨每次 pending 更新清空。觸控使用 pointer capture 與 `touch-action: none`。
 
