@@ -16,6 +16,8 @@
 
 * {
   box-sizing: border-box;
+  /* Apply pretty wrapping everywhere without overriding intentional nowrap/vertical layouts. */
+  text-wrap-style: pretty;
 }
 
 html {

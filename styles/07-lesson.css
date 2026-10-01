@@ -43,7 +43,7 @@
 .lesson-page .lesson-heading h1 {
   font-size: clamp(28px, 5vw, 42px);
   line-height: 1.14;
-  text-wrap: balance;
+  text-wrap: pretty;
 }
 
 .lesson-curriculum {

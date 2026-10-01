@@ -56,6 +56,7 @@ export function SymbolChart({
           </div>
           <div
             className="symbol-chart-grid"
+            dir="rtl"
             style={{ "--symbol-columns": group.columns } as React.CSSProperties}
           >
             {group.cells.map((symbol, index) =>

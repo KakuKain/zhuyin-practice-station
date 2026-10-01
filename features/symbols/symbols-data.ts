@@ -2,7 +2,7 @@ export const consonants = Array.from("ㄅㄆㄇㄈㄉㄊㄋㄌㄍㄎㄏㄐㄑㄒ
 export const vowels = Array.from("ㄚㄛㄜㄝㄞㄟㄠㄡㄢㄣㄤㄥㄦㄧㄨㄩ");
 export const allSymbols = [...consonants, ...vowels];
 
-// Reading down each column keeps related sounds together, like a classroom chart.
+// Columns flow right to left; reading down each keeps related sounds together.
 export const symbolGroups = [
   {
     id: "consonants",
