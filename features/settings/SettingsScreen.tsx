@@ -199,7 +199,7 @@ export function SettingsScreen({
             >
               CC BY 4.0
             </a>{" "}
-            授權使用；網站已轉為 M4A 並調整播放速度。
+            授權使用；網站已轉為 M4A，單個注音符號以正常速度播放。
           </p>
         </div>
       )}
