@@ -21,7 +21,7 @@ The focused region was the central interaction stack: title, instruction copy, c
 - Fonts and typography: the implementation preserves the project’s child-friendly Chinese font stack, enlarges「準備聽寫」to the requested readable scale, and keeps the supporting copy smaller without vertical wrapping.
 - Spacing and layout rhythm: the ready card is now a single vertical flow; the central button is centered, the illustration sits behind/beside it, and the three summary cards remain aligned below it.
 - Colors and visual tokens: the blue action ring, navy text, pale blue background, cream paper, and watercolor footer remain consistent with the selected third direction.
-- Image quality and asset fidelity: the generated no-cat watercolor background is stored at `public/course-art/listening-ready-background-v1.png`; the existing lesson cat remains an independent asset overlay, with no second background variant or duplicated character baked into the background.
+- Image quality and asset fidelity: the generated no-cat watercolor background is stored at `public/course-art/listening-ready-background-v1.webp`; the existing lesson cat remains an independent asset overlay, with no second background variant or duplicated character baked into the background.
 - Copy and content: the secondary note now says the audio leaves a short pause after playback and no longer claims that 注音 audio is slowed.
 
 ## Findings
