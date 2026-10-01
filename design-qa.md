@@ -1,46 +1,64 @@
-# 聽寫準備畫面 Design QA
+# 聽寫開始按鈕 Design QA — 2026-10-01
 
-source visual truth path: `/Users/kaoru/.codex/generated_images/01a0f21b-d2d2-78a2-a4c1-0503a3500033/exec-f882c9e9-ca83-49bc-8ede-744c443a162a.png`
+Scope: only the central start button's artwork and interaction. Preserve existing background, lesson art, typography, layout, summary, and normal-speed audio. The lower CTA in the reference is intentionally omitted per the user's earlier instruction.
 
-implementation screenshot path: `inline native Chrome CUA capture from http://localhost:3001/` (the desktop display capture API could not persist a file; the rendered screenshot was captured and reviewed inline at 2774 × 1740 JPEG pixels)
+source visual truth path: `docs/visual-qa/listening-button-reference.png` (copied from the user attachment `/var/folders/l7/tdmqctxx3_d7fmvk0h6n4r180000gn/T/codex-clipboard-677699bc-e308-4879-9d5b-aded08587f6b.png`)
 
-viewport: implementation app shell `max-width: 480px`; source concept normalized from 853 × 1844 pixels to approximately 390 × 844 CSS pixels for comparison; browser chrome and surrounding desktop margins excluded from the visual judgment
+implementation screenshot path: `docs/visual-qa/listening-button-mobile.png`
 
-state: 第一課「貓咪」→ 第二關聽寫 → 第一大題「注音符號」→ 準備聽寫；未播放、未作答
+viewport: 390 × 844 CSS px; additional checks at 320 × 568 and 1440 × 1000, using Codex In-app Browser.
 
-## Full-view comparison evidence
+Density normalization: source 853 × 1844 pixels normalized to 390 × 844 for the full-view comparison; implementation 390 × 844 pixels (1 screenshot pixel per CSS px). Source button crop 425 × 425 and implementation crop 230 × 230 both normalized to 300 × 300, allowing artwork comparison independently of the intentionally retained touch-target size.
 
-The source and rendered implementation share the same hierarchy: progress dots at the top, a large preparation title, short listening guidance, one large centered circular start control, watercolor garden art, and one three-column timing summary below. The background asset intentionally contains no cat; the existing lesson cat remains a separate transparent overlay so the background stays reusable and does not duplicate the character. The implementation is a responsive app shell rather than a fixed poster, so the screenshot includes the browser frame; comparison was made against the centered app content only.
-
-## Focused region comparison evidence
-
-The focused region was the central interaction stack: title, instruction copy, circular「開始聽」button, and summary cards. Accessibility capture confirmed exactly one ready-state button named「開始聽」and no second bottom CTA. A follow-up click entered the active listening state with the canvas, countdown, replay, and early-submit controls, then the flow was exited and returned to the ready state.
-
-## Required fidelity surfaces
-
-- Fonts and typography: the implementation preserves the project’s child-friendly Chinese font stack, enlarges「準備聽寫」to the requested readable scale, and keeps the supporting copy smaller without vertical wrapping.
-- Spacing and layout rhythm: the ready card is now a single vertical flow; the central button is centered, the illustration sits behind/beside it, and the three summary cards remain aligned below it.
-- Colors and visual tokens: the blue action ring, navy text, pale blue background, cream paper, and watercolor footer remain consistent with the selected third direction.
-- Image quality and asset fidelity: the generated no-cat watercolor background is stored at `public/course-art/listening-ready-background-v1.webp`; the existing lesson cat remains an independent asset overlay, with no second background variant or duplicated character baked into the background.
-- Copy and content: the secondary note now says the audio leaves a short pause after playback and no longer claims that 注音 audio is slowed.
+state: 第一課「貓咪」→ 第二關聽寫 → 準備聽寫 → 第 1 小題 / 4; playback 2 times, interval 8 seconds, answer time 30 seconds; before activation.
 
 ## Findings
 
-No actionable P0/P1/P2 findings remain. P3: the native Chrome capture includes browser chrome because the display capture API could not persist a content-only file; this does not affect the implementation content comparison.
+No actionable P0/P1/P2 findings remain within the scoped button change.
+
+- [Resolved P1] Inherited grid columns shrank the artwork into a 44 px column. Evidence: `docs/visual-qa/listening-button-initial-mobile.png`. Fix: block button, full-width/full-height image, zero padding, no CSS border/background. Post-fix button and image are both 230 × 230 CSS px.
+- [Expected] The reference's second lower CTA, slower-audio wording, different cat scale, and page spacing are deliberately not copied. User preferences require one central button, normal-speed audio, and a reusable background; adjacent content is outside this change.
+- [P3] Generated pigment/grain is slightly stronger than the reference. The asset follows the same blue rim, warm ivory paper, and rounded triangle art direction; it is not a pixel-identical extraction.
+
+## Full-view comparison evidence
+
+`docs/visual-qa/listening-button-comparison-full.png` places the normalized reference and rendered mobile implementation together. The circular control retains its central position and existing 230 px hit target; removing inner text allows the triangle to be larger and optically centered. Existing background and summary are unchanged; the lower duplicate CTA is absent.
+
+## Focused region comparison evidence
+
+`docs/visual-qa/listening-button-comparison-focused.png` places both button crops together at equal dimensions. A hand-painted blue rim, warm paper center, and large rounded triangle replace the small geometric icon. Transparent corners blend into the landscape without an opaque box. Runtime artwork: 640 × 640 RGBA lossless WebP, 322,528 bytes, sufficient for the 282 CSS px maximum button at 2x density.
+
+## Required fidelity surfaces
+
+- Fonts/typography: existing project fonts and surrounding text hierarchy retained. The button has only play artwork; accessible name remains「開始聽」.
+- Spacing/layout rhythm: central placement and 230–282 px button retained; short screens use 184 px. No horizontal overflow at 320 px. The summary is vertically scrollable on short screens; the primary button remains fully visible. Desktop shows the centered app shell and full control.
+- Colors/tokens: watercolor light blue, ivory paper, and blue triangle follow the reference palette. Keyboard focus is a 3 px dark-blue outline. Minor pigment variation is recorded as P3.
+- Image quality/asset fidelity: real transparent artwork generated with built-in Image Gen, not CSS/div/handcrafted SVG. Original: `assets/artwork/listening-play-button-watercolor-v1.png`. Exact prompt and provenance: `assets/artwork/listening-play-button-watercolor-v1.md`. Runtime: `public/course-art/listening-play-button-watercolor-v1.webp`. Optimizer reproduces the 640 px output and preserves alpha. No new background or baked-in cat was generated.
+- Copy/content: no screenshot text baked into the asset. Accessible name「開始聽」and existing pause-after-playback guidance retained; no slow-play claim or second CTA.
 
 ## Comparison history
 
-1. Initial implementation capture: P1 responsive layout drift. The legacy two-column `.focus-content` grid and row-oriented ready card caused the title and copy to collapse into narrow vertical columns on the wide browser preview. Fixes: corrected the responsive `calc()` width declarations and set `.listen-ready-card` to `flex-direction: column`.
-2. Post-fix capture: the title, copy, button, artwork, and summaries render as one centered vertical composition. AX capture shows one and only one ready-state「開始聽」button. The flow was tested through the active listening state and returned to ready state; no further P0/P1/P2 issue was found.
-3. Background fidelity correction: the cat was removed from the reusable watercolor background asset. A cache-busting version query was added so the preview cannot keep showing the previous cat-bearing background; the cat is rendered only by the existing transparent lesson-art overlay.
+1. Before: `docs/visual-qa/listening-button-before-mobile.png` shows old CSS ring, small icon, and text inside the circle.
+2. First implementation: `docs/visual-qa/listening-button-initial-mobile.png` exposed the P1 inherited-grid sizing issue; result blocked.
+3. Fixed: `docs/visual-qa/listening-button-mobile.png` and the two combined comparisons confirm full-size artwork and a prominent rounded play triangle. Scoped QA passed with only the recorded P3 variation.
+4. Responsive evidence: `docs/visual-qa/listening-button-small-mobile.png` (320 × 568) and `docs/visual-qa/listening-button-desktop.png` (1440 × 1000). Keyboard: `docs/visual-qa/listening-button-keyboard-focus.png`.
+
+## Interactions and verification
+
+- Exactly one ready-state button named「開始聽」.
+- Tab reaches the button with a visible focus outline; Enter starts the countdown and handwriting canvas.
+- Audio playback rate verified as 1; exit confirmation pauses the session and returns to the lesson.
+- Native browser error/warning log empty after ready-screen and activation checks.
+- Lint (zero warnings), TypeScript, 8 unit tests, production build, and server-rendered HTML test passed.
+- Regression test extended for one control, loaded 640 px image, full control coverage, keyboard activation, and normal-speed audio. Chromium/WebKit regressions run in existing GitHub CI; no separate Playwright CLI browser used for visual QA.
 
 ## Implementation checklist
 
-- [x] Implement selected third direction.
-- [x] Keep only the centered circular「開始聽」button.
-- [x] Remove the lower duplicate start button.
-- [x] Keep 注音 audio at normal playback rate and remove slow-play wording from the ready screen.
-- [x] Verify the button enters the listening canvas state.
-- [x] Run production build and rendered HTML tests.
+- [x] Match central watercolor button art direction.
+- [x] Retain one semantic, touch-friendly, keyboard-operable button.
+- [x] Add hover/press feedback; respect reduced-motion preferences.
+- [x] Preserve background, lesson art, layout, and audio speed.
+- [x] Compare source and implementation together, fix sizing, and recapture.
+- [x] Verify mobile, short viewport, desktop, keyboard activation, and playback.
 
 final result: passed

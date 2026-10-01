@@ -9,11 +9,17 @@ await mkdir(source, { recursive: true });
 const deployed = `${root}public/course-art`;
 const newFiles = (await readdir(deployed)).filter((file) => file.endsWith(".png"));
 for (const file of newFiles) await rename(`${deployed}/${file}`, `${source}/${file}`);
-let before = 0, after = 0;
+let before = 0,
+  after = 0;
 for (const file of (await readdir(source)).filter((file) => file.endsWith(".png"))) {
   const destination = `${deployed}/${file.replace(/\.png$/, ".webp")}`;
   before += (await stat(`${source}/${file}`)).size;
-  await sharp(`${source}/${file}`).webp({ lossless: true, effort: 6 }).toFile(destination);
+  const artwork = sharp(`${source}/${file}`);
+  // The circular CTA never exceeds 282 CSS px; retain enough pixels for 2x displays.
+  if (file === "listening-play-button-watercolor-v1.png") {
+    artwork.resize({ width: 640, withoutEnlargement: true });
+  }
+  await artwork.webp({ lossless: true, effort: 6 }).toFile(destination);
   after += (await stat(destination)).size;
 }
 // Update both explicit and dynamic image paths in source/styles.

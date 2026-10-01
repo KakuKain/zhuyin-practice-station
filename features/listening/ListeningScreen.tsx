@@ -2,15 +2,7 @@
 
 import type { AppController } from "../usePracticeApp";
 import { listenCategoryLabels } from "./listening-data";
-import {
-  Clock,
-  Headphones,
-  PencilLine,
-  Play,
-  SpeakerHigh,
-  Star,
-  Timer,
-} from "@phosphor-icons/react";
+import { Clock, Headphones, PencilLine, SpeakerHigh, Star, Timer } from "@phosphor-icons/react";
 import { courseArtwork } from "../courses/course-data";
 import { AnswerDisplay } from "../../components/Zhuyin";
 import { LoadingOverlay } from "../../components/AppChrome";
@@ -137,10 +129,15 @@ export function ListeningScreen({ app }: { app: AppController }) {
                   onClick={startListening}
                   aria-label="開始聽"
                 >
-                  <span className="play-circle">
-                    <Play size={42} weight="fill" aria-hidden="true" />
-                  </span>
-                  <strong>開始聽</strong>
+                  <img
+                    className="listen-start-art"
+                    src="/course-art/listening-play-button-watercolor-v1.webp"
+                    width={640}
+                    height={640}
+                    alt=""
+                    draggable={false}
+                    fetchPriority="high"
+                  />
                 </button>
                 <img
                   className="listen-ready-art"

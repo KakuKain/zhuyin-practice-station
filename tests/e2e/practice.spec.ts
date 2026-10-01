@@ -150,8 +150,24 @@ test("listening has one start control, normal-speed symbols, review and deferred
   await page.goto("/");
   await openLesson(page);
   await page.getByRole("button", { name: /第二關 聽寫/ }).click();
-  await expect(page.getByRole("button", { name: "開始聽", exact: true })).toHaveCount(1);
-  await page.getByRole("button", { name: "開始聽", exact: true }).click();
+  const start = page.getByRole("button", { name: "開始聽", exact: true });
+  await expect(start).toHaveCount(1);
+  const artwork = start.locator("img");
+  await expect(artwork).toHaveAttribute(
+    "src",
+    "/course-art/listening-play-button-watercolor-v1.webp",
+  );
+  await expect
+    .poll(() => artwork.evaluate((image: HTMLImageElement) => image.naturalWidth))
+    .toBe(640);
+  const buttonBox = (await start.boundingBox())!;
+  const artworkBox = (await artwork.boundingBox())!;
+  expect(artworkBox.width).toBeGreaterThanOrEqual(buttonBox.width * 0.95);
+  expect(artworkBox.height).toBeGreaterThanOrEqual(buttonBox.height * 0.95);
+  // The illustrated control stays a semantic button and supports keyboard activation.
+  await start.focus();
+  await expect(start).toBeFocused();
+  await start.press("Enter");
   const canvas = page.locator("canvas[aria-label='田字格手寫區']");
   await drawStroke(page, canvas);
   expect(
