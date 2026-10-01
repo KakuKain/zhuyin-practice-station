@@ -1,4 +1,4 @@
-import type { FillFavorite, PracticeState, SavedQuestion } from "../types";
+import type { FillFavorite, PracticeSession, PracticeState, SavedQuestion } from "../types";
 import {
   findQuestionSeed,
   legacySavedQuestionIndexes,
@@ -6,7 +6,8 @@ import {
 } from "../listening/listening-data";
 import { exercises } from "../courses/course-data";
 
-export const practiceStorageKey = "zhuyin-practice-state-v3";
+export const practiceStorageKey = "zhuyin-practice-state-v4";
+export const thirdPracticeStorageKey = "zhuyin-practice-state-v3";
 
 export const fillFavoritesStorageKey = "zhuyin-fill-favorites-v1";
 
@@ -18,9 +19,10 @@ export const initialPracticeState: PracticeState = {
   savedQuestions: [],
   recentLesson: null,
   completedSessions: 0,
+  history: [],
 };
 
-export function validatePracticeState(raw: unknown, version: 1 | 2 | 3 = 3): PracticeState {
+export function validatePracticeState(raw: unknown, version: 1 | 2 | 3 | 4 = 4): PracticeState {
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) return initialPracticeState;
   const parsed = raw as Record<string, unknown>;
   const savedQuestions = (
@@ -34,7 +36,7 @@ export function validatePracticeState(raw: unknown, version: 1 | 2 | 3 = 3): Pra
     )
       return [];
     let id = item.questionId;
-    if (version !== 3) {
+    if (version < 3) {
       const legacyIndex = Number.isInteger(item.questionIndex)
         ? version === 2
           ? item.questionIndex
@@ -49,18 +51,67 @@ export function validatePracticeState(raw: unknown, version: 1 | 2 | 3 = 3): Pra
           {
             lessonIndex: item.lessonIndex,
             questionId: id,
+            // Older records cannot distinguish a star from automatic remediation.
+            // Preserve all old stars as well as pending work instead of losing a favorite.
+            isFavorite:
+              version < 4 || item.isFavorite === undefined ? true : item.isFavorite === true,
             needsPractice: Boolean(item.needsPractice),
           },
         ]
       : [];
   });
+  const merged = new Map<string, SavedQuestion>();
+  for (const item of savedQuestions) {
+    const key = `${item.lessonIndex}:${item.questionId}`;
+    const previous = merged.get(key);
+    merged.set(key, {
+      ...item,
+      isFavorite: item.isFavorite || Boolean(previous?.isFavorite),
+      needsPractice: item.needsPractice || Boolean(previous?.needsPractice),
+    });
+  }
+  const history = (Array.isArray(parsed.history) ? parsed.history : []).flatMap(
+    (item): PracticeSession[] => {
+      if (
+        !item ||
+        typeof item !== "object" ||
+        typeof item.id !== "string" ||
+        !item.id ||
+        !Number.isInteger(item.lessonIndex) ||
+        !exercises[item.lessonIndex] ||
+        !["fill", "listening", "single"].includes(item.mode) ||
+        !Number.isFinite(item.completedAt) ||
+        item.completedAt <= 0 ||
+        !Number.isInteger(item.answeredUnits) ||
+        item.answeredUnits < 1 ||
+        item.answeredUnits > 200 ||
+        !Number.isInteger(item.correctUnits) ||
+        item.correctUnits < 0 ||
+        item.correctUnits > item.answeredUnits ||
+        !Number.isInteger(item.pendingQuestions) ||
+        item.pendingQuestions < 0 ||
+        item.pendingQuestions > item.answeredUnits
+      )
+        return [];
+      return [
+        {
+          id: item.id.slice(0, 100),
+          lessonIndex: item.lessonIndex,
+          mode: item.mode,
+          completedAt: item.completedAt,
+          answeredUnits: item.answeredUnits,
+          correctUnits: item.correctUnits,
+          pendingQuestions: item.pendingQuestions,
+        },
+      ];
+    },
+  );
   return {
-    savedQuestions: savedQuestions.filter(
-      (item, index) =>
-        savedQuestions.findIndex(
-          (other) => other.lessonIndex === item.lessonIndex && other.questionId === item.questionId,
-        ) === index,
-    ),
+    savedQuestions: [...merged.values()].filter((item) => item.isFavorite || item.needsPractice),
+    history: history
+      .filter((item, index) => history.findIndex((other) => other.id === item.id) === index)
+      .sort((a, b) => b.completedAt - a.completedAt)
+      .slice(0, 20),
     recentLesson:
       typeof parsed.recentLesson === "number" &&
       Number.isInteger(parsed.recentLesson) &&
@@ -76,7 +127,8 @@ export function validatePracticeState(raw: unknown, version: 1 | 2 | 3 = 3): Pra
 
 export function readPracticeState(storage: Storage): PracticeState {
   for (const [key, version] of [
-    [practiceStorageKey, 3],
+    [practiceStorageKey, 4],
+    [thirdPracticeStorageKey, 3],
     [previousPracticeStorageKey, 2],
     [firstPracticeStorageKey, 1],
   ] as const) {
@@ -151,8 +203,11 @@ export function validatedFillFavorites(raw: unknown): FillFavorite[] {
       status:
         candidate.status === "needs_rewrite" || existing?.status === "needs_rewrite"
           ? "needs_rewrite"
-          : "review_later",
+          : candidate.status === "mastered"
+            ? "mastered"
+            : "review_later",
+      isFavorite: candidate.isFavorite !== false || Boolean(existing?.isFavorite),
     });
   }
-  return [...result.values()];
+  return [...result.values()].filter((item) => item.isFavorite || item.status === "needs_rewrite");
 }

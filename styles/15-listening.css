@@ -15,126 +15,6 @@
   font-weight: 700;
 }
 
-.phase-ready {
-  background: #f5fbff url("/course-art/lesson-watercolor-paper.webp") center bottom / 100% auto
-    no-repeat;
-}
-
-.phase-ready .focus-content {
-  display: block;
-  width: min(calc(100% - 28px), 430px);
-  padding: clamp(24px, 5vh, 46px) 0 30px;
-}
-
-.listen-ready-card {
-  gap: 15px;
-}
-
-.listen-ready-context {
-  display: grid;
-  justify-items: center;
-  gap: 8px;
-}
-
-.listen-ready-context .writing-kicker {
-  margin: 0;
-  color: #4d82bd;
-  font-size: 15px;
-}
-
-.listen-ready-card h1 {
-  color: #173763;
-  font-size: clamp(36px, 10vw, 48px);
-  line-height: 1.15;
-  letter-spacing: 0.04em;
-}
-
-.listen-ready-card p {
-  max-width: 370px;
-  margin: 0;
-  color: #526f89;
-  font-size: 16px;
-  line-height: 1.6;
-}
-
-.listen-ready-card .listen-audio-note {
-  margin: -7px 0 0;
-  color: #4f789c;
-  font-size: 14px;
-}
-
-.listen-ready-stage {
-  min-height: 252px;
-  margin: 2px 0 0;
-}
-
-.listen-ready-stage .listen-ready-art {
-  right: 2%;
-  bottom: 0;
-  z-index: 0;
-  width: clamp(98px, 30vw, 126px);
-  max-height: 138px;
-}
-
-.listen-ready-summary {
-  gap: 7px;
-}
-
-.listen-ready-summary span {
-  gap: 4px;
-  padding: 12px 4px;
-  border: 1px solid #d2e5f4;
-  border-radius: 14px;
-  background: rgba(246, 251, 255, 0.84);
-  color: #58738e;
-  font-size: 13px;
-}
-
-.listen-ready-summary span small {
-  color: #66809a;
-  font-size: 13px;
-}
-
-.listen-ready-summary strong {
-  color: #173763;
-  font-size: 18px;
-}
-
-@media (max-height: 720px) {
-  .phase-ready .focus-content {
-    padding-top: 18px;
-  }
-  .listen-ready-card {
-    gap: 11px;
-  }
-  .listen-ready-card h1 {
-    font-size: 34px;
-  }
-  .listen-ready-card p {
-    font-size: 14px;
-  }
-  .listen-ready-stage {
-    min-height: 198px;
-  }
-  .listen-ready-stage .listen-ready-art {
-    width: 92px;
-    max-height: 105px;
-  }
-  .listen-ready-summary span {
-    padding-block: 9px;
-  }
-}
-
-@media (max-width: 350px) {
-  .phase-ready .focus-content {
-    width: min(calc(100% - 24px), 430px);
-  }
-  .listen-ready-stage .listen-ready-art {
-    right: -3%;
-    width: 88px;
-  }
-}
-
 /* Ready state follows the selected reference image: sky, progress dots, one vertical CTA, and a single info panel. */
 
 .phase-ready {
@@ -181,7 +61,7 @@
 .listen-progress-dots {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(4, 25px);
+  grid-template-columns: repeat(var(--question-count, 4), 25px);
   gap: 20px;
   align-items: center;
 }
@@ -197,6 +77,10 @@
   background: rgba(255, 255, 255, 0.96);
   content: "";
   transform: translateY(-50%);
+}
+
+.listen-progress-dots.is-single::before {
+  display: none;
 }
 
 .listen-progress-dots span {
@@ -242,7 +126,22 @@
 }
 
 .listen-ready-context .writing-kicker {
-  display: none;
+  display: block;
+}
+
+.listen-ready-context .listen-ready-lesson {
+  margin: 0 0 4px;
+  color: #426987;
+  font-size: 15px;
+  letter-spacing: 0;
+}
+
+.listen-ready-category {
+  display: block;
+  margin-bottom: 10px;
+  color: #426987;
+  font-size: 15px;
+  font-weight: 700;
 }
 
 .listen-ready-card h1 {
@@ -458,7 +357,7 @@
   }
   .listen-ready-card p,
   .listen-ready-card .listen-audio-note {
-    font-size: 14px;
+    font-size: 15px;
   }
   .listen-ready-stage {
     min-height: 205px;

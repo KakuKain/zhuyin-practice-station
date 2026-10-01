@@ -2,10 +2,13 @@
 
 import type { AppController } from "../usePracticeApp";
 import { listenCategoryLabels } from "./listening-data";
-import { Clock, Headphones, PencilLine, SpeakerHigh, Star, Timer } from "@phosphor-icons/react";
+import { Clock, Headphones, PencilLine, SpeakerHigh, Timer } from "@phosphor-icons/react";
+import { FavoriteButton, ReviewActions } from "../../components/ReviewActions";
 import { courseArtwork } from "../courses/course-data";
+import { FocusHeader } from "../../components/FocusHeader";
+import { listeningPhaseLabel } from "./listening-policy";
 import { AnswerDisplay } from "../../components/Zhuyin";
-import { LoadingOverlay } from "../../components/AppChrome";
+import { LoadingOverlay, ResourceNotice } from "../../components/AppChrome";
 import { ListeningCanvas } from "./ListeningCanvas";
 
 export function ListeningScreen({ app }: { app: AppController }) {
@@ -27,6 +30,7 @@ export function ListeningScreen({ app }: { app: AppController }) {
     listenPhase,
     listeningSettings,
     loadingMessage,
+    resourceError,
     playCount,
     playbackRef,
     questionDuration,
@@ -36,6 +40,7 @@ export function ListeningScreen({ app }: { app: AppController }) {
     sectionProgress,
     sectionQuestionIndex,
     sectionQuestionCount,
+    singleQuestionPractice,
     selectRemediation,
     selectedLesson,
     setListenExitOpen,
@@ -51,40 +56,37 @@ export function ListeningScreen({ app }: { app: AppController }) {
   return (
     <main className={`focus-shell phase-${listenPhase}`}>
       <audio ref={playbackRef} onEnded={finishPlayback} preload="none" hidden aria-hidden="true" />
-      {listenPhase === "ready" && (
-        <button type="button" className="listen-ready-exit" onClick={leaveFocus}>
-          離開
-        </button>
-      )}
-      <header className="focus-topbar">
-        <button type="button" className="focus-exit" onClick={leaveFocus}>
-          ← <span>離開</span>
-        </button>
-        <div className="focus-question">
-          <strong>{listenCategoryLabels[currentQuestion.category]}</strong>
-          <small>{sectionProgress}</small>
-        </div>
-        <div className="focus-meta">
-          <span
-            className={
-              secondsLeft <= 8 && (listenPhase === "active" || listenPhase === "retry")
-                ? "urgent"
-                : ""
-            }
-          >
-            <Timer size={14} weight="bold" />{" "}
-            {listenPhase === "retry_ready"
-              ? "待重寫"
-              : listenPhase === "review" || listenPhase === "choice"
-                ? "已交卷"
-                : `${String(Math.floor((listenPhase === "ready" ? questionDuration : secondsLeft) / 60)).padStart(2, "0")}:${String((listenPhase === "ready" ? questionDuration : secondsLeft) % 60).padStart(2, "0")}`}
-          </span>
-          <span aria-label={`已播放 ${playCount} 次`}>
-            <SpeakerHigh size={14} weight="bold" /> {playCount} 次
-          </span>
-        </div>
-      </header>
+      <FocusHeader
+        onBack={leaveFocus}
+        backLabel={singleQuestionPractice ? "回到練習" : "回到課文預覽"}
+        lessonIndex={selectedLesson}
+        stage={`${listenCategoryLabels[currentQuestion.category]} · ${listeningPhaseLabel(listenPhase)}`}
+        progress={sectionProgress}
+        heading={listenPhase !== "ready"}
+        status={
+          listenPhase !== "ready" ? (
+            <>
+              <span
+                className={
+                  secondsLeft <= 8 && (listenPhase === "active" || listenPhase === "retry")
+                    ? "urgent"
+                    : ""
+                }
+              >
+                <Timer size={14} weight="bold" />{" "}
+                {listenPhase === "active" || listenPhase === "retry"
+                  ? `${String(Math.floor(secondsLeft / 60)).padStart(2, "0")}:${String(secondsLeft % 60).padStart(2, "0")}`
+                  : listeningPhaseLabel(listenPhase)}
+              </span>
+              <span aria-label={`已播放 ${playCount} 次`}>
+                <SpeakerHigh size={14} weight="bold" /> {playCount} 次
+              </span>
+            </>
+          ) : undefined
+        }
+      />
       <div className="focus-content">
+        <ResourceNotice failed={resourceError} />
         <p className="sr-only" aria-live="polite">
           {listenMessage}
         </p>
@@ -94,7 +96,11 @@ export function ListeningScreen({ app }: { app: AppController }) {
               className="listen-ready-progress"
               aria-label={`第 ${sectionQuestionIndex + 1} 小題，共 ${sectionQuestionCount} 題`}
             >
-              <div className="listen-progress-dots" aria-hidden="true">
+              <div
+                className={`listen-progress-dots ${sectionQuestionCount === 1 ? "is-single" : ""}`}
+                style={{ "--question-count": sectionQuestionCount } as React.CSSProperties}
+                aria-hidden="true"
+              >
                 {Array.from({ length: sectionQuestionCount }, (_, index) => (
                   <span
                     key={index}
@@ -108,18 +114,21 @@ export function ListeningScreen({ app }: { app: AppController }) {
                   />
                 ))}
               </div>
-              <strong>
-                第 {sectionQuestionIndex + 1} 小題 / {sectionQuestionCount}
-              </strong>
+              <strong>{sectionProgress}</strong>
             </div>
             <div className="listen-ready-card">
               <div className="listen-ready-context">
+                <span className="listen-ready-category">
+                  {listenCategoryLabels[currentQuestion.category]}
+                </span>
                 <h1>準備聽寫</h1>
               </div>
               <p>
                 {isWordQuestion
-                  ? "聽一個圈詞，每格寫一個字的注音。"
-                  : "聽題目，在田字格寫下完整注音。"}
+                  ? "聽一個語詞，每格寫一個字的注音。"
+                  : currentQuestion.category === "symbols"
+                    ? "聽題目，在田字格寫下聽到的注音符號。"
+                    : "聽題目，在田字格寫下完整注音。"}
               </p>
               <small className="listen-audio-note">播放後會留一小段空白，準備好就按下開始。</small>
               <div className="listen-ready-stage">
@@ -206,36 +215,12 @@ export function ListeningScreen({ app }: { app: AppController }) {
                   ? `${wordLength} 格都寫完後，才可以判定答對；也可以選需要補強。`
                   : "還沒有手寫內容；可以先按「需要補強」再練一次。"}
             </p>
-            <div className="review-actions">
-              <button
-                type="button"
-                className="review-correct"
-                disabled={!hasCompleteInk}
-                onClick={() => handleParentDecision("correct")}
-              >
-                ✓ 答對
-              </button>
-              <button
-                type="button"
-                className="review-retry"
-                onClick={() => handleParentDecision("needs_review")}
-              >
-                ↻ 需要補強
-              </button>
-            </div>
-            <button
-              type="button"
-              className={`review-save ${currentQuestionSaved ? "is-saved" : ""}`}
-              aria-pressed={currentQuestionSaved}
-              onClick={toggleCurrentQuestionSaved}
-            >
-              <Star
-                size={17}
-                weight={currentQuestionSaved ? "fill" : "regular"}
-                aria-hidden="true"
-              />
-              {currentQuestionSaved ? "已收藏 · 取消收藏" : "收藏這題，之後再練"}
-            </button>
+            <ReviewActions
+              correctDisabled={!hasCompleteInk}
+              onCorrect={() => handleParentDecision("correct")}
+              onRetry={() => handleParentDecision("needs_review")}
+            />
+            <FavoriteButton saved={currentQuestionSaved} onToggle={toggleCurrentQuestionSaved} />
           </div>
         )}
         {listenPhase === "remediation_offer" && (
@@ -272,7 +257,11 @@ export function ListeningScreen({ app }: { app: AppController }) {
             </div>
             <p>
               {retryMessage ||
-                (isWordQuestion ? "選出你剛剛聽到的完整語詞注音。" : "選出你剛剛聽到的完整音節。")}
+                (isWordQuestion
+                  ? "選出你剛剛聽到的完整語詞注音。"
+                  : currentQuestion.category === "symbols"
+                    ? "選出你剛剛聽到的注音符號。"
+                    : "選出你剛剛聽到的完整音節。")}
             </p>
             <button type="button" className="remediation-later" onClick={deferRemediation}>
               稍後再練這題
@@ -315,7 +304,8 @@ export function ListeningScreen({ app }: { app: AppController }) {
             <span className="fill-dialog-eyebrow">聽寫練習</span>
             <h2 id="listen-exit-title">要先離開聽寫嗎？</h2>
             <p id="listen-exit-description">
-              倒數已暫停。繼續作答時可按「再聽一次」；離開後這一題的筆跡不會保留。
+              {listenPhase === "active" || listenPhase === "retry" ? "倒數已暫停。" : ""}
+              離開後，這一輪未完成的進度與筆跡不會保留；已收藏與待補強的題目仍會留下。
             </p>
             <button
               className="fill-dialog-primary"
@@ -323,10 +313,10 @@ export function ListeningScreen({ app }: { app: AppController }) {
               autoFocus
               onClick={() => setListenExitOpen(false)}
             >
-              繼續作答
+              繼續練習
             </button>
             <button className="fill-dialog-secondary" type="button" onClick={confirmLeaveFocus}>
-              離開本題
+              結束本輪
             </button>
           </div>
         </div>

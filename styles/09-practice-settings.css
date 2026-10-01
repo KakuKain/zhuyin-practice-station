@@ -146,6 +146,38 @@
   line-height: 1.45;
 }
 
+.is-practice .empty-reinforce > button {
+  grid-column: 2;
+  min-height: 44px;
+  margin-top: 12px;
+}
+
+.practice-notice p {
+  margin: 0;
+}
+
+.settings-options.answer-time-options {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.practice-notice button {
+  min-height: 44px;
+  margin-top: 8px;
+  padding: 8px 14px;
+  border: 1px solid #91b7d6;
+  border-radius: 12px;
+  background: #fff;
+  color: #245f96;
+}
+
+.saved-question-actions .saved-remove.not-favorite {
+  color: #58738e;
+}
+.result-score {
+  color: var(--ref-navy);
+  font-size: 18px;
+  font-weight: 700;
+}
+
 .is-practice .saved-question-list {
   gap: 10px;
 }

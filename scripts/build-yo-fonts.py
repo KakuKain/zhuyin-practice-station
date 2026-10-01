@@ -6,8 +6,10 @@ original character outline, spacing, and vertical layout.
 """
 
 from pathlib import Path
+import re
 
 from fontTools.pens.ttGlyphPen import TTGlyphPen
+from fontTools import subset
 from fontTools.ttLib import TTFont
 
 
@@ -18,6 +20,23 @@ FONTS = (
     ("BpmfZihiSans-Regular.ttf", "KidLessonYoSans.woff2", "Kid Lesson Yo Sans"),
     ("BpmfZihiOnly-R.ttf", "KidLessonYoOnly.woff2", "Kid Lesson Yo Only"),
 )
+
+
+def app_characters() -> set[int]:
+    """Subset from all checked-in UI/data text, including pronunciation selectors.
+
+    Keep the editable full fonts in assets/font-sources. Rebuild after adding text.
+    Cmap format 14 and dependent annotation glyphs are retained by fontTools.
+    """
+    characters = set(range(32, 127)) | set(range(0x3000, 0x3040))
+    characters |= set(range(0x3105, 0x312A)) | {0x2C7, 0x2CA, 0x2CB, 0x2D9, 0xE01E1}
+    for directory in ("features", "components", "app"):
+        for path in (ROOT / directory).rglob("*"):
+            if path.suffix in (".ts", ".tsx"):
+                text = path.read_text(encoding="utf-8")
+                characters.update(ord(char) for char in text)
+                characters.update(int(value, 16) for value in re.findall(r"\\u\{([0-9A-Fa-f]+)\}", text))
+    return characters
 
 
 def build(source_name: str, output_name: str, family_name: str) -> None:
@@ -55,6 +74,22 @@ def build(source_name: str, output_name: str, family_name: str) -> None:
         }.get(record.nameID)
         if replacement is not None:
             record.string = replacement.encode(record.getEncoding())
+
+    # Keep contextual variants and glyph names, not just the default Han glyphs.
+    options = subset.Options()
+    options.layout_features = ["*"]
+    options.glyph_names = True
+    options.name_IDs = ["*"]
+    options.name_legacy = True
+    options.name_languages = ["*"]
+    subsetter = subset.Subsetter(options=options)
+    characters = app_characters()
+    source_cmap = font.getBestCmap()
+    subsetter.populate(unicodes=characters)
+    subsetter.subset(font)
+    assert set(source_cmap).intersection(characters) <= set(font.getBestCmap())
+    for selector in characters.intersection(range(0xE0100, 0xE01F0)):
+        assert any(table.format == 14 and selector in table.uvsDict for table in font["cmap"].tables)
 
     output_path = FONT_DIR / output_name
     font.flavor = "woff2"

@@ -1,0 +1,316 @@
+/* Shared roles, not identical screens: browsing, focused writing, and parent review. */
+:root {
+  --title-lesson: 2.25rem;
+  --title-action: 1.75rem;
+  --control-label: 1rem;
+}
+
+.lesson-title .title-word {
+  display: inline-block;
+}
+.lesson-text-lines {
+  scroll-margin-top: 76px;
+}
+.review-actions button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.lesson-title {
+  font-size: var(--title-lesson) !important;
+  line-height: 1.45 !important;
+}
+.lesson-label {
+  display: inline;
+}
+.practice-focus-header {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 8px 12px;
+  flex: 0 0 auto;
+  width: 100%;
+  padding: max(10px, env(safe-area-inset-top)) 14px 10px;
+  border-bottom: 1px solid #c6dce3;
+  background: rgba(255, 253, 248, 0.94);
+  color: #173763;
+}
+.focus-header-back {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  align-self: center;
+  min-height: 44px;
+  padding: 4px 6px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #2868b9;
+  font-size: 0.9375rem;
+}
+.focus-header-back span {
+  max-width: 6em;
+  text-wrap: pretty;
+}
+.focus-header-title {
+  margin: 0;
+  min-width: 0;
+  text-align: center;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+.focus-header-title .lesson-label {
+  display: block;
+  font-weight: 750;
+}
+.focus-header-stage {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 750;
+}
+.focus-header-progress {
+  display: block;
+  color: #5d7592;
+  font-size: 0.875rem;
+  font-weight: 650;
+}
+.focus-header-status {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 12px;
+  color: #2868b9;
+  font-size: 0.9375rem;
+}
+.focus-header-status > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.phase-ready .practice-focus-header {
+  background: rgba(239, 249, 255, 0.68);
+}
+
+/* Keep the square centered. Labels and erasers live in an external side rail. */
+.canvas-zone.is-word {
+  width: 100%;
+  max-width: 380px;
+  margin-inline: auto;
+  --word-cell-size: min(210px, max(160px, calc((100dvh - 325px) / var(--word-count, 2))));
+}
+.word-canvas-stack {
+  width: 100%;
+  padding: 5px 6px 12px;
+  gap: 12px;
+}
+.word-canvas-row {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  direction: ltr;
+}
+.canvas-zone.is-word .word-paper {
+  width: min(var(--word-cell-size), calc(100% - 104px));
+  flex-shrink: 0;
+}
+.word-canvas-tools {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(50% - min(var(--word-cell-size), calc(100% - 104px)) / 2 - 52px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 9px;
+  width: 44px;
+}
+.word-canvas-tools .word-paper-label {
+  position: static;
+  padding: 3px 0;
+  width: 44px;
+  text-align: center;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+.word-canvas-tools .word-paper-clear {
+  position: static;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+}
+.phase-review .canvas-zone.is-word,
+.phase-choice .canvas-zone.is-word,
+.phase-remediation_offer .canvas-zone.is-word,
+.phase-retry_ready .canvas-zone.is-word {
+  width: 100%;
+  --word-cell-size: min(160px, max(112px, calc((100dvh - 455px) / var(--word-count, 2))));
+}
+.canvas-toolbar {
+  align-self: stretch;
+}
+.canvas-zone:not(.is-word) .canvas-toolbar {
+  order: -1;
+}
+.canvas-toolbar button,
+.fill-clear-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  border-radius: 12px;
+  font-size: 1rem;
+}
+
+/* The ready panel is constrained by its own width, not the desktop viewport. */
+.phase-ready {
+  aspect-ratio: auto;
+  width: min(100%, var(--container-writing));
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+  container-type: inline-size;
+}
+.phase-ready .focus-content {
+  flex: 1 1 auto;
+  height: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-width: 0;
+  padding: 18px 20px 24px;
+}
+.listen-ready-card,
+.listen-ready-context,
+.listen-ready-summary,
+.listen-ready-stage {
+  min-width: 0;
+  max-width: 100%;
+}
+.listen-ready-progress {
+  margin-bottom: 20px;
+  gap: 10px;
+}
+.listen-ready-progress strong {
+  font-size: clamp(1.25rem, 5.2cqi, 1.75rem);
+}
+.listen-ready-card h1 {
+  font-size: clamp(2.25rem, 10.4cqi, 3rem);
+}
+.listen-ready-card p {
+  font-size: clamp(1rem, 4.25cqi, 1.125rem);
+  white-space: normal;
+}
+.listen-ready-card .listen-audio-note {
+  width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  font-size: 0.9375rem;
+}
+.listen-ready-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.listen-ready-summary > span {
+  min-width: 0;
+  padding-inline: 6px;
+}
+.listen-ready-summary strong {
+  font-size: clamp(1.25rem, 6.2cqi, 1.75rem);
+}
+.listen-ready-summary small {
+  font-size: 0.9375rem;
+}
+.listen-ready-stage .listen-start-button {
+  width: clamp(184px, 58cqi, 270px);
+  height: clamp(184px, 58cqi, 270px);
+}
+.listen-ready-stage .listen-ready-art {
+  width: clamp(100px, 28cqi, 136px);
+}
+.listen-ready-lesson {
+  display: none;
+} /* The shared header keeps this context visible in every phase. */
+
+.fill-focus-intro h1,
+.fill-practice-prompt h1,
+.fill-practice-review h1 {
+  font-size: var(--title-action);
+  line-height: 1.4;
+}
+.fill-practice-compare {
+  width: 100%;
+}
+.fill-review-actions button,
+.review-actions button {
+  min-height: 48px;
+  font-size: var(--control-label);
+  border-radius: 12px;
+}
+.review-correct,
+.fill-review-actions .review-correct {
+  background: #10a264;
+  color: white;
+}
+.review-retry,
+.fill-review-actions .review-retry {
+  background: #f58337;
+  color: white;
+}
+.practice-notice {
+  position: fixed;
+  z-index: 35;
+  bottom: calc(var(--nav-height) + env(safe-area-inset-bottom) + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(calc(100% - 28px), 680px);
+  max-height: 30dvh;
+  overflow-y: auto;
+  padding: 14px 16px;
+  border: 1px solid #9cc9ba;
+  border-radius: 14px;
+  background: #edf9f1;
+  box-shadow: 0 6px 24px #17324f25;
+}
+.practice-notice .notice-dismiss {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+}
+.practice-notice p {
+  padding-right: 38px;
+}
+.setting-save-notice {
+  color: #327454;
+  font-size: 0.875rem;
+  min-height: 1.5em;
+}
+@media (max-width: 360px) {
+  .practice-focus-header {
+    gap: 6px 8px;
+    padding-inline: 10px;
+  }
+  .focus-header-back {
+    font-size: 0.875rem;
+  }
+  .focus-header-title {
+    font-size: 0.9375rem;
+  }
+  .phase-ready .focus-content {
+    padding-inline: 14px;
+  }
+  .lesson-title {
+    --title-lesson: 1.875rem;
+  }
+}

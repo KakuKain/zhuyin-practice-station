@@ -23,7 +23,7 @@
   grid-row: auto;
   gap: 8px;
   white-space: nowrap;
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .focus-meta span {
@@ -88,13 +88,13 @@
 }
 
 .canvas-toolbar {
-  min-height: 29px;
-  font-size: 11px;
+  min-height: 44px;
+  font-size: 14px;
 }
 
 .canvas-toolbar button {
   min-width: 54px;
-  font-size: 11px;
+  font-size: 15px;
 }
 
 .listen-start-button,
@@ -117,7 +117,7 @@
   border-radius: 10px;
   background: #fff5e9;
   color: #ae5427;
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 800;
 }
 
@@ -142,10 +142,13 @@
 .parent-review p,
 .choice-panel p {
   margin: 6px 0 8px;
-  font-size: 11px;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 .review-actions button {
+  min-height: 48px;
+  font-size: 18px;
   padding: 9px;
 }
 
@@ -166,8 +169,9 @@
   align-items: center;
   justify-content: center;
   gap: 12px;
-  background: rgba(11, 29, 47, 0.62);
-  color: white;
+  border-radius: 8px;
+  background: rgba(229, 244, 250, 0.92);
+  color: var(--ref-navy);
   font-size: 14px;
   font-weight: 800;
 }

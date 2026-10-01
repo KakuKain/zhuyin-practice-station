@@ -4,7 +4,7 @@ import type { AppController } from "../usePracticeApp";
 import { courseArtwork, lessonNumerals, lessons } from "./course-data";
 import { ArrowRight } from "@phosphor-icons/react";
 import { AnnotatedText } from "../../components/AnnotatedText";
-import { lessonTitleVariants } from "../lesson/annotated-text";
+import { lessonTitleGroups, lessonTitleVariants } from "../lesson/annotated-text";
 
 export function CourseList({ app }: { app: Pick<AppController, "openLesson" | "practiceState"> }) {
   const { openLesson, practiceState } = app;
@@ -40,16 +40,20 @@ export function CourseList({ app }: { app: Pick<AppController, "openLesson" | "p
                 className="journey-card"
                 type="button"
                 onClick={() => openLesson(index)}
-                aria-label={`第${lessonNumerals[index]}課，${item.title}${isRecent ? "，上次練習" : ""}`}
+                aria-label={`第${lessonNumerals[index]}課，${item.title}${isRecent ? "，最近開啟" : ""}`}
               >
                 <span className="journey-card-copy">
                   <small>
                     <AnnotatedText text={`第${lessonNumerals[index]}課`} />
                   </small>
                   <strong>
-                    <AnnotatedText text={item.title} variants={lessonTitleVariants[index]} />
+                    <AnnotatedText
+                      text={item.title}
+                      variants={lessonTitleVariants[index]}
+                      groups={lessonTitleGroups[index]}
+                    />
                   </strong>
-                  {isRecent && <em>上次練習</em>}
+                  {isRecent && <em>最近開啟</em>}
                 </span>
                 <img
                   className="journey-art"

@@ -1,5 +1,6 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import type { AppController } from "../usePracticeApp";
 import { Eraser, Play } from "@phosphor-icons/react";
 
@@ -40,40 +41,50 @@ export function ListeningCanvas({
   } = app;
   return (
     <div
-      className={`canvas-zone ${isWordQuestion ? "is-word" : ""} ${isWordQuestion && wordLength > 2 ? "is-long-word" : ""} ${["review", "remediation_offer", "choice", "retry_ready"].includes(listenPhase) ? "is-locked" : ""}`}
+      className={`canvas-zone ${isWordQuestion ? "is-word" : ""} ${["review", "remediation_offer", "choice", "retry_ready"].includes(listenPhase) ? "is-locked" : ""}`}
+      style={isWordQuestion ? ({ "--word-count": wordLength } as CSSProperties) : undefined}
     >
       <div className="canvas-surface">
         {isWordQuestion ? (
-          <div className="word-canvas-stack" aria-label={`語詞 ${wordLength} 格田字格`}>
+          <div
+            className="word-canvas-stack"
+            dir="rtl"
+            role="group"
+            aria-label={`語詞 ${wordLength} 格田字格`}
+          >
             {Array.from({ length: wordLength }, (_, index) => (
-              <div className="canvas-paper word-paper" key={index}>
-                <span className="word-paper-label" aria-hidden="true">
-                  第 {index + 1} 字
-                </span>
-                <button
-                  type="button"
-                  className="word-paper-clear"
-                  aria-label={`清除語詞第 ${index + 1} 字`}
-                  title={`清除第 ${index + 1} 字`}
-                  disabled={
-                    !wordInk[index] || (listenPhase !== "active" && listenPhase !== "retry")
-                  }
-                  onClick={() => clearWordCanvas(index)}
-                >
-                  <Eraser size={19} aria-hidden="true" />
-                </button>
-                <canvas
-                  ref={(element) => {
-                    wordCanvasRefs.current[index] = element;
-                  }}
-                  data-word-index={index}
-                  onPointerDown={beginDrawing}
-                  onPointerMove={draw}
-                  onPointerUp={endDrawing}
-                  onPointerCancel={endDrawing}
-                  onPointerLeave={endDrawing}
-                  aria-label={`語詞第 ${index + 1} 字田字格手寫區`}
-                />
+              <div className="word-canvas-row" key={index}>
+                <div className="word-canvas-tools">
+                  <span className="word-paper-label" aria-hidden="true">
+                    第{index + 1}字
+                  </span>
+                  <button
+                    type="button"
+                    className="word-paper-clear"
+                    aria-label={`清除語詞第 ${index + 1} 字`}
+                    title={`清除第 ${index + 1} 字`}
+                    disabled={
+                      !wordInk[index] || (listenPhase !== "active" && listenPhase !== "retry")
+                    }
+                    onClick={() => clearWordCanvas(index)}
+                  >
+                    <Eraser size={19} aria-hidden="true" />
+                  </button>
+                </div>
+                <div className="canvas-paper word-paper">
+                  <canvas
+                    ref={(element) => {
+                      wordCanvasRefs.current[index] = element;
+                    }}
+                    data-word-index={index}
+                    onPointerDown={beginDrawing}
+                    onPointerMove={draw}
+                    onPointerUp={endDrawing}
+                    onPointerCancel={endDrawing}
+                    onPointerLeave={endDrawing}
+                    aria-label={`語詞第 ${index + 1} 字田字格手寫區`}
+                  />
+                </div>
               </div>
             ))}
           </div>
@@ -105,7 +116,7 @@ export function ListeningCanvas({
         )}
         {listenPhase === "retry_ready" && (
           <div className="canvas-replay-overlay retry-ready-overlay">
-            <strong>答對了！再聽一次，重新寫。</strong>
+            <strong>選對了！再聽一次，重新寫。</strong>
             <button type="button" onClick={startRetryWriting}>
               <Play size={22} weight="fill" aria-hidden="true" /> 再聽一次並重寫
             </button>
@@ -117,10 +128,11 @@ export function ListeningCanvas({
         {!isWordQuestion && (
           <button
             type="button"
+            aria-label="清除重寫"
             onClick={clearCanvas}
             disabled={listenPhase !== "active" && listenPhase !== "retry"}
           >
-            清除
+            <Eraser size={20} aria-hidden="true" /> 清除
           </button>
         )}
       </div>

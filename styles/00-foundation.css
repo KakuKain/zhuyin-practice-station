@@ -12,6 +12,9 @@
   --coral: #ed845c;
   --coral-dark: #c96a48;
   --nav-height: 78px;
+  --container-reading: 840px;
+  --container-manage: 760px;
+  --container-writing: 480px;
 }
 
 * {
@@ -1464,7 +1467,7 @@ h1 em {
 
 .answer-reveal > span {
   color: var(--muted);
-  font-size: 10px;
+  font-size: 14px;
 }
 
 .answer-reveal .zhuyin-stack {
@@ -1633,7 +1636,7 @@ h1 em {
     grid-column: 1;
   }
   .canvas-toolbar span {
-    font-size: 8px;
+    font-size: inherit;
   }
   .result-page h1 {
     font-size: 49px;

@@ -8,7 +8,8 @@ import {
   previewPronunciationVariants,
 } from "../courses/course-data";
 import { AnnotatedText } from "../../components/AnnotatedText";
-import { lessonTitleVariants } from "./annotated-text";
+import { LessonTitle } from "../../components/LessonTitle";
+import { useReaderPosition } from "./useReaderPosition";
 import { ArrowLeft, ArrowRight, Headphones, PencilLine, SpeakerHigh } from "@phosphor-icons/react";
 
 export function LessonReader({
@@ -25,6 +26,7 @@ export function LessonReader({
     | "previewMode"
     | "previewPage"
     | "previewPageCount"
+    | "previewPageStart"
     | "previewPointerStartRef"
     | "previewVisibleLines"
     | "previewWheelAtRef"
@@ -43,6 +45,7 @@ export function LessonReader({
     previewMode,
     previewPage,
     previewPageCount,
+    previewPageStart,
     previewPointerStartRef,
     previewVisibleLines,
     previewWheelAtRef,
@@ -50,6 +53,7 @@ export function LessonReader({
     setPreviewMode,
     setPreviewPage,
   } = app;
+  const readerRef = useReaderPosition(previewPage, previewMode);
   return (
     <section className="page-section lesson-page">
       <div className={`lesson-heading${selectedLesson === 7 ? " is-radish" : ""}`}>
@@ -57,9 +61,7 @@ export function LessonReader({
           <span className="eyebrow">
             <AnnotatedText text={`第${lessonNumerals[selectedLesson]}課`} />
           </span>
-          <h1>
-            <AnnotatedText text={lesson.title} variants={lessonTitleVariants[selectedLesson]} />
-          </h1>
+          <LessonTitle lessonIndex={selectedLesson} />
         </div>
         <img
           className="lesson-heading-art"
@@ -133,11 +135,14 @@ export function LessonReader({
         </div>
         <div
           className={`lesson-text-lines ${previewMode === "zhuyin" ? "is-zhuyin-only" : ""}`}
+          ref={readerRef}
+          role="region"
+          tabIndex={-1}
           dir="rtl"
           aria-label={`${lesson.title}課文，第 ${previewPage + 1} 頁，共 ${previewPageCount} 頁，由右向左閱讀`}
           style={
             {
-              "--preview-columns": previewColumns,
+              "--preview-columns": Math.min(previewColumns, previewVisibleLines.length),
               "--preview-max-chars": Math.max(
                 ...lesson.lines.map((line) => Array.from(line).length),
               ),
@@ -175,7 +180,7 @@ export function LessonReader({
           }}
         >
           {previewVisibleLines.map((line, pageLineIndex) => {
-            const lineIndex = previewPage * previewColumns + pageLineIndex;
+            const lineIndex = previewPageStart + pageLineIndex;
             return (
               <div className="lesson-text-line" dir="ltr" key={lineIndex}>
                 {Array.from(line).map((char, charIndex) => (

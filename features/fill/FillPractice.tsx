@@ -2,9 +2,10 @@
 
 import type { AppController } from "../usePracticeApp";
 import { fillFavoriteKey, fillLocation } from "../practice/practice-storage";
-import { InkPreview, LoadingOverlay } from "../../components/AppChrome";
-import { ArrowLeft, Eraser } from "@phosphor-icons/react";
-import { lessonNumerals, lessons } from "../courses/course-data";
+import { InkPreview, LoadingOverlay, ResourceNotice } from "../../components/AppChrome";
+import { Eraser } from "@phosphor-icons/react";
+import { FocusHeader } from "../../components/FocusHeader";
+import { ReviewActions } from "../../components/ReviewActions";
 import { ZhuyinStack } from "../../components/Zhuyin";
 
 export function FillPractice({
@@ -24,10 +25,12 @@ export function FillPractice({
     | "fillPracticeStrokes"
     | "fillPracticeTarget"
     | "loadingMessage"
+    | "resourceError"
     | "moveFillDrawing"
-    | "removeFillFavorite"
+    | "markFillFavoritePracticed"
     | "setFillFavorites"
     | "setFillHasInk"
+    | "setFillIsDirty"
     | "setFillPracticeExitOpen"
     | "setFillPracticePhase"
     | "setFillPracticeStrokes"
@@ -48,10 +51,12 @@ export function FillPractice({
     fillPracticeStrokes,
     fillPracticeTarget,
     loadingMessage,
+    resourceError,
     moveFillDrawing,
-    removeFillFavorite,
+    markFillFavoritePracticed,
     setFillFavorites,
     setFillHasInk,
+    setFillIsDirty,
     setFillPracticeExitOpen,
     setFillPracticePhase,
     setFillPracticeStrokes,
@@ -64,29 +69,24 @@ export function FillPractice({
   const location = fillLocation(favorite.lessonIndex, favorite.positions[0]);
   return (
     <main className="fill-focus-shell fill-practice-shell">
+      <ResourceNotice failed={resourceError} />
       {loadingMessage && <LoadingOverlay label={loadingMessage} />}
-      <header className="fill-focus-header">
-        <button
-          type="button"
-          onClick={() => {
-            if (fillPracticePhase === "writing" && fillIsDirty) {
-              setFillPracticeExitOpen(true);
-              return;
-            }
-            setView("practice");
-          }}
-        >
-          <ArrowLeft size={19} aria-hidden="true" /> 回到練習
-        </button>
-        <strong>錯字重練</strong>
-        <span>第{lessonNumerals[favorite.lessonIndex]}課</span>
-      </header>
+      <FocusHeader
+        backLabel="回到練習"
+        lessonIndex={favorite.lessonIndex}
+        stage={`單題重練 · ${fillPracticePhase === "writing" ? "課文默寫" : "家長檢查"}`}
+        progress={location}
+        onBack={() => {
+          if (fillPracticePhase === "writing" && fillIsDirty) {
+            setFillPracticeExitOpen(true);
+            return;
+          }
+          setView("practice");
+        }}
+      />
       {fillPracticePhase === "writing" ? (
         <div className="fill-focus-body">
           <div className="fill-practice-prompt">
-            <small>
-              {lessons[favorite.lessonIndex].title} · {location}
-            </small>
             <h1>寫出「{favorite.character}」的注音</h1>
             <p>寫好後交給家長檢查，正確答案會在下一頁顯示。</p>
           </div>
@@ -132,7 +132,7 @@ export function FillPractice({
         <div className="fill-review-body fill-practice-review">
           <h1>請家長一起檢查</h1>
           <p>
-            {lessons[favorite.lessonIndex].title} · {location} ·「{favorite.character}」
+            {location} ·「{favorite.character}」
           </p>
           <div className="fill-practice-compare">
             <div>
@@ -148,37 +148,31 @@ export function FillPractice({
               </div>
             </div>
           </div>
-          <div className="fill-review-actions">
-            <button
-              type="button"
-              onClick={() => {
-                setFillPracticePhase("writing");
-                setFillPracticeStrokes([]);
-                setFillHasInk(false);
-              }}
-            >
-              再寫一次
-            </button>
-            <button type="button" onClick={() => removeFillFavorite(favorite, true)}>
-              已掌握 · 移出收藏
-            </button>
-          </div>
+          <ReviewActions
+            onCorrect={() => markFillFavoritePracticed(favorite)}
+            onRetry={() => {
+              setFillFavorites((current) =>
+                current.map((item) =>
+                  fillFavoriteKey(item) === fillFavoriteKey(favorite)
+                    ? { ...item, status: "needs_rewrite" }
+                    : item,
+                ),
+              );
+              setFillPracticePhase("writing");
+              setFillPracticeStrokes([]);
+              setFillHasInk(false);
+              setFillIsDirty(false);
+            }}
+          />
           <button
             type="button"
             className="fill-practice-defer"
             onClick={() => {
-              setFillFavorites((current) =>
-                current.map((item) =>
-                  fillFavoriteKey(item) === fillFavoriteKey(favorite)
-                    ? { ...item, status: "review_later" }
-                    : item,
-                ),
-              );
-              setPracticeNotice("已保留在錯字收藏，下次可以再練。");
+              setPracticeNotice("已保留這題，下次可以再練。");
               setView("practice");
             }}
           >
-            稍後再練，保留收藏
+            稍後再練
           </button>
         </div>
       )}
@@ -191,10 +185,10 @@ export function FillPractice({
             aria-labelledby="practice-exit-title"
             aria-describedby="practice-exit-description"
           >
-            <span className="fill-dialog-eyebrow">錯字練習</span>
+            <span className="fill-dialog-eyebrow">單題重練</span>
             <h2 id="practice-exit-title">這格還沒寫完</h2>
             <p id="practice-exit-description">
-              現在離開會失去這次筆跡；錯字收藏仍會保留，可以之後再練。
+              現在離開會失去這次筆跡；收藏與待補強仍會保留，可以之後再練。
             </p>
             <button
               className="fill-dialog-primary"

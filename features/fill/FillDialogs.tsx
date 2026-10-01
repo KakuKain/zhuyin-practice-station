@@ -12,6 +12,7 @@ export function FillDialogs({
     | "leaveFill"
     | "lesson"
     | "lessonNumber"
+    | "lessonItems"
     | "restartFillDraft"
     | "resumeFillDraft"
     | "setFillExitTarget"
@@ -24,6 +25,7 @@ export function FillDialogs({
     leaveFill,
     lesson,
     lessonNumber,
+    lessonItems,
     restartFillDraft,
     resumeFillDraft,
     setFillExitTarget,
@@ -43,7 +45,12 @@ export function FillDialogs({
           <span className="fill-dialog-eyebrow">上次的進度</span>
           <h2 id="fill-resume-title">要繼續上次的默寫嗎？</h2>
           <p id="fill-resume-description">
-            第{lessonNumber}課「{lesson.title}」的筆跡已保存在這台裝置。
+            第{lessonNumber}課「{lesson.title}」的筆跡已保存在這台裝置。 已寫{" "}
+            {Object.values(fillResumeDraft.strokes).filter((strokes) => strokes.length > 0).length}{" "}
+            / {lessonItems.length} 格
+            {Object.keys(fillResumeDraft.pendingCells).length > 0 &&
+              `，另有 ${Object.keys(fillResumeDraft.pendingCells).length} 格未完成`}
+            。
           </p>
           <button className="fill-dialog-primary" type="button" autoFocus onClick={resumeFillDraft}>
             繼續默寫

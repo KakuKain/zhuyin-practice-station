@@ -3,7 +3,9 @@
 import type { AppController } from "../usePracticeApp";
 import { courseArtwork } from "../courses/course-data";
 import { InkPreview } from "../../components/AppChrome";
+import { LessonTitle } from "../../components/LessonTitle";
 import { ArrowRight } from "@phosphor-icons/react";
+import { useRef } from "react";
 
 export function FillBlank({
   app,
@@ -28,6 +30,7 @@ export function FillBlank({
     | "writtenCount"
   >;
 }) {
+  const columnRefs = useRef<(HTMLDivElement | null)[]>([]);
   const {
     fillComplete,
     fillLineStarts,
@@ -51,7 +54,7 @@ export function FillBlank({
       <div className="fill-story-heading">
         <div className="fill-story-copy">
           <span className="fill-story-kicker">第{lessonNumber}課 · 課文默寫</span>
-          <h1>{lesson.title}</h1>
+          <LessonTitle lessonIndex={selectedLesson} />
           <p className="fill-sheet-help">
             {fillParentChecked
               ? "家長已檢查。修改任何一格後，需要再檢查一次。"
@@ -72,19 +75,58 @@ export function FillBlank({
       <div className="fill-status-line">
         <span>
           {fillParentChecked ? "家長已檢查" : `已寫 ${writtenCount} / ${lessonItems.length} 格`}
+          {!fillParentChecked &&
+            Object.keys(fillPendingCells).length > 0 &&
+            ` · ${Object.keys(fillPendingCells).length} 格未完成`}
         </span>
         <small>
           {lesson.title} ·{" "}
           {fillParentChecked
             ? `完成 ${lessonItems.length} / ${lessonItems.length} 格`
             : "逐格完成注音"}
-          {lessonLines.length > 5 ? " · 左右滑動看其他行" : ""}
         </small>
       </div>
       {storageError && (
         <p className="fill-storage-error" role="alert">
           這台裝置目前無法保存默寫；請先不要關閉頁面，檢查瀏覽器的儲存設定。
         </p>
+      )}
+      {lessonLines.length > 5 && (
+        <div
+          className="fill-line-progress"
+          dir="rtl"
+          role="group"
+          aria-label="各行完成進度"
+          style={
+            { "--line-progress-columns": lessonLines.length <= 9 ? 3 : 4 } as React.CSSProperties
+          }
+        >
+          {lessonLines.map((line, lineIndex) => {
+            const complete = line.filter(
+              (_, offset) => fillStrokes[fillLineStarts[lineIndex] + offset]?.length,
+            ).length;
+            return (
+              <button
+                type="button"
+                className={complete === line.length ? "is-complete" : ""}
+                key={lineIndex}
+                aria-label={`第 ${lineIndex + 1} 行，已寫 ${complete} / ${line.length} 格`}
+                onClick={() =>
+                  columnRefs.current[lineIndex]?.scrollIntoView({
+                    block: "nearest",
+                    inline: "nearest",
+                    behavior: "instant",
+                  })
+                }
+              >
+                <span>第{lineIndex + 1}行</span>
+                <small>
+                  {complete} / {line.length} 格
+                </small>
+              </button>
+            );
+          })}
+        </div>
       )}
       <div className="zhuyin-sheet">
         <div
@@ -100,6 +142,9 @@ export function FillBlank({
                 role="group"
                 aria-label={`第 ${lineIndex + 1} 行`}
                 key={lineIndex}
+                ref={(element) => {
+                  columnRefs.current[lineIndex] = element;
+                }}
               >
                 <span className="fill-line-label">第{lineIndex + 1}行</span>
                 {line.map((_, itemIndex) => {

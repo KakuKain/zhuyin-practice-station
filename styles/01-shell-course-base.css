@@ -14,7 +14,7 @@ body {
 }
 
 .app-shell {
-  max-width: 480px;
+  max-width: var(--container-writing);
   min-height: 100vh;
   margin: 0 auto;
   overflow: hidden;
@@ -381,7 +381,7 @@ body {
 
 .bottom-nav {
   grid-template-columns: repeat(4, 1fr);
-  max-width: 480px;
+  max-width: var(--container-writing);
   height: 67px;
   padding: 7px 11px max(7px, env(safe-area-inset-bottom));
   border-color: #d4e3ed;
@@ -392,7 +392,7 @@ body {
 .bottom-nav button {
   gap: 2px;
   color: #61748d;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .bottom-nav button.active {
@@ -405,7 +405,7 @@ body {
 }
 
 .focus-shell {
-  max-width: 480px;
+  max-width: var(--container-writing);
   margin: 0 auto;
   background: #f7fcff;
   box-shadow: 0 0 34px rgba(29, 64, 99, 0.14);

@@ -1,12 +1,12 @@
-/* Listening has three four-cell sections; a two-character word shares one playback. */
+/* A word shares one playback; its writing cells form one centered vertical column. */
 
 .focus-question strong {
-  font-size: 13px;
+  font-size: 14px;
   white-space: nowrap;
 }
 
 .focus-question small {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 750;
 }
 
@@ -22,6 +22,10 @@
 }
 
 .answer-display.is-word .zhuyin-stack {
+  direction: ltr;
+}
+
+.answer-display.is-word .zhuyin-stack {
   min-width: 29px;
 }
 
@@ -31,12 +35,21 @@
 }
 
 .canvas-zone.is-word {
-  width: min(100%, 260px, max(150px, calc((100dvh - 250px) / 2)));
+  width: min(100%, 260px, max(150px, calc((100dvh - 250px) / var(--word-count, 2))));
+  margin-inline: auto;
 }
 
 .word-canvas-stack {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
   gap: 8px;
+  max-width: 100%;
+  padding: 4px 4px 12px;
+}
+
+.word-canvas-stack > .word-paper {
+  direction: ltr;
 }
 
 .canvas-zone.is-word .canvas-paper {
@@ -45,15 +58,6 @@
   min-height: 0;
   aspect-ratio: 1;
   background-image: none;
-}
-
-.canvas-zone.is-word.is-long-word {
-  width: min(100%, 370px);
-}
-
-.is-long-word .word-canvas-stack {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
 }
 
 .word-paper-label {
@@ -74,20 +78,13 @@
 .phase-choice .canvas-zone.is-word,
 .phase-remediation_offer .canvas-zone.is-word,
 .phase-retry_ready .canvas-zone.is-word {
-  width: min(100%, 180px, max(120px, calc((100dvh - 390px) / 2)));
-}
-
-.phase-review .canvas-zone.is-long-word,
-.phase-choice .canvas-zone.is-long-word,
-.phase-remediation_offer .canvas-zone.is-long-word,
-.phase-retry_ready .canvas-zone.is-long-word {
-  width: min(100%, 300px);
+  width: min(100%, 180px, max(120px, calc((100dvh - 390px) / var(--word-count, 2))));
 }
 
 .listen-replay-button {
   display: inline-flex;
   width: min(100%, 430px);
-  min-height: 42px;
+  min-height: 48px;
   align-items: center;
   justify-content: center;
   gap: 8px;
@@ -95,7 +92,7 @@
   border-radius: 10px;
   background: #fff;
   color: var(--ref-blue);
-  font-size: 14px;
+  font-size: 17px;
   font-weight: 800;
 }
 
@@ -130,7 +127,14 @@
 
 .answer-display.is-word {
   max-width: 100%;
-  flex-wrap: wrap;
+  min-width: 0;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  overflow-x: auto;
+}
+
+.answer-display.is-word .zhuyin-stack {
+  flex: 0 0 auto;
 }
 
 .answer-reveal {
@@ -153,12 +157,16 @@
   transform: translate(-50%, -50%);
 }
 
-@media (max-width: 430px) {
-  .focus-question strong {
-    font-size: 12px;
+@media (max-width: 360px) {
+  .focus-topbar {
+    grid-template-columns: auto minmax(0, 1fr);
   }
-  .focus-question small {
-    font-size: 10px;
+  .focus-meta {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-content: flex-end;
+    padding: 0;
+    border: 0;
   }
 }
 

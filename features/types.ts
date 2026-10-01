@@ -48,23 +48,45 @@ export type FillDraft = {
   reviewOpen: boolean;
 };
 
-export type SavedQuestion = { lessonIndex: number; questionId: string; needsPractice?: boolean };
+export type SavedQuestion = {
+  lessonIndex: number;
+  questionId: string;
+  isFavorite: boolean;
+  needsPractice: boolean;
+};
+
+export type PracticeSession = {
+  id: string;
+  lessonIndex: number;
+  mode: "fill" | "listening" | "single";
+  completedAt: number;
+  answeredUnits: number;
+  correctUnits: number;
+  pendingQuestions: number;
+};
 
 export type FillFavorite = {
   lessonIndex: number;
   character: string;
   zhuyin: string;
   positions: number[];
-  status: "needs_rewrite" | "review_later";
+  status: "needs_rewrite" | "review_later" | "mastered";
+  /** Missing in legacy v1 records; migration preserves those stars. */
+  isFavorite?: boolean;
 };
 
 export type PracticeState = {
   savedQuestions: SavedQuestion[];
   recentLesson: number | null;
   completedSessions: number;
+  history: PracticeSession[];
 };
 
-export type ListeningSettings = { repeatCount: 1 | 2 | 3; intervalSeconds: 5 | 8 | 10 };
+export type ListeningSettings = {
+  repeatCount: 1 | 2 | 3;
+  intervalSeconds: 5 | 8 | 10;
+  answerTime: "standard" | "relaxed";
+};
 
 export type MorePanel = "home" | "help" | "listening" | "versions";
 

@@ -2,7 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 import { usePracticeApp } from "../features/usePracticeApp";
-import { AppHeader, BottomNav, LoadingOverlay } from "./AppChrome";
+import { AppHeader, BottomNav, LoadingOverlay, ResourceNotice } from "./AppChrome";
 import { FillDialogs } from "../features/fill/FillDialogs";
 import { CourseList } from "../features/courses/CourseList";
 import { LessonReader } from "../features/lesson/LessonReader";
@@ -32,6 +32,7 @@ export function PracticeApp() {
     finishPlayback,
     navigate,
     loadingMessage,
+    resourceError,
   } = app;
   const renderMain = () => {
     switch (view) {
@@ -83,9 +84,12 @@ export function PracticeApp() {
               ? () => navigate("lesson")
               : undefined
         }
-        backLabel="回到課程"
+        backLabel={view === "fill" ? "回到課文預覽" : "回到課程"}
       />
-      <main className="main-content">{renderMain()}</main>
+      <main className="main-content">
+        <ResourceNotice failed={resourceError} />
+        {renderMain()}
+      </main>
       <BottomNav
         active={view === "lesson" || view === "fill" || view === "result" ? "courses" : view}
         onNavigate={navigate}

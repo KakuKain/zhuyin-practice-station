@@ -270,15 +270,15 @@
 
 @media (min-width: 700px) {
   .app-shell:is(.is-courses, .is-symbols, .is-practice, .is-more) {
-    max-width: 760px;
+    max-width: var(--container-manage);
   }
   .app-shell:is(.is-courses, .is-symbols, .is-practice, .is-more) .main-content {
     width: min(100%, 660px);
     margin-inline: auto;
   }
   .app-shell:is(.is-courses, .is-symbols, .is-practice, .is-more) .bottom-nav {
-    width: min(100%, 760px);
-    max-width: 760px;
+    width: min(100%, var(--container-manage));
+    max-width: var(--container-manage);
   }
   .is-courses .journey-heading,
   .is-practice .practice-page .section-heading,

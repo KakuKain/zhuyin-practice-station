@@ -38,6 +38,7 @@ export function useAudioPlayer({
   const playbackTailTimeoutRef = useRef<number | null>(null);
 
   const playbackTokenRef = useRef(0);
+  const audioLoadTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     // Recreate the cache during React's development effect replay as well.
@@ -65,6 +66,8 @@ export function useAudioPlayer({
 
   const stopPlayback = useCallback(() => {
     playbackTokenRef.current += 1;
+    if (audioLoadTimeoutRef.current !== null) window.clearTimeout(audioLoadTimeoutRef.current);
+    audioLoadTimeoutRef.current = null;
     onStopRepeat();
     if (playbackTailTimeoutRef.current !== null)
       window.clearTimeout(playbackTailTimeoutRef.current);
@@ -104,6 +107,19 @@ export function useAudioPlayer({
       const playbackToken = playbackTokenRef.current;
       setAudioError(false);
       setAudioLoading(true);
+      const loaded = () => {
+        if (playbackToken !== playbackTokenRef.current) return;
+        if (audioLoadTimeoutRef.current !== null) window.clearTimeout(audioLoadTimeoutRef.current);
+        audioLoadTimeoutRef.current = null;
+        setAudioLoading(false);
+      };
+      const failed = () => {
+        if (playbackToken !== playbackTokenRef.current) return;
+        stopPlayback();
+        setAudioError(true);
+        if (view === "practice") setPracticeNotice("音訊尚未準備好，請檢查網路後再播放。");
+      };
+      audioLoadTimeoutRef.current = window.setTimeout(failed, 15000);
       const isZhuyinPrompt = /^[\u3105-\u3129]+$/.test(text);
       setPlayingSymbol(isZhuyinPrompt ? text : null);
       // Keep one natural reading per clip; the listening timer controls repeats.
@@ -112,15 +128,17 @@ export function useAudioPlayer({
       audio.preservesPitch = true;
       (audio as HTMLAudioElement & { webkitPreservesPitch?: boolean }).webkitPreservesPitch = true;
       const url = listeningAudioUrl(text);
+      audioPreloaderRef.current?.cancelWarmup(url);
       audio.src = audioPreloaderRef.current?.playbackUrl(url) ?? url;
       audio
         .play()
         .then(() => {
-          if (playbackToken === playbackTokenRef.current) setAudioLoading(false);
+          loaded();
         })
         .catch(() => {
           if (playbackToken !== playbackTokenRef.current) return;
           if (isZhuyinPrompt) {
+            loaded();
             setPlayingSymbol(null);
             setAudioLoading(false);
             setAudioError(true);
@@ -136,9 +154,11 @@ export function useAudioPlayer({
                 finishPlayback();
               }
             };
-            utterance.onstart = () => setAudioLoading(false);
+            utterance.onstart = loaded;
+            utterance.onerror = failed;
             window.speechSynthesis.speak(utterance);
           } else {
+            loaded();
             setAudioLoading(false);
             setAudioError(true);
             if (view === "practice") setPracticeNotice("音訊無法播放，請檢查音量或網路後再試。");

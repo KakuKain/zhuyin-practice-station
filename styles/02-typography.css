@@ -16,7 +16,7 @@
 
 @font-face {
   font-family: "KidLessonYoSans";
-  src: url("/fonts/KidLessonYoSans.woff2?v=1") format("woff2");
+  src: url("/fonts/KidLessonYoSans.woff2?v=4") format("woff2");
   font-style: normal;
   font-weight: 400;
   font-display: swap;
@@ -24,7 +24,7 @@
 
 @font-face {
   font-family: "KidLessonYoOnly";
-  src: url("/fonts/KidLessonYoOnly.woff2?v=1") format("woff2");
+  src: url("/fonts/KidLessonYoOnly.woff2?v=4") format("woff2");
   font-style: normal;
   font-weight: 400;
   font-display: swap;
@@ -34,6 +34,11 @@
   font-family: "KidLessonYoSans", "BpmfZihiSans", "PingFang TC", sans-serif;
   font-weight: 400;
   font-synthesis: none;
+}
+
+.title-word {
+  display: inline-block;
+  white-space: nowrap;
 }
 
 .visually-hidden {
@@ -49,7 +54,7 @@
 
 .zhuyin-stack,
 .logo-mark span {
-  font-family: "BpmfZihiOnly", "PingFang TC", sans-serif;
+  font-family: "KidLessonYoOnly", "BpmfZihiOnly", "PingFang TC", sans-serif;
   font-weight: 400;
 }
 

@@ -2,16 +2,18 @@
 
 import { usePersistentState } from "../lib/storage/usePersistentState";
 import { useAudioPlayer } from "../lib/audio/useAudioPlayer";
-import {
-  initialPracticeState,
-  readPracticeState,
-  validatePracticeState,
-  readFillFavorites,
-} from "./practice/practice-storage";
 import { readListeningSettings, validateListeningSettings } from "./settings/listening-settings";
 import { useFillDraft } from "./fill/useFillDraft";
 import { useFillCanvas } from "./fill/useFillCanvas";
 import { useListeningCanvas } from "./listening/useListeningCanvas";
+import { needsListeningExitConfirmation } from "./listening/listening-policy";
+import { usePagePosition } from "./navigation/usePagePosition";
+import { useDialogKeyboard } from "./navigation/useDialogKeyboard";
+import { usePageResources } from "../lib/loading/usePageResources";
+import { usePracticeCollection } from "./practice/usePracticeCollection";
+import { useFillCollection } from "./practice/useFillCollection";
+import { useLessonPreview } from "./lesson/useLessonPreview";
+import { listeningDuration } from "./settings/listening-settings";
 import { useCallback, useEffect, useEffectEvent, useRef, useState } from "react";
 import type {
   FillDraft,
@@ -21,7 +23,6 @@ import type {
   ListeningQuestion,
   MorePanel,
   ParentResult,
-  PreviewMode,
   View,
 } from "./types";
 import {
@@ -36,29 +37,12 @@ import {
 
 import { exercises, lessonNumerals, lessons } from "./courses/course-data";
 import { clearFillDraft, readFillDraft, writeFillDraft } from "./fill/fill-storage";
-import {
-  fillFavoriteKey,
-  fillFavoritesStorageKey,
-  practiceStorageKey,
-  validatedFillFavorites,
-} from "./practice/practice-storage";
+import { fillFavoriteKey } from "./practice/practice-storage";
 
 export function usePracticeApp() {
   const [view, setView] = useState<View>("courses");
 
   const [selectedLesson, setSelectedLesson] = useState(0);
-
-  const [previewMode, setPreviewMode] = useState<PreviewMode>("annotated");
-
-  const [previewPage, setPreviewPage] = useState(0);
-
-  const [previewColumns, setPreviewColumns] = useState(6);
-
-  const previewColumnsRef = useRef(6);
-
-  const previewPointerStartRef = useRef<{ x: number; y: number } | null>(null);
-
-  const previewWheelAtRef = useRef(0);
 
   const [fillStrokes, setFillStrokes] = useState<Record<number, InkStroke[]>>({});
 
@@ -102,7 +86,7 @@ export function usePracticeApp() {
     "按下「開始聽」才會播放題目。時間會從這裡開始倒數。 ",
   );
 
-  const [loadingMessage, setLoadingMessage] = useState<string | null>(null);
+  const { loadingMessage, resourceError, showLoading } = usePageResources(view);
 
   const [retryMessage, setRetryMessage] = useState("");
 
@@ -113,8 +97,6 @@ export function usePracticeApp() {
   const [morePanel, setMorePanel] = useState<MorePanel>("home");
 
   const [draftStorageError, setStorageError] = useState(false);
-
-  const [practiceNotice, setPracticeNotice] = useState("");
 
   const [singleQuestionPractice, setSingleQuestionPractice] = useState(false);
 
@@ -128,38 +110,66 @@ export function usePracticeApp() {
 
   const repeatTimeoutRef = useRef<number | null>(null);
 
-  const loadingTimeoutRef = useRef<number | null>(null);
-
   const repeatRemainingRef = useRef(0);
 
   const autoRepeatEnabledRef = useRef(false);
 
   const playbackEndedRef = useRef<() => void>(() => {});
 
-  const [practiceState, setPracticeState, practiceStorageError] = usePersistentState(
-    practiceStorageKey,
-    initialPracticeState,
-    readPracticeState,
-    validatePracticeState,
-  );
-  const [fillFavorites, setFillFavorites, favoritesStorageError] = usePersistentState<
-    FillFavorite[]
-  >(fillFavoritesStorageKey, [], readFillFavorites, validatedFillFavorites);
+  const {
+    practiceState,
+    setPracticeState,
+    practiceStorageError,
+    practiceNotice,
+    setPracticeNotice,
+    unfavoriteUndo,
+    setUnfavoriteUndo,
+    saveQuestion,
+    markQuestionPracticed,
+    removeQuestion,
+    undoUnfavorite,
+    toggleSavedQuestion,
+    recordSession,
+  } = usePracticeCollection(selectedLesson);
   const [listeningSettings, setListeningSettings, settingsStorageError] = usePersistentState(
     listeningSettingsStorageKey,
     defaultListeningSettings,
     readListeningSettings,
     validateListeningSettings,
   );
-  const storageError =
-    draftStorageError || practiceStorageError || favoritesStorageError || settingsStorageError;
 
   const lesson = lessons[selectedLesson];
+  const {
+    previewMode,
+    setPreviewMode,
+    previewPage,
+    setPreviewPage,
+    previewColumns,
+    previewPointerStartRef,
+    previewWheelAtRef,
+    previewPageCount,
+    previewPageStart,
+    previewVisibleLines,
+  } = useLessonPreview(lesson.lines);
   const exercise = exercises[selectedLesson] ?? exercises[0];
 
   const lessonLines = exercise.lines;
 
   const lessonItems = lessonLines.flat();
+  const {
+    fillFavorites,
+    setFillFavorites,
+    favoritesStorageError,
+    toggleFillFavorite,
+    unfavoriteFill,
+    saveFillFavorite,
+    markFillMastered,
+    unfavoriteFillUndo,
+    setUnfavoriteFillUndo,
+    undoFillUnfavorite,
+  } = useFillCollection(selectedLesson, lessonItems, setPracticeNotice);
+  const storageError =
+    draftStorageError || practiceStorageError || favoritesStorageError || settingsStorageError;
 
   const fillLineStarts = lessonLines.map((_, lineIndex) =>
     lessonLines.slice(0, lineIndex).reduce((count, line) => count + line.length, 0),
@@ -249,7 +259,7 @@ export function usePracticeApp() {
 
   const wordLength = currentQuestion.answer.split("|").length;
 
-  const questionDuration = isWordQuestion ? Math.max(30, wordLength * 12) : 30;
+  const questionDuration = listeningDuration(currentQuestion, listeningSettings);
 
   const {
     wordInk,
@@ -282,7 +292,7 @@ export function usePracticeApp() {
   );
 
   const sectionProgress = singleQuestionPractice
-    ? "收藏題目重練"
+    ? "單題重練"
     : isWordQuestion
       ? `第 ${sectionQuestionIndex + 1} 詞 / ${sectionQuestionCount} · ${wordLength} 字`
       : `第 ${sectionQuestionIndex + 1} 小題 / ${sectionQuestionCount}`;
@@ -294,17 +304,13 @@ export function usePracticeApp() {
 
   const isFocusMode = view === "listen";
 
-  const previewPageCount = Math.ceil(lesson.lines.length / previewColumns);
-
-  const previewVisibleLines = lesson.lines.slice(
-    previewPage * previewColumns,
-    (previewPage + 1) * previewColumns,
-  );
-
   const lessonNumber = lessonNumerals[selectedLesson];
 
   const currentQuestionSaved = practiceState.savedQuestions.some(
-    (item) => item.lessonIndex === selectedLesson && item.questionId === currentQuestion.id,
+    (item) =>
+      item.lessonIndex === selectedLesson &&
+      item.questionId === currentQuestion.id &&
+      item.isFavorite,
   );
 
   const pendingSessionCount = reviewedIndexes.filter((index) =>
@@ -315,109 +321,24 @@ export function usePracticeApp() {
         item.needsPractice,
     ),
   ).length;
+  const sessionAnsweredUnits = reviewedIndexes.reduce(
+    (count, index) => count + (listeningQuestions[index]?.answer.split("|").length ?? 0),
+    0,
+  );
 
-  useEffect(() => {
-    const media = window.matchMedia("(min-width: 700px)");
-    const updateColumns = () => {
-      const next = media.matches ? 8 : 6;
-      const previous = previewColumnsRef.current;
-      if (next === previous) return;
-      previewColumnsRef.current = next;
-      setPreviewPage((page) => Math.floor((page * previous) / next));
-      setPreviewColumns(next);
-    };
-    updateColumns();
-    media.addEventListener("change", updateColumns);
-    return () => media.removeEventListener("change", updateColumns);
-  }, []);
+  usePagePosition(
+    view,
+    `${selectedLesson}:${view === "fill" ? (activeFillCell === null ? (fillReviewOpen ? "review" : "sheet") : activeFillCell) : view === "more" ? morePanel : view === "listen" ? `${listenIndex}:${listenPhase}` : view === "fill-practice" ? fillPracticePhase : "page"}`,
+  );
 
-  useEffect(() => {
-    // The annotated preview font is sizeable; fetch it only after the first
-    // screen is idle so the course list stays responsive.
-    const loadFont = () => {
-      void document.fonts.load('400 29px "KidLessonYoSans"').catch(() => {});
-    };
-    const idleWindow = window as Window & {
-      requestIdleCallback?: (callback: () => void) => number;
-      cancelIdleCallback?: (id: number) => void;
-    };
-    if (idleWindow.requestIdleCallback) {
-      const id = idleWindow.requestIdleCallback(loadFont);
-      return () => idleWindow.cancelIdleCallback?.(id);
-    }
-    const id = window.setTimeout(loadFont, 250);
-    return () => window.clearTimeout(id);
-  }, []);
-
-  useEffect(() => {
-    if (!fillResumeDraft && !fillExitTarget && !listenExitOpen && !fillPracticeExitOpen) return;
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        event.preventDefault();
-        if (fillExitTarget) setFillExitTarget(null);
-        if (listenExitOpen) setListenExitOpen(false);
-        if (fillPracticeExitOpen) setFillPracticeExitOpen(false);
-      }
-      if (event.key !== "Tab") return;
-      const buttons = Array.from(
-        document.querySelectorAll<HTMLButtonElement>(".fill-dialog button"),
-      );
-      if (!buttons.length) return;
-      const first = buttons[0];
-      const last = buttons[buttons.length - 1];
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [fillResumeDraft, fillExitTarget, listenExitOpen, fillPracticeExitOpen]);
-
-  const saveQuestion = (lessonIndex: number, id: string, needsPractice = false) => {
-    setPracticeState((current) => {
-      const existing = current.savedQuestions.find(
-        (item) => item.lessonIndex === lessonIndex && item.questionId === id,
-      );
-      if (existing)
-        return needsPractice && !existing.needsPractice
-          ? {
-              ...current,
-              savedQuestions: current.savedQuestions.map((item) =>
-                item === existing ? { ...item, needsPractice: true } : item,
-              ),
-            }
-          : current;
-      return {
-        ...current,
-        savedQuestions: [...current.savedQuestions, { lessonIndex, questionId: id, needsPractice }],
-      };
-    });
-  };
-
-  const markQuestionPracticed = (lessonIndex: number, id: string) => {
-    setPracticeState((current) => ({
-      ...current,
-      savedQuestions: current.savedQuestions.map((item) =>
-        item.lessonIndex === lessonIndex && item.questionId === id
-          ? { ...item, needsPractice: false }
-          : item,
-      ),
-    }));
-  };
-
-  const removeQuestion = (lessonIndex: number, id: string) => {
-    setPracticeState((current) => ({
-      ...current,
-      savedQuestions: current.savedQuestions.filter(
-        (item) => item.lessonIndex !== lessonIndex || item.questionId !== id,
-      ),
-    }));
-    setPracticeNotice("已取消收藏，這題不會再顯示在練習頁。 ");
-  };
+  useDialogKeyboard(
+    Boolean(fillResumeDraft || fillExitTarget || listenExitOpen || fillPracticeExitOpen),
+    () => {
+      if (fillExitTarget) setFillExitTarget(null);
+      if (listenExitOpen) setListenExitOpen(false);
+      if (fillPracticeExitOpen) setFillPracticeExitOpen(false);
+    },
+  );
 
   const toggleCurrentQuestionSaved = () => {
     if (currentQuestionSaved) removeQuestion(selectedLesson, currentQuestion.id);
@@ -434,25 +355,19 @@ export function usePracticeApp() {
     setView("lesson");
   };
 
-  const clearListenTimers = useCallback(() => {
+  const clearAnswerTimers = useCallback(() => {
     if (timerRef.current !== null) window.clearInterval(timerRef.current);
     timerRef.current = null;
+    timeoutRefs.current.forEach((id) => window.clearTimeout(id));
+    timeoutRefs.current = [];
+  }, []);
+  const clearListenTimers = useCallback(() => {
+    clearAnswerTimers();
     if (repeatTimeoutRef.current !== null) window.clearTimeout(repeatTimeoutRef.current);
     repeatTimeoutRef.current = null;
     repeatRemainingRef.current = 0;
     autoRepeatEnabledRef.current = false;
-    timeoutRefs.current.forEach((id) => window.clearTimeout(id));
-    timeoutRefs.current = [];
-  }, []);
-
-  const showLoading = useCallback((message: string, duration = 420) => {
-    if (loadingTimeoutRef.current !== null) window.clearTimeout(loadingTimeoutRef.current);
-    setLoadingMessage(message);
-    loadingTimeoutRef.current = window.setTimeout(() => {
-      loadingTimeoutRef.current = null;
-      setLoadingMessage(null);
-    }, duration);
-  }, []);
+  }, [clearAnswerTimers]);
 
   useEffect(() => {
     playbackEndedRef.current = () => {
@@ -491,6 +406,9 @@ export function usePracticeApp() {
 
   const openListening = () => {
     showLoading("正在準備聽寫…");
+    setPracticeNotice("");
+    setUnfavoriteUndo(null);
+    setUnfavoriteFillUndo(null);
     setSessionQuestions(buildListeningSession(selectedLesson));
     resetListeningQuestion(0);
     setSessionScore({ listeningCorrect: 0 });
@@ -506,13 +424,20 @@ export function usePracticeApp() {
     setSelectedLesson(lessonIndex);
     setSessionQuestions([makeQuestion(seed)]);
     setSingleQuestionPractice(true);
+    setSessionScore({ listeningCorrect: 0 });
+    setReviewedIndexes([]);
     setPracticeNotice("");
+    setUnfavoriteUndo(null);
+    setUnfavoriteFillUndo(null);
     resetListeningQuestion(0);
     setView("listen");
   };
 
   const openFill = () => {
     showLoading("正在準備默寫格…");
+    setPracticeNotice("");
+    setUnfavoriteUndo(null);
+    setUnfavoriteFillUndo(null);
     const draft = readFillDraft(selectedLesson, lessonItems.length);
     setFillStrokes({});
     setFillPendingCells({});
@@ -559,39 +484,13 @@ export function usePracticeApp() {
     setFillReviewOpen(true);
   };
 
-  const toggleFillFavorite = (index: number) => {
-    const item = lessonItems[index];
-    const key = fillFavoriteKey({ lessonIndex: selectedLesson, ...item });
-    setFillFavorites((current) => {
-      const existing = current.find((favorite) => fillFavoriteKey(favorite) === key);
-      if (!existing)
-        return [
-          ...current,
-          {
-            lessonIndex: selectedLesson,
-            character: item.character,
-            zhuyin: item.zhuyin,
-            positions: [index],
-            status: "review_later",
-          },
-        ];
-      const positions = existing.positions.includes(index)
-        ? existing.positions.filter((position) => position !== index)
-        : [...existing.positions, index].sort((a, b) => a - b);
-      if (!positions.length) return current.filter((favorite) => fillFavoriteKey(favorite) !== key);
-      return current.map((favorite) =>
-        fillFavoriteKey(favorite) === key ? { ...favorite, positions } : favorite,
-      );
-    });
-  };
-
   const rewriteFillCell = (index: number) => {
     setFillNeedsRetry((current) => (current.includes(index) ? current : [...current, index]));
     openFillCell(index);
   };
 
   const openFillFavorite = (favorite: FillFavorite) => {
-    showLoading("正在開啟錯字重練…");
+    showLoading("正在開啟單題重練…");
     setFillPracticeTarget(favorite);
     setSelectedLesson(favorite.lessonIndex);
     setFillPracticePhase("writing");
@@ -599,23 +498,27 @@ export function usePracticeApp() {
     setFillHasInk(false);
     setFillIsDirty(false);
     setPracticeNotice("");
+    setUnfavoriteUndo(null);
+    setUnfavoriteFillUndo(null);
     setView("fill-practice");
   };
 
-  const removeFillFavorite = (favorite: FillFavorite, mastered = false) => {
-    const key = fillFavoriteKey(favorite);
-    setFillFavorites((current) => current.filter((item) => fillFavoriteKey(item) !== key));
-    setPracticeNotice(
-      mastered
-        ? `家長已確認「${favorite.character}」掌握，已移出錯字收藏。`
-        : `已取消收藏「${favorite.character}」。`,
-    );
+  const removeFillFavorite = (favorite: FillFavorite) => {
+    setUnfavoriteUndo(null);
+    unfavoriteFill(favorite);
+    setFillPracticeTarget(null);
+    setView("practice");
+  };
+  const markFillFavoritePracticed = (favorite: FillFavorite) => {
+    setUnfavoriteUndo(null);
+    markFillMastered(favorite);
+    recordSession("single", 1, 1, 0);
     setFillPracticeTarget(null);
     setView("practice");
   };
 
   const leaveFocus = () => {
-    if (listenPhase === "active" || listenPhase === "retry") {
+    if (needsListeningExitConfirmation(listenPhase, reviewedIndexes.length)) {
       clearListenTimers();
       stopPlayback();
       setListenExitOpen(true);
@@ -645,7 +548,8 @@ export function usePracticeApp() {
 
   const remainingSeconds = useEffectEvent(() => secondsLeft);
   useEffect(() => {
-    if (listenExitOpen || (listenPhase !== "active" && listenPhase !== "retry")) return;
+    if (listenExitOpen || audioLoading || (listenPhase !== "active" && listenPhase !== "retry"))
+      return;
 
     timerRef.current = window.setInterval(() => {
       setSecondsLeft((current) => (current <= 1 ? 0 : current - 1));
@@ -654,14 +558,15 @@ export function usePracticeApp() {
     const timeUp = window.setTimeout(() => finishListening(), remainingSeconds() * 1000);
     timeoutRefs.current = [timeUp];
 
-    return clearListenTimers;
+    return clearAnswerTimers;
   }, [
-    clearListenTimers,
+    clearAnswerTimers,
     finishListening,
     listenIndex,
     listenPhase,
     questionDuration,
     listenExitOpen,
+    audioLoading,
   ]);
 
   useEffect(
@@ -790,12 +695,21 @@ export function usePracticeApp() {
     setActiveFillCell(null);
   };
 
-  const goToNextQuestion = () => {
+  const confirmFillReview = () => {
+    if (fillNeedsRetry.length || !fillComplete) return;
+    setFillReviewOpen(false);
+    setFillParentChecked(true);
+    setCompletedFillLessons((current) =>
+      current.includes(selectedLesson) ? current : [...current, selectedLesson],
+    );
+    recordSession("fill", lessonItems.length, lessonItems.length, 0);
+  };
+  const goToNextQuestion = (
+    correctUnits = sessionScore.listeningCorrect,
+    pendingQuestions = pendingSessionCount,
+  ) => {
     if (listenIndex >= listeningQuestions.length - 1) {
-      setPracticeState((current) => ({
-        ...current,
-        completedSessions: current.completedSessions + 1,
-      }));
+      recordSession("listening", sessionWritingUnits, correctUnits, pendingQuestions);
       setView("result");
       clearListenTimers();
       return;
@@ -804,10 +718,21 @@ export function usePracticeApp() {
   };
 
   const handleParentDecision = (result: Exclude<ParentResult, null>) => {
+    setReviewedIndexes((current) =>
+      current.includes(listenIndex) ? current : [...current, listenIndex],
+    );
     if (result === "correct") {
       markQuestionPracticed(selectedLesson, currentQuestion.id);
       if (singleQuestionPractice) {
-        setPracticeNotice("這題練完了！可以再練一次，或取消收藏。 ");
+        setUnfavoriteFillUndo(null);
+        setUnfavoriteUndo(null);
+        recordSession(
+          "single",
+          currentQuestion.answer.split("|").length,
+          currentQuestion.answer.split("|").length,
+          0,
+        );
+        setPracticeNotice("家長已確認這題掌握，已移出待補強；收藏仍會保留。");
         setView("practice");
         clearListenTimers();
       } else {
@@ -815,12 +740,18 @@ export function usePracticeApp() {
           ...current,
           listeningCorrect: current.listeningCorrect + currentQuestion.answer.split("|").length,
         }));
-        goToNextQuestion();
+        const wasPending = practiceState.savedQuestions.some(
+          (item) =>
+            item.lessonIndex === selectedLesson &&
+            item.questionId === currentQuestion.id &&
+            item.needsPractice,
+        );
+        goToNextQuestion(
+          sessionScore.listeningCorrect + currentQuestion.answer.split("|").length,
+          pendingSessionCount - Number(wasPending && reviewedIndexes.includes(listenIndex)),
+        );
       }
     } else {
-      setReviewedIndexes((current) =>
-        current.includes(listenIndex) ? current : [...current, listenIndex],
-      );
       saveQuestion(selectedLesson, currentQuestion.id, true);
       setListenPhase("remediation_offer");
       setListenMessage("已加入待補強，可以現在練，也可以稍後再練。 ");
@@ -863,6 +794,7 @@ export function usePracticeApp() {
     }
     if (next !== "listen") clearListenTimers();
     if (next === "more") setMorePanel("home");
+    if (next !== view) showLoading(next === "symbols" ? "正在準備注音…" : "正在開啟頁面…");
     setView(next);
   };
 
@@ -886,6 +818,7 @@ export function usePracticeApp() {
     clearWordCanvas,
     completedFillLessons,
     confirmLeaveFocus,
+    confirmFillReview,
     currentQuestion,
     currentQuestionSaved,
     deferRemediation,
@@ -931,6 +864,7 @@ export function usePracticeApp() {
     loadingMessage,
     morePanel,
     moveFillDrawing,
+    markFillFavoritePracticed,
     navigate,
     openFill,
     openFillCell,
@@ -950,11 +884,13 @@ export function usePracticeApp() {
     previewMode,
     previewPage,
     previewPageCount,
+    previewPageStart,
     previewPointerStartRef,
     previewVisibleLines,
     previewWheelAtRef,
     questionDuration,
     removeFillFavorite,
+    saveFillFavorite,
     removeQuestion,
     replayQuestion,
     restartFillDraft,
@@ -969,12 +905,16 @@ export function usePracticeApp() {
     selectRemediation,
     selectedLesson,
     sessionScore,
+    sessionAnsweredUnits,
     sessionWritingUnits,
     setCompletedFillLessons,
     setFillExitTarget,
     setFillFavorites,
+    setUnfavoriteFillUndo,
+    setUnfavoriteUndo,
     setFillHasInk,
     setFillParentChecked,
+    setFillIsDirty,
     setFillPracticeExitOpen,
     setFillPracticePhase,
     setFillPracticeStrokes,
@@ -982,6 +922,7 @@ export function usePracticeApp() {
     setListenExitOpen,
     setListenPhase,
     setListeningSettings,
+    settingsStorageError,
     setMorePanel,
     setPracticeNotice,
     setPreviewMode,
@@ -992,6 +933,13 @@ export function usePracticeApp() {
     startListening,
     startRetryWriting,
     storageError,
+    singleQuestionPractice,
+    resourceError,
+    unfavoriteUndo,
+    unfavoriteFillUndo,
+    undoFillUnfavorite,
+    undoUnfavorite,
+    toggleSavedQuestion,
     submitRetryWriting,
     toggleCurrentQuestionSaved,
     toggleFillFavorite,

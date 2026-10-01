@@ -30,7 +30,10 @@ export function AnswerDisplay({
   literalSymbols?: boolean;
 }) {
   return (
-    <span className={`answer-display ${answer.includes("|") ? "is-word" : ""}`}>
+    <span
+      className={`answer-display ${answer.includes("|") ? "is-word" : ""}`}
+      dir={answer.includes("|") ? "rtl" : undefined}
+    >
       {answer.split("|").map((syllable, index) => (
         <ZhuyinStack text={syllable} literalSymbol={literalSymbols} key={`${index}-${syllable}`} />
       ))}

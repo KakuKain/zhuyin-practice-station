@@ -1,8 +1,9 @@
 "use client";
 
 import type { AppController } from "../usePracticeApp";
-import { LoadingOverlay } from "../../components/AppChrome";
-import { ArrowLeft, Eraser } from "@phosphor-icons/react";
+import { LoadingOverlay, ResourceNotice } from "../../components/AppChrome";
+import { Eraser } from "@phosphor-icons/react";
+import { FocusHeader } from "../../components/FocusHeader";
 import { courseArtwork } from "../courses/course-data";
 
 export function FillWriting({
@@ -19,10 +20,9 @@ export function FillWriting({
     | "fillLineForCell"
     | "fillLineStarts"
     | "leaveFillCell"
-    | "lesson"
     | "lessonItems"
-    | "lessonNumber"
     | "loadingMessage"
+    | "resourceError"
     | "moveFillDrawing"
     | "saveFillDrawing"
     | "selectedLesson"
@@ -39,10 +39,9 @@ export function FillWriting({
     fillLineForCell,
     fillLineStarts,
     leaveFillCell,
-    lesson,
     lessonItems,
-    lessonNumber,
     loadingMessage,
+    resourceError,
     moveFillDrawing,
     saveFillDrawing,
     selectedLesson,
@@ -55,23 +54,22 @@ export function FillWriting({
   return (
     <main className="fill-focus-shell">
       {loadingMessage && <LoadingOverlay label={loadingMessage} />}
-      <header className="fill-focus-header">
-        <button type="button" onClick={leaveFillCell}>
-          <ArrowLeft size={19} aria-hidden="true" /> 回到課文
-        </button>
-        <strong>
-          第 {lineIndex + 1} 行 · 第 {position} 格
-        </strong>
-        <span>
-          {writtenCount} / {lessonItems.length}
-        </span>
-      </header>
+      <FocusHeader
+        onBack={leaveFillCell}
+        backLabel="回到默寫"
+        lessonIndex={selectedLesson}
+        stage="課文默寫"
+        progress={`第 ${lineIndex + 1} 行 · 第 ${position} 格`}
+        status={
+          <span>
+            已寫 {writtenCount} / {lessonItems.length} 格
+          </span>
+        }
+      />
       <div className="fill-focus-body">
+        <ResourceNotice failed={resourceError} />
         <div className="fill-focus-intro">
           <div>
-            <span className="writing-kicker">
-              第{lessonNumber}課 · {lesson.title}
-            </span>
             <h1>寫出完整注音</h1>
             <p>記得寫聲調，寫好後按「完成這格」。</p>
           </div>

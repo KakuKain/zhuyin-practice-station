@@ -6,6 +6,8 @@ import {
   validatedFillFavorites,
   readPracticeState,
   practiceStorageKey,
+  initialPracticeState,
+  thirdPracticeStorageKey,
 } from "../../features/practice/practice-storage";
 import { validateListeningSettings } from "../../features/settings/listening-settings";
 import { createPersistentStore } from "../../lib/storage/persistent-store";
@@ -74,10 +76,15 @@ test("v1, v2 and v3 favorites survive migration, dedupe and invalid records", ()
   ]);
   assert.deepEqual(favorites[0].positions, [0, 1, 2]);
   assert.equal(favorites[0].status, "needs_rewrite");
-  assert.deepEqual(validateListeningSettings(null), { repeatCount: 2, intervalSeconds: 8 });
+  assert.deepEqual(validateListeningSettings(null), {
+    repeatCount: 2,
+    intervalSeconds: 8,
+    answerTime: "standard",
+  });
   assert.deepEqual(validateListeningSettings({ repeatCount: 3, intervalSeconds: 10 }), {
     repeatCount: 3,
     intervalSeconds: 10,
+    answerTime: "standard",
   });
 });
 
@@ -109,7 +116,7 @@ test("hydration never overwrites existing records; quota failures keep in-memory
     if (previousWindow) Object.defineProperty(globalThis, "window", previousWindow);
     else Reflect.deleteProperty(globalThis, "window");
   });
-  const initial = { savedQuestions: [], recentLesson: null, completedSessions: 0 };
+  const initial = initialPracticeState;
   const store = createPersistentStore(
     practiceStorageKey,
     initial,
@@ -127,4 +134,29 @@ test("hydration never overwrites existing records; quota failures keep in-memory
   assert.equal(store.getSnapshot().error, true);
   assert.equal(data.get(practiceStorageKey), before);
   unsubscribe();
+});
+
+test("v3 migration preserves pending work and all legacy stars; v4 merges flags", () => {
+  const raw = {
+    savedQuestions: [{ lessonIndex: 0, questionId: "symbols:ㄅ", needsPractice: true }],
+  };
+  const storage = {
+    getItem: (key: string) => (key === thirdPracticeStorageKey ? JSON.stringify(raw) : null),
+  } as Storage;
+  assert.deepEqual(readPracticeState(storage).savedQuestions[0], {
+    lessonIndex: 0,
+    questionId: "symbols:ㄅ",
+    isFavorite: true,
+    needsPractice: true,
+  });
+  const savedQuestions = validatePracticeState({
+    savedQuestions: [
+      { lessonIndex: 0, questionId: "symbols:ㄅ", isFavorite: false, needsPractice: true },
+      { lessonIndex: 0, questionId: "symbols:ㄅ", isFavorite: true, needsPractice: false },
+      { lessonIndex: 0, questionId: "symbols:ㄆ", isFavorite: false, needsPractice: false },
+    ],
+  }).savedQuestions;
+  assert.equal(savedQuestions.length, 1);
+  assert.equal(savedQuestions[0].isFavorite, true);
+  assert.equal(savedQuestions[0].needsPractice, true);
 });

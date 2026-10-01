@@ -22,7 +22,8 @@
 
 .fill-focus-header button,
 .focus-exit {
-  min-height: 40px;
+  min-height: 44px;
+  font-size: 15px;
   color: #2868b9;
 }
 
@@ -312,7 +313,7 @@
 }
 
 .canvas-toolbar button {
-  min-height: 33px;
+  min-height: 44px;
   border-radius: 10px;
   background: #fffdfa;
 }

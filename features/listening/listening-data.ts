@@ -10,7 +10,11 @@ import { circledVocabulary } from "../courses/circled-vocabulary";
 
 export const listeningSettingsStorageKey = "zhuyin-listening-settings-v1";
 
-export const defaultListeningSettings: ListeningSettings = { repeatCount: 2, intervalSeconds: 8 };
+export const defaultListeningSettings: ListeningSettings = {
+  repeatCount: 2,
+  intervalSeconds: 8,
+  answerTime: "standard",
+};
 
 export const audioPlaybackRate = 0.76;
 

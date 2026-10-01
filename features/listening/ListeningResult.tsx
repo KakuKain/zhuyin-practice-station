@@ -15,6 +15,7 @@ export function ListeningResult({
     | "selectedLesson"
     | "sessionScore"
     | "sessionWritingUnits"
+    | "sessionAnsweredUnits"
     | "setView"
   >;
 }) {
@@ -26,6 +27,7 @@ export function ListeningResult({
     selectedLesson,
     sessionScore,
     sessionWritingUnits,
+    sessionAnsweredUnits,
     setView,
   } = app;
   return (
@@ -46,7 +48,7 @@ export function ListeningResult({
           <span>
             <strong>課文默寫</strong>
             <small>
-              直式注音格 · {completedFillLessons.includes(selectedLesson) ? "已完成" : "尚未練習"}
+              本輪 · {completedFillLessons.includes(selectedLesson) ? "已完成" : "未進行默寫"}
             </small>
           </span>
           <b>{completedFillLessons.includes(selectedLesson) ? "✓" : "—"}</b>
@@ -58,12 +60,15 @@ export function ListeningResult({
           <span>
             <strong>聽寫</strong>
             <small>
-              三大題 · {sessionScore.listeningCorrect} / {sessionWritingUnits} 格完成
+              本輪已作答 {sessionAnsweredUnits} / {sessionWritingUnits} 格
             </small>
           </span>
           <b>✓</b>
         </div>
       </div>
+      <p className="result-score">
+        家長判定答對 {sessionScore.listeningCorrect} / {sessionWritingUnits} 格
+      </p>
       <div className="result-note">
         <span>☼</span>
         <p>
@@ -80,7 +85,7 @@ export function ListeningResult({
           再練一次 <span>↻</span>
         </button>
         <button className="secondary-button" type="button" onClick={() => setView("practice")}>
-          查看收藏
+          查看練習紀錄
         </button>
         <button className="secondary-button" type="button" onClick={() => setView("lesson")}>
           回到課次

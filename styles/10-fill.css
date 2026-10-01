@@ -1,5 +1,36 @@
 /* Dictation: the selected watercolor practice-notebook direction. */
 
+.fill-line-progress {
+  display: grid;
+  grid-template-columns: repeat(var(--line-progress-columns), minmax(0, 1fr));
+  gap: 6px;
+  margin-block: 12px;
+}
+
+.fill-line-progress button {
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+  min-height: 52px;
+  padding: 7px 4px;
+  border: 1px solid #d0e4ee;
+  border-radius: 12px;
+  background: #f3f9ff;
+  color: #28597f;
+  font-size: 14px;
+  font-weight: 750;
+}
+
+.fill-line-progress button small {
+  direction: ltr;
+  font-size: 12px;
+}
+.fill-line-progress button.is-complete {
+  border-color: #a1d0b9;
+  background: #edf8f0;
+  color: #347c59;
+}
+
 .app-shell.is-fill {
   overflow: clip;
   background: #f6fbff;

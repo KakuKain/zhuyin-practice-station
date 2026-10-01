@@ -123,3 +123,11 @@ export function LoadingOverlay({ label }: { label: string }) {
     </div>
   );
 }
+
+export function ResourceNotice({ failed }: { failed: boolean }) {
+  return failed ? (
+    <p className="practice-storage-error" role="alert">
+      部分圖片或字型尚未載入，仍可繼續練習；請檢查網路後重新整理。
+    </p>
+  ) : null;
+}

@@ -1,7 +1,12 @@
-/* Lesson reader: six complete vertical lines per page at every viewport. */
+/* Lesson reader: complete, balanced vertical lines without an orphaned tail page. */
 
 .app-shell.is-lesson {
-  max-width: min(100%, 960px);
+  max-width: min(100%, var(--container-reading));
+}
+
+.is-lesson .bottom-nav {
+  width: min(100%, var(--container-reading));
+  max-width: var(--container-reading);
 }
 
 .is-lesson .main-content {
@@ -88,7 +93,7 @@
 }
 
 .lesson-text-lines.is-zhuyin-only {
-  font-size: clamp(28px, 7.5vw, 43px);
+  font-size: clamp(34px, 9.2vw, 52px);
 }
 
 .lesson-text-lines.is-zhuyin-only .lesson-text-line {
@@ -193,7 +198,7 @@
 
 @media (max-width: 380px) {
   .lesson-text-lines.is-zhuyin-only {
-    font-size: 27px;
+    font-size: 34px;
   }
   .lesson-symbols button {
     min-height: 74px;
@@ -212,7 +217,7 @@
 
 .is-lesson .app-header {
   z-index: 3;
-  width: min(100%, 840px);
+  width: min(100%, var(--container-reading));
   padding-inline: clamp(16px, 3vw, 28px);
   border: 0;
   background: transparent;
@@ -220,7 +225,7 @@
 
 .is-lesson .main-content {
   display: flex;
-  width: min(100%, 840px);
+  width: min(100%, var(--container-reading));
   min-height: 0;
   flex: 1;
   flex-direction: column;
@@ -269,7 +274,7 @@
   z-index: 1;
   bottom: clamp(24px, 6vw, 52px);
   left: clamp(20px, 4vw, 42px);
-  width: 43%;
+  width: 49%;
   text-shadow: 0 1px 4px rgba(255, 255, 255, 0.95);
 }
 
@@ -294,7 +299,7 @@
   z-index: 1;
   right: -1%;
   bottom: -2%;
-  width: 51%;
+  width: 45%;
   height: 72%;
   max-height: none;
   margin: 0;
@@ -649,7 +654,7 @@
 
 @media (max-width: 380px) {
   .lesson-page .lesson-heading > div {
-    width: 42%;
+    width: 49%;
   }
   .lesson-page .lesson-heading h1 {
     font-size: 29px;

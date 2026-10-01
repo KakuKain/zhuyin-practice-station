@@ -1,8 +1,11 @@
 "use client";
 
 import type { AppController } from "../usePracticeApp";
-import { InkPreview, LoadingOverlay } from "../../components/AppChrome";
-import { ArrowLeft, ArrowRight, PencilLine, Star } from "@phosphor-icons/react";
+import { InkPreview, LoadingOverlay, ResourceNotice } from "../../components/AppChrome";
+import { ArrowRight, PencilLine } from "@phosphor-icons/react";
+import { FavoriteButton } from "../../components/ReviewActions";
+import { FocusHeader } from "../../components/FocusHeader";
+import { LessonTitle } from "../../components/LessonTitle";
 import { courseArtwork } from "../courses/course-data";
 import { fillFavoriteKey } from "../practice/practice-storage";
 import { ZhuyinStack } from "../../components/Zhuyin";
@@ -13,74 +16,56 @@ export function FillReview({
   app: Pick<
     AppController,
     | "fillFavorites"
+    | "confirmFillReview"
     | "fillLineStarts"
     | "fillNeedsRetry"
     | "fillReviewOpen"
     | "fillStrokes"
-    | "lesson"
     | "lessonItems"
     | "lessonLines"
-    | "lessonNumber"
     | "loadingMessage"
+    | "resourceError"
     | "rewriteFillCell"
     | "selectedLesson"
-    | "setCompletedFillLessons"
-    | "setFillParentChecked"
     | "setFillReviewOpen"
     | "toggleFillFavorite"
   >;
 }) {
   const {
     fillFavorites,
+    confirmFillReview,
     fillLineStarts,
     fillNeedsRetry,
     fillReviewOpen,
     fillStrokes,
-    lesson,
     lessonItems,
     lessonLines,
-    lessonNumber,
     loadingMessage,
+    resourceError,
     rewriteFillCell,
     selectedLesson,
-    setCompletedFillLessons,
-    setFillParentChecked,
     setFillReviewOpen,
     toggleFillFavorite,
   } = app;
 
   if (!fillReviewOpen) return null;
-  const confirmFillReview = () => {
-    if (fillNeedsRetry.length) return;
-    setFillReviewOpen(false);
-    setFillParentChecked(true);
-    setCompletedFillLessons((current) =>
-      current.includes(selectedLesson) ? current : [...current, selectedLesson],
-    );
-  };
   const savedCount = fillFavorites
-    .filter((favorite) => favorite.lessonIndex === selectedLesson)
+    .filter((favorite) => favorite.lessonIndex === selectedLesson && favorite.isFavorite !== false)
     .reduce((count, favorite) => count + favorite.positions.length, 0);
   return (
     <main className="fill-focus-shell fill-review-shell">
       {loadingMessage && <LoadingOverlay label={loadingMessage} />}
-      <header className="fill-focus-header">
-        <button type="button" onClick={() => setFillReviewOpen(false)}>
-          <ArrowLeft size={19} aria-hidden="true" /> 回到課文
-        </button>
-        <strong>家長檢查</strong>
-        <img
-          className="fill-review-corner"
-          src="/course-art/review-corner-leaves-watercolor-v2.webp"
-          alt=""
-        />
-      </header>
+      <FocusHeader
+        onBack={() => setFillReviewOpen(false)}
+        backLabel="回到默寫"
+        lessonIndex={selectedLesson}
+        stage="課文默寫 · 家長檢查"
+      />
       <div className="fill-review-body">
+        <ResourceNotice failed={resourceError} />
         <div className="fill-review-intro">
           <div>
-            <h1>
-              第{lessonNumber}課 · {lesson.title}
-            </h1>
+            <LessonTitle lessonIndex={selectedLesson} />
             <small>
               已寫 {lessonItems.length} / {lessonItems.length} 格 · 已收藏 {savedCount} 格
               {fillNeedsRetry.length ? ` · ${fillNeedsRetry.length} 格待重寫` : ""}
@@ -110,7 +95,9 @@ export function FillReview({
                 const key = fillFavoriteKey({ lessonIndex: selectedLesson, ...item });
                 const saved = fillFavorites.some(
                   (favorite) =>
-                    fillFavoriteKey(favorite) === key && favorite.positions.includes(index),
+                    favorite.isFavorite !== false &&
+                    fillFavoriteKey(favorite) === key &&
+                    favorite.positions.includes(index),
                 );
                 const needsRetry = fillNeedsRetry.includes(index);
                 return (
@@ -131,15 +118,13 @@ export function FillReview({
                       </div>
                       <small>正確注音</small>
                     </div>
-                    <button
-                      type="button"
+                    <FavoriteButton
                       className="fill-favorite-toggle"
-                      aria-label={`${saved ? "取消收藏" : "收藏"}第 ${lineIndex + 1} 行第 ${offset + 1} 格`}
-                      aria-pressed={saved}
-                      onClick={() => toggleFillFavorite(index)}
-                    >
-                      <Star size={25} weight={saved ? "fill" : "regular"} aria-hidden="true" />
-                    </button>
+                      ariaLabel={`${saved ? "取消收藏" : "收藏"}第 ${lineIndex + 1} 行第 ${offset + 1} 格`}
+                      saved={saved}
+                      iconOnly
+                      onToggle={() => toggleFillFavorite(index)}
+                    />
                     <button
                       type="button"
                       className="fill-rewrite-cell"

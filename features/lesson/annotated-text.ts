@@ -11,3 +11,10 @@ export const lessonTitleVariants: Readonly<Record<number, Readonly<Record<number
   5: { 1: "\u{E01E1}" },
   7: { 2: "\u{E01E1}" },
 };
+
+export const lessonTitleGroups: Readonly<Record<number, readonly string[]>> = {
+  2: ["河馬", "和", "河狸"],
+  5: ["謝謝", "老師"],
+  6: ["龜兔", "賽跑"],
+  8: ["動物", "狂歡會"],
+};

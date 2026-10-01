@@ -49,6 +49,28 @@
   font-size: clamp(16px, 4.4vw, 24px);
 }
 
+@media (max-width: 380px) {
+  .lesson-page .mode-card {
+    grid-template-columns: 24px minmax(0, 1fr);
+    gap: 6px 4px;
+    padding: 7px;
+  }
+
+  .lesson-page .mode-card .mode-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .lesson-page .mode-card .mode-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .lesson-page .mode-card .lesson-mode-copy strong {
+    white-space: nowrap;
+  }
+}
+
 .lesson-page .lesson-mode-cta,
 .lesson-page .listen-mode .lesson-mode-cta {
   background: #2476dc;
@@ -117,6 +139,8 @@
   align-items: center;
   justify-content: center;
   gap: 7px;
+  min-height: 48px;
+  font-size: 16px;
 }
 
 .review-save.is-saved svg {

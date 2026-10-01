@@ -72,8 +72,8 @@ test("handwriting is saved, survives resizing and resumes after reload", async (
   await page.setViewportSize({ width: current.width - 12, height: current.height - 20 });
   await expect.poll(() => inkPixels(writing)).toBeGreaterThan(20);
   await page.getByRole("button", { name: "完成這格", exact: true }).click();
-  await expect(page.locator(".fill-focus-header strong")).toHaveText("第 1 行 · 第 2 格");
-  await page.getByRole("button", { name: "回到課文", exact: false }).click();
+  await expect(page.locator(".focus-header-progress")).toHaveText("第 1 行 · 第 2 格");
+  await page.getByRole("button", { name: "回到默寫", exact: true }).click();
   await expect(page.locator(".fill-cell.is-filled")).toHaveCount(1);
   await page.reload();
   await openLesson(page);
@@ -177,11 +177,13 @@ test("listening has one start control, normal-speed symbols, review and deferred
   await expect(page.locator(".answer-reveal")).toBeVisible();
   await page.getByRole("button", { name: "需要補強", exact: false }).click();
   await page.getByRole("button", { name: "稍後再練", exact: true }).click();
-  await page.getByRole("button", { name: "離開", exact: false }).click();
+  await page.getByRole("button", { name: "回到課文預覽", exact: true }).click();
+  await expect(page.getByRole("alertdialog")).toContainText("未完成的進度與筆跡不會保留");
+  await page.getByRole("button", { name: "結束本輪", exact: true }).click();
   await page.getByRole("button", { name: "練習", exact: true }).click();
   await expect(page.locator(".saved-question:not(.fill-favorite)")).toHaveCount(1);
   await page.getByRole("button", { name: "重練這題", exact: true }).click();
-  await expect(page.locator(".listen-ready-progress strong")).toHaveText("第 1 小題 / 1");
+  await expect(page.locator(".listen-ready-progress strong")).toHaveText("單題重練");
 });
 
 test("word questions have the right progress and require ink in every cell", async ({ page }) => {
@@ -198,13 +200,13 @@ test("word questions have the right progress and require ink in every cell", asy
   await page.goto("/");
   await page.getByRole("button", { name: "練習", exact: true }).click();
   await page.getByRole("button", { name: "重練這題", exact: true }).click();
-  await expect(page.locator(".listen-ready-progress strong")).toHaveText("第 1 小題 / 1");
+  await expect(page.locator(".listen-ready-progress strong")).toHaveText("單題重練");
   await page.getByRole("button", { name: "開始聽", exact: true }).click();
   await expect(page.locator("canvas")).toHaveCount(2);
   await drawStroke(page, page.locator("canvas").first());
   await page.getByRole("button", { name: "提早交卷", exact: true }).click();
   await expect(page.getByRole("button", { name: "答對", exact: false })).toBeDisabled();
-  await expect(page.locator(".focus-question small")).toHaveText("收藏題目重練");
+  await expect(page.locator(".focus-header-progress")).toHaveText("單題重練");
 });
 
 test("exit confirmation pauses and resumes the listening timer", async ({ page }) => {
@@ -212,15 +214,15 @@ test("exit confirmation pauses and resumes the listening timer", async ({ page }
   await openLesson(page);
   await page.getByRole("button", { name: /第二關 聽寫/ }).click();
   await page.getByRole("button", { name: "開始聽", exact: true }).click();
-  await page.getByRole("button", { name: "離開", exact: false }).click();
+  await page.getByRole("button", { name: "回到課文預覽", exact: true }).click();
   await expect(page.getByRole("alertdialog")).toBeVisible();
-  const before = await page.locator(".focus-meta > span").first().textContent();
+  const before = await page.locator(".focus-header-status > span").first().textContent();
   await page.waitForTimeout(1200);
-  expect(await page.locator(".focus-meta > span").first().textContent()).toBe(before);
-  await page.getByRole("button", { name: "繼續作答", exact: true }).click();
+  expect(await page.locator(".focus-header-status > span").first().textContent()).toBe(before);
+  await page.getByRole("button", { name: "繼續練習", exact: true }).click();
   await expect(page.getByRole("alertdialog")).toHaveCount(0);
   await expect
-    .poll(() => page.locator(".focus-meta > span").first().textContent())
+    .poll(() => page.locator(".focus-header-status > span").first().textContent())
     .not.toBe(before);
 });
 
@@ -254,4 +256,87 @@ test("slow or failed audio has loading and actionable retry feedback", async ({ 
   await expect(page.getByRole("status", { name: "聲音準備中…", exact: true })).toBeVisible();
   await expect(page.getByRole("alert")).toContainText("音訊無法播放");
   await expect(page.getByRole("button", { name: "再聽一次", exact: false })).toBeVisible();
+});
+
+test("320px word writing keeps tools outside centered squares and clears only one cell", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 740 });
+  await page.addInitScript(() =>
+    localStorage.setItem(
+      "zhuyin-practice-state-v4",
+      JSON.stringify({
+        savedQuestions: [
+          { lessonIndex: 0, questionId: "words:貓咪", isFavorite: true, needsPractice: false },
+        ],
+        recentLesson: null,
+        completedSessions: 0,
+        history: [],
+      }),
+    ),
+  );
+  await page.goto("/");
+  await page.getByRole("button", { name: "練習", exact: true }).click();
+  await page.getByRole("button", { name: "重練這題", exact: true }).click();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(320);
+  await expect(page.getByRole("button", { name: "開始聽", exact: true })).toHaveCount(1);
+  await page.getByRole("button", { name: "開始聽", exact: true }).click();
+  await expect(page.locator("h1")).toBeFocused();
+  const header = (await page.locator(".practice-focus-header").boundingBox())!;
+  const rows = page.locator(".word-canvas-row");
+  await expect(rows).toHaveCount(2);
+  for (const row of await rows.all()) {
+    const tools = (await row.locator(".word-canvas-tools").boundingBox())!;
+    const paper = (await row.locator(".word-paper").boundingBox())!;
+    expect(tools.x + tools.width).toBeLessThanOrEqual(paper.x);
+    expect(Math.abs(paper.x + paper.width / 2 - 160)).toBeLessThan(2);
+    expect(paper.y).toBeGreaterThanOrEqual(header.y + header.height);
+    expect(await row.locator(".word-paper button").count()).toBe(0);
+    await drawStroke(page, row.locator("canvas"));
+  }
+  const before = await inkPixels(page.locator("canvas").last());
+  await page.getByRole("button", { name: "清除語詞第 1 字", exact: true }).click();
+  expect(await inkPixels(page.locator("canvas").first())).toBe(0);
+  expect(await inkPixels(page.locator("canvas").last())).toBe(before);
+});
+
+test("fill mastery retains yellow favorites and unfavorite has an in-viewport undo", async ({
+  page,
+}) => {
+  await page.addInitScript(() =>
+    localStorage.setItem(
+      "zhuyin-fill-favorites-v1",
+      JSON.stringify([
+        {
+          lessonIndex: 0,
+          character: "咪",
+          zhuyin: "ㄇㄧ",
+          positions: [0],
+          status: "needs_rewrite",
+          isFavorite: true,
+        },
+      ]),
+    ),
+  );
+  await page.goto("/");
+  await page.getByRole("button", { name: "練習", exact: true }).click();
+  await page.getByRole("button", { name: "取消收藏咪", exact: true }).click();
+  await expect(page.locator(".fill-favorite")).toHaveCount(1);
+  await expect(page.getByRole("button", { name: "收藏咪", exact: true })).toHaveAttribute(
+    "aria-pressed",
+    "false",
+  );
+  const notice = (await page.locator(".practice-notice").boundingBox())!;
+  expect(notice.y).toBeGreaterThanOrEqual(0);
+  expect(notice.y + notice.height).toBeLessThan(page.viewportSize()!.height);
+  await page.getByRole("button", { name: "復原取消收藏", exact: true }).click();
+  await page.getByRole("button", { name: "重練注音", exact: true }).click();
+  await drawStroke(page, page.locator("canvas"));
+  await page.getByRole("button", { name: "請家長檢查", exact: true }).click();
+  await page.getByRole("button", { name: "答對", exact: true }).click();
+  await expect(page.getByRole("button", { name: "取消收藏咪", exact: true })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  await expect(page.locator(".fill-favorite")).toContainText("已掌握");
 });

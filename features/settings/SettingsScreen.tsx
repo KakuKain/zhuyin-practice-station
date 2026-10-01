@@ -1,6 +1,8 @@
 "use client";
 
 import type { AppController } from "../usePracticeApp";
+import { useState } from "react";
+import type { ListeningSettings } from "../types";
 import { ArrowLeft, ArrowRight, Info, MusicNotes, Question } from "@phosphor-icons/react";
 import { siteReleaseNotes } from "../courses/course-data";
 
@@ -9,10 +11,27 @@ export function SettingsScreen({
 }: {
   app: Pick<
     AppController,
-    "listeningSettings" | "morePanel" | "setListeningSettings" | "setMorePanel" | "setView"
+    | "listeningSettings"
+    | "morePanel"
+    | "setListeningSettings"
+    | "setMorePanel"
+    | "setView"
+    | "settingsStorageError"
   >;
 }) {
-  const { listeningSettings, morePanel, setListeningSettings, setMorePanel, setView } = app;
+  const {
+    listeningSettings,
+    morePanel,
+    setListeningSettings,
+    setMorePanel,
+    setView,
+    settingsStorageError,
+  } = app;
+  const [saveRequested, setSaveRequested] = useState(false);
+  const updateSettings = (patch: Partial<ListeningSettings>) => {
+    setListeningSettings((current) => ({ ...current, ...patch }));
+    setSaveRequested(true);
+  };
 
   if (morePanel === "home")
     return (
@@ -31,7 +50,7 @@ export function SettingsScreen({
                 <strong>聽寫設定</strong>
                 <small>
                   播放 {listeningSettings.repeatCount} 次 · 間隔 {listeningSettings.intervalSeconds}{" "}
-                  秒
+                  秒 · {listeningSettings.answerTime === "relaxed" ? "寬鬆作答" : "一般作答"}
                 </small>
               </span>
               <span className="more-arrow" aria-hidden="true">
@@ -49,7 +68,7 @@ export function SettingsScreen({
               </span>
               <span>
                 <strong>使用說明</strong>
-                <small>課文默寫、聽寫與錯題重練</small>
+                <small>課文默寫、聽寫與單題重練</small>
               </span>
               <span className="more-arrow" aria-hidden="true">
                 <ArrowRight size={21} weight="bold" />
@@ -75,16 +94,48 @@ export function SettingsScreen({
 
   return (
     <section className="page-section more-page more-detail-page">
-      <button type="button" className="more-back" onClick={() => setMorePanel("home")}>
+      <button
+        type="button"
+        className="more-back"
+        onClick={() => {
+          setSaveRequested(false);
+          setMorePanel("home");
+        }}
+      >
         <ArrowLeft size={19} aria-hidden="true" /> 更多
       </button>
       {morePanel === "listening" && (
         <div id="listening-settings" className="more-detail-content">
           <h1>聽寫設定</h1>
           <p className="more-detail-intro">
-            一般題 30 秒；較長的圈詞會有更多書寫時間。設定只留在這台裝置。
+            聲音速度不變；可以依孩子的書寫速度調整時間。設定只留在這台裝置。
+          </p>
+          <p className="setting-save-notice" role="status">
+            {saveRequested
+              ? settingsStorageError
+                ? "這台裝置無法儲存設定；目前頁面仍會使用你的選擇。"
+                : "已儲存到這台裝置"
+              : ""}
           </p>
           <div className="more-setting-group">
+            <fieldset>
+              <legend>作答時間</legend>
+              <div className="settings-options answer-time-options">
+                {(["standard", "relaxed"] as const).map((answerTime) => (
+                  <button
+                    type="button"
+                    key={answerTime}
+                    aria-pressed={listeningSettings.answerTime === answerTime}
+                    onClick={() => updateSettings({ answerTime })}
+                  >
+                    {answerTime === "standard" ? "一般 · 30 秒起" : "寬鬆 · 60 秒起"}
+                  </button>
+                ))}
+              </div>
+              <p className="more-detail-footnote">
+                較長的語詞會自動增加時間；寬鬆模式提供兩倍時間。
+              </p>
+            </fieldset>
             <fieldset>
               <legend>每題播放幾次</legend>
               <div className="settings-options">
@@ -93,9 +144,7 @@ export function SettingsScreen({
                     type="button"
                     key={count}
                     aria-pressed={listeningSettings.repeatCount === count}
-                    onClick={() =>
-                      setListeningSettings((current) => ({ ...current, repeatCount: count }))
-                    }
+                    onClick={() => updateSettings({ repeatCount: count })}
                   >
                     {count} 次
                   </button>
@@ -110,9 +159,7 @@ export function SettingsScreen({
                     type="button"
                     key={seconds}
                     aria-pressed={listeningSettings.intervalSeconds === seconds}
-                    onClick={() =>
-                      setListeningSettings((current) => ({ ...current, intervalSeconds: seconds }))
-                    }
+                    onClick={() => updateSettings({ intervalSeconds: seconds })}
                   >
                     {seconds} 秒
                   </button>
@@ -120,7 +167,9 @@ export function SettingsScreen({
               </div>
             </fieldset>
           </div>
-          <p className="more-detail-footnote">作答時可按「再聽一次」；這不會改變上方設定。</p>
+          <p className="more-detail-footnote">
+            倒數從第一次播放開始，包含播放與間隔時間。手動「再聽一次」不會重設倒數或改變設定。
+          </p>
         </div>
       )}
       {morePanel === "help" && (
@@ -138,7 +187,7 @@ export function SettingsScreen({
               <span>02</span>
               <div>
                 <h2>課文默寫</h2>
-                <p>點空格寫完整注音。整篇完成後請家長對照；標記需要重寫的字會留在練習頁。</p>
+                <p>點空格寫完整注音。整篇完成後請家長對照；黃色星星是收藏，可從練習頁重練。</p>
               </div>
             </section>
             <section>
@@ -147,7 +196,22 @@ export function SettingsScreen({
                 <h2>聽寫與補強</h2>
                 <p>
                   按「開始聽」播放題目，寫完交給家長檢查。需要補強的題目可現在練，也可稍後從練習頁重練。
+                  取消收藏不會移除待補強；家長確認重寫答對後，才會移出待補強。
                 </p>
+              </div>
+            </section>
+            <section>
+              <span>04</span>
+              <div>
+                <h2>聽全部注音</h2>
+                <p>下方「注音」收錄 37 個符號，分成聲符與韻符。點符號可聽正常速度的讀音。</p>
+                <button
+                  type="button"
+                  className="more-primary-link"
+                  onClick={() => setView("symbols")}
+                >
+                  前往注音 <ArrowRight size={18} aria-hidden="true" />
+                </button>
               </div>
             </section>
           </div>
@@ -160,7 +224,7 @@ export function SettingsScreen({
         <div className="more-detail-content">
           <h1>版本</h1>
           <p className="more-detail-intro">
-            網站目前仍在 Beta 測試階段，版本依 SemVer 格式記錄。開發過程中的細項更新可在{" "}
+            網站目前仍在 Beta 測試階段，版本號用來區分每次功能更新。開發過程中的細項更新可在{" "}
             <a
               href="https://github.com/KakuKain/zhuyin-practice-station/commits/main/"
               target="_blank"
