@@ -13,6 +13,7 @@ from fontTools.ttLib import TTFont
 
 ROOT = Path(__file__).resolve().parents[1]
 FONT_DIR = ROOT / "public" / "fonts"
+SOURCE_DIR = ROOT / "assets" / "font-sources"
 FONTS = (
     ("BpmfZihiSans-Regular.ttf", "KidLessonYoSans.woff2", "Kid Lesson Yo Sans"),
     ("BpmfZihiOnly-R.ttf", "KidLessonYoOnly.woff2", "Kid Lesson Yo Only"),
@@ -20,7 +21,7 @@ FONTS = (
 
 
 def build(source_name: str, output_name: str, family_name: str) -> None:
-    font = TTFont(FONT_DIR / source_name, recalcBBoxes=False)
+    font = TTFont(SOURCE_DIR / source_name, recalcBBoxes=False)
     glyph_name = font.getBestCmap()[ord("喲")]
     original = font["glyf"][glyph_name]
     annotation = next(

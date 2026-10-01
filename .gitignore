@@ -43,4 +43,6 @@ next-env.d.ts
 /work/
 
 # Local visual QA captures are not part of the deployed source.
-/design-evidence/parent-review-*.png
+/docs/visual-qa/parent-review-*.png
+/playwright-report/
+/test-results/

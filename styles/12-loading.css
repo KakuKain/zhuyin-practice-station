@@ -1,0 +1,63 @@
+/* Slow mobile connections should always have a visible, friendly handoff. */
+
+.loading-overlay {
+  position: fixed;
+  z-index: 160;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 12px;
+  padding: 24px;
+  background: rgba(247, 252, 255, 0.76);
+  color: #23486e;
+  font-size: 14px;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.loading-orbit {
+  position: relative;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  height: 20px;
+}
+
+.loading-orbit i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2b82e8;
+  animation: loading-bounce 0.9s ease-in-out infinite;
+}
+
+.loading-orbit i:nth-child(2) {
+  animation-delay: 0.12s;
+  background: #69b996;
+}
+
+.loading-orbit i:nth-child(3) {
+  animation-delay: 0.24s;
+  background: #f0b452;
+}
+
+@keyframes loading-bounce {
+  0%,
+  70%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.55;
+  }
+  35% {
+    transform: translateY(-7px);
+    opacity: 1;
+  }
+}
+
+.fill-focus-shell > .loading-overlay,
+.focus-shell > .loading-overlay {
+  position: absolute;
+}

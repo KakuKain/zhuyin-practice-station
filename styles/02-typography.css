@@ -1,0 +1,104 @@
+@font-face {
+  font-family: "BpmfZihiOnly";
+  src: url("/fonts/BpmfZihiOnly-R.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "BpmfZihiSans";
+  src: url("/fonts/BpmfZihiSans-Regular.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "KidLessonYoSans";
+  src: url("/fonts/KidLessonYoSans.woff2?v=1") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "KidLessonYoOnly";
+  src: url("/fonts/KidLessonYoOnly.woff2?v=1") format("woff2");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+.zhuyin-stack,
+.logo-mark span {
+  font-family: "BpmfZihiOnly", "PingFang TC", sans-serif;
+  font-weight: 400;
+}
+
+.zhuyin-stack:not(.is-empty) {
+  position: relative;
+  display: block;
+  width: 2.6em;
+  height: 4em;
+  min-width: 0;
+  line-height: 1;
+}
+
+.zhuyin-glyph {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1em;
+  height: 1em;
+  font-size: 4em;
+  line-height: 1;
+  text-align: center;
+  transform: translate(-50%, -50%) scaleX(0.68);
+}
+
+.zhuyin-glyph.is-neutral-di {
+  font-feature-settings: "ss01" 1;
+}
+
+.syllable-cell.is-drop-hover {
+  border: 2px solid var(--ref-green);
+  background: #ddffe8;
+  box-shadow: 0 0 0 4px rgba(22, 166, 91, 0.19);
+  transform: scale(1.04);
+  transition:
+    transform 0.12s ease,
+    background 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.syllable-cell,
+.drag-preview {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.drag-preview {
+  position: fixed;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  width: 78px;
+  height: 102px;
+  border: 2px solid var(--ref-blue);
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 14px 28px rgba(16, 44, 90, 0.25);
+  pointer-events: none;
+  transform: translate(-50%, -55%) rotate(-4deg) scale(1.05);
+}
+
+.drag-preview .zhuyin-stack {
+  color: var(--ref-navy);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .syllable-cell.is-drop-hover {
+    transition: none;
+  }
+}

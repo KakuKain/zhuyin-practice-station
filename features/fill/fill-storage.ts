@@ -1,0 +1,112 @@
+import type { FillDraft, InkStroke } from "../types";
+
+export const fillDraftStorageKey = (lessonIndex: number) => `zhuyin-fill-draft-v1-${lessonIndex}`;
+
+export const fillDraftCookieKey = (lessonIndex: number) => `zhuyin_fill_draft_${lessonIndex}`;
+
+export const validInkStrokes = (value: unknown): value is InkStroke[] =>
+  Array.isArray(value) &&
+  value.length <= 200 &&
+  value.every(
+    (stroke) =>
+      Array.isArray(stroke) &&
+      stroke.length > 0 &&
+      stroke.length <= 2000 &&
+      stroke.every(
+        (point) =>
+          point &&
+          typeof point.x === "number" &&
+          typeof point.y === "number" &&
+          Number.isFinite(point.x) &&
+          Number.isFinite(point.y) &&
+          point.x >= 0 &&
+          point.x <= 100 &&
+          point.y >= 0 &&
+          point.y <= 100,
+      ),
+  );
+
+export function readFillDraft(lessonIndex: number, cellCount: number): FillDraft | null {
+  try {
+    const raw = window.localStorage.getItem(fillDraftStorageKey(lessonIndex));
+    if (!raw) return null;
+    return validateFillDraft(JSON.parse(raw), lessonIndex, cellCount);
+  } catch {
+    return null;
+  }
+}
+
+export function validateFillDraft(
+  raw: unknown,
+  lessonIndex: number,
+  cellCount: number,
+): FillDraft | null {
+  try {
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+    const draft = structuredClone(raw) as FillDraft;
+    if (!Number.isFinite(draft.savedAt) || draft.savedAt < 0) return null;
+    if (
+      draft?.version !== 1 ||
+      draft.lessonIndex !== lessonIndex ||
+      !draft.strokes ||
+      typeof draft.strokes !== "object" ||
+      Array.isArray(draft.strokes)
+    )
+      return null;
+    if (
+      !Object.entries(draft.strokes).every(
+        ([key, strokes]) =>
+          Number.isInteger(Number(key)) &&
+          Number(key) >= 0 &&
+          Number(key) < cellCount &&
+          validInkStrokes(strokes),
+      )
+    )
+      return null;
+    if (
+      !draft.pendingCells ||
+      typeof draft.pendingCells !== "object" ||
+      Array.isArray(draft.pendingCells) ||
+      !Object.entries(draft.pendingCells).every(
+        ([key, strokes]) =>
+          Number.isInteger(Number(key)) &&
+          Number(key) >= 0 &&
+          Number(key) < cellCount &&
+          validInkStrokes(strokes),
+      )
+    )
+      return null;
+    if (
+      !Array.isArray(draft.needsRetry) ||
+      !draft.needsRetry.every(
+        (index) => Number.isInteger(index) && index >= 0 && index < cellCount,
+      ) ||
+      typeof draft.reviewOpen !== "boolean"
+    )
+      return null;
+    // An interrupted save can leave a completed cell in both collections.
+    // The duplicate pending copy must not mask the completed preview.
+    for (const [key, pending] of Object.entries(draft.pendingCells)) {
+      if (
+        draft.strokes[Number(key)] &&
+        JSON.stringify(draft.strokes[Number(key)]) === JSON.stringify(pending)
+      )
+        delete draft.pendingCells[Number(key)];
+    }
+    return Object.keys(draft.strokes).length || Object.keys(draft.pendingCells).length
+      ? draft
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+export function writeFillDraft(draft: FillDraft) {
+  window.localStorage.setItem(fillDraftStorageKey(draft.lessonIndex), JSON.stringify(draft));
+  document.cookie = `${fillDraftCookieKey(draft.lessonIndex)}=1; Max-Age=2592000; Path=/; SameSite=Lax`;
+}
+
+export function clearFillDraft(lessonIndex: number) {
+  window.localStorage.removeItem(fillDraftStorageKey(lessonIndex));
+  document.cookie = `${fillDraftCookieKey(lessonIndex)}=; Max-Age=0; Path=/; SameSite=Lax`;
+}

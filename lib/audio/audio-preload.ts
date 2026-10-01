@@ -7,7 +7,11 @@ export function createAudioPreloader(maxClips = 64) {
   let disposed = false;
 
   const warm = (urls: readonly string[]) => {
-    if (disposed || (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData) return;
+    if (
+      disposed ||
+      (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData
+    )
+      return;
     for (const url of new Set(urls)) {
       if (ready.has(url) || pending.has(url)) continue;
       const controller = new AbortController();

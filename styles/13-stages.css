@@ -1,0 +1,139 @@
+/* Both lesson stages use the same card rhythm; the icon accent still names the mode. */
+
+.lesson-page .mode-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid #d7e8ef;
+  background: linear-gradient(115deg, #f7fbff, #eef7ff 72%, #f8fcff);
+  box-shadow: 0 8px 18px rgba(36, 84, 116, 0.08);
+}
+
+.lesson-page .mode-card::before {
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 6px;
+  background: #4f9af0;
+  content: "";
+}
+
+.lesson-page .listen-mode::before {
+  background: #67b890;
+}
+
+.lesson-page .fill-mode,
+.lesson-page .listen-mode {
+  background: linear-gradient(115deg, #f7fbff, #eef7ff 72%, #f8fcff);
+}
+
+.lesson-page .mode-card .mode-icon,
+.lesson-page .listen-mode .mode-icon {
+  background: #dcedff;
+  color: #2476dc;
+}
+
+.lesson-page .listen-mode .mode-icon {
+  background: #dff4e7;
+  color: #32865f;
+}
+
+.lesson-page .mode-card .lesson-mode-copy small,
+.lesson-page .listen-mode .lesson-mode-copy small {
+  color: #5b7695;
+}
+
+.lesson-page .mode-card .lesson-mode-copy strong {
+  font-size: clamp(16px, 4.4vw, 24px);
+}
+
+.lesson-page .lesson-mode-cta,
+.lesson-page .listen-mode .lesson-mode-cta {
+  background: #2476dc;
+  box-shadow: 0 3px 0 rgba(31, 105, 203, 0.16);
+}
+
+.lesson-page .listen-mode .lesson-mode-cta {
+  background: #348b64;
+  box-shadow: 0 3px 0 rgba(47, 131, 92, 0.16);
+}
+
+/* Let the watercolor hero dissolve into the page at its upper edge too. */
+
+.lesson-page .lesson-heading::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0 0 auto;
+  height: 44%;
+  background:
+    radial-gradient(ellipse at 78% 0%, rgba(255, 255, 255, 0.88), transparent 60%),
+    linear-gradient(
+      to bottom,
+      rgba(255, 254, 251, 0.94),
+      rgba(255, 254, 251, 0.58) 28%,
+      rgba(255, 254, 251, 0) 100%
+    );
+  filter: blur(0.4px);
+  content: "";
+  pointer-events: none;
+}
+
+.lesson-text-lines::before {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 72px;
+  background: linear-gradient(to bottom, rgba(255, 254, 251, 0.8), rgba(255, 254, 251, 0));
+  content: "";
+  pointer-events: none;
+}
+
+/* The writing area is intentionally top-aligned so the grid stays reachable on short phones. */
+
+.fill-focus-body {
+  justify-content: flex-start;
+  padding-top: clamp(14px, 3vh, 28px);
+}
+
+.fill-focus-intro {
+  align-items: flex-start;
+}
+
+.listen-audio-note {
+  display: block;
+  margin: -7px 0 1px;
+  color: #527693;
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.45;
+}
+
+.review-save {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+.review-save.is-saved svg {
+  color: #e9a92f;
+}
+
+.saved-question-actions .saved-remove {
+  color: #a56f0b;
+  border-color: #f0d27f;
+  background: #fff9e7;
+}
+
+.saved-question-actions .saved-remove svg {
+  color: #e8aa2c;
+}
+
+.saved-question-actions .saved-remove:hover {
+  border-color: #e5b448;
+  background: #fff3c9;
+}

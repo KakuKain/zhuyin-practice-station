@@ -2,7 +2,8 @@ export type CircledTerm = { text: string; syllables: readonly string[] };
 
 function term(text: string, reading: string): CircledTerm {
   const syllables = reading.split("|");
-  if (Array.from(text).length !== syllables.length) throw new Error(`圈詞「${text}」的注音格數不一致`);
+  if (Array.from(text).length !== syllables.length)
+    throw new Error(`圈詞「${text}」的注音格數不一致`);
   return { text, syllables };
 }
 
