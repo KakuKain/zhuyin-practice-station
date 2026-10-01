@@ -36,7 +36,7 @@ test("server-renders the public zhuyin practice station", async () => {
   assert.doesNotMatch(html, /首頁/);
 });
 
-test("individual Zhuyin prompts use the official clips at a gentler playback rate", async () => {
+test("individual Zhuyin prompts use the official clips at normal playback rate", async () => {
   const fs = await import("node:fs/promises");
   const page = await fs.readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
   const generator = await fs.readFile(new URL("../scripts/generate-listening-audio.mjs", import.meta.url), "utf8");
@@ -44,7 +44,11 @@ test("individual Zhuyin prompts use the official clips at a gentler playback rat
   assert.equal(symbols.length, 37);
   assert.match(generator, /officialAudioBase.*language\.moe\.gov\.tw/);
   assert.match(generator, /F\$\{officialIndex \+ 1\}\.WAV/);
-  assert.match(page, /audio\.playbackRate = isZhuyinPrompt \? 0\.84 : 1/);
+  assert.match(page, /const audioPlaybackRate = 0\.76/);
+  assert.match(page, /const zhuyinPlaybackRate = 1/);
+  assert.match(page, /audio\.playbackRate = isZhuyinPrompt \? zhuyinPlaybackRate : audioPlaybackRate/);
+  assert.match(page, /audio\.preservesPitch = true/);
+  assert.match(page, /audioTailDelayMs = 650/);
   assert.match(page, /\?v=44/);
   for (const symbol of symbols) {
     const filename = symbol.codePointAt(0).toString(16);
@@ -322,7 +326,8 @@ test("every listening prompt has an on-site audio clip and the settings pages ha
     const file = new URL(`../public/listening-audio/${name}.m4a`, import.meta.url);
     assert.ok((await fs.stat(file)).size > 1024, `missing playable clip: ${text}`);
   }
-  assert.match(page, /audio\.play\(\)\.catch/);
+  assert.match(page, /audio\.play\(\)\.then/);
+  assert.match(page, /\.catch\(\(\) =>/);
   assert.match(page, /const isSymbol = literalSymbol && \/\^\[\\u3105-\\u3129\]\+\$\//);
   assert.match(page, /isSymbol \? text : syllableGlyphs\[text\] \?\? text/);
   assert.match(page, /literalSymbols=\{currentQuestion\.category === "symbols"\}/);
@@ -338,10 +343,13 @@ test("parent review, listening preferences, and deferred reinforcement remain av
   const page = await (await import("node:fs/promises")).readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
   assert.match(page, /ListeningSettings = \{ repeatCount: 1 \| 2 \| 3; intervalSeconds: 5 \| 8 \| 10 \}/);
   assert.match(page, /listeningSettingsStorageKey/);
-  assert.match(page, /listenPhase === "ready" \? <div className="listen-ready-card"/);
+  assert.match(page, /listenPhase === "ready" \? <><div className="listen-ready-progress"/);
+  assert.match(page, /aria-label="開始聽"/);
+  assert.doesNotMatch(page, /慢速播放/);
   assert.match(page, /repeatTimeoutRef\.current = window\.setTimeout/);
   assert.match(page, /listeningSettings\.intervalSeconds \* 1000/);
-  assert.match(page, /onEnded=\{\(\) => \{ setPlayingSymbol\(null\); playbackEndedRef\.current\(\); \}\}/);
+  assert.match(page, /const finishPlayback = useCallback/);
+  assert.match(page, /onEnded=\{finishPlayback\}/);
   assert.doesNotMatch(page, /repeatPlaybacks = Array\.from/);
   assert.match(page, /needsPractice: true/);
   assert.match(page, /現在補強/);
