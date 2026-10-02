@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import { SoundPractice } from "../sound-practice/SoundPractice";
 import type { AppController } from "../usePracticeApp";
 import { SectionHeading } from "../../components/AppChrome";
 import { fillFavoriteKey, fillLocation } from "./practice-storage";
@@ -33,9 +35,13 @@ export function PracticeList({
     | "undoUnfavorite"
     | "setView"
     | "speak"
+    | "stopPlayback"
+    | "audioLoading"
+    | "audioError"
     | "storageError"
   >;
 }) {
+  const [soundPracticeOpen, setSoundPracticeOpen] = useState(false);
   const {
     fillFavorites,
     openFillFavorite,
@@ -57,6 +63,8 @@ export function PracticeList({
     speak,
     storageError,
   } = app;
+  if (soundPracticeOpen)
+    return <SoundPractice audio={app} onBack={() => setSoundPracticeOpen(false)} />;
   return (
     <section className="page-section practice-page">
       <SectionHeading
@@ -64,6 +72,22 @@ export function PracticeList({
         title="練習紀錄"
         description="收藏與待補強，隨時重練。"
       />
+      <div className="sound-practice-entry">
+        <Headphones size={28} weight="duotone" aria-hidden="true" />
+        <div>
+          <h2>辨音小練習</h2>
+          <p>先聽兩個音，再做 6 題。不用寫字。</p>
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            app.stopPlayback();
+            setSoundPracticeOpen(true);
+          }}
+        >
+          開始辨音
+        </button>
+      </div>
       {storageError && (
         <p className="practice-storage-error" role="alert">
           這個瀏覽器目前無法儲存收藏；關閉頁面後，紀錄可能會消失。

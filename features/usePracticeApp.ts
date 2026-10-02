@@ -953,6 +953,7 @@ export function usePracticeApp() {
     setView,
     speak,
     startListening,
+    stopPlayback,
     startRetryWriting,
     storageError,
     singleQuestionPractice,

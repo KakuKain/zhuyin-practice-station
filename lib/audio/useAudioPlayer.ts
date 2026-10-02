@@ -17,6 +17,11 @@ type Options = {
   setPracticeNotice: StateSetter<string>;
   onStopRepeat: () => void;
 };
+export type ClipOptions = {
+  playbackRate?: number;
+  allowSynthesis?: boolean;
+  onEnded?: () => void;
+};
 export function useAudioPlayer({
   view,
   lessonSymbols,
@@ -39,6 +44,7 @@ export function useAudioPlayer({
 
   const playbackTokenRef = useRef(0);
   const audioLoadTimeoutRef = useRef<number | null>(null);
+  const clipEndedRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     // Recreate the cache during React's development effect replay as well.
@@ -66,6 +72,7 @@ export function useAudioPlayer({
 
   const stopPlayback = useCallback(() => {
     playbackTokenRef.current += 1;
+    clipEndedRef.current = null;
     if (audioLoadTimeoutRef.current !== null) window.clearTimeout(audioLoadTimeoutRef.current);
     audioLoadTimeoutRef.current = null;
     onStopRepeat();
@@ -87,6 +94,9 @@ export function useAudioPlayer({
     const playbackToken = playbackTokenRef.current;
     setPlayingSymbol(null);
     setAudioLoading(false);
+    const onEnded = clipEndedRef.current;
+    clipEndedRef.current = null;
+    onEnded?.();
     if (playbackTailTimeoutRef.current !== null)
       window.clearTimeout(playbackTailTimeoutRef.current);
     playbackTailTimeoutRef.current = window.setTimeout(() => {
@@ -96,7 +106,7 @@ export function useAudioPlayer({
   }, [playbackEndedRef]);
 
   const speak = useCallback(
-    (text: string) => {
+    (text: string, options: ClipOptions = {}) => {
       const audio = playbackRef.current;
       if (!audio) {
         setAudioError(true);
@@ -104,6 +114,7 @@ export function useAudioPlayer({
         return;
       }
       stopPlayback();
+      clipEndedRef.current = options.onEnded ?? null;
       const playbackToken = playbackTokenRef.current;
       setAudioError(false);
       setAudioLoading(true);
@@ -124,7 +135,8 @@ export function useAudioPlayer({
       setPlayingSymbol(isZhuyinPrompt ? text : null);
       // Keep one natural reading per clip; the listening timer controls repeats.
       // Symbols stay at normal speed; only generated character/word clips are slower.
-      audio.playbackRate = isZhuyinPrompt ? zhuyinPlaybackRate : audioPlaybackRate;
+      audio.playbackRate =
+        options.playbackRate ?? (isZhuyinPrompt ? zhuyinPlaybackRate : audioPlaybackRate);
       audio.preservesPitch = true;
       (audio as HTMLAudioElement & { webkitPreservesPitch?: boolean }).webkitPreservesPitch = true;
       const url = listeningAudioUrl(text);
@@ -137,7 +149,7 @@ export function useAudioPlayer({
         })
         .catch(() => {
           if (playbackToken !== playbackTokenRef.current) return;
-          if (isZhuyinPrompt) {
+          if (isZhuyinPrompt || options.allowSynthesis === false) {
             loaded();
             setPlayingSymbol(null);
             setAudioLoading(false);

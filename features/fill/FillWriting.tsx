@@ -5,6 +5,7 @@ import { LoadingOverlay, ResourceNotice } from "../../components/AppChrome";
 import { InkNotice, InkTools } from "../../components/InkTools";
 import { FocusHeader } from "../../components/FocusHeader";
 import { courseArtwork } from "../courses/course-data";
+import { FillPositionPeek } from "./FillPositionPeek";
 
 export function FillWriting({
   app,
@@ -32,6 +33,10 @@ export function FillWriting({
     | "saveFillDrawing"
     | "selectedLesson"
     | "writtenCount"
+    | "lessonLines"
+    | "fillStrokes"
+    | "fillPendingCells"
+    | "fillDraftRef"
   >;
 }) {
   const {
@@ -56,13 +61,17 @@ export function FillWriting({
     saveFillDrawing,
     selectedLesson,
     writtenCount,
+    lessonLines,
+    fillStrokes,
+    fillPendingCells,
+    fillDraftRef,
   } = app;
 
   if (activeFillCell === null) return null;
   const lineIndex = fillLineForCell(activeFillCell);
   const position = activeFillCell - fillLineStarts[lineIndex] + 1;
   return (
-    <main className="fill-focus-shell">
+    <main className="fill-focus-shell has-position-peek">
       {loadingMessage && <LoadingOverlay label={loadingMessage} />}
       <FocusHeader
         onBack={leaveFillCell}
@@ -92,6 +101,13 @@ export function FillWriting({
             alt=""
           />
         </div>
+        <FillPositionPeek
+          key={activeFillCell}
+          lineLengths={lessonLines.map((line) => line.length)}
+          activeCell={activeFillCell}
+          strokes={fillStrokes}
+          pending={{ ...fillPendingCells, [activeFillCell]: fillDraftRef.current }}
+        />
         <div className="fill-canvas-tools">
           <InkTools
             erasing={fillEraserActive}
