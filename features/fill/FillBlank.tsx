@@ -1,4 +1,5 @@
 "use client";
+import { isFillCellComplete } from "./fill-draft-policy";
 
 import type { AppController } from "../usePracticeApp";
 import { courseArtwork } from "../courses/course-data";
@@ -102,8 +103,8 @@ export function FillBlank({
           }
         >
           {lessonLines.map((line, lineIndex) => {
-            const complete = line.filter(
-              (_, offset) => fillStrokes[fillLineStarts[lineIndex] + offset]?.length,
+            const complete = line.filter((_, offset) =>
+              isFillCellComplete(fillLineStarts[lineIndex] + offset, fillStrokes, fillPendingCells),
             ).length;
             return (
               <button
@@ -149,15 +150,16 @@ export function FillBlank({
                 <span className="fill-line-label">第{lineIndex + 1}行</span>
                 {line.map((_, itemIndex) => {
                   const index = lineStart + itemIndex;
+                  const hasPending = fillPendingCells[index] !== undefined;
                   return (
                     <button
-                      className={`syllable-cell fill-cell ${fillStrokes[index]?.length ? "is-filled" : "is-target"} ${fillPendingCells[index]?.length ? "is-in-progress" : ""} ${fillNeedsRetry.includes(index) ? "is-needs-retry" : ""}`}
+                      className={`syllable-cell fill-cell ${isFillCellComplete(index, fillStrokes, fillPendingCells) ? "is-filled" : "is-target"} ${hasPending ? "is-in-progress" : ""} ${fillNeedsRetry.includes(index) ? "is-needs-retry" : ""}`}
                       key={index}
                       type="button"
-                      aria-label={`第 ${lineIndex + 1} 行第 ${itemIndex + 1} 格，${fillPendingCells[index]?.length ? "尚未完成，繼續寫注音" : fillNeedsRetry.includes(index) ? "待重寫" : fillStrokes[index]?.length ? "修改注音" : "寫注音"}`}
+                      aria-label={`第 ${lineIndex + 1} 行第 ${itemIndex + 1} 格，${hasPending ? "尚未完成，繼續寫注音" : fillNeedsRetry.includes(index) ? "待重寫" : fillStrokes[index]?.length ? "修改注音" : "寫注音"}`}
                       onClick={() => openFillCell(index)}
                     >
-                      {fillPendingCells[index]?.length ? (
+                      {hasPending ? (
                         <InkPreview strokes={fillPendingCells[index]} />
                       ) : fillStrokes[index]?.length ? (
                         <InkPreview strokes={fillStrokes[index]} />
@@ -182,7 +184,11 @@ export function FillBlank({
           className="fill-begin-button"
           type="button"
           onClick={() =>
-            openFillCell(lessonItems.findIndex((_, index) => !fillStrokes[index]?.length))
+            openFillCell(
+              lessonItems.findIndex(
+                (_, index) => !isFillCellComplete(index, fillStrokes, fillPendingCells),
+              ),
+            )
           }
         >
           {writtenCount ? "從下一格繼續" : "從第一格開始"}{" "}

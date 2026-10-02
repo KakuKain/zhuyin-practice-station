@@ -51,7 +51,7 @@ export function useFillDraft({
             ...fillDraftRef.current,
             ...(fillActiveStrokeRef.current?.length ? [fillActiveStrokeRef.current] : []),
           ];
-          if (strokes.length) pendingCells[activeFillCell] = strokes;
+          pendingCells[activeFillCell] = strokes;
         }
         if (!Object.keys(fillStrokes).length && !Object.keys(pendingCells).length) {
           clearFillDraft(selectedLesson);

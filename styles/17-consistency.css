@@ -112,6 +112,8 @@
   place-items: center;
   width: 100%;
   direction: ltr;
+  min-height: 170px;
+  align-items: start;
 }
 .canvas-zone.is-word .word-paper {
   width: min(var(--word-cell-size), calc(100% - 104px));
@@ -126,7 +128,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  gap: 9px;
+  gap: 3px;
   width: 44px;
 }
 .word-canvas-tools .word-paper-label {
@@ -153,6 +155,8 @@
 }
 .canvas-toolbar {
   align-self: stretch;
+  flex-direction: column;
+  gap: 4px;
 }
 .canvas-zone:not(.is-word) .canvas-toolbar {
   order: -1;
@@ -166,6 +170,84 @@
   min-height: 44px;
   border-radius: 12px;
   font-size: 1rem;
+}
+
+/* Ink tools stay outside the paper and share the same behavior in both modes. */
+.ink-tools {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.ink-tools .ink-tool {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 5px 9px;
+  border: 1px solid #c9dce8;
+  border-radius: 12px;
+  background: #fbfdff;
+  color: #365a77;
+  font-size: 0.875rem;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.ink-tools .ink-tool:hover:not(:disabled) {
+  background: #edf6ff;
+}
+.ink-tools .ink-tool:disabled {
+  opacity: 0.42;
+  cursor: default;
+}
+.ink-tools .ink-tool.is-active {
+  border-color: #d49a39;
+  background: #fff3cf;
+  color: #895511;
+  box-shadow: 0 0 0 2px rgba(235, 183, 80, 0.18);
+}
+.ink-tools.is-compact {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 3px;
+}
+.ink-tools.is-compact .ink-tool {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+}
+.ink-tools .ink-clear {
+  color: #6d7f8e;
+}
+.fill-canvas-tools {
+  justify-content: center;
+}
+.ink-notice {
+  margin: 6px auto 0;
+  max-width: 440px;
+  color: #65807e;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  text-align: center;
+}
+.ink-notice.is-erasing {
+  color: #895511;
+}
+canvas.is-erasing {
+  cursor: crosshair;
+  outline: 3px solid rgba(235, 183, 80, 0.5);
+  outline-offset: -3px;
+}
+.canvas-zone.is-locked .ink-undo,
+.canvas-zone.is-locked .ink-clear {
+  display: none;
+}
+.canvas-zone.is-locked .word-canvas-row {
+  min-height: 0;
 }
 
 /* The ready panel is constrained by its own width, not the desktop viewport. */

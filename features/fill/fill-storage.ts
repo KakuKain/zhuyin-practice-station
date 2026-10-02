@@ -6,7 +6,8 @@ export const fillDraftCookieKey = (lessonIndex: number) => `zhuyin_fill_draft_${
 
 export const validInkStrokes = (value: unknown): value is InkStroke[] =>
   Array.isArray(value) &&
-  value.length <= 200 &&
+  // A partial erase may split one original stroke into several fragments.
+  value.length <= 2000 &&
   value.every(
     (stroke) =>
       Array.isArray(stroke) &&

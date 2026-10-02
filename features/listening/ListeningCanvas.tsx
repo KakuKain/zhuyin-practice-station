@@ -2,7 +2,8 @@
 
 import type { CSSProperties } from "react";
 import type { AppController } from "../usePracticeApp";
-import { Eraser, Play } from "@phosphor-icons/react";
+import { Play } from "@phosphor-icons/react";
+import { InkNotice, InkTools } from "../../components/InkTools";
 
 export function ListeningCanvas({
   app,
@@ -11,8 +12,13 @@ export function ListeningCanvas({
     AppController,
     | "beginDrawing"
     | "canvasRef"
-    | "clearCanvas"
     | "clearWordCanvas"
+    | "clearListeningCell"
+    | "listeningEraserCell"
+    | "listeningUndoAvailable"
+    | "listeningInkNotice"
+    | "toggleListeningEraser"
+    | "undoListeningInk"
     | "draw"
     | "endDrawing"
     | "isWordQuestion"
@@ -27,8 +33,13 @@ export function ListeningCanvas({
   const {
     beginDrawing,
     canvasRef,
-    clearCanvas,
     clearWordCanvas,
+    clearListeningCell,
+    listeningEraserCell,
+    listeningUndoAvailable,
+    listeningInkNotice,
+    toggleListeningEraser,
+    undoListeningInk,
     draw,
     endDrawing,
     isWordQuestion,
@@ -58,18 +69,17 @@ export function ListeningCanvas({
                   <span className="word-paper-label" aria-hidden="true">
                     第{index + 1}字
                   </span>
-                  <button
-                    type="button"
-                    className="word-paper-clear"
-                    aria-label={`清除語詞第 ${index + 1} 字`}
-                    title={`清除第 ${index + 1} 字`}
-                    disabled={
-                      !wordInk[index] || (listenPhase !== "active" && listenPhase !== "retry")
-                    }
-                    onClick={() => clearWordCanvas(index)}
-                  >
-                    <Eraser size={19} aria-hidden="true" />
-                  </button>
+                  <InkTools
+                    compact
+                    cellLabel={`語詞第 ${index + 1} 字`}
+                    erasing={listeningEraserCell === index}
+                    hasInk={Boolean(wordInk[index])}
+                    canUndo={Boolean(listeningUndoAvailable[index])}
+                    disabled={listenPhase !== "active" && listenPhase !== "retry"}
+                    onEraser={() => toggleListeningEraser(index)}
+                    onUndo={() => undoListeningInk(index)}
+                    onClear={() => clearWordCanvas(index)}
+                  />
                 </div>
                 <div className="canvas-paper word-paper">
                   <canvas
@@ -77,11 +87,11 @@ export function ListeningCanvas({
                       wordCanvasRefs.current[index] = element;
                     }}
                     data-word-index={index}
+                    className={listeningEraserCell === index ? "is-erasing" : undefined}
                     onPointerDown={beginDrawing}
                     onPointerMove={draw}
                     onPointerUp={endDrawing}
                     onPointerCancel={endDrawing}
-                    onPointerLeave={endDrawing}
                     aria-label={`語詞第 ${index + 1} 字田字格手寫區`}
                   />
                 </div>
@@ -92,11 +102,11 @@ export function ListeningCanvas({
           <div className="canvas-paper">
             <canvas
               ref={canvasRef}
+              className={listeningEraserCell === 0 ? "is-erasing" : undefined}
               onPointerDown={beginDrawing}
               onPointerMove={draw}
               onPointerUp={endDrawing}
               onPointerCancel={endDrawing}
-              onPointerLeave={endDrawing}
               aria-label="田字格手寫區"
             />
           </div>
@@ -124,16 +134,27 @@ export function ListeningCanvas({
         )}
       </div>
       <div className="canvas-toolbar">
-        <span>{isWordQuestion ? "每格寫一字；可分別清除" : "田字格"}</span>
         {!isWordQuestion && (
-          <button
-            type="button"
-            aria-label="清除重寫"
-            onClick={clearCanvas}
+          <InkTools
+            erasing={listeningEraserCell === 0}
+            hasInk={Boolean(wordInk[0])}
+            canUndo={Boolean(listeningUndoAvailable[0])}
             disabled={listenPhase !== "active" && listenPhase !== "retry"}
-          >
-            <Eraser size={20} aria-hidden="true" /> 清除
-          </button>
+            onEraser={() => toggleListeningEraser(0)}
+            onUndo={() => undoListeningInk(0)}
+            onClear={() => clearListeningCell(0)}
+          />
+        )}
+        {(listenPhase === "active" || listenPhase === "retry") && (
+          <InkNotice
+            erasing={listeningEraserCell !== null}
+            notice={listeningInkNotice}
+            cellLabel={
+              isWordQuestion && listeningEraserCell !== null
+                ? `第 ${listeningEraserCell + 1} 字`
+                : ""
+            }
+          />
         )}
       </div>
     </div>

@@ -31,8 +31,13 @@ test("two to five character canvases retain sequential labels and per-character 
     const app: ComponentProps<typeof ListeningCanvas>["app"] = {
       beginDrawing() {},
       canvasRef: createRef<HTMLCanvasElement>(),
-      clearCanvas() {},
       clearWordCanvas() {},
+      clearListeningCell() {},
+      listeningEraserCell: null,
+      listeningUndoAvailable: Array(wordLength).fill(true),
+      listeningInkNotice: "",
+      toggleListeningEraser() {},
+      undoListeningInk() {},
       draw() {},
       endDrawing() {},
       isWordQuestion: true,
@@ -56,14 +61,17 @@ test("two to five character canvases retain sequential labels and per-character 
       Array.from({ length: wordLength }, (_, index) => index),
     );
     for (let index = 1; index <= wordLength; index++) {
-      assert.ok(html.includes(`aria-label="清除語詞第 ${index} 字"`));
+      assert.ok(html.includes(`aria-label="圈選擦除語詞第 ${index} 字"`));
+      assert.ok(html.includes(`aria-label="復原語詞第 ${index} 字筆跡"`));
+      assert.ok(html.includes(`aria-label="清空語詞第 ${index} 字"`));
       assert.ok(html.includes(`aria-label="語詞第 ${index} 字田字格手寫區"`));
     }
     // Each tool rail is a sibling before the paper, never a canvas overlay.
     assert.equal((html.match(/class="word-canvas-row"/g) ?? []).length, wordLength);
     assert.equal((html.match(/class="word-canvas-tools"/g) ?? []).length, wordLength);
     assert.equal(
-      (html.match(/<\/button><\/div><div class="canvas-paper word-paper"><canvas/g) ?? []).length,
+      (html.match(/<\/button><\/div><\/div><div class="canvas-paper word-paper"><canvas/g) ?? [])
+        .length,
       wordLength,
     );
   }

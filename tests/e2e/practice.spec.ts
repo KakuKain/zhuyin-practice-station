@@ -23,6 +23,56 @@ async function inkPixels(canvas: Locator) {
   });
 }
 
+async function circleInk(page: Page, canvas: Locator) {
+  const box = (await canvas.boundingBox())!;
+  const points = [
+    [0.4, 0.4],
+    [0.6, 0.4],
+    [0.6, 0.6],
+    [0.4, 0.6],
+    [0.4, 0.4],
+  ];
+  await page.mouse.move(box.x + box.width * points[0][0], box.y + box.height * points[0][1]);
+  await page.mouse.down();
+  for (const [x, y] of points.slice(1))
+    await page.mouse.move(box.x + box.width * x, box.y + box.height * y, { steps: 8 });
+  await page.mouse.up();
+}
+
+test("lasso keeps outside stroke portions and undo restores the original without changing saved format", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+  await openLesson(page);
+  await page.getByRole("button", { name: /第一關 課文默寫/ }).click();
+  await page.getByRole("button", { name: "從第一格開始", exact: false }).click();
+  const canvas = page.locator("canvas");
+  await drawStroke(page, canvas);
+  const before = await inkPixels(canvas);
+  await page.getByRole("button", { name: "圈選擦除這格", exact: true }).click();
+  await circleInk(page, canvas);
+  const after = await inkPixels(canvas);
+  expect(after).toBeGreaterThan(20);
+  expect(after).toBeLessThan(before);
+  await expect(page.getByRole("button", { name: "圈選擦除這格", exact: true })).toHaveAttribute(
+    "aria-pressed",
+    "false",
+  );
+  const saved = await page.evaluate(() =>
+    JSON.parse(localStorage.getItem("zhuyin-fill-draft-v1-0")!),
+  );
+  expect(saved.version).toBe(1);
+  expect(saved.pendingCells[0]).toHaveLength(2);
+  await page.getByRole("button", { name: "復原這格筆跡", exact: true }).click();
+  expect(await inkPixels(canvas)).toBe(before);
+  await page.getByRole("button", { name: "清空這格", exact: true }).click();
+  expect(await inkPixels(canvas)).toBe(0);
+  await expect(page.getByRole("button", { name: "完成這格", exact: true })).toBeDisabled();
+  await page.getByRole("button", { name: "復原這格筆跡", exact: true }).click();
+  expect(await inkPixels(canvas)).toBe(before);
+});
+
 test.beforeEach(async ({ page }) => {
   page.on("dialog", (dialog) => void dialog.accept());
 });
@@ -295,7 +345,7 @@ test("320px word writing keeps tools outside centered squares and clears only on
     await drawStroke(page, row.locator("canvas"));
   }
   const before = await inkPixels(page.locator("canvas").last());
-  await page.getByRole("button", { name: "清除語詞第 1 字", exact: true }).click();
+  await page.getByRole("button", { name: "清空語詞第 1 字", exact: true }).click();
   expect(await inkPixels(page.locator("canvas").first())).toBe(0);
   expect(await inkPixels(page.locator("canvas").last())).toBe(before);
 });

@@ -1,6 +1,7 @@
 "use client";
 
 import type { AppController } from "../usePracticeApp";
+import { isFillCellComplete } from "./fill-draft-policy";
 
 export function FillDialogs({
   app,
@@ -46,7 +47,11 @@ export function FillDialogs({
           <h2 id="fill-resume-title">要繼續上次的默寫嗎？</h2>
           <p id="fill-resume-description">
             第{lessonNumber}課「{lesson.title}」的筆跡已保存在這台裝置。 已寫{" "}
-            {Object.values(fillResumeDraft.strokes).filter((strokes) => strokes.length > 0).length}{" "}
+            {
+              lessonItems.filter((_, index) =>
+                isFillCellComplete(index, fillResumeDraft.strokes, fillResumeDraft.pendingCells),
+              ).length
+            }{" "}
             / {lessonItems.length} 格
             {Object.keys(fillResumeDraft.pendingCells).length > 0 &&
               `，另有 ${Object.keys(fillResumeDraft.pendingCells).length} 格未完成`}

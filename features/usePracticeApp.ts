@@ -37,6 +37,7 @@ import {
 
 import { exercises, lessonNumerals, lessons } from "./courses/course-data";
 import { clearFillDraft, readFillDraft, writeFillDraft } from "./fill/fill-storage";
+import { isFillCellComplete } from "./fill/fill-draft-policy";
 import { fillFavoriteKey } from "./practice/practice-storage";
 
 export function usePracticeApp() {
@@ -175,7 +176,9 @@ export function usePracticeApp() {
     lessonLines.slice(0, lineIndex).reduce((count, line) => count + line.length, 0),
   );
 
-  const writtenCount = lessonItems.filter((_, index) => fillStrokes[index]?.length).length;
+  const writtenCount = lessonItems.filter((_, index) =>
+    isFillCellComplete(index, fillStrokes, fillPendingCells),
+  ).length;
 
   const fillComplete = writtenCount === lessonItems.length;
 
@@ -191,6 +194,11 @@ export function usePracticeApp() {
     moveFillDrawing,
     endFillDrawing,
     clearFillDrawing,
+    fillEraserActive,
+    fillCanUndo,
+    fillInkNotice,
+    toggleFillEraser,
+    undoFillInk,
   } = useFillCanvas({
     view,
     activeFillCell,
@@ -263,13 +271,17 @@ export function usePracticeApp() {
 
   const {
     wordInk,
-    setWordInk,
     hasInk,
-    setHasInk,
     canvasRef,
     wordCanvasRefs,
     clearCanvas,
     clearWordCanvas,
+    clearListeningCell,
+    listeningEraserCell,
+    listeningUndoAvailable,
+    listeningInkNotice,
+    toggleListeningEraser,
+    undoListeningInk,
     beginDrawing,
     draw,
     endDrawing,
@@ -391,14 +403,11 @@ export function usePracticeApp() {
     clearListenTimers();
     stopPlayback();
     setListenExitOpen(false);
-    const canvas = canvasRef.current;
-    if (canvas) canvas.getContext("2d")?.clearRect(0, 0, canvas.width, canvas.height);
+    clearCanvas();
     setListenIndex(index);
     setListenPhase("ready");
     setSecondsLeft(30);
     setPlayCount(0);
-    setHasInk(false);
-    setWordInk([]);
     setAudioError(false);
     setRetryMessage("");
     setListenMessage("按下「開始聽」才會播放題目。時間會從這裡開始倒數。 ");
@@ -583,8 +592,7 @@ export function usePracticeApp() {
     setListenPhase("active");
     setSecondsLeft(questionDuration);
     setPlayCount(1);
-    setHasInk(false);
-    setWordInk([]);
+    clearCanvas();
     setListenMessage("第一次播放中，Canvas 已開放，可以邊聽邊寫。 ");
     speak(currentQuestion.audioText);
   };
@@ -592,8 +600,7 @@ export function usePracticeApp() {
   const startRetryWriting = () => {
     repeatRemainingRef.current = listeningSettings.repeatCount - 1;
     autoRepeatEnabledRef.current = true;
-    setHasInk(false);
-    setWordInk([]);
+    clearCanvas();
     setListenPhase("retry");
     setSecondsLeft(questionDuration);
     setPlayCount((current) => current + 1);
@@ -667,17 +674,21 @@ export function usePracticeApp() {
     }
     if (wasFilled) {
       if (remainingRetry.length) setActiveFillCell(remainingRetry[0]);
-      else if (Object.keys(next).length === lessonItems.length) openFillReview();
+      else if (lessonItems.every((_, itemIndex) => isFillCellComplete(itemIndex, next, pending)))
+        openFillReview();
       return;
     }
     const lineStart = fillLineStarts[lineIndex];
     const nextEmpty = lessonLines[lineIndex].findIndex(
-      (_, offset) => !next[lineStart + offset]?.length,
+      (_, offset) => !isFillCellComplete(lineStart + offset, next, pending),
     );
     if (nextEmpty >= 0) setActiveFillCell(lineStart + nextEmpty);
-    else if (Object.keys(next).length === lessonItems.length) openFillReview();
+    else if (lessonItems.every((_, itemIndex) => isFillCellComplete(itemIndex, next, pending)))
+      openFillReview();
     else {
-      const nextUnwritten = lessonItems.findIndex((_, itemIndex) => !next[itemIndex]?.length);
+      const nextUnwritten = lessonItems.findIndex(
+        (_, itemIndex) => !isFillCellComplete(itemIndex, next, pending),
+      );
       if (nextUnwritten >= 0) setActiveFillCell(nextUnwritten);
     }
   };
@@ -817,6 +828,12 @@ export function usePracticeApp() {
     clearFillDrawing,
     clearWordCanvas,
     completedFillLessons,
+    clearListeningCell,
+    listeningEraserCell,
+    listeningUndoAvailable,
+    listeningInkNotice,
+    toggleListeningEraser,
+    undoListeningInk,
     confirmLeaveFocus,
     confirmFillReview,
     currentQuestion,
@@ -833,6 +850,11 @@ export function usePracticeApp() {
     fillHasInk,
     fillIsDirty,
     fillLineForCell,
+    fillEraserActive,
+    fillCanUndo,
+    fillInkNotice,
+    toggleFillEraser,
+    undoFillInk,
     fillLineStarts,
     fillNeedsRetry,
     fillParentChecked,

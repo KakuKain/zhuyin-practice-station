@@ -3,7 +3,7 @@
 import type { AppController } from "../usePracticeApp";
 import { fillFavoriteKey, fillLocation } from "../practice/practice-storage";
 import { InkPreview, LoadingOverlay, ResourceNotice } from "../../components/AppChrome";
-import { Eraser } from "@phosphor-icons/react";
+import { InkNotice, InkTools } from "../../components/InkTools";
 import { FocusHeader } from "../../components/FocusHeader";
 import { ReviewActions } from "../../components/ReviewActions";
 import { ZhuyinStack } from "../../components/Zhuyin";
@@ -15,6 +15,11 @@ export function FillPractice({
     AppController,
     | "beginFillDrawing"
     | "clearFillDrawing"
+    | "fillEraserActive"
+    | "fillCanUndo"
+    | "fillInkNotice"
+    | "toggleFillEraser"
+    | "undoFillInk"
     | "endFillDrawing"
     | "fillCanvasRef"
     | "fillDraftRef"
@@ -41,6 +46,11 @@ export function FillPractice({
   const {
     beginFillDrawing,
     clearFillDrawing,
+    fillEraserActive,
+    fillCanUndo,
+    fillInkNotice,
+    toggleFillEraser,
+    undoFillInk,
     endFillDrawing,
     fillCanvasRef,
     fillDraftRef,
@@ -91,18 +101,18 @@ export function FillPractice({
             <p>寫好後交給家長檢查，正確答案會在下一頁顯示。</p>
           </div>
           <div className="fill-canvas-tools">
-            <button
-              type="button"
-              className="fill-clear-button"
-              aria-label="清除重寫"
-              onClick={clearFillDrawing}
-            >
-              <Eraser size={20} aria-hidden="true" />
-              清除
-            </button>
+            <InkTools
+              erasing={fillEraserActive}
+              hasInk={fillHasInk}
+              canUndo={fillCanUndo}
+              onEraser={() => toggleFillEraser()}
+              onUndo={() => undoFillInk()}
+              onClear={clearFillDrawing}
+            />
           </div>
           <div className="fill-writing-grid">
             <canvas
+              className={fillEraserActive ? "is-erasing" : undefined}
               ref={fillCanvasRef}
               onPointerDown={beginFillDrawing}
               onPointerMove={moveFillDrawing}
@@ -111,6 +121,7 @@ export function FillPractice({
               aria-label={`${favorite.character}注音手寫區`}
             />
           </div>
+          <InkNotice erasing={fillEraserActive} notice={fillInkNotice} />
           <div className="fill-writing-actions">
             <button
               type="button"
