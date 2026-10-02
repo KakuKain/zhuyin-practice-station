@@ -2,6 +2,7 @@
 
 import { usePersistentState } from "../lib/storage/usePersistentState";
 import { useAudioPlayer } from "../lib/audio/useAudioPlayer";
+import { useCustomRecordings } from "../lib/audio/useCustomRecordings";
 import { readListeningSettings, validateListeningSettings } from "./settings/listening-settings";
 import { useFillDraft } from "./fill/useFillDraft";
 import { useFillCanvas } from "./fill/useFillCanvas";
@@ -219,6 +220,7 @@ export function usePracticeApp() {
     if (repeatTimeoutRef.current !== null) window.clearTimeout(repeatTimeoutRef.current);
     repeatTimeoutRef.current = null;
   }, []);
+  const customAudio = useCustomRecordings();
   const {
     playingSymbol,
     setPlayingSymbol,
@@ -237,6 +239,7 @@ export function usePracticeApp() {
     playbackEndedRef,
     setPracticeNotice,
     onStopRepeat,
+    getCustomRecording: customAudio.get,
   });
 
   const hasFillDraft =
@@ -394,10 +397,10 @@ export function usePracticeApp() {
         repeatRemainingRef.current -= 1;
         setPlayCount((current) => current + 1);
         setListenMessage(`第 ${nextPlay} 次播放中，可以繼續寫。`);
-        speak(currentQuestion.audioText);
+        speak(currentQuestion.audioText, { pronunciation: currentQuestion.answer });
       }, listeningSettings.intervalSeconds * 1000);
     };
-  }, [listeningSettings, currentQuestion.audioText, speak]);
+  }, [listeningSettings, currentQuestion.audioText, currentQuestion.answer, speak]);
 
   const resetListeningQuestion = (index = 0) => {
     clearListenTimers();
@@ -594,7 +597,7 @@ export function usePracticeApp() {
     setPlayCount(1);
     clearCanvas();
     setListenMessage("第一次播放中，Canvas 已開放，可以邊聽邊寫。 ");
-    speak(currentQuestion.audioText);
+    speak(currentQuestion.audioText, { pronunciation: currentQuestion.answer });
   };
 
   const startRetryWriting = () => {
@@ -605,12 +608,12 @@ export function usePracticeApp() {
     setSecondsLeft(questionDuration);
     setPlayCount((current) => current + 1);
     setListenMessage("題目正在播放，請重新寫一次；需要時可按重播。 ");
-    speak(currentQuestion.audioText);
+    speak(currentQuestion.audioText, { pronunciation: currentQuestion.answer });
   };
 
   const replayQuestion = () => {
     setPlayCount((current) => current + 1);
-    speak(currentQuestion.audioText);
+    speak(currentQuestion.audioText, { pronunciation: currentQuestion.answer });
   };
 
   const fillLineForCell = (index: number) =>
@@ -819,6 +822,7 @@ export function usePracticeApp() {
   };
   return {
     activeFillCell,
+    customAudio,
     audioError,
     audioLoading,
     beginDrawing,

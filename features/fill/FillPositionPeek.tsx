@@ -16,12 +16,10 @@ export type PositionMapProps = {
 
 /** Only lengths and the child's own ink enter this component, never answers. */
 export function FillPositionMap({ lineLengths, activeCell, strokes, pending }: PositionMapProps) {
-  let start = 0;
   return (
     <div className="fill-position-map" dir="rtl" aria-label="整課默寫位置">
       {lineLengths.map((length, line) => {
-        const offset = start;
-        start += length;
+        const offset = lineLengths.slice(0, line).reduce((sum, count) => sum + count, 0);
         return (
           <div className="fill-position-column" key={line}>
             <span>第 {line + 1} 行</span>
@@ -47,8 +45,13 @@ export function FillPositionMap({ lineLengths, activeCell, strokes, pending }: P
   );
 }
 
-export function FillPositionPeek(props: PositionMapProps) {
+export function FillPositionPeek({
+  compact = false,
+  readDraft,
+  ...props
+}: PositionMapProps & { compact?: boolean; readDraft?: () => InkStroke[] }) {
   const [held, setHeld] = useState(false);
+  const [heldDraft, setHeldDraft] = useState<InkStroke[] | null>(null);
   const [hold] = useState(() => createPositionHold(setHeld));
   const [panelTop, setPanelTop] = useState(0);
   const mapRef = useRef<HTMLDivElement>(null);
@@ -81,7 +84,7 @@ export function FillPositionPeek(props: PositionMapProps) {
     });
   }, [held]);
   return (
-    <div className="fill-position-peek">
+    <div className={`fill-position-peek${compact ? " is-compact" : ""}`}>
       <button
         type="button"
         className="position-peek-button"
@@ -90,6 +93,10 @@ export function FillPositionPeek(props: PositionMapProps) {
         aria-describedby="position-peek-help"
         onPointerDown={(event) => {
           if (event.button !== 0 || !hold.pointerDown(event.pointerId)) return;
+          // Capture the latest ink on press, not by reading a canvas ref during render.
+          setHeldDraft(
+            readDraft?.().map((stroke) => stroke.map((point) => ({ ...point }))) ?? null,
+          );
           event.preventDefault();
           event.currentTarget.setPointerCapture(event.pointerId);
           setPanelTop(event.currentTarget.getBoundingClientRect().bottom + 12);
@@ -100,6 +107,9 @@ export function FillPositionPeek(props: PositionMapProps) {
         onContextMenu={(event) => event.preventDefault()}
         onKeyDown={(event) => {
           if (hold.keyDown(event.key)) {
+            setHeldDraft(
+              readDraft?.().map((stroke) => stroke.map((point) => ({ ...point }))) ?? null,
+            );
             event.preventDefault();
             setPanelTop(event.currentTarget.getBoundingClientRect().bottom + 12);
           }
@@ -112,7 +122,9 @@ export function FillPositionPeek(props: PositionMapProps) {
         <MapPin size={22} weight="duotone" aria-hidden="true" />
         按住看位置
       </button>
-      <p id="position-peek-help">亮起的是正在寫的格子，放開就繼續寫。</p>
+      <p id="position-peek-help" className={compact ? "visually-hidden" : undefined}>
+        亮起的是正在寫的格子，放開就繼續寫。
+      </p>
       {held && (
         <div
           className="fill-position-overlay"
@@ -123,7 +135,12 @@ export function FillPositionPeek(props: PositionMapProps) {
           <div className="fill-position-card">
             <strong>正在寫這裡</strong>
             <p>只顯示你的筆跡，不顯示答案。</p>
-            <FillPositionMap {...props} />
+            <FillPositionMap
+              {...props}
+              pending={
+                heldDraft ? { ...props.pending, [props.activeCell]: heldDraft } : props.pending
+              }
+            />
             <span className="position-map-legend">
               <i aria-hidden="true" />
               黃色亮格：目前位置

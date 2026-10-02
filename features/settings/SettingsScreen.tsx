@@ -3,8 +3,16 @@
 import type { AppController } from "../usePracticeApp";
 import { useState } from "react";
 import type { ListeningSettings } from "../types";
-import { ArrowLeft, ArrowRight, Info, MusicNotes, Question } from "@phosphor-icons/react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Info,
+  Microphone,
+  MusicNotes,
+  Question,
+} from "@phosphor-icons/react";
 import { siteReleaseNotes } from "../courses/course-data";
+import { CustomAudioPanel } from "./CustomAudioPanel";
 
 export function SettingsScreen({
   app,
@@ -17,6 +25,11 @@ export function SettingsScreen({
     | "setMorePanel"
     | "setView"
     | "settingsStorageError"
+    | "customAudio"
+    | "speak"
+    | "stopPlayback"
+    | "audioLoading"
+    | "audioError"
   >;
 }) {
   const {
@@ -52,6 +65,18 @@ export function SettingsScreen({
                   播放 {listeningSettings.repeatCount} 次 · 間隔 {listeningSettings.intervalSeconds}{" "}
                   秒 · {listeningSettings.answerTime === "relaxed" ? "寬鬆作答" : "一般作答"}
                 </small>
+              </span>
+              <span className="more-arrow" aria-hidden="true">
+                <ArrowRight size={21} weight="bold" />
+              </span>
+            </button>
+            <button type="button" onClick={() => setMorePanel("audio")}>
+              <span className="more-row-icon blue">
+                <Microphone size={21} aria-hidden="true" />
+              </span>
+              <span>
+                <strong>自訂讀音</strong>
+                <small>錄製或匯入清楚的生字、語詞讀音</small>
               </span>
               <span className="more-arrow" aria-hidden="true">
                 <ArrowRight size={21} weight="bold" />
@@ -104,6 +129,15 @@ export function SettingsScreen({
       >
         <ArrowLeft size={19} aria-hidden="true" /> 更多
       </button>
+      {morePanel === "audio" && (
+        <CustomAudioPanel
+          audio={app.customAudio}
+          speak={app.speak}
+          stopPlayback={app.stopPlayback}
+          audioLoading={app.audioLoading}
+          audioError={app.audioError}
+        />
+      )}
       {morePanel === "listening" && (
         <div id="listening-settings" className="more-detail-content">
           <h1>聽寫設定</h1>

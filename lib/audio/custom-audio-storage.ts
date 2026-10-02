@@ -1,0 +1,113 @@
+import {
+  recordingKey,
+  validateRecording,
+  type CustomRecording,
+  type RecordingInfo,
+} from "./custom-audio";
+
+const databaseName = "zhuyin-custom-audio-v1";
+const storeName = "recordings";
+
+/** Resolve on transaction completion: a successful request can still fail to commit. */
+async function transaction<T>(
+  mode: IDBTransactionMode,
+  action: (store: IDBObjectStore, result: (value: T) => void) => void,
+): Promise<T> {
+  if (typeof indexedDB === "undefined")
+    throw new Error("這個瀏覽器無法儲存錄音，請換一般瀏覽器模式再試。");
+  const db = await new Promise<IDBDatabase>((resolve, reject) => {
+    const request = indexedDB.open(databaseName, 1);
+    let expired = false;
+    const timeout = setTimeout(() => {
+      expired = true;
+      reject(new Error("錄音儲存區無法開啟，請關閉其他相同網站的分頁後再試。"));
+    }, 8000);
+    request.onupgradeneeded = () => {
+      if (!request.result.objectStoreNames.contains(storeName))
+        request.result.createObjectStore(storeName, { keyPath: "key" });
+    };
+    request.onerror = () => {
+      clearTimeout(timeout);
+      reject(request.error ?? new Error("無法開啟裝置錄音儲存區。"));
+    };
+    request.onsuccess = () => {
+      clearTimeout(timeout);
+      if (expired) request.result.close();
+      else resolve(request.result);
+    };
+  });
+  return new Promise<T>((resolve, reject) => {
+    let value: T;
+    const tx = db.transaction(storeName, mode);
+    tx.oncomplete = () => {
+      db.close();
+      resolve(value);
+    };
+    tx.onabort = () => {
+      db.close();
+      reject(tx.error ?? new Error("錄音沒有儲存成功，原本的錄音仍保留。"));
+    };
+    tx.onerror = () => {
+      /* Abort reports the final error; never report an early success. */
+    };
+    try {
+      action(tx.objectStore(storeName), (result) => {
+        value = result;
+      });
+    } catch (error) {
+      tx.abort();
+      db.close();
+      reject(error);
+    }
+  });
+}
+
+export const customAudioStorage = {
+  async get(text: string, pronunciation: string): Promise<CustomRecording | null> {
+    const value = await transaction<CustomRecording | undefined>("readonly", (store, result) => {
+      const request = store.get(recordingKey(text, pronunciation));
+      request.onsuccess = () => result(request.result);
+    });
+    if (!value) return null;
+    validateRecording(value);
+    return value;
+  },
+  list(): Promise<RecordingInfo[]> {
+    return transaction("readonly", (store, result) => {
+      const entries: RecordingInfo[] = [];
+      const cursor = store.openCursor();
+      cursor.onsuccess = () => {
+        if (!cursor.result) {
+          result(entries);
+          return;
+        }
+        const recording = cursor.result.value as CustomRecording;
+        // List metadata only: do not retain all audio blobs in React's state.
+        entries.push({
+          key: recording.key,
+          text: recording.text,
+          pronunciation: recording.pronunciation,
+          mimeType: recording.mimeType,
+          duration: recording.duration,
+          updatedAt: recording.updatedAt,
+        });
+        cursor.result.continue();
+      };
+    });
+  },
+  put(recording: CustomRecording): Promise<void> {
+    validateRecording(recording);
+    const { key, text, pronunciation, blob, mimeType, duration, updatedAt } = recording;
+    return transaction("readwrite", (store, result) => {
+      // Do not persist UI-only object URLs or other incidental fields.
+      store.put({ key, text, pronunciation, blob, mimeType, duration, updatedAt });
+      result(undefined);
+    });
+  },
+  remove(key: string): Promise<void> {
+    return transaction("readwrite", (store, result) => {
+      store.delete(key);
+      result(undefined);
+    });
+  },
+};

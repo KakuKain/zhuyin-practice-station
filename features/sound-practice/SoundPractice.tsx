@@ -40,6 +40,7 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack: () => v
     const token = generation.current;
     setPlaying(true);
     audio.speak(pair.sounds[choice].audioText, {
+      pronunciation: pair.sounds[choice].label,
       playbackRate: 1,
       allowSynthesis: false,
       onEnded: () => {
@@ -56,6 +57,7 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack: () => v
     setCanChoose(false);
     setPlaying(true);
     audio.speak(pair.sounds[questions[questionIndex].target].audioText, {
+      pronunciation: pair.sounds[questions[questionIndex].target].label,
       playbackRate: 1,
       allowSynthesis: false,
       onEnded: () => {

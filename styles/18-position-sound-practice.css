@@ -1,3 +1,218 @@
+/* Writing-first layout; tools and location stay outside the actual square. */
+.has-position-peek .fill-focus-body {
+  justify-content: flex-start;
+  gap: 0;
+  padding: 20px 18px max(22px, env(safe-area-inset-bottom));
+}
+.fill-writing-intro {
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto 18px;
+}
+.fill-writing-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.fill-writing-heading h1 {
+  margin: 0;
+  font-size: clamp(22px, 6vw, 26px);
+  line-height: 1.4;
+  letter-spacing: 0.025em;
+}
+.fill-writing-count {
+  flex: none;
+  color: #607c8f;
+  font-size: 13px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.fill-writing-count strong {
+  color: #286b87;
+  font-size: 18px;
+}
+.fill-writing-intro p {
+  margin: 7px 0 13px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.fill-writing-progress {
+  display: block;
+  width: 100%;
+  height: 5px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 10px;
+  background: #e2eeeb;
+  color: #7cbba7;
+  appearance: none;
+}
+.fill-writing-progress::-webkit-progress-bar {
+  border-radius: 10px;
+  background: #e2eeeb;
+}
+.fill-writing-progress::-webkit-progress-value {
+  border-radius: 10px;
+  background: #7cbba7;
+}
+.fill-writing-progress::-moz-progress-bar {
+  border-radius: 10px;
+  background: #7cbba7;
+}
+.fill-writing-workspace {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+  padding: 12px;
+  border: 1px solid #ddeae8;
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.87);
+  box-shadow: 0 8px 24px rgba(45, 86, 97, 0.045);
+}
+.fill-writing-position {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.fill-writing-location {
+  min-width: 0;
+  padding-left: 2px;
+}
+.fill-writing-location > span {
+  display: block;
+  margin-bottom: 2px;
+  color: #627e88;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.fill-writing-location strong {
+  color: #244e64;
+  font-size: 15px;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+.fill-position-peek.is-compact {
+  flex: 0 0 auto;
+  width: auto;
+  margin: 0;
+}
+.fill-position-peek.is-compact .position-peek-button {
+  min-height: 44px;
+  gap: 5px;
+  padding: 8px 10px;
+  border: 1px solid #cee1ed;
+  border-radius: 13px;
+  background: #eff7fc;
+  font-size: 14px;
+}
+.fill-position-peek.is-compact .position-peek-button[aria-expanded="true"] {
+  border-color: #d4a446;
+  background: #fff2c7;
+  color: #815610;
+}
+.has-position-peek .fill-writing-grid {
+  width: min(100%, 52dvh, 400px);
+  flex: 0 0 auto;
+  border: 2px solid #b6d5c9;
+  border-radius: 18px;
+  background: #fffefa;
+  box-shadow: 0 3px 0 #e1eee6;
+}
+.has-position-peek .fill-canvas-tools {
+  min-height: 48px;
+  margin: 0;
+}
+.fill-writing-workspace .ink-tools {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr 1fr;
+  gap: 3px;
+  width: 100%;
+  padding: 3px;
+  border-radius: 14px;
+  background: #f1f6f7;
+}
+.fill-writing-workspace .ink-tool {
+  gap: 4px;
+  min-height: 44px;
+  padding: 5px 4px;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  background: transparent;
+  color: #355e75;
+  font-size: 13px;
+}
+.fill-writing-workspace .ink-tool:disabled {
+  color: #7a8d99;
+  opacity: 1;
+}
+.fill-writing-workspace .ink-tool.is-active {
+  border-color: #e4c17b;
+  background: #fff3cf;
+  color: #895511;
+  box-shadow: 0 2px 4px rgba(130, 95, 24, 0.08);
+}
+.has-position-peek .fill-focus-body > .ink-notice {
+  width: 100%;
+  min-height: 21px;
+  margin: 12px auto 0;
+  padding-inline: 6px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.has-position-peek .fill-writing-actions {
+  flex: 0 0 auto;
+  margin: 16px auto 0;
+}
+.has-position-peek .fill-save-button {
+  min-height: 56px;
+  gap: 8px;
+  border-radius: 18px;
+  background:
+    linear-gradient(120deg, rgba(70, 145, 239, 0.96), rgba(34, 106, 215, 0.96)),
+    url("/course-art/course-card-paper-v1.webp") center / 240px 240px;
+  box-shadow:
+    0 4px 0 #c9e1f2,
+    0 7px 16px rgba(52, 120, 208, 0.12);
+  font-size: 18px;
+}
+.has-position-peek .fill-save-button:disabled {
+  background: #e6eef4;
+  color: #627c90;
+  box-shadow: 0 3px 0 #dbe6ed;
+}
+.has-position-peek :is(.position-peek-button, .ink-tool, .fill-save-button):focus-visible {
+  outline: 3px solid #2868b9;
+  outline-offset: 3px;
+}
+@media (max-width: 350px) {
+  .has-position-peek .fill-focus-body {
+    padding-inline: 12px;
+  }
+  .fill-writing-workspace {
+    gap: 10px;
+    padding: 10px;
+    border-radius: 22px;
+  }
+  .fill-writing-heading {
+    gap: 8px;
+  }
+  .fill-writing-count {
+    font-size: 12px;
+  }
+  .fill-writing-location strong {
+    font-size: 14px;
+  }
+  .fill-position-peek.is-compact .position-peek-button {
+    padding-inline: 8px;
+    font-size: 13px;
+  }
+}
+
 .fill-position-peek {
   display: flex;
   align-items: center;

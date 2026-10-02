@@ -210,7 +210,7 @@ export function PracticeList({
                   <div className="saved-question-actions">
                     <button
                       type="button"
-                      onClick={() => speak(question.audioText)}
+                      onClick={() => speak(question.audioText, { pronunciation: question.answer })}
                       aria-label={`播放第${lessonNumerals[lessonIndex]}課 ${question.audioText}`}
                     >
                       <SpeakerHigh size={18} aria-hidden="true" /> 播放

@@ -3,12 +3,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { RefObject } from "react";
 import type { ListeningQuestion, StateSetter, View } from "../../features/types";
 import { createAudioPreloader } from "./audio-preload";
-import {
-  listeningAudioUrl,
-  audioPlaybackRate,
-  zhuyinPlaybackRate,
-  audioTailDelayMs,
-} from "../../features/listening/listening-data";
+import { clipPolicy, type CustomRecording } from "./custom-audio";
+import { listeningAudioUrl, audioTailDelayMs } from "../../features/listening/listening-data";
 type Options = {
   view: View;
   lessonSymbols: readonly string[];
@@ -16,8 +12,10 @@ type Options = {
   playbackEndedRef: RefObject<() => void>;
   setPracticeNotice: StateSetter<string>;
   onStopRepeat: () => void;
+  getCustomRecording: (text: string, pronunciation: string) => Promise<CustomRecording | null>;
 };
 export type ClipOptions = {
+  pronunciation?: string;
   playbackRate?: number;
   allowSynthesis?: boolean;
   onEnded?: () => void;
@@ -29,6 +27,7 @@ export function useAudioPlayer({
   playbackEndedRef,
   setPracticeNotice,
   onStopRepeat,
+  getCustomRecording,
 }: Options) {
   const [playingSymbol, setPlayingSymbol] = useState<string | null>(null);
 
@@ -45,6 +44,7 @@ export function useAudioPlayer({
   const playbackTokenRef = useRef(0);
   const audioLoadTimeoutRef = useRef<number | null>(null);
   const clipEndedRef = useRef<(() => void) | null>(null);
+  const customUrlRef = useRef<string | null>(null);
 
   useEffect(() => {
     // Recreate the cache during React's development effect replay as well.
@@ -84,6 +84,8 @@ export function useAudioPlayer({
       audio.pause();
       audio.currentTime = 0;
     }
+    if (customUrlRef.current) URL.revokeObjectURL(customUrlRef.current);
+    customUrlRef.current = null;
     if ("speechSynthesis" in window) window.speechSynthesis.cancel();
     setPlayingSymbol(null);
     setAudioLoading(false);
@@ -94,6 +96,8 @@ export function useAudioPlayer({
     const playbackToken = playbackTokenRef.current;
     setPlayingSymbol(null);
     setAudioLoading(false);
+    if (customUrlRef.current) URL.revokeObjectURL(customUrlRef.current);
+    customUrlRef.current = null;
     const onEnded = clipEndedRef.current;
     clipEndedRef.current = null;
     onEnded?.();
@@ -133,51 +137,67 @@ export function useAudioPlayer({
       audioLoadTimeoutRef.current = window.setTimeout(failed, 15000);
       const isZhuyinPrompt = /^[\u3105-\u3129]+$/.test(text);
       setPlayingSymbol(isZhuyinPrompt ? text : null);
-      // Keep one natural reading per clip; the listening timer controls repeats.
-      // Symbols stay at normal speed; only generated character/word clips are slower.
-      audio.playbackRate =
-        options.playbackRate ?? (isZhuyinPrompt ? zhuyinPlaybackRate : audioPlaybackRate);
-      audio.preservesPitch = true;
-      (audio as HTMLAudioElement & { webkitPreservesPitch?: boolean }).webkitPreservesPitch = true;
-      const url = listeningAudioUrl(text);
-      audioPreloaderRef.current?.cancelWarmup(url);
-      audio.src = audioPreloaderRef.current?.playbackUrl(url) ?? url;
-      audio
-        .play()
-        .then(() => {
-          loaded();
-        })
-        .catch(() => {
-          if (playbackToken !== playbackTokenRef.current) return;
-          if (isZhuyinPrompt || options.allowSynthesis === false) {
+      const start = async () => {
+        // A failed custom lookup must not quietly substitute the old unclear voice.
+        const custom =
+          !isZhuyinPrompt && options.pronunciation
+            ? await getCustomRecording(text, options.pronunciation)
+            : null;
+        if (playbackToken !== playbackTokenRef.current) return;
+        const policy = clipPolicy(!!custom, isZhuyinPrompt, options.playbackRate);
+        audio.playbackRate = policy.playbackRate;
+        audio.preservesPitch = true;
+        (audio as HTMLAudioElement & { webkitPreservesPitch?: boolean }).webkitPreservesPitch =
+          true;
+        const url = listeningAudioUrl(text);
+        audioPreloaderRef.current?.cancelWarmup(url);
+        if (custom) {
+          customUrlRef.current = URL.createObjectURL(custom.blob);
+          audio.src = customUrlRef.current;
+        } else audio.src = audioPreloaderRef.current?.playbackUrl(url) ?? url;
+        await audio
+          .play()
+          .then(() => {
             loaded();
-            setPlayingSymbol(null);
-            setAudioLoading(false);
-            setAudioError(true);
-            if (view === "practice") setPracticeNotice("注音讀音無法播放，請重新整理後再試。");
-            return;
-          }
-          if ("speechSynthesis" in window) {
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = "zh-TW";
-            utterance.rate = 0.68;
-            utterance.onend = () => {
-              if (playbackToken === playbackTokenRef.current) {
-                finishPlayback();
-              }
-            };
-            utterance.onstart = loaded;
-            utterance.onerror = failed;
-            window.speechSynthesis.speak(utterance);
-          } else {
-            loaded();
-            setAudioLoading(false);
-            setAudioError(true);
-            if (view === "practice") setPracticeNotice("音訊無法播放，請檢查音量或網路後再試。");
-          }
-        });
+          })
+          .catch(() => {
+            if (playbackToken !== playbackTokenRef.current) return;
+            if (!policy.allowSynthesis || options.allowSynthesis === false) {
+              loaded();
+              setPlayingSymbol(null);
+              setAudioLoading(false);
+              setAudioError(true);
+              if (view === "practice")
+                setPracticeNotice(
+                  custom
+                    ? "自訂錄音無法播放，請到「更多 → 自訂讀音」重新錄製。"
+                    : "注音讀音無法播放，請重新整理後再試。",
+                );
+              return;
+            }
+            if ("speechSynthesis" in window) {
+              const utterance = new SpeechSynthesisUtterance(text);
+              utterance.lang = "zh-TW";
+              utterance.rate = 0.68;
+              utterance.onend = () => {
+                if (playbackToken === playbackTokenRef.current) {
+                  finishPlayback();
+                }
+              };
+              utterance.onstart = loaded;
+              utterance.onerror = failed;
+              window.speechSynthesis.speak(utterance);
+            } else {
+              loaded();
+              setAudioLoading(false);
+              setAudioError(true);
+              if (view === "practice") setPracticeNotice("音訊無法播放，請檢查音量或網路後再試。");
+            }
+          });
+      };
+      void start().catch(failed);
     },
-    [finishPlayback, stopPlayback, view, setPracticeNotice],
+    [finishPlayback, stopPlayback, view, setPracticeNotice, getCustomRecording],
   );
 
   const playPreviewSymbol = (symbol: string) => {
