@@ -3,6 +3,7 @@ import { useCallback, useEffect } from "react";
 import type { RefObject } from "react";
 import type { FillDraft, InkStroke, StateSetter, View } from "../types";
 import { clearFillDraft, writeFillDraft } from "./fill-storage";
+import { shouldCaptureFillCell } from "./fill-draft-policy";
 type Options = {
   view: View;
   fillDraftReady: boolean;
@@ -51,7 +52,8 @@ export function useFillDraft({
             ...fillDraftRef.current,
             ...(fillActiveStrokeRef.current?.length ? [fillActiveStrokeRef.current] : []),
           ];
-          pendingCells[activeFillCell] = strokes;
+          if (shouldCaptureFillCell(activeFillCell, strokes, fillStrokes, pendingCells))
+            pendingCells[activeFillCell] = strokes;
         }
         if (!Object.keys(fillStrokes).length && !Object.keys(pendingCells).length) {
           clearFillDraft(selectedLesson);

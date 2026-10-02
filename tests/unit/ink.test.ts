@@ -3,7 +3,7 @@ import test from "node:test";
 import { cloneInk, eraseInsideLasso, InkHistory, isUsableLasso } from "../../lib/ink/ink-path";
 import type { InkPoint, InkStroke } from "../../features/types";
 import { validateFillDraft } from "../../features/fill/fill-storage";
-import { isFillCellComplete } from "../../features/fill/fill-draft-policy";
+import { isFillCellComplete, shouldCaptureFillCell } from "../../features/fill/fill-draft-policy";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { InkTools } from "../../components/InkTools";
@@ -183,4 +183,11 @@ test("ink tool clicks never pass mouse events as a cell index", () => {
   const buttons = element.props.children as { props: { onClick: (event: unknown) => void } }[];
   for (const button of buttons) button.props.onClick({ type: "click" });
   assert.deepEqual(received, [[], [], []]);
+});
+
+test("draft capture preserves erased cells without inventing untouched blank drafts", () => {
+  assert.equal(shouldCaptureFillCell(0, [], {}, {}), false);
+  assert.equal(shouldCaptureFillCell(0, line, {}, {}), true);
+  assert.equal(shouldCaptureFillCell(0, [], { 0: line }, {}), true);
+  assert.equal(shouldCaptureFillCell(0, [], {}, { 0: [] }), true);
 });
