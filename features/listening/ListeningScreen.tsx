@@ -2,12 +2,10 @@
 import { ShowMsg } from "../../components/ShowMsg";
 
 import type { AppController } from "../usePracticeApp";
-import { listeningSectionLabel } from "./listening-data";
-import { SpeakerHigh, Timer } from "@phosphor-icons/react";
+import { listenCategoryLabels, listeningSectionLabel } from "./listening-data";
+import { ArrowLeft, SpeakerHigh } from "@phosphor-icons/react";
 import { FavoriteButton, ReviewActions } from "../../components/ReviewActions";
 import { useCatalogLesson } from "../courses/MaterialContext";
-import { FocusHeader } from "../../components/FocusHeader";
-import { listeningPhaseLabel } from "./listening-policy";
 import { AnswerDisplay } from "../../components/Zhuyin";
 import { AppHeader, LoadingOverlay, ResourceNotice } from "../../components/AppChrome";
 import { ListeningBatchReview } from "./ListeningBatchReview";
@@ -33,18 +31,15 @@ export function ListeningScreen({ app }: { app: AppController }) {
     listeningSettings,
     loadingMessage,
     resourceError,
-    playCount,
     playbackRef,
     replayQuestion,
     retryMessage,
     secondsLeft,
-    sectionProgress,
     listeningQuestions,
     sectionQuestionIndex,
     sectionQuestionCount,
     singleQuestionPractice,
     selectRemediation,
-    selectedLesson,
     setListenExitOpen,
     setListenPhase,
     setRetryMessage,
@@ -62,45 +57,33 @@ export function ListeningScreen({ app }: { app: AppController }) {
       {listenPhase === "ready" || listenPhase === "batch_review" ? (
         <AppHeader onCourses={leaveFocus} onBack={leaveFocus} backLabel="返回" />
       ) : (
-        <FocusHeader
-          onBack={leaveFocus}
-          backLabel={
-            singleQuestionPractice
-              ? "回到練習"
-              : catalogLesson.listeningOnly
-                ? "回到課程"
-                : "回到課文預覽"
-          }
-          lessonIndex={selectedLesson}
-          stage={
-            singleQuestionPractice
-              ? "單題重練"
-              : listeningSectionLabel(listeningQuestions, app.listenIndex)
-          }
-          progress={sectionProgress}
-          heading
-          status={
-            <>
-              {singleQuestionPractice && (
-                <span
-                  className={
-                    secondsLeft <= 8 && (listenPhase === "active" || listenPhase === "retry")
-                      ? "urgent"
-                      : ""
-                  }
-                >
-                  <Timer size={14} weight="bold" />{" "}
-                  {listenPhase === "active" || listenPhase === "retry"
-                    ? `${String(Math.floor(secondsLeft / 60)).padStart(2, "0")}:${String(secondsLeft % 60).padStart(2, "0")}`
-                    : listeningPhaseLabel(listenPhase)}
-                </span>
-              )}
-              <span aria-label={`已播放 ${playCount} 次`}>
-                <SpeakerHigh size={14} weight="bold" /> {playCount} 次
-              </span>
-            </>
-          }
-        />
+        <header className="listening-focus-header">
+          <button type="button" className="listening-header-back" onClick={leaveFocus}>
+            <ArrowLeft size={20} aria-hidden="true" />
+            <span>返回</span>
+          </button>
+          <h1 tabIndex={-1}>
+            <span>
+              {singleQuestionPractice ? "單題重練" : "聽寫"} ·{" "}
+              {listenCategoryLabels[currentQuestion.category]}
+            </span>
+            <small>
+              {singleQuestionPractice
+                ? ""
+                : `${app.listenIndex + 1} / ${listeningQuestions.length} 題`}
+              {isWordQuestion ? `${singleQuestionPractice ? "" : " · "}${wordLength} 字` : ""}
+              {singleQuestionPractice && (listenPhase === "active" || listenPhase === "retry")
+                ? ` ${String(Math.floor(secondsLeft / 60)).padStart(2, "0")}:${String(secondsLeft % 60).padStart(2, "0")}`
+                : ""}
+            </small>
+          </h1>
+          {(listenPhase === "active" || listenPhase === "retry") && (
+            <button type="button" className="listening-header-replay" onClick={replayQuestion}>
+              <SpeakerHigh size={20} aria-hidden="true" />
+              再聽一次
+            </button>
+          )}
+        </header>
       )}
       <div className="focus-content">
         <ResourceNotice failed={resourceError} />
@@ -151,7 +134,7 @@ export function ListeningScreen({ app }: { app: AppController }) {
                   <img
                     className="listen-ready-art"
                     src={
-                      selectedLesson === 7
+                      app.selectedLesson === 7
                         ? "/course-art/radish-story.webp"
                         : catalogLesson.artwork
                           ? `/course-art/${catalogLesson.artwork}-watercolor.webp`
@@ -174,11 +157,6 @@ export function ListeningScreen({ app }: { app: AppController }) {
         )}
         {audioError && (
           <ShowMsg error message="音訊無法播放。請檢查音量或網路，再按「再聽一次」。" />
-        )}
-        {(listenPhase === "active" || listenPhase === "retry") && (
-          <button type="button" className="listen-replay-button" onClick={replayQuestion}>
-            <SpeakerHigh size={18} aria-hidden="true" /> 再聽一次
-          </button>
         )}
         {listenPhase === "active" && !singleQuestionPractice && (
           <div className="listening-navigation">

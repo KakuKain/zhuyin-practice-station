@@ -406,3 +406,51 @@ canvas.is-erasing {
   font-weight: 800;
   color: #19375b;
 }
+
+.listening-focus-header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 14px;
+  background: #fffefb;
+  border-bottom: 1px solid #c7dce8;
+  flex-shrink: 0;
+}
+.listening-focus-header h1 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  color: #19375b;
+  font-size: 17px;
+  font-weight: 700;
+  text-align: center;
+}
+.listening-focus-header h1 small {
+  color: #617b91;
+  font-size: 14px;
+  font-weight: 500;
+}
+.listening-focus-header button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 11px 8px;
+  border: 0;
+  border-radius: 12px;
+  font: inherit;
+  color: #2d659d;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.listening-header-back {
+  background: transparent;
+}
+.listening-header-replay {
+  background: #eaf4fc;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+}
