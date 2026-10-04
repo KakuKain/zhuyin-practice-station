@@ -134,11 +134,13 @@ export function ListeningScreen({ app }: { app: AppController }) {
                   <img
                     className="listen-ready-art"
                     src={
-                      app.selectedLesson === 7
-                        ? "/course-art/radish-story.webp"
-                        : catalogLesson.artwork
-                          ? `/course-art/${catalogLesson.artwork}-watercolor.webp`
-                          : "/course-art/lesson-watercolor-paper.webp"
+                      catalogLesson.listeningOnly
+                        ? "/course-art/review-sleeping-cat-watercolor-v2.webp"
+                        : app.selectedLesson === 7
+                          ? "/course-art/radish-story.webp"
+                          : catalogLesson.artwork
+                            ? `/course-art/${catalogLesson.artwork}-watercolor.webp`
+                            : "/course-art/lesson-watercolor-paper.webp"
                     }
                     alt=""
                   />
