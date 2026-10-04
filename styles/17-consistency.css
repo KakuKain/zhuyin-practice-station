@@ -99,7 +99,7 @@
   width: 100%;
   max-width: 380px;
   margin-inline: auto;
-  --word-cell-size: min(210px, max(160px, calc((100dvh - 325px) / var(--word-count, 2))));
+  --word-cell-size: 320px;
 }
 .word-canvas-stack {
   width: 100%;
@@ -138,7 +138,7 @@
 .phase-remediation_offer .canvas-zone.is-word,
 .phase-retry_ready .canvas-zone.is-word {
   width: 100%;
-  --word-cell-size: min(160px, max(112px, calc((100dvh - 455px) / var(--word-count, 2))));
+  --word-cell-size: 320px;
 }
 .canvas-toolbar {
   align-self: stretch;
@@ -405,4 +405,31 @@ canvas.is-erasing {
   font-size: 26px;
   font-weight: 800;
   color: #19375b;
+}
+
+.word-canvas-row[hidden] {
+  display: none;
+}
+.word-cell-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.word-cell-navigation button {
+  background: #fff;
+  border: 1px solid #c7dce8;
+  color: #264d74;
+  padding: 10px;
+  border-radius: 10px;
+  font: inherit;
+}
+.word-cell-navigation button:disabled {
+  opacity: 0.4;
+}
+.phase-active .canvas-zone.is-word {
+  --word-cell-size: min(320px, max(190px, calc(100dvh - 440px)));
+}
+.word-canvas-tools .word-paper-label {
+  display: none;
 }

@@ -170,7 +170,7 @@ export function ListeningScreen({ app }: { app: AppController }) {
         ) : listenPhase === "batch_review" ? (
           <ListeningBatchReview app={app} />
         ) : (
-          <ListeningCanvas app={app} />
+          <ListeningCanvas key={currentQuestion.id} app={app} />
         )}
         {audioError && (
           <ShowMsg error message="音訊無法播放。請檢查音量或網路，再按「再聽一次」。" />
