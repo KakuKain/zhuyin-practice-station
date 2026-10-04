@@ -152,7 +152,12 @@ export function useAudioPlayer({
         const policy = clipPolicy(
           !!custom,
           isZhuyinPrompt,
-          options.playbackRate ?? (naturalReadingPrompts.has(text) ? 1 : undefined),
+          options.playbackRate ??
+            (naturalReadingPrompts.has(text)
+              ? 0.8
+              : view === "listen" && isZhuyinPrompt
+                ? 0.8
+                : undefined),
         );
         audio.playbackRate = policy.playbackRate;
         audio.preservesPitch = true;
@@ -187,7 +192,7 @@ export function useAudioPlayer({
             if ("speechSynthesis" in window) {
               const utterance = new SpeechSynthesisUtterance(text);
               utterance.lang = "zh-TW";
-              utterance.rate = 0.68;
+              utterance.rate = 0.6;
               utterance.onend = () => {
                 if (playbackToken === playbackTokenRef.current) {
                   finishPlayback();

@@ -40,7 +40,7 @@ export function validateRecording(recording: CustomRecording): void {
 /** Custom recordings never fall back to a synthetic voice, nor get slowed down. */
 export function clipPolicy(custom: boolean, symbol: boolean, requestedRate?: number) {
   return {
-    playbackRate: custom ? 1 : (requestedRate ?? (symbol ? 1 : 0.76)),
+    playbackRate: custom ? 1 : (requestedRate ?? (symbol ? 1 : 0.68)),
     allowSynthesis: !custom && !symbol,
   };
 }
