@@ -45,43 +45,13 @@ export function FillBlank({
     openFillCell,
     openFillReview,
     openListening,
-    selectedLesson,
     storageError,
     writtenCount,
   } = app;
   const catalogLesson = useCatalogLesson(app.selectedLesson);
   return (
     <section className={`page-section fill-page ${fillParentChecked ? "is-complete" : ""}`}>
-      <div className="fill-story-heading">
-        <div className="fill-story-copy">
-          <h1 className="fill-story-kicker">
-            第{lessonNumber}課{catalogLesson.custom ? " · 注音默寫" : ""}
-          </h1>
-          {catalogLesson.custom && (
-            <p className="fill-sheet-help">
-              {fillParentChecked
-                ? "家長已檢查。修改任何一格後，需要再檢查一次。"
-                : catalogLesson.custom
-                  ? "依字詞順序寫注音，再請家長對照答案。"
-                  : "先寫完整篇，再請家長對照答案。"}
-              {fillNeedsRetry.length > 0 && `有 ${fillNeedsRetry.length} 格待重寫。`}
-            </p>
-          )}
-        </div>
-        {!catalogLesson.custom && (
-          <img
-            className="fill-story-art"
-            src={
-              selectedLesson === 7
-                ? "/course-art/radish-story.webp"
-                : catalogLesson.artwork
-                  ? `/course-art/${catalogLesson.artwork}-watercolor.webp`
-                  : "/course-art/lesson-watercolor-paper.webp"
-            }
-            alt=""
-          />
-        )}
-      </div>
+      <h1 className="visually-hidden">{lesson.title}注音默寫</h1>
       <div className="fill-status-line">
         <span>
           {fillParentChecked ? "家長已檢查" : `已寫 ${writtenCount} / ${lessonItems.length} 格`}
@@ -126,11 +96,6 @@ export function FillBlank({
                     ? lessonNumber
                     : `第${lineIndex + (catalogLesson.custom ? 1 : 0)}行`}
                 </span>
-                {!catalogLesson.custom && lineIndex === 0 && (
-                  <span className="fill-title-number" dir="ltr">
-                    。
-                  </span>
-                )}
                 {line.map((_, itemIndex) => {
                   const index = lineStart + itemIndex;
                   const hasPending = fillPendingCells[index] !== undefined;
@@ -160,8 +125,12 @@ export function FillBlank({
         </div>
         {!fillParentChecked && (
           <img
-            className="fill-pencil-art"
-            src="/course-art/blue-watercolor-pencil-v2.webp"
+            className="fill-sheet-art"
+            src={
+              catalogLesson.artwork
+                ? `/course-art/${catalogLesson.artwork}-watercolor.webp`
+                : "/course-art/blue-watercolor-pencil-v2.webp"
+            }
             alt=""
             onError={(event) => {
               event.currentTarget.hidden = true;
@@ -210,7 +179,11 @@ export function FillBlank({
           </p>
           <img
             className="completion-pencil-art"
-            src="/course-art/blue-watercolor-pencil-v2.webp"
+            src={
+              catalogLesson.artwork
+                ? `/course-art/${catalogLesson.artwork}-watercolor.webp`
+                : "/course-art/blue-watercolor-pencil-v2.webp"
+            }
             alt=""
             onError={(event) => {
               event.currentTarget.hidden = true;

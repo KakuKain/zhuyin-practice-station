@@ -290,7 +290,7 @@
   font-size: 26px;
 }
 
-.fill-pencil-art {
+.fill-sheet-art {
   position: absolute;
   right: -16px;
   bottom: -18px;
@@ -371,7 +371,7 @@
   overflow: visible;
 }
 
-.is-fill .fill-pencil-art {
+.is-fill .fill-sheet-art {
   z-index: 2;
   right: -10px;
   bottom: -56px;
@@ -396,16 +396,4 @@
 }
 .fill-page .fill-story-art {
   max-height: 96px;
-}
-.fill-title-number {
-  display: block;
-  width: 100%;
-  text-align: center;
-  direction: ltr;
-  unicode-bidi: isolate;
-  font-family: "PingFang TC", "Noto Sans TC", system-ui, sans-serif;
-  min-height: 32px;
-  color: #173763;
-  font-weight: 800;
-  font-size: 22px;
 }
