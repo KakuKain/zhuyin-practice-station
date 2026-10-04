@@ -2,8 +2,9 @@
 
 import type { CSSProperties } from "react";
 import type { AppController } from "../usePracticeApp";
+import { ShowMsg } from "../../components/ShowMsg";
 import { Play } from "@phosphor-icons/react";
-import { InkNotice, InkTools } from "../../components/InkTools";
+import { InkTools } from "../../components/InkTools";
 
 export function ListeningCanvas({
   app,
@@ -149,15 +150,7 @@ export function ListeningCanvas({
       </div>
       <div className="canvas-toolbar">
         {(listenPhase === "active" || listenPhase === "retry") && (
-          <InkNotice
-            erasing={listeningEraserCell !== null}
-            notice={listeningInkNotice}
-            cellLabel={
-              isWordQuestion && listeningEraserCell !== null
-                ? `第 ${listeningEraserCell + 1} 字`
-                : ""
-            }
-          />
+          <ShowMsg message={listeningInkNotice} />
         )}
       </div>
     </div>

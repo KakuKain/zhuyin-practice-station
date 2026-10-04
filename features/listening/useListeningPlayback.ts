@@ -3,6 +3,7 @@ import { useCallback, useEffect, useEffectEvent } from "react";
 import type { ListenPhase, ListeningQuestion, ListeningSettings, StateSetter } from "../types";
 import type { useListeningTimers } from "./useListeningTimers";
 type Params = {
+  untimed?: boolean;
   timers: ReturnType<typeof useListeningTimers>;
   listeningSettings: ListeningSettings;
   currentQuestion: ListeningQuestion;
@@ -21,6 +22,7 @@ type Params = {
   setListenMessage: StateSetter<string>;
 };
 export function useListeningPlayback({
+  untimed = false,
   timers,
   listeningSettings,
   currentQuestion,
@@ -52,15 +54,13 @@ export function useListeningPlayback({
     playbackEndedRef.current = () => {
       if (!autoRepeatEnabledRef.current || repeatRemainingRef.current <= 0) return;
       const nextPlay = listeningSettings.repeatCount - repeatRemainingRef.current + 1;
-      setListenMessage(
-        `等待 ${listeningSettings.intervalSeconds} 秒後播放第 ${nextPlay} 次，可以繼續寫。`,
-      );
+      setListenMessage(`等待重播。`);
       repeatTimeoutRef.current = window.setTimeout(() => {
         repeatTimeoutRef.current = null;
         if (!autoRepeatEnabledRef.current || repeatRemainingRef.current <= 0) return;
         repeatRemainingRef.current -= 1;
         setPlayCount((current) => current + 1);
-        setListenMessage(`第 ${nextPlay} 次播放中，可以繼續寫。`);
+        setListenMessage(`第 ${nextPlay} 次播放。`);
         speak(currentQuestion.audioText, { pronunciation: currentQuestion.answer });
       }, listeningSettings.intervalSeconds * 1000);
     };
@@ -83,14 +83,19 @@ export function useListeningPlayback({
       stopPlayback();
       setSecondsLeft(0);
       setListenPhase("review");
-      setListenMessage(early ? "已交卷，請家長一起看看。" : "時間到，請把平板交給家長一起看看。");
+      setListenMessage(early ? "已交卷。" : "時間到。");
     },
     [clearListenTimers, stopPlayback, setSecondsLeft, setListenPhase, setListenMessage],
   );
 
   const remainingSeconds = useEffectEvent(() => secondsLeft);
   useEffect(() => {
-    if (listenExitOpen || audioLoading || (listenPhase !== "active" && listenPhase !== "retry"))
+    if (
+      untimed ||
+      listenExitOpen ||
+      audioLoading ||
+      (listenPhase !== "active" && listenPhase !== "retry")
+    )
       return;
 
     timerRef.current = window.setInterval(() => {
@@ -102,6 +107,7 @@ export function useListeningPlayback({
 
     return clearAnswerTimers;
   }, [
+    untimed,
     clearAnswerTimers,
     finishListening,
     listenIndex,
@@ -122,6 +128,11 @@ export function useListeningPlayback({
     [clearListenTimers, stopPlayback, setSecondsLeft, setListenPhase, setListenMessage],
   );
 
+  const resumeListening = () => {
+    repeatRemainingRef.current = listeningSettings.repeatCount - 1;
+    autoRepeatEnabledRef.current = true;
+  };
+
   const startListening = () => {
     repeatRemainingRef.current = listeningSettings.repeatCount - 1;
     autoRepeatEnabledRef.current = true;
@@ -129,7 +140,7 @@ export function useListeningPlayback({
     setSecondsLeft(questionDuration);
     setPlayCount(1);
     clearCanvas();
-    setListenMessage("第一次播放中，Canvas 已開放，可以邊聽邊寫。 ");
+    setListenMessage("播放中。");
     speak(currentQuestion.audioText, { pronunciation: currentQuestion.answer });
   };
 
@@ -140,7 +151,7 @@ export function useListeningPlayback({
     setListenPhase("retry");
     setSecondsLeft(questionDuration);
     setPlayCount((current) => current + 1);
-    setListenMessage("題目正在播放，請重新寫一次；需要時可按重播。 ");
+    setListenMessage("請重新作答。");
     speak(currentQuestion.audioText, { pronunciation: currentQuestion.answer });
   };
 
@@ -149,5 +160,5 @@ export function useListeningPlayback({
     speak(currentQuestion.audioText, { pronunciation: currentQuestion.answer });
   };
 
-  return { finishListening, startListening, startRetryWriting, replayQuestion };
+  return { finishListening, startListening, startRetryWriting, replayQuestion, resumeListening };
 }

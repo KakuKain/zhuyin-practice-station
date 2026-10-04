@@ -2,7 +2,7 @@
 import { ShowMsg } from "../../components/ShowMsg";
 
 import type { AppController } from "../usePracticeApp";
-import { listenCategoryLabels } from "./listening-data";
+import { listeningSectionLabel } from "./listening-data";
 import { SpeakerHigh, Timer } from "@phosphor-icons/react";
 import { FavoriteButton, ReviewActions } from "../../components/ReviewActions";
 import { useCatalogLesson } from "../courses/MaterialContext";
@@ -10,6 +10,7 @@ import { FocusHeader } from "../../components/FocusHeader";
 import { listeningPhaseLabel } from "./listening-policy";
 import { AnswerDisplay } from "../../components/Zhuyin";
 import { AppHeader, LoadingOverlay, ResourceNotice } from "../../components/AppChrome";
+import { ListeningBatchReview } from "./ListeningBatchReview";
 import { ListeningCanvas } from "./ListeningCanvas";
 
 export function ListeningScreen({ app }: { app: AppController }) {
@@ -38,6 +39,7 @@ export function ListeningScreen({ app }: { app: AppController }) {
     retryMessage,
     secondsLeft,
     sectionProgress,
+    listeningQuestions,
     sectionQuestionIndex,
     sectionQuestionCount,
     singleQuestionPractice,
@@ -57,7 +59,7 @@ export function ListeningScreen({ app }: { app: AppController }) {
   return (
     <main className={`focus-shell phase-${listenPhase}`}>
       <audio ref={playbackRef} onEnded={finishPlayback} preload="none" hidden aria-hidden="true" />
-      {listenPhase === "ready" ? (
+      {listenPhase === "ready" || listenPhase === "batch_review" ? (
         <AppHeader onCourses={leaveFocus} onBack={leaveFocus} backLabel="返回" />
       ) : (
         <FocusHeader
@@ -70,23 +72,29 @@ export function ListeningScreen({ app }: { app: AppController }) {
                 : "回到課文預覽"
           }
           lessonIndex={selectedLesson}
-          stage={`${listenCategoryLabels[currentQuestion.category]} · ${listeningPhaseLabel(listenPhase)}`}
+          stage={
+            singleQuestionPractice
+              ? "單題重練"
+              : listeningSectionLabel(listeningQuestions, app.listenIndex)
+          }
           progress={sectionProgress}
           heading
           status={
             <>
-              <span
-                className={
-                  secondsLeft <= 8 && (listenPhase === "active" || listenPhase === "retry")
-                    ? "urgent"
-                    : ""
-                }
-              >
-                <Timer size={14} weight="bold" />{" "}
-                {listenPhase === "active" || listenPhase === "retry"
-                  ? `${String(Math.floor(secondsLeft / 60)).padStart(2, "0")}:${String(secondsLeft % 60).padStart(2, "0")}`
-                  : listeningPhaseLabel(listenPhase)}
-              </span>
+              {singleQuestionPractice && (
+                <span
+                  className={
+                    secondsLeft <= 8 && (listenPhase === "active" || listenPhase === "retry")
+                      ? "urgent"
+                      : ""
+                  }
+                >
+                  <Timer size={14} weight="bold" />{" "}
+                  {listenPhase === "active" || listenPhase === "retry"
+                    ? `${String(Math.floor(secondsLeft / 60)).padStart(2, "0")}:${String(secondsLeft % 60).padStart(2, "0")}`
+                    : listeningPhaseLabel(listenPhase)}
+                </span>
+              )}
               <span aria-label={`已播放 ${playCount} 次`}>
                 <SpeakerHigh size={14} weight="bold" /> {playCount} 次
               </span>
@@ -116,21 +124,12 @@ export function ListeningScreen({ app }: { app: AppController }) {
             <div className="listen-ready-card">
               <div className="listen-ready-context">
                 <span className="listen-ready-category">
-                  {
-                    { symbols: "注音符號", characters: "生字", words: "語詞" }[
-                      currentQuestion.category
-                    ]
-                  }
+                  {singleQuestionPractice
+                    ? "單題重練"
+                    : listeningSectionLabel(listeningQuestions, app.listenIndex)}
                 </span>
                 <h1>聽一聽，寫注音</h1>
               </div>
-              <p>
-                {isWordQuestion
-                  ? "按播放，聽完後每格寫一個字的注音。"
-                  : currentQuestion.category === "symbols"
-                    ? "按播放，聽完後在格子裡寫注音。"
-                    : "按播放，聽完後在格子裡寫完整注音。"}
-              </p>
               <div className="listen-ready-stage">
                 <button
                   type="button"
@@ -168,6 +167,8 @@ export function ListeningScreen({ app }: { app: AppController }) {
               </p>
             </div>
           </>
+        ) : listenPhase === "batch_review" ? (
+          <ListeningBatchReview app={app} />
         ) : (
           <ListeningCanvas app={app} />
         )}
@@ -179,7 +180,24 @@ export function ListeningScreen({ app }: { app: AppController }) {
             <SpeakerHigh size={18} aria-hidden="true" /> 再聽一次
           </button>
         )}
-        {listenPhase === "active" && (
+        {listenPhase === "active" && !singleQuestionPractice && (
+          <div className="listening-navigation">
+            <button
+              type="button"
+              disabled={app.listenIndex === 0}
+              onClick={() => app.goToListeningQuestion(app.listenIndex - 1)}
+            >
+              上一題
+            </button>
+            <button type="button" onClick={app.nextListeningAnswer}>
+              {app.listenIndex === listeningQuestions.length - 1 ? "全部寫完，開始檢查" : "下一題"}
+            </button>
+            <button type="button" onClick={app.openBatchReview}>
+              結束作答並檢查
+            </button>
+          </div>
+        )}
+        {listenPhase === "active" && singleQuestionPractice && (
           <button
             type="button"
             className="early-submit-button"
@@ -199,10 +217,10 @@ export function ListeningScreen({ app }: { app: AppController }) {
             </div>
             <p>
               {hasCompleteInk
-                ? "請家長依照孩子的手寫內容判定。"
+                ? "請家長檢查。"
                 : isWordQuestion
-                  ? `${wordLength} 格都寫完後，才可以判定答對；也可以選需要補強。`
-                  : "還沒有手寫內容；可以先按「需要補強」再練一次。"}
+                  ? `${wordLength} 格尚未全部完成。`
+                  : "尚未作答。"}
             </p>
             <ReviewActions
               correctDisabled={!hasCompleteInk}
@@ -215,7 +233,7 @@ export function ListeningScreen({ app }: { app: AppController }) {
         {listenPhase === "remediation_offer" && (
           <div className="remediation-offer">
             <strong>這題已加入待補強</strong>
-            <p>可以現在練，也可以先做下一題；稍後會留在「練習」。</p>
+
             <div>
               <button
                 type="button"
@@ -270,7 +288,7 @@ export function ListeningScreen({ app }: { app: AppController }) {
               disabled={!hasCompleteInk}
               onClick={submitRetryWriting}
             >
-              我寫好了，請家長看看 <span>→</span>
+              寫好了 <span>→</span>
             </button>
             <button type="button" className="remediation-later" onClick={deferRemediation}>
               稍後再練
@@ -293,7 +311,9 @@ export function ListeningScreen({ app }: { app: AppController }) {
             <span className="fill-dialog-eyebrow">聽寫練習</span>
             <h2 id="listen-exit-title">要先離開聽寫嗎？</h2>
             <p id="listen-exit-description">
-              {listenPhase === "active" || listenPhase === "retry" ? "倒數已暫停。" : ""}
+              {singleQuestionPractice && (listenPhase === "active" || listenPhase === "retry")
+                ? "倒數已暫停。"
+                : ""}
               離開後，這一輪未完成的進度與筆跡不會保留；已收藏與待補強的題目仍會留下。
             </p>
             <button

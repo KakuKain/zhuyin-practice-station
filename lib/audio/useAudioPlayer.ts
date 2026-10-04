@@ -4,7 +4,11 @@ import type { RefObject } from "react";
 import type { ListeningQuestion, StateSetter, View } from "../../features/types";
 import { createAudioPreloader } from "./audio-preload";
 import { clipPolicy, type CustomRecording } from "./custom-audio";
-import { listeningAudioUrl, audioTailDelayMs } from "../../features/listening/listening-data";
+import {
+  listeningAudioUrl,
+  dictationAudioUrl,
+  audioTailDelayMs,
+} from "../../features/listening/listening-data";
 type Options = {
   view: View;
   lessonSymbols: readonly string[];
@@ -66,7 +70,7 @@ export function useAudioPlayer({
   useEffect(() => {
     if (view !== "listen") return;
     audioPreloaderRef.current?.warm(
-      sessionQuestions.map((question) => listeningAudioUrl(question.audioText)),
+      sessionQuestions.map((question) => dictationAudioUrl(question.audioText)),
     );
   }, [view, sessionQuestions]);
 
@@ -149,7 +153,7 @@ export function useAudioPlayer({
         audio.preservesPitch = true;
         (audio as HTMLAudioElement & { webkitPreservesPitch?: boolean }).webkitPreservesPitch =
           true;
-        const url = listeningAudioUrl(text);
+        const url = view === "listen" ? dictationAudioUrl(text) : listeningAudioUrl(text);
         audioPreloaderRef.current?.cancelWarmup(url);
         if (custom) {
           customUrlRef.current = URL.createObjectURL(custom.blob);

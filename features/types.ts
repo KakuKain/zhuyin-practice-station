@@ -10,7 +10,14 @@ export type View =
   | "result";
 
 export type ListenPhase =
-  "ready" | "active" | "review" | "remediation_offer" | "choice" | "retry_ready" | "retry";
+  | "ready"
+  | "active"
+  | "batch_review"
+  | "review"
+  | "remediation_offer"
+  | "choice"
+  | "retry_ready"
+  | "retry";
 
 export type ParentResult = "correct" | "needs_review" | null;
 

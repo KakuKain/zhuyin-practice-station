@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { useInkCanvas } from "../../lib/ink/useInkCanvas";
-import type { ListenPhase, ListeningQuestion, View } from "../types";
+import type { InkStroke, ListenPhase, ListeningQuestion, View } from "../types";
 
 type Options = {
   view: View;
@@ -11,6 +11,7 @@ type Options = {
   currentQuestion: ListeningQuestion;
   isWordQuestion: boolean;
   wordLength: number;
+  readDraft?: (questionIndex: number, cellIndex: number) => InkStroke[];
 };
 
 export function useListeningCanvas({
@@ -20,17 +21,20 @@ export function useListeningCanvas({
   currentQuestion,
   isWordQuestion,
   wordLength,
+  readDraft,
 }: Options) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wordCanvasRefs = useRef<(HTMLCanvasElement | null)[]>([]);
   const editor = useInkCanvas({
     scope: `${view}:${listenIndex}:${currentQuestion.id}`,
-    mounted: view === "listen" && listenPhase !== "ready",
+    mounted: view === "listen" && listenPhase !== "ready" && listenPhase !== "batch_review",
     enabled: view === "listen" && (listenPhase === "active" || listenPhase === "retry"),
     count: isWordQuestion ? wordLength : 1,
+    readInitial: (index) => readDraft?.(listenIndex, index) ?? [],
     getCanvas: (index) => (isWordQuestion ? wordCanvasRefs.current[index] : canvasRef.current),
   });
   return {
+    readListeningInk: editor.snapshot,
     wordInk: editor.ink,
     hasInk: Boolean(editor.ink[0]),
     canvasRef,

@@ -384,3 +384,25 @@ canvas.is-erasing {
     --title-lesson: 1.875rem;
   }
 }
+
+.phase-active .canvas-zone:not(.is-word) {
+  width: min(100%, max(150px, calc(100dvh - 390px)), 430px);
+}
+.listening-navigation {
+  width: 100%;
+  flex-shrink: 0;
+}
+.listening-batch-review {
+  width: 100%;
+}
+
+.listening-review-controls .review-save {
+  width: auto;
+  margin: 0;
+  flex: 0 0 auto;
+}
+.listening-batch-review h1 {
+  font-size: 26px;
+  font-weight: 800;
+  color: #19375b;
+}

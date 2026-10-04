@@ -12,7 +12,7 @@ type Options = {
   enabled: boolean;
   count: number;
   getCanvas: (index: number) => HTMLCanvasElement | null;
-  readInitial?: () => InkStroke[];
+  readInitial?: (index: number) => InkStroke[];
   onChange?: (index: number, strokes: InkStroke[]) => void;
 };
 
@@ -41,7 +41,7 @@ export function useInkCanvas({
     erase: boolean;
   } | null>(null);
   const frameRef = useRef<number | null>(null);
-  const readInitialEvent = useEffectEvent(() => readInitial?.() ?? []);
+  const readInitialEvent = useEffectEvent((index: number) => readInitial?.(index) ?? []);
   const getCanvasEvent = useEffectEvent((index: number) => getCanvas(index));
 
   const updateFlags = () => {
@@ -100,7 +100,7 @@ export function useInkCanvas({
     stopGesture();
     historiesRef.current = Array.from(
       { length: count },
-      (_, index) => new InkHistory(index === 0 ? cloneInk(readInitialEvent()) : []),
+      (_, index) => new InkHistory(cloneInk(readInitialEvent(index))),
     );
     scopeRef.current = scope;
     changeEraser(null);
@@ -269,5 +269,6 @@ export function useInkCanvas({
     clear,
     undo,
     reset,
+    snapshot: () => historiesRef.current.map((history) => cloneInk(history.strokes)),
   };
 }

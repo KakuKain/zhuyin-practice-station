@@ -94,6 +94,11 @@ export function questionId(question: ListeningSeed): string {
 export function listeningAudioUrl(text: string): string {
   const example = combinedRhymeExample(text);
   if (example) return example.audioUrl;
+  return dictationAudioUrl(text);
+}
+
+// Exam playback uses reading-only clips, never dictionary attribute narration.
+export function dictationAudioUrl(text: string): string {
   const filename = [...text].map((character) => character.codePointAt(0)!.toString(16)).join("-");
   // These 37 clips changed source in v44; the query bypasses older browser caches.
   return `/listening-audio/${filename}.m4a${/^[\u3105-\u3129]$/.test(text) ? "?v=44" : ""}`;
@@ -232,9 +237,9 @@ export const fallbackListeningQuestion: ListeningQuestion = {
 };
 
 export const listenCategoryLabels: Record<ListenCategory, string> = {
-  symbols: "第一大題 · 注音符號",
-  characters: "第二大題 · 生字",
-  words: "第三大題 · 語詞",
+  symbols: "注音符號",
+  characters: "生字",
+  words: "語詞",
 };
 
 export function sectionPosition(questions: readonly ListeningQuestion[], index: number) {
@@ -252,3 +257,11 @@ export const legacySavedQuestionIndexes: Record<number, readonly number[]> = {
   0: [4, 5, 7],
   2: [4, 5, 6],
 };
+
+export function listeningSectionLabel(questions: readonly ListeningQuestion[], index: number) {
+  const category = questions[index]?.category;
+  if (!category) return "聽寫";
+  const categories = [...new Set(questions.map((question) => question.category))];
+  const ordinal = ["一", "二", "三"][categories.indexOf(category)];
+  return `第${ordinal}大題 · ${listenCategoryLabels[category]}`;
+}

@@ -1,4 +1,5 @@
 "use client";
+import { isListeningAnswerComplete } from "./listening/listening-policy";
 
 import { usePersistentState } from "../lib/storage/usePersistentState";
 import { useAudioPlayer } from "../lib/audio/useAudioPlayer";
@@ -89,15 +90,17 @@ export function usePracticeApp() {
 
   const [playCount, setPlayCount] = useState(0);
 
-  const [listenMessage, setListenMessage] = useState(
-    "按下「開始聽」才會播放題目。時間會從這裡開始倒數。 ",
-  );
+  const [listenMessage, setListenMessage] = useState("");
 
   const { loadingMessage, resourceError, showLoading } = usePageResources(view);
 
   const [retryMessage, setRetryMessage] = useState("");
 
   const [sessionScore, setSessionScore] = useState({ listeningCorrect: 0 });
+
+  const listeningDraftsRef = useRef<Record<number, InkStroke[][]>>({});
+  const [listeningDrafts, setListeningDrafts] = useState<Record<number, InkStroke[][]>>({});
+  const [batchNeedsReview, setBatchNeedsReview] = useState<number[]>([]);
 
   const [reviewedIndexes, setReviewedIndexes] = useState<number[]>([]);
 
@@ -151,9 +154,10 @@ export function usePracticeApp() {
   } = useLessonPreview(lesson.lines);
   const exercise = lesson.exercise;
 
-  const lessonLines = lesson.custom || lesson.listeningOnly
-    ? exercise.lines
-    : [exercise.lines[exercise.lines.length - 1], ...exercise.lines.slice(0, -1)];
+  const lessonLines =
+    lesson.custom || lesson.listeningOnly
+      ? exercise.lines
+      : [exercise.lines[exercise.lines.length - 1], ...exercise.lines.slice(0, -1)];
 
   const lessonItems = exercise.lines.flat();
   const {
@@ -275,6 +279,7 @@ export function usePracticeApp() {
     hasInk,
     canvasRef,
     wordCanvasRefs,
+    readListeningInk,
     clearCanvas,
     clearWordCanvas,
     clearListeningCell,
@@ -293,6 +298,8 @@ export function usePracticeApp() {
     currentQuestion,
     isWordQuestion,
     wordLength,
+    readDraft: (questionIndex, cellIndex) =>
+      listeningDraftsRef.current[questionIndex]?.[cellIndex] ?? [],
   });
 
   const hasCompleteInk = isWordQuestion
@@ -307,8 +314,8 @@ export function usePracticeApp() {
   const sectionProgress = singleQuestionPractice
     ? "單題重練"
     : isWordQuestion
-      ? `第 ${sectionQuestionIndex + 1} 詞 / ${sectionQuestionCount} · ${wordLength} 字`
-      : `第 ${sectionQuestionIndex + 1} 小題 / ${sectionQuestionCount}`;
+      ? `第 ${sectionQuestionIndex + 1} 題 / ${sectionQuestionCount} · ${wordLength} 字`
+      : `第 ${sectionQuestionIndex + 1} 題 / ${sectionQuestionCount}`;
 
   const sessionWritingUnits = listeningQuestions.reduce(
     (count, question) => count + question.answer.split("|").length,
@@ -334,10 +341,15 @@ export function usePracticeApp() {
         item.needsPractice,
     ),
   ).length;
-  const sessionAnsweredUnits = reviewedIndexes.reduce(
-    (count, index) => count + (listeningQuestions[index]?.answer.split("|").length ?? 0),
-    0,
-  );
+  const sessionAnsweredUnits = !singleQuestionPractice
+    ? Object.values(listeningDrafts).reduce(
+        (sum, cells) => sum + cells.filter((cell) => cell.length > 0).length,
+        0,
+      )
+    : reviewedIndexes.reduce(
+        (count, index) => count + (listeningQuestions[index]?.answer.split("|").length ?? 0),
+        0,
+      );
 
   usePagePosition(
     view,
@@ -353,9 +365,10 @@ export function usePracticeApp() {
     },
   );
 
-  const { finishListening, startListening, startRetryWriting, replayQuestion } =
+  const { finishListening, startListening, startRetryWriting, replayQuestion, resumeListening } =
     useListeningPlayback({
       timers,
+      untimed: !singleQuestionPractice,
       listeningSettings,
       currentQuestion,
       speak,
@@ -406,7 +419,7 @@ export function usePracticeApp() {
     setPlayCount(0);
     setAudioError(false);
     setRetryMessage("");
-    setListenMessage("按下「開始聽」才會播放題目。時間會從這裡開始倒數。 ");
+    setListenMessage("");
   };
 
   const prepareListening = (lessonIndex: number) => {
@@ -414,6 +427,9 @@ export function usePracticeApp() {
     setPracticeNotice("");
     setUnfavoriteUndo(null);
     setUnfavoriteFillUndo(null);
+    listeningDraftsRef.current = {};
+    setListeningDrafts({});
+    setBatchNeedsReview([]);
     setSessionQuestions(buildListeningSession(lessonIndex, catalog));
     resetListeningQuestion(0);
     setSessionScore({ listeningCorrect: 0 });
@@ -568,6 +584,66 @@ export function usePracticeApp() {
     setListenPhase("ready");
   };
 
+  const captureListeningAnswer = () => {
+    const next = { ...listeningDraftsRef.current, [listenIndex]: readListeningInk() };
+    listeningDraftsRef.current = next;
+    setListeningDrafts(next);
+    return next;
+  };
+  const goToListeningQuestion = (index: number) => {
+    if (listenPhase !== "batch_review") captureListeningAnswer();
+    clearListenTimers();
+    stopPlayback();
+    setListenIndex(index);
+    setListenPhase("active");
+    setPlayCount(1);
+    resumeListening();
+    const question = listeningQuestions[index];
+    speak(question.audioText, { pronunciation: question.answer });
+  };
+  const openBatchReview = () => {
+    captureListeningAnswer();
+    clearListenTimers();
+    stopPlayback();
+    setListenPhase("batch_review");
+  };
+  const nextListeningAnswer = () => {
+    if (listenIndex === listeningQuestions.length - 1) openBatchReview();
+    else goToListeningQuestion(listenIndex + 1);
+  };
+  const toggleBatchNeedsReview = (index: number) =>
+    setBatchNeedsReview((current) =>
+      current.includes(index) ? current.filter((item) => item !== index) : [...current, index],
+    );
+  const finishBatchReview = () => {
+    let correctUnits = 0;
+    let pending = 0;
+    listeningQuestions.forEach((question, index) => {
+      const units = question.answer.split("|").length;
+      const cells = listeningDraftsRef.current[index] ?? [];
+      const complete = isListeningAnswerComplete(question.answer, cells);
+      if (complete && !batchNeedsReview.includes(index)) {
+        correctUnits += units;
+        markQuestionPracticed(selectedLesson, question.id);
+      } else {
+        pending++;
+        saveQuestion(selectedLesson, question.id, true);
+      }
+    });
+    setReviewedIndexes(listeningQuestions.map((_, index) => index));
+    setSessionScore({ listeningCorrect: correctUnits });
+    recordSession("listening", sessionWritingUnits, correctUnits, pending);
+    setView("result");
+  };
+  const toggleBatchFavorite = (questionId: string) => {
+    const favorite = practiceState.savedQuestions.some(
+      (item) =>
+        item.lessonIndex === selectedLesson && item.questionId === questionId && item.isFavorite,
+    );
+    if (favorite) removeQuestion(selectedLesson, questionId);
+    else saveQuestion(selectedLesson, questionId);
+  };
+
   const goToNextQuestion = (
     correctUnits = sessionScore.listeningCorrect,
     pendingQuestions = pendingSessionCount,
@@ -663,6 +739,16 @@ export function usePracticeApp() {
     clearListenTimers,
   });
   return {
+    listeningQuestions,
+    listenIndex,
+    listeningDrafts,
+    batchNeedsReview,
+    goToListeningQuestion,
+    openBatchReview,
+    nextListeningAnswer,
+    toggleBatchNeedsReview,
+    finishBatchReview,
+    toggleBatchFavorite,
     ...materials,
     activeFillCell,
     customAudio,
