@@ -13,6 +13,7 @@ export function FillPractice({
 }: {
   app: Pick<
     AppController,
+    | "deferFillPractice"
     | "beginFillDrawing"
     | "clearFillDrawing"
     | "fillEraserActive"
@@ -70,7 +71,6 @@ export function FillPractice({
     setFillPracticeExitOpen,
     setFillPracticePhase,
     setFillPracticeStrokes,
-    setPracticeNotice,
     setView,
   } = app;
 
@@ -179,8 +179,7 @@ export function FillPractice({
             type="button"
             className="fill-practice-defer"
             onClick={() => {
-              setPracticeNotice("已保留這題，下次可以再練。");
-              setView("practice");
+              app.deferFillPractice();
             }}
           >
             稍後再練

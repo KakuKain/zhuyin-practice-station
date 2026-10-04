@@ -1,302 +1,293 @@
 "use client";
-import { ShowMsg } from "../../components/ShowMsg";
-
 import { useState } from "react";
-import { SoundPractice } from "../sound-practice/SoundPractice";
-import type { AppController } from "../usePracticeApp";
-import { PageHeading } from "../../components/PageHeading";
-import { fillFavoriteKey, fillLocation } from "./practice-storage";
-import { ArrowRight, Headphones, PencilLine, SpeakerHigh } from "@phosphor-icons/react";
+import {
+  ArrowRight,
+  CaretDown,
+  CaretUp,
+  Headphones,
+  PencilLine,
+  ArrowClockwise,
+} from "@phosphor-icons/react";
+import { ShowMsg } from "../../components/ShowMsg";
 import { FavoriteButton } from "../../components/ReviewActions";
-import { LessonLabel } from "../../components/LessonTitle";
+import { PageHeading } from "../../components/PageHeading";
+import { SoundPractice } from "../sound-practice/SoundPractice";
 import { useCatalog } from "../courses/MaterialContext";
-import { findQuestionSeed, listenCategoryLabels } from "../listening/listening-data";
+import { findQuestionSeed } from "../listening/listening-data";
+import { fillFavoriteKey } from "./practice-storage";
+import type { AppController } from "../usePracticeApp";
 
-export function PracticeList({
-  app,
-}: {
-  app: Pick<
-    AppController,
-    | "fillFavorites"
-    | "openFillFavorite"
-    | "openLesson"
-    | "openSavedQuestion"
-    | "practiceNotice"
-    | "practiceState"
-    | "removeFillFavorite"
-    | "saveFillFavorite"
-    | "removeQuestion"
-    | "toggleSavedQuestion"
-    | "unfavoriteUndo"
-    | "unfavoriteFillUndo"
-    | "undoFillUnfavorite"
-    | "setUnfavoriteFillUndo"
-    | "setUnfavoriteUndo"
-    | "setPracticeNotice"
-    | "undoUnfavorite"
-    | "setView"
-    | "speak"
-    | "stopPlayback"
-    | "audioLoading"
-    | "audioError"
-    | "storageError"
-  >;
-}) {
+type Filter = "all" | "fill" | "listening";
+export function PracticeList({ app }: { app: AppController }) {
   const catalog = useCatalog();
-  const lessonNumerals = Object.fromEntries(catalog.map((item) => [item.index, item.number]));
-  const lessons = Object.fromEntries(catalog.map((item) => [item.index, item]));
-  const [soundPracticeOpen, setSoundPracticeOpen] = useState(false);
-  const {
-    fillFavorites,
-    openFillFavorite,
-    openLesson,
-    openSavedQuestion,
-    practiceNotice,
-    practiceState,
-    removeFillFavorite,
-    saveFillFavorite,
-    toggleSavedQuestion,
-    unfavoriteUndo,
-    unfavoriteFillUndo,
-    undoFillUnfavorite,
-    setUnfavoriteFillUndo,
-    setUnfavoriteUndo,
-    setPracticeNotice,
-    undoUnfavorite,
-    setView,
-    speak,
-    storageError,
-  } = app;
-  if (soundPracticeOpen)
-    return <SoundPractice audio={app} onBack={() => setSoundPracticeOpen(false)} />;
+  const [filter, setFilter] = useState<Filter>("all");
+  const [expanded, setExpanded] = useState<number | null | undefined>(undefined);
+  const [showAllHistory, setShowAllHistory] = useState(false);
+  const [soundOpen, setSoundOpen] = useState(false);
+  const entries = [
+    ...app.fillFavorites.map((favorite) => ({
+      key: `fill:${fillFavoriteKey(favorite)}`,
+      lessonIndex: favorite.lessonIndex,
+      mode: "fill" as const,
+      word: favorite.character,
+      pending: favorite.status === "needs_rewrite",
+      mastered: favorite.status === "mastered",
+      saved: favorite.isFavorite !== false,
+      open: () => app.openFillFavorite(favorite),
+      toggle: () => {
+        if (favorite.isFavorite !== false) app.removeFillFavorite(favorite);
+        else app.saveFillFavorite(favorite);
+      },
+    })),
+    ...app.practiceState.savedQuestions.flatMap((saved) => {
+      const question = findQuestionSeed(saved.lessonIndex, saved.questionId, catalog);
+      if (!question) return [];
+      return [
+        {
+          key: `listen:${saved.lessonIndex}:${saved.questionId}`,
+          lessonIndex: saved.lessonIndex,
+          mode: "listening" as const,
+          word: question.audioText,
+          pending: Boolean(saved.needsPractice),
+          mastered: false,
+          saved: saved.isFavorite,
+          open: () => app.openSavedQuestion(saved.lessonIndex, saved.questionId),
+          toggle: () => {
+            app.setUnfavoriteFillUndo(null);
+            app.toggleSavedQuestion(saved.lessonIndex, saved.questionId, saved.isFavorite);
+          },
+        },
+      ];
+    }),
+  ]
+    .filter((entry) => filter === "all" || entry.mode === filter)
+    .sort((a, b) => Number(b.pending) - Number(a.pending));
+  const groups = catalog.filter((lesson) =>
+    entries.some((entry) => entry.lessonIndex === lesson.index),
+  );
+  const defaultExpanded = groups.some((group) => group.index === app.practiceState.recentLesson)
+    ? app.practiceState.recentLesson
+    : groups[0]?.index;
+  const activeGroup = expanded === undefined ? defaultExpanded : expanded;
+  const history = app.practiceState.history.filter(
+    (session) =>
+      catalog.some((lesson) => lesson.index === session.lessonIndex) &&
+      (filter === "all" ||
+        (filter === "fill" ? session.mode === "fill" : session.mode === "listening")),
+  );
+  if (soundOpen) return <SoundPractice audio={app} onBack={() => setSoundOpen(false)} />;
   return (
-    <section className="page-section practice-page">
-      <PageHeading
-        artwork="/course-art/happy-watercolor.webp"
-        title="練習紀錄"
-        description="收藏與待補強，隨時重練。"
-      />
-      <div className="sound-practice-entry">
-        <Headphones size={28} weight="duotone" aria-hidden="true" />
-        <div>
-          <h2>辨音小練習</h2>
-          <p>先聽兩個音，再做 6 題。不用寫字。</p>
-        </div>
-        <button
-          type="button"
-          onClick={() => {
-            app.stopPlayback();
-            setSoundPracticeOpen(true);
-          }}
-        >
-          開始辨音
-        </button>
+    <section className="page-section practice-page practice-grouped-page">
+      <PageHeading title="練習紀錄" artwork="/course-art/happy-watercolor.webp" />
+      <div className="practice-mode-tabs" role="group" aria-label="篩選練習類型">
+        {(
+          [
+            ["all", "全部"],
+            ["fill", "默寫"],
+            ["listening", "聽寫"],
+          ] as const
+        ).map(([value, label]) => (
+          <button
+            type="button"
+            key={value}
+            aria-pressed={filter === value}
+            onClick={() => {
+              setFilter(value);
+              setExpanded(undefined);
+            }}
+          >
+            {label}
+          </button>
+        ))}
       </div>
       <ShowMsg
         error
-        message={storageError ? "這個瀏覽器目前無法儲存收藏；關閉頁面後，紀錄可能會消失。" : ""}
+        message={app.storageError ? "這個瀏覽器目前無法儲存收藏；關閉頁面後，紀錄可能會消失。" : ""}
       />
       <ShowMsg
-        message={practiceNotice}
+        message={app.practiceNotice}
         onClose={() => {
-          setPracticeNotice("");
-          setUnfavoriteUndo(null);
-          setUnfavoriteFillUndo(null);
+          app.setPracticeNotice("");
+          app.setUnfavoriteUndo(null);
+          app.setUnfavoriteFillUndo(null);
         }}
       >
-        {(unfavoriteUndo || unfavoriteFillUndo) && (
-          <button type="button" onClick={unfavoriteFillUndo ? undoFillUnfavorite : undoUnfavorite}>
+        {(app.unfavoriteUndo || app.unfavoriteFillUndo) && (
+          <button
+            type="button"
+            onClick={app.unfavoriteFillUndo ? app.undoFillUnfavorite : app.undoUnfavorite}
+          >
             復原取消收藏
           </button>
         )}
       </ShowMsg>
-      <div className="section-title-row">
-        <h2>課文默寫 · 待補強與收藏</h2>
-        <span className="list-count">
-          {fillFavorites.filter((item) => item.status === "needs_rewrite").length} 題待補強
-        </span>
-      </div>
-      {fillFavorites.length ? (
-        <div className="saved-question-list fill-favorite-list">
-          {fillFavorites.map((favorite) => (
-            <div className="saved-question fill-favorite" key={fillFavoriteKey(favorite)}>
-              <span className="saved-question-icon">
-                <PencilLine size={24} weight="duotone" aria-hidden="true" />
-              </span>
-              <div className="saved-question-copy">
-                <strong>
-                  <LessonLabel lessonIndex={favorite.lessonIndex} /> · {favorite.character}
-                </strong>
-                <small>
-                  {fillLocation(favorite.lessonIndex, favorite.positions[0], catalog)}
-                  {favorite.positions.length > 1
-                    ? ` 等 ${favorite.positions.length} 格`
-                    : ""} ·{" "}
-                  {favorite.status === "needs_rewrite"
-                    ? "待補強"
-                    : favorite.status === "mastered"
-                      ? "已掌握"
-                      : "待複習"}
-                  {favorite.isFavorite !== false ? " · 已收藏" : ""}
-                </small>
-              </div>
-              <div className="saved-question-actions">
-                <button
-                  type="button"
-                  className="saved-start"
-                  onClick={() => openFillFavorite(favorite)}
-                >
-                  重練注音
-                </button>
-                <FavoriteButton
-                  className="saved-remove"
-                  saved={favorite.isFavorite !== false}
-                  ariaLabel={`${favorite.isFavorite !== false ? "取消收藏" : "收藏"}${favorite.character}`}
-                  label={favorite.isFavorite !== false ? "取消收藏" : "收藏這題"}
-                  onToggle={() => {
-                    if (favorite.isFavorite !== false) removeFillFavorite(favorite);
-                    else saveFillFavorite(favorite);
-                  }}
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="empty-reinforce">
-          <span>
-            <PencilLine size={28} weight="duotone" aria-hidden="true" />
-          </span>
-          <strong>目前沒有默寫待補強或收藏題目</strong>
-          <small>家長檢查時點黃色星星可收藏；重練時標記需要補強，會保留這題。</small>
-        </div>
-      )}
-      <div className="section-title-row practice-list-heading">
-        <h2>聽寫 · 待補強與收藏</h2>
-        <span className="list-count">
-          {practiceState.savedQuestions.filter((item) => item.needsPractice).length} 題待補強
-        </span>
-      </div>
-      {practiceState.savedQuestions.length ? (
-        <div className="saved-question-list">
-          {[...practiceState.savedQuestions]
-            .sort((a, b) => Number(Boolean(b.needsPractice)) - Number(Boolean(a.needsPractice)))
-            .map(({ lessonIndex, questionId, needsPractice, isFavorite }) => {
-              const question = findQuestionSeed(lessonIndex, questionId, catalog);
-              if (!question) return null;
-              return (
-                <div className="saved-question" key={`${lessonIndex}-${questionId}`}>
-                  <span className="saved-question-icon">
-                    <Headphones size={24} weight="duotone" aria-hidden="true" />
-                  </span>
-                  <div className="saved-question-copy">
-                    <strong>
-                      {lessons[lessonIndex].listeningOnly
-                        ? lessons[lessonIndex].title
-                        : `第${lessonNumerals[lessonIndex]}課`}{" "}
-                      · {listenCategoryLabels[question.category]}
-                    </strong>
-                    <small>
-                      {lessons[lessonIndex].listeningOnly
-                        ? lessons[lessonIndex].reviewRange
-                        : lessons[lessonIndex].title}{" "}
-                      · {question.audioText} · {needsPractice ? "待補強" : "已收藏"}
-                      {needsPractice && isFavorite ? " · 已收藏" : ""}
-                    </small>
-                  </div>
-                  <div className="saved-question-actions">
+      <div className="practice-course-groups">
+        {groups.map((lesson) => {
+          const rows = entries.filter((entry) => entry.lessonIndex === lesson.index);
+          const pending = rows.filter((entry) => entry.pending).length;
+          const open = activeGroup === lesson.index;
+          return (
+            <section className="practice-course-group" key={lesson.index}>
+              <button
+                type="button"
+                className="practice-course-toggle"
+                aria-expanded={open}
+                aria-controls={`practice-course-${lesson.index}`}
+                onClick={() => setExpanded(open ? null : lesson.index)}
+              >
+                {lesson.artwork && (
+                  <img src={`/course-art/${lesson.artwork}-watercolor.webp`} alt="" />
+                )}
+                <span>
+                  <strong>
+                    {lesson.listeningOnly ? lesson.title : `第${lesson.number}課 ${lesson.title}`}
+                  </strong>
+                  <small className={pending ? "practice-pending" : "practice-count-neutral"}>
+                    {pending ? `${pending} 題待補強` : `${rows.length} 題收藏`}
+                  </small>
+                </span>
+                {open ? (
+                  <CaretUp size={24} aria-hidden="true" />
+                ) : (
+                  <CaretDown size={24} aria-hidden="true" />
+                )}
+              </button>
+              {open && (
+                <div id={`practice-course-${lesson.index}`} className="practice-course-content">
+                  {rows.map((entry) => (
+                    <div className="practice-item" key={entry.key}>
+                      <button
+                        className="practice-item-open"
+                        type="button"
+                        onClick={entry.open}
+                        aria-label={`重練${entry.word}（${entry.mode === "fill" ? "默寫" : "聽寫"}）`}
+                      >
+                        <strong>{entry.word}</strong>
+                        <span className={`practice-mode-label mode-${entry.mode}`}>
+                          {entry.mode === "fill" ? "默寫" : "聽寫"}
+                        </span>
+                        <small className={entry.pending ? "practice-pending" : "practice-mastered"}>
+                          {entry.pending ? "待補強" : entry.mastered ? "已掌握" : "待複習"}
+                        </small>
+                      </button>
+                      <FavoriteButton
+                        iconOnly
+                        saved={entry.saved}
+                        className="practice-star"
+                        ariaLabel={`${entry.saved ? "取消收藏" : "收藏"}${entry.word}`}
+                        onToggle={entry.toggle}
+                      />
+                      <button
+                        className="practice-item-arrow"
+                        type="button"
+                        aria-label={`開啟${entry.word}重練`}
+                        onClick={entry.open}
+                      >
+                        <ArrowRight size={22} aria-hidden="true" />
+                      </button>
+                    </div>
+                  ))}
+                  {pending > 0 && (
                     <button
                       type="button"
-                      onClick={() => speak(question.audioText, { pronunciation: question.answer })}
-                      aria-label={`播放${lessons[lessonIndex].listeningOnly ? lessons[lessonIndex].title : `第${lessonNumerals[lessonIndex]}課`} ${question.audioText}`}
+                      className="practice-course-retry"
+                      onClick={() => app.startCourseReview(lesson.index, filter)}
                     >
-                      <SpeakerHigh size={18} aria-hidden="true" /> 播放
+                      <ArrowClockwise size={22} aria-hidden="true" />
+                      重練待補強 {pending} 題
                     </button>
-                    <button
-                      type="button"
-                      className="saved-start"
-                      onClick={() => openSavedQuestion(lessonIndex, questionId)}
-                    >
-                      重練這題
-                    </button>
-                    <FavoriteButton
-                      className="saved-remove"
-                      saved={isFavorite}
-                      onToggle={() => {
-                        setUnfavoriteFillUndo(null);
-                        toggleSavedQuestion(lessonIndex, questionId, isFavorite);
-                      }}
-                      ariaLabel={`${isFavorite ? "取消收藏" : "收藏"}${lessons[lessonIndex].listeningOnly ? lessons[lessonIndex].title : `第${lessonNumerals[lessonIndex]}課`} ${question.audioText}`}
-                      label={isFavorite ? "取消收藏" : "收藏這題"}
-                    />
-                  </div>
+                  )}
                 </div>
-              );
-            })}
-        </div>
-      ) : (
-        <div className="empty-reinforce">
-          <span>
-            <Headphones size={28} weight="duotone" aria-hidden="true" />
-          </span>
-          <strong>目前沒有待補強或收藏題目</strong>
-          <small>聽寫時按「需要補強」會先記下題目，之後可以再練。</small>
-          <button type="button" className="secondary-button" onClick={() => setView("courses")}>
-            前往課程
-          </button>
-        </div>
-      )}
-      <div className="practice-list">
-        <div className="section-title-row">
-          <h2>最近完成的練習</h2>
-          <span className="list-count">{practiceState.history.length} 個紀錄</span>
-        </div>
-        {practiceState.history.length === 0 ? (
-          <p className="practice-no-recent">完成家長檢查後，這裡會留下練習時間與成果。</p>
-        ) : (
-          practiceState.history.map((session) => (
+              )}
+            </section>
+          );
+        })}
+        {groups.length === 0 && (
+          <div className="practice-group-empty">
+            <p>
+              目前沒有{filter === "fill" ? "默寫" : filter === "listening" ? "聽寫" : ""}
+              待補強或收藏題目
+            </p>
+            <button type="button" onClick={() => app.setView("courses")}>
+              前往課程
+              <ArrowRight size={20} aria-hidden="true" />
+            </button>
+          </div>
+        )}
+      </div>
+      <section className="practice-recent-section">
+        <div className="practice-recent-heading">
+          <h2>最近完成</h2>
+          {history.length > 3 && (
             <button
-              key={session.id}
-              className="practice-row"
               type="button"
-              onClick={() => openLesson(session.lessonIndex)}
+              aria-expanded={showAllHistory}
+              onClick={() => setShowAllHistory((value) => !value)}
             >
-              <span className="practice-row-icon">
-                {String(session.lessonIndex + 1).padStart(2, "0")}
+              {showAllHistory ? "收合" : "查看全部"}
+              <ArrowRight size={18} aria-hidden="true" />
+            </button>
+          )}
+        </div>
+        {history.length === 0 && <p className="practice-no-recent">完成練習後，這裡會留下紀錄。</p>}
+        {(showAllHistory ? history : history.slice(0, 3)).map((session) => {
+          const lesson = catalog.find((lesson) => lesson.index === session.lessonIndex)!;
+          return (
+            <button
+              className="practice-recent-row"
+              type="button"
+              key={session.id}
+              onClick={() => app.openLesson(session.lessonIndex)}
+            >
+              <span
+                className={`practice-recent-icon mode-${session.mode === "listening" ? "listening" : "fill"}`}
+              >
+                {session.mode === "listening" ? (
+                  <Headphones size={24} aria-hidden="true" />
+                ) : (
+                  <PencilLine size={24} aria-hidden="true" />
+                )}
               </span>
               <span>
                 <strong>
-                  {lessons[session.lessonIndex].listeningOnly
-                    ? lessons[session.lessonIndex].title
-                    : `第${lessonNumerals[session.lessonIndex]}課・${lessons[session.lessonIndex].title}`}
-                </strong>
-                <small>
-                  {new Date(session.completedAt).toLocaleString("zh-TW", {
-                    month: "numeric",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    hour12: false,
-                  })}{" "}
-                  ·{" "}
+                  {lesson.listeningOnly ? lesson.title : `第${lesson.number}課`} ·{" "}
                   {session.mode === "fill"
-                    ? "課文默寫"
+                    ? "默寫"
                     : session.mode === "single"
                       ? "單題重練"
                       : "聽寫"}
-                </small>
+                </strong>
                 <small>
-                  已作答 {session.answeredUnits} 格 · 答對 {session.correctUnits} 格 · 待補強{" "}
-                  {session.pendingQuestions} 題
+                  {new Date(session.completedAt).toLocaleDateString("zh-TW", {
+                    month: "numeric",
+                    day: "numeric",
+                    timeZone: "Asia/Taipei",
+                  })}{" "}
+                  ·{" "}
+                  {session.pendingQuestions
+                    ? `${session.pendingQuestions} 題待補強`
+                    : `${session.correctUnits} 格完成`}
                 </small>
               </span>
-              <span className="journey-arrow" aria-hidden="true">
-                <ArrowRight size={21} weight="bold" />
-              </span>
+              <ArrowRight size={22} aria-hidden="true" />
             </button>
-          ))
-        )}
-      </div>
+          );
+        })}
+      </section>
+      <button
+        type="button"
+        className="practice-sound-link"
+        onClick={() => {
+          app.stopPlayback();
+          setSoundOpen(true);
+        }}
+      >
+        <span className="practice-recent-icon mode-listening">
+          <Headphones size={26} aria-hidden="true" />
+        </span>
+        <strong>辨音小練習</strong>
+        <ArrowRight size={22} aria-hidden="true" />
+      </button>
     </section>
   );
 }

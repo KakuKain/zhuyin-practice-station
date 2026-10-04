@@ -1,4 +1,5 @@
 "use client";
+import { courseReviewQueue, type CourseReviewItem } from "./practice/course-review";
 import { isListeningAnswerComplete } from "./listening/listening-policy";
 
 import { usePersistentState } from "../lib/storage/usePersistentState";
@@ -98,6 +99,7 @@ export function usePracticeApp() {
 
   const [sessionScore, setSessionScore] = useState({ listeningCorrect: 0 });
 
+  const reviewQueueRef = useRef<CourseReviewItem[]>([]);
   const listeningDraftsRef = useRef<Record<number, InkStroke[][]>>({});
   const [listeningDrafts, setListeningDrafts] = useState<Record<number, InkStroke[][]>>({});
   const [batchNeedsReview, setBatchNeedsReview] = useState<number[]>([]);
@@ -440,7 +442,8 @@ export function usePracticeApp() {
 
   const openListening = () => prepareListening(selectedLesson);
 
-  const openSavedQuestion = (lessonIndex: number, id: string) => {
+  const openSavedQuestion = (lessonIndex: number, id: string, queued = false) => {
+    if (!queued) reviewQueueRef.current = [];
     const seed = findQuestionSeed(lessonIndex, id, catalog);
     if (!seed) return;
     showLoading("正在開啟收藏題目…");
@@ -538,7 +541,8 @@ export function usePracticeApp() {
     openFillCell(index);
   };
 
-  const openFillFavorite = (favorite: FillFavorite) => {
+  const openFillFavorite = (favorite: FillFavorite, queued = false) => {
+    if (!queued) reviewQueueRef.current = [];
     showLoading("正在開啟單題重練…");
     setFillPracticeTarget(favorite);
     setSelectedLesson(favorite.lessonIndex);
@@ -552,6 +556,27 @@ export function usePracticeApp() {
     setView("fill-practice");
   };
 
+  const advanceReviewQueue = () => {
+    const next = reviewQueueRef.current.shift();
+    if (!next) return;
+    if (next.mode === "fill") openFillFavorite(next.favorite, true);
+    else openSavedQuestion(next.lessonIndex, next.questionId, true);
+  };
+  const startCourseReview = (lessonIndex: number, mode: "all" | "fill" | "listening") => {
+    reviewQueueRef.current = courseReviewQueue(
+      lessonIndex,
+      mode,
+      fillFavorites,
+      practiceState.savedQuestions,
+    );
+    advanceReviewQueue();
+  };
+
+  const deferFillPractice = () => {
+    setPracticeNotice("已保留這題，下次可以再練。");
+    setView("practice");
+    advanceReviewQueue();
+  };
   const removeFillFavorite = (favorite: FillFavorite) => {
     setUnfavoriteUndo(null);
     unfavoriteFill(favorite);
@@ -564,6 +589,7 @@ export function usePracticeApp() {
     recordSession("single", 1, 1, 0);
     setFillPracticeTarget(null);
     setView("practice");
+    advanceReviewQueue();
   };
 
   const leaveFocus = () => {
@@ -577,6 +603,7 @@ export function usePracticeApp() {
   };
 
   const confirmLeaveFocus = () => {
+    reviewQueueRef.current = [];
     clearListenTimers();
     stopPlayback();
     setListenExitOpen(false);
@@ -675,6 +702,7 @@ export function usePracticeApp() {
         setPracticeNotice("家長已確認這題掌握，已移出待補強；收藏仍會保留。");
         setView("practice");
         clearListenTimers();
+        advanceReviewQueue();
       } else {
         setSessionScore((current) => ({
           ...current,
@@ -703,6 +731,7 @@ export function usePracticeApp() {
       setPracticeNotice("這題還在待補強清單，之後可以再練。");
       setView("practice");
       clearListenTimers();
+      advanceReviewQueue();
     } else goToNextQuestion();
   };
 
@@ -824,10 +853,12 @@ export function usePracticeApp() {
     openFill,
     openFillCell,
     openFillFavorite,
+    deferFillPractice,
     openFillReview,
     openLesson,
     openListening,
     openSavedQuestion,
+    startCourseReview,
     pendingSessionCount,
     playCount,
     playPreviewSymbol,

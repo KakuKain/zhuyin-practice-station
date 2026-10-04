@@ -501,3 +501,246 @@ canvas.is-erasing {
 .listening-review-controls .review-save {
   padding: 12px;
 }
+
+/* Course-grouped practice collection, matching the approved watercolor concept. */
+.practice-grouped-page .page-heading {
+  margin-bottom: 22px;
+}
+.practice-mode-tabs {
+  display: flex;
+  background: #f0f7fc;
+  border-radius: 28px;
+  padding: 4px;
+  margin-bottom: 24px;
+}
+.practice-mode-tabs button {
+  flex: 1;
+  min-height: 48px;
+  border: 0;
+  background: transparent;
+  color: #64738b;
+  border-radius: 25px;
+  font: inherit;
+  font-weight: 700;
+}
+.practice-mode-tabs button[aria-pressed="true"] {
+  background: #3474d7;
+  color: #fff;
+}
+.practice-course-group {
+  border-bottom: 1px solid #dce7ef;
+  padding: 18px 0 24px;
+}
+.practice-course-toggle {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: #1b345b;
+  text-align: left;
+  font: inherit;
+  min-height: 72px;
+}
+.practice-course-toggle img {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.practice-course-toggle > span {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+}
+.practice-course-toggle strong {
+  font-size: 21px;
+  font-weight: 800;
+}
+.practice-course-toggle svg {
+  flex-shrink: 0;
+  color: #7788a2;
+}
+.practice-pending,
+.practice-mastered,
+.practice-count-neutral,
+.practice-mode-label {
+  font-size: 13px;
+  line-height: 1.5;
+  font-weight: 600;
+  border-radius: 12px;
+  padding: 4px 8px;
+  white-space: nowrap;
+}
+.practice-pending {
+  color: #8a611f;
+  background: #fff3d4;
+}
+.practice-mastered {
+  color: #54816c;
+  background: #eef8f2;
+}
+.practice-count-neutral {
+  color: #607a94;
+  background: #eef5fb;
+}
+.practice-course-content {
+  margin-top: 14px;
+}
+.practice-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0;
+  border-bottom: 1px solid #e0eaf1;
+}
+.practice-item-open {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+  min-height: 44px;
+  background: transparent;
+  border: 0;
+  padding: 4px 0;
+  text-align: left;
+  color: #19375b;
+  font: inherit;
+}
+.practice-item-open strong {
+  font-size: 20px;
+  overflow-wrap: anywhere;
+}
+.mode-fill {
+  color: #5176a0;
+  background: #edf5ff;
+}
+.mode-listening {
+  color: #53866c;
+  background: #eaf6ef;
+}
+.practice-star,
+.practice-item-arrow {
+  min-width: 44px;
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  color: #79869b;
+}
+.practice-star.is-saved {
+  color: #dda838;
+}
+.practice-course-retry {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #3474d7;
+  color: #fff;
+  border: 0;
+  border-radius: 16px;
+  padding: 16px;
+  min-height: 54px;
+  width: 100%;
+  margin-top: 18px;
+  font: inherit;
+  font-weight: 700;
+}
+.practice-recent-section {
+  margin-top: 26px;
+}
+.practice-recent-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.practice-recent-heading h2 {
+  font-size: 22px;
+  font-weight: 800;
+  color: #19375b;
+}
+.practice-recent-heading button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 0;
+  padding: 10px 0;
+  min-height: 44px;
+  font: inherit;
+  color: #3474d7;
+}
+.practice-recent-row,
+.practice-sound-link {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  padding: 16px 0;
+  border: 0;
+  border-bottom: 1px solid #e0eaf1;
+  background: transparent;
+  color: #19375b;
+  text-align: left;
+  font: inherit;
+}
+.practice-recent-icon {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.practice-recent-row > span:nth-child(2) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+.practice-recent-row small {
+  color: #77869a;
+  font-size: 14px;
+}
+.practice-recent-row > svg,
+.practice-sound-link > svg {
+  color: #78889f;
+  flex-shrink: 0;
+}
+.practice-sound-link strong {
+  flex: 1;
+}
+.practice-sound-link {
+  margin-top: 8px;
+}
+.practice-group-empty {
+  padding: 28px 0;
+  color: #677e92;
+}
+.practice-group-empty button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  border-radius: 12px;
+  background: #eef5ff;
+  padding: 12px;
+  color: #3474d7;
+  font: inherit;
+}
+.practice-grouped-page button {
+  cursor: pointer;
+}
