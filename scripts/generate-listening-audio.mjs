@@ -6,8 +6,8 @@ import { join, resolve } from "node:path";
 // Run on macOS when lesson content changes. The generated clips are committed
 // so deployed playback does not depend on a visitor's speech-synthesis support.
 const root = resolve(import.meta.dirname, "..");
-const source = readFileSync(join(root, "app/page.tsx"), "utf8");
-const vocabularySource = readFileSync(join(root, "app/circled-vocabulary.ts"), "utf8");
+const source = readFileSync(join(root, "features/courses/course-data.ts"), "utf8");
+const vocabularySource = readFileSync(join(root, "features/courses/circled-vocabulary.ts"), "utf8");
 const circledTexts = [...vocabularySource.matchAll(/term\("([^"]+)"/g)].map((match) => match[1]);
 const texts = new Set([
   ...circledTexts,
@@ -15,8 +15,14 @@ const texts = new Set([
   ...[...source.matchAll(/audioText: "([^"]+)"/g)].map((match) => match[1]),
   ...[...source.matchAll(/wordQuestion\("([^"]+)"/g)].map((match) => match[1]),
   ...[...source.matchAll(/character: "([^"]+)"/g)].map((match) => match[1]),
-  ...[...source.matchAll(/lines: \[([^\]]+)\]/g)].flatMap((match) => [...match[1].matchAll(/"([^"]+)"/g)].flatMap((line) => [...line[1]].filter((character) => character.trim()))),
-  ...[...source.matchAll(/symbols: \[([^\]]+)\]/g)].flatMap((match) => [...match[1].matchAll(/"([^"]+)"/g)].map((symbol) => symbol[1])),
+  ...[...source.matchAll(/lines: \[([^\]]+)\]/g)].flatMap((match) =>
+    [...match[1].matchAll(/"([^"]+)"/g)].flatMap((line) =>
+      [...line[1]].filter((character) => character.trim()),
+    ),
+  ),
+  ...[...source.matchAll(/symbols: \[([^\]]+)\]/g)].flatMap((match) =>
+    [...match[1].matchAll(/"([^"]+)"/g)].map((symbol) => symbol[1]),
+  ),
 ]);
 const output = join(root, "public/listening-audio");
 mkdirSync(output, { recursive: true });
@@ -26,21 +32,45 @@ const refreshAll = process.argv.includes("--refresh-all");
 const refreshSymbols = process.argv.includes("--refresh-symbols");
 // F1–F37 follow the symbol order in the Ministry of Education's Bopomofo manual.
 // Its individual audio files are CC BY 4.0; attribution is in public/listening-audio/ATTRIBUTION.md.
-const officialSymbols = [..."ㄅㄆㄇㄈㄉㄊㄋㄌㄍㄎㄏㄐㄑㄒㄓㄔㄕㄖㄗㄘㄙㄚㄛㄜㄝㄞㄟㄠㄡㄢㄣㄤㄥㄦㄧㄨㄩ"];
-const officialAudioBase = "https://language.moe.gov.tw/001/Upload/files/site_content/M0001/juyin/html_ch/audio";
+const officialSymbols = [
+  ..."ㄅㄆㄇㄈㄉㄊㄋㄌㄍㄎㄏㄐㄑㄒㄓㄔㄕㄖㄗㄘㄙㄚㄛㄜㄝㄞㄟㄠㄡㄢㄣㄤㄥㄦㄧㄨㄩ",
+];
+const officialAudioBase =
+  "https://language.moe.gov.tw/001/Upload/files/site_content/M0001/juyin/html_ch/audio";
 // Use unambiguous spoken equivalents for polyphonic characters and combined sounds.
 const spokenTextOverrides = new Map([
   ["背", "揹"],
   ["背著", "揹著"],
   ["ㄧㄠ", "腰"],
   ["ㄨㄢ", "彎"],
-  ["ㄧㄚ", "鴨"], ["ㄧㄡ", "悠"], ["ㄧㄤ", "央"],
-  ["ㄧㄝ", "椰"], ["ㄨㄚ", "蛙"], ["ㄨㄛ", "窩"], ["ㄨㄥ", "翁"],
-  ["ㄧㄢ", "煙"], ["ㄧㄥ", "英"], ["ㄨㄞ", "歪"], ["ㄨㄟ", "威"],
-  ["ㄧㄛ", "唷"], ["ㄨㄤ", "汪"], ["ㄩㄢ", "冤"], ["ㄩㄥ", "雍"],
-  ["ㄧㄞ", "崖"], ["ㄧㄣ", "音"], ["ㄨㄣ", "溫"], ["ㄩㄝ", "約"], ["ㄩㄣ", "暈"],
-  ["翹", "俏"], ["覺", "叫"], ["浣", "碗"], ["蔔", "伯"], ["喲", "唷"], ["長", "漲"],
-  ["背書包", "揹書包"], ["嘿喲", "嘿唷"],
+  ["ㄧㄚ", "鴨"],
+  ["ㄧㄡ", "悠"],
+  ["ㄧㄤ", "央"],
+  ["ㄧㄝ", "椰"],
+  ["ㄨㄚ", "蛙"],
+  ["ㄨㄛ", "窩"],
+  ["ㄨㄥ", "翁"],
+  ["ㄧㄢ", "煙"],
+  ["ㄧㄥ", "英"],
+  ["ㄨㄞ", "歪"],
+  ["ㄨㄟ", "威"],
+  ["ㄧㄛ", "唷"],
+  ["ㄨㄤ", "汪"],
+  ["ㄩㄢ", "冤"],
+  ["ㄩㄥ", "雍"],
+  ["ㄧㄞ", "崖"],
+  ["ㄧㄣ", "音"],
+  ["ㄨㄣ", "溫"],
+  ["ㄩㄝ", "約"],
+  ["ㄩㄣ", "暈"],
+  ["翹", "俏"],
+  ["覺", "叫"],
+  ["浣", "碗"],
+  ["蔔", "伯"],
+  ["喲", "唷"],
+  ["長", "漲"],
+  ["背書包", "揹書包"],
+  ["嘿喲", "嘿唷"],
 ]);
 
 try {
@@ -48,13 +78,32 @@ try {
     const filename = [...text].map((character) => character.codePointAt(0).toString(16)).join("-");
     const destination = join(output, `${filename}.m4a`);
     const officialIndex = officialSymbols.indexOf(text);
-    if (existsSync(destination) && statSync(destination).size > 1024 && !refreshAll && !(refreshSymbols && officialIndex >= 0)) continue;
+    if (
+      existsSync(destination) &&
+      statSync(destination).size > 1024 &&
+      !refreshAll &&
+      !(refreshSymbols && officialIndex >= 0)
+    )
+      continue;
     const sourceAudio = join(temporary, `${filename}.${officialIndex >= 0 ? "wav" : "aiff"}`);
     // One clip is one reading. The app controls the gap between repetitions.
     if (officialIndex >= 0) {
-      execFileSync("curl", ["-fLsS", `${officialAudioBase}/F${officialIndex + 1}.WAV`, "-o", sourceAudio]);
+      execFileSync("curl", [
+        "-fLsS",
+        `${officialAudioBase}/F${officialIndex + 1}.WAV`,
+        "-o",
+        sourceAudio,
+      ]);
     } else {
-      execFileSync("say", ["-v", "Meijia", "-r", "100", "-o", sourceAudio, spokenTextOverrides.get(text) ?? text]);
+      execFileSync("say", [
+        "-v",
+        "Meijia",
+        "-r",
+        "100",
+        "-o",
+        sourceAudio,
+        spokenTextOverrides.get(text) ?? text,
+      ]);
     }
     execFileSync("afconvert", ["-f", "m4af", "-d", "aac", "-b", "48000", sourceAudio, destination]);
     if (statSync(destination).size <= 1024) throw new Error(`Empty audio clip for ${text}`);

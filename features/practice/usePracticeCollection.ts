@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { builtinCatalog, type CatalogLesson } from "../courses/materials";
 import { usePersistentState } from "../../lib/storage/usePersistentState";
 import {
   initialPracticeState,
@@ -11,12 +12,19 @@ import {
 import { appendPracticeSession, updateQuestionFlags } from "./practice-state";
 import type { PracticeSession, SavedQuestion } from "../types";
 
-export function usePracticeCollection(lessonIndex: number) {
+export function usePracticeCollection(
+  lessonIndex: number,
+  catalog: CatalogLesson[] = builtinCatalog,
+) {
+  const catalogRef = useRef(catalog);
+  useEffect(() => {
+    catalogRef.current = catalog;
+  }, [catalog]);
   const [practiceState, setPracticeState, practiceStorageError] = usePersistentState(
     practiceStorageKey,
     initialPracticeState,
-    readPracticeState,
-    validatePracticeState,
+    (storage) => readPracticeState(storage, catalogRef.current, true),
+    (raw) => validatePracticeState(raw, 4, catalogRef.current, true),
   );
   const [practiceNotice, setPracticeNotice] = useState("");
   const [unfavoriteUndo, setUnfavoriteUndo] = useState<Pick<

@@ -1,13 +1,9 @@
 "use client";
 
 import type { AppController } from "../usePracticeApp";
-import {
-  courseArtwork,
-  exercises,
-  lessonNumerals,
-  previewPronunciationVariants,
-} from "../courses/course-data";
+import { previewPronunciationVariants } from "../courses/course-data";
 import { AnnotatedText } from "../../components/AnnotatedText";
+import { ZhuyinStack } from "../../components/Zhuyin";
 import { LessonTitle } from "../../components/LessonTitle";
 import { useReaderPosition } from "./useReaderPosition";
 import { ArrowLeft, ArrowRight, Headphones, PencilLine, SpeakerHigh } from "@phosphor-icons/react";
@@ -18,6 +14,7 @@ export function LessonReader({
   app: Pick<
     AppController,
     | "lesson"
+    | "lessonLines"
     | "openFill"
     | "openListening"
     | "playPreviewSymbol"
@@ -59,21 +56,25 @@ export function LessonReader({
       <div className={`lesson-heading${selectedLesson === 7 ? " is-radish" : ""}`}>
         <div>
           <span className="eyebrow">
-            <AnnotatedText text={`第${lessonNumerals[selectedLesson]}課`} />
+            <AnnotatedText text={`第${lesson.number}課`} />
           </span>
           <LessonTitle lessonIndex={selectedLesson} />
         </div>
-        <img
-          className="lesson-heading-art"
-          src={
-            selectedLesson === 7
-              ? "/course-art/radish-story.webp"
-              : `/course-art/${courseArtwork[selectedLesson]}-watercolor.webp`
-          }
-          alt=""
-        />
+        {!lesson.custom && (
+          <img
+            className="lesson-heading-art"
+            src={
+              selectedLesson === 7
+                ? "/course-art/radish-story.webp"
+                : lesson.artwork
+                  ? `/course-art/${lesson.artwork}-watercolor.webp`
+                  : "/course-art/lesson-watercolor-paper.webp"
+            }
+            alt=""
+          />
+        )}
       </div>
-      {exercises[selectedLesson] && (
+      {lesson.exercise && (
         <div className="mode-grid">
           <button className="mode-card fill-mode" type="button" onClick={openFill}>
             <span className="mode-icon" aria-hidden="true">
@@ -84,7 +85,7 @@ export function LessonReader({
                 <AnnotatedText text="第一關" />
               </small>
               <strong>
-                <AnnotatedText text="課文默寫" />
+                <AnnotatedText text={lesson.custom ? "注音默寫" : "課文默寫"} />
               </strong>
             </span>
             <span className="lesson-mode-cta">
@@ -114,7 +115,7 @@ export function LessonReader({
       <div className="lesson-curriculum">
         <div className="lesson-curriculum-heading">
           <strong>
-            <AnnotatedText text="課文" />
+            <AnnotatedText text={lesson.custom ? "字詞預覽" : "課文"} />
           </strong>
           <div className="lesson-preview-switch" role="group" aria-label="課文顯示方式">
             <button
@@ -133,66 +134,90 @@ export function LessonReader({
             </button>
           </div>
         </div>
-        <div
-          className={`lesson-text-lines ${previewMode === "zhuyin" ? "is-zhuyin-only" : ""}`}
-          ref={readerRef}
-          role="region"
-          tabIndex={-1}
-          dir="rtl"
-          aria-label={`${lesson.title}課文，第 ${previewPage + 1} 頁，共 ${previewPageCount} 頁，由右向左閱讀`}
-          style={
-            {
-              "--preview-columns": Math.min(previewColumns, previewVisibleLines.length),
-              "--preview-max-chars": Math.max(
-                ...lesson.lines.map((line) => Array.from(line).length),
-              ),
-            } as React.CSSProperties
-          }
-          onPointerDown={(event) => {
-            previewPointerStartRef.current = { x: event.clientX, y: event.clientY };
-            event.currentTarget.setPointerCapture(event.pointerId);
-          }}
-          onPointerCancel={() => {
-            previewPointerStartRef.current = null;
-          }}
-          onPointerUp={(event) => {
-            const start = previewPointerStartRef.current;
-            previewPointerStartRef.current = null;
-            if (!start) return;
-            const dx = event.clientX - start.x;
-            const dy = event.clientY - start.y;
-            if (Math.abs(dx) < 45 || Math.abs(dx) < Math.abs(dy) * 1.3) return;
-            setPreviewPage((page) =>
-              Math.max(0, Math.min(previewPageCount - 1, page + (dx > 0 ? 1 : -1))),
-            );
-          }}
-          onWheel={(event) => {
-            if (
-              Math.abs(event.deltaX) < 35 ||
-              Math.abs(event.deltaX) < Math.abs(event.deltaY) * 1.3 ||
-              Date.now() - previewWheelAtRef.current < 450
-            )
-              return;
-            previewWheelAtRef.current = Date.now();
-            setPreviewPage((page) =>
-              Math.max(0, Math.min(previewPageCount - 1, page + (event.deltaX < 0 ? 1 : -1))),
-            );
-          }}
-        >
-          {previewVisibleLines.map((line, pageLineIndex) => {
-            const lineIndex = previewPageStart + pageLineIndex;
-            return (
-              <div className="lesson-text-line" dir="ltr" key={lineIndex}>
-                {Array.from(line).map((char, charIndex) => (
-                  <span key={charIndex}>
-                    {char}
-                    {previewPronunciationVariants[selectedLesson]?.[lineIndex]?.[charIndex] ?? ""}
+        {lesson.custom ? (
+          <div className="material-word-preview" aria-label="已確認的字詞與注音">
+            {lesson.terms.map((term) => (
+              <div
+                className="material-word-card"
+                key={term.text}
+                aria-label={`${term.text}，${term.syllables.join(" ")}`}
+              >
+                {Array.from(term.text).map((character, index) => (
+                  <span className="material-word-character" key={index}>
+                    {previewMode === "annotated" && (
+                      <span className="material-character-text">{character}</span>
+                    )}
+                    <ZhuyinStack text={term.syllables[index]} />
                   </span>
                 ))}
               </div>
-            );
-          })}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <>
+            <div
+              className={`lesson-text-lines ${previewMode === "zhuyin" ? "is-zhuyin-only" : ""}`}
+              ref={readerRef}
+              role="region"
+              tabIndex={-1}
+              dir="rtl"
+              aria-label={`${lesson.title}課文，第 ${previewPage + 1} 頁，共 ${previewPageCount} 頁，由右向左閱讀`}
+              style={
+                {
+                  "--preview-columns": Math.min(previewColumns, previewVisibleLines.length),
+                  "--preview-max-chars": Math.max(
+                    ...lesson.lines.map((line) => Array.from(line).length),
+                  ),
+                } as React.CSSProperties
+              }
+              onPointerDown={(event) => {
+                previewPointerStartRef.current = { x: event.clientX, y: event.clientY };
+                event.currentTarget.setPointerCapture(event.pointerId);
+              }}
+              onPointerCancel={() => {
+                previewPointerStartRef.current = null;
+              }}
+              onPointerUp={(event) => {
+                const start = previewPointerStartRef.current;
+                previewPointerStartRef.current = null;
+                if (!start) return;
+                const dx = event.clientX - start.x;
+                const dy = event.clientY - start.y;
+                if (Math.abs(dx) < 45 || Math.abs(dx) < Math.abs(dy) * 1.3) return;
+                setPreviewPage((page) =>
+                  Math.max(0, Math.min(previewPageCount - 1, page + (dx > 0 ? 1 : -1))),
+                );
+              }}
+              onWheel={(event) => {
+                if (
+                  Math.abs(event.deltaX) < 35 ||
+                  Math.abs(event.deltaX) < Math.abs(event.deltaY) * 1.3 ||
+                  Date.now() - previewWheelAtRef.current < 450
+                )
+                  return;
+                previewWheelAtRef.current = Date.now();
+                setPreviewPage((page) =>
+                  Math.max(0, Math.min(previewPageCount - 1, page + (event.deltaX < 0 ? 1 : -1))),
+                );
+              }}
+            >
+              {previewVisibleLines.map((line, pageLineIndex) => {
+                const lineIndex = previewPageStart + pageLineIndex;
+                return (
+                  <div className="lesson-text-line" dir="ltr" key={lineIndex}>
+                    {Array.from(line).map((char, charIndex) => (
+                      <span key={charIndex}>
+                        {char}
+                        {previewPronunciationVariants[selectedLesson]?.[lineIndex]?.[charIndex] ??
+                          ""}
+                      </span>
+                    ))}
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
         {previewPageCount > 1 && (
           <div className="lesson-page-controls" aria-label="課文翻頁">
             <div className="lesson-page-action">
@@ -231,30 +256,32 @@ export function LessonReader({
             </div>
           </div>
         )}
-        <div className="lesson-curriculum-heading">
-          <strong>
-            <AnnotatedText text="注音符號" />
-          </strong>
-        </div>
-        <div className="lesson-symbols" dir="rtl" aria-label="本課注音符號，點選可聽發音">
-          {lesson.symbols.map((symbol) => (
-            <button
-              type="button"
-              className={`${symbol.length > 1 ? "is-combination " : ""}${playingSymbol === symbol ? "is-playing" : ""}`}
-              key={symbol}
-              onClick={() => playPreviewSymbol(symbol)}
-              aria-label={`播放注音符號 ${symbol}`}
-            >
-              <span>{symbol}</span>
-              <SpeakerHigh size={15} weight="fill" aria-hidden="true" />
-            </button>
-          ))}
-        </div>
+        {lesson.symbols.length > 0 && (
+          <>
+            <div className="lesson-curriculum-heading">
+              <strong>
+                <AnnotatedText text="注音符號" />
+              </strong>
+            </div>
+            <div className="lesson-symbols" dir="rtl" aria-label="本課注音符號，點選可聽發音">
+              {lesson.symbols.map((symbol) => (
+                <button
+                  type="button"
+                  className={`${symbol.length > 1 ? "is-combination " : ""}${playingSymbol === symbol ? "is-playing" : ""}`}
+                  key={symbol}
+                  onClick={() => playPreviewSymbol(symbol)}
+                  aria-label={`播放注音符號 ${symbol}`}
+                >
+                  <span>{symbol}</span>
+                  <SpeakerHigh size={15} weight="fill" aria-hidden="true" />
+                </button>
+              ))}
+            </div>
+          </>
+        )}
       </div>
       <div className="lesson-meadow-footer" aria-hidden="true" />
-      {!exercises[selectedLesson] && (
-        <p className="lesson-upcoming">這一課的課文默寫與聽寫練習準備中。</p>
-      )}
+      {!lesson.exercise && <p className="lesson-upcoming">這一課的課文默寫與聽寫練習準備中。</p>}
     </section>
   );
 }

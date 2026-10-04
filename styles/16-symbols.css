@@ -1,18 +1,10 @@
+@font-face {
+  font-family: "KidCombinedRhymes";
+  src: url("/fonts/KidCombinedRhymes.woff2?v=2") format("woff2");
+  font-display: block;
+}
 .symbol-page {
   padding-top: 18px;
-}
-
-.symbol-page-heading h1 {
-  margin: 0;
-  color: var(--ref-navy);
-  font-size: clamp(32px, 7vw, 42px);
-  line-height: 1.35;
-}
-
-.symbol-page-heading p {
-  margin: 6px 0 18px;
-  color: #57748d;
-  font-size: 15px;
 }
 
 .symbol-audio-status {
@@ -88,6 +80,24 @@
   --symbol-wash: #f0f9ed;
   --symbol-active: #d7eecf;
 }
+.symbol-group.is-combined {
+  --symbol-color: #8a632b;
+  --symbol-wash: #fff9ec;
+  --symbol-active: #ffedc2;
+}
+.is-combined .symbol-chart-glyph {
+  font-family: "KidCombinedRhymes";
+  font-size: clamp(44px, 13vw, 58px);
+  white-space: nowrap;
+}
+.is-combined .symbol-group-heading h3 {
+  margin: 0;
+  font-size: 20px;
+}
+.combined-rhymes > h2 {
+  color: #173763;
+  margin: 28px 4px 12px;
+}
 
 .symbol-group-heading {
   display: flex;
@@ -138,6 +148,22 @@
   font-size: clamp(36px, 10vw, 48px);
   font-weight: 400;
   line-height: 1;
+}
+
+.combined-rhyme-example {
+  color: #607678;
+  font-family: "PingFang TC", sans-serif;
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.is-combined .symbol-chart-button {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 3px;
 }
 
 .symbol-chart-button.is-playing {

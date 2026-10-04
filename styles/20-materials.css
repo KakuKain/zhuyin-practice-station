@@ -1,0 +1,340 @@
+.active-material-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px;
+  margin: 0 0 24px;
+  border: 1px solid #cbd8cf;
+  background: #f5f8ed;
+  border-radius: 20px;
+}
+.active-material-bar div {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+.active-material-bar strong {
+  overflow-wrap: anywhere;
+  color: #37574b;
+}
+.active-material-bar small {
+  color: #5a6b62;
+}
+.active-material-bar button {
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 8px 12px;
+  color: #345c4e;
+  border: 1px solid #b2c8bb;
+  border-radius: 12px;
+  background: #fff;
+  font-weight: 700;
+}
+.journey-card.is-custom-material {
+  background: #f4f7eb url("/course-art/lesson-watercolor-paper.webp") center/cover;
+  min-height: 120px;
+}
+.materials-panel h2 {
+  font-size: 19px;
+  margin: 24px 0 12px;
+}
+.material-device-note,
+.material-course-summary,
+.material-file-preview {
+  border: 1px solid #cbd9ce;
+  background: #f1f5ed;
+  border-radius: 16px;
+  padding: 16px;
+  margin: 16px 0;
+}
+.material-device-note p,
+.material-course-summary p {
+  font-size: 14px;
+  line-height: 1.7;
+  margin: 6px 0 0;
+  color: #4f6558;
+}
+.material-course-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.material-field {
+  display: grid;
+  gap: 8px;
+  margin: 16px 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #3e5147;
+}
+.material-field input,
+.material-field select,
+.material-field textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 12px;
+  background: #fffefa;
+  border: 1px solid #b7c8be;
+  border-radius: 12px;
+  color: #263c31;
+  font-size: 16px;
+  font-weight: 400;
+}
+.material-field textarea {
+  resize: vertical;
+  line-height: 1.7;
+}
+.material-field input:focus,
+.material-field select:focus,
+.material-field textarea:focus {
+  outline: 3px solid #8fac9a;
+  outline-offset: 2px;
+}
+.material-primary,
+.material-actions button,
+.material-actions a,
+.material-preview {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  border: 1px solid #b6c9ba;
+  background: #fffefa;
+  color: #355e4c;
+  font-weight: 700;
+}
+button.material-primary {
+  background: #426b53;
+  color: #fff;
+  border-color: #426b53;
+}
+.material-actions {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+.material-metadata {
+  padding: 14px;
+  border: 1px solid #d0dbd0;
+  border-radius: 12px;
+}
+.material-metadata summary {
+  cursor: pointer;
+  padding: 4px 0;
+}
+.material-progress {
+  display: flex;
+  gap: 12px;
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+  font-size: 13px;
+  color: #69746b;
+}
+.material-progress li[aria-current] {
+  color: #315a43;
+  font-weight: 800;
+}
+.material-review-row {
+  padding: 16px;
+  margin: 14px 0;
+  background: #f8faf3;
+  border: 1px solid #cad7cc;
+  border-radius: 16px;
+}
+.material-review-row .material-field {
+  margin: 12px 0;
+}
+.material-include {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  font-weight: 700;
+}
+.material-include input {
+  width: 22px;
+  height: 22px;
+  accent-color: #426b53;
+}
+.material-success {
+  padding: 14px;
+  background: #ecf5e9;
+  border: 1px solid #bfd2b7;
+  border-radius: 12px;
+  color: #315c38;
+  line-height: 1.7;
+}
+.material-lesson-list {
+  padding-left: 24px;
+}
+.material-lesson-list li {
+  padding: 8px 0;
+}
+.material-lesson-list small {
+  margin-left: 12px;
+  color: #536c59;
+}
+.imported-preview-cell {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: sans-serif;
+}
+.lesson-text-line .imported-preview-cell > span:first-child {
+  font-family: sans-serif;
+}
+.imported-preview-cell .zhuyin-stack {
+  font-family: sans-serif;
+  font-size: 28px;
+}
+@media (max-width: 380px) {
+  .active-material-bar {
+    padding: 12px;
+    gap: 8px;
+  }
+  .active-material-bar strong {
+    font-size: 14px;
+  }
+  .material-progress {
+    gap: 8px;
+    font-size: 12px;
+  }
+}
+.material-word-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 20px;
+  background: #fffdf4;
+  border-radius: 18px;
+}
+.material-word-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border: 1px solid #d0ddc9;
+  background: #f7f9ef;
+  border-radius: 14px;
+}
+.material-word-character {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.material-character-text {
+  font:
+    36px/1.2 "PingFang TC",
+    sans-serif;
+}
+.material-word-character .zhuyin-stack {
+  font-size: 13px;
+}
+.zhuyin-glyph.is-literal {
+  transform: translate(-50%, -50%);
+}
+.literal-syllable {
+  display: flex;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  height: 1em;
+  font-family: "PingFang TC", sans-serif;
+}
+.literal-letters {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.29em;
+  line-height: 1.08;
+}
+.literal-tone {
+  position: absolute;
+  right: 0.12em;
+  top: 45%;
+  font-size: 0.29em;
+}
+.literal-tone.is-neutral {
+  top: -0.28em;
+  right: 1.1em;
+}
+.material-word-card {
+  max-width: 100%;
+  flex-wrap: wrap;
+}
+
+.material-actions a {
+  text-decoration: none;
+}
+.material-actions a:focus-visible {
+  outline: 3px solid #426b53;
+  outline-offset: 2px;
+}
+.material-management-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0;
+}
+.material-management-actions button,
+.material-archive-row button {
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid #b6c9ba;
+  border-radius: 10px;
+  background: #fffefa;
+  color: #355e4c;
+}
+.material-management-actions button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.material-managed-lessons {
+  list-style: none;
+  padding: 0;
+}
+.material-managed-lessons li {
+  padding: 12px;
+  margin: 12px 0;
+  border: 1px solid #cbd9ce;
+  border-radius: 14px;
+  background: #f8faf5;
+}
+.material-managed-lessons small {
+  display: block;
+  margin-top: 5px;
+  color: #5a6b62;
+}
+.material-managed-lessons strong {
+  overflow-wrap: anywhere;
+}
+.material-archive {
+  margin: 16px 0;
+  border: 1px solid #cbd9ce;
+  border-radius: 14px;
+  padding: 14px;
+}
+.material-archive summary {
+  min-height: 44px;
+  cursor: pointer;
+}
+.material-archive-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+}
+.material-archive-row span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  flex: 1;
+}

@@ -1,3 +1,8 @@
+import { existsSync, readFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { combinedRhymeExamples } from "../../features/symbols/combined-rhyme-audio";
+import { listeningAudioUrl } from "../../features/listening/listening-data";
+import { combinedRhymeGroups } from "../../features/symbols/symbols-data";
 import assert from "node:assert/strict";
 import test from "node:test";
 import { allSymbols, consonants, symbolGroups, vowels } from "../../features/symbols/symbols-data";
@@ -37,4 +42,48 @@ test("title annotations retain every character and use context-correct neutral t
       lesson.title,
     );
   });
+});
+
+test("all 22 combined rhymes have a unique playable local clip", () => {
+  const rhymes = combinedRhymeGroups.flatMap((group) => [...group.cells]);
+  assert.equal(rhymes.length, 22);
+  assert.equal(new Set(rhymes).size, 22);
+  assert.deepEqual(
+    combinedRhymeGroups.map((group) => group.cells.length),
+    [10, 8, 4],
+  );
+  for (const rhyme of rhymes) {
+    assert.equal(rhyme.length, 2);
+    assert.ok(
+      existsSync(new URL(`../../public${listeningAudioUrl(rhyme)}`, import.meta.url)),
+      rhyme,
+    );
+  }
+});
+
+test("combined-rhyme playback uses intact official example recordings with explicit tones", () => {
+  const manifest = JSON.parse(
+    readFileSync(
+      new URL("../../public/listening-audio/moe-examples/manifest.json", import.meta.url),
+      "utf8",
+    ),
+  );
+  assert.equal(manifest.dictionaryVersion, "2014_20260929");
+  assert.equal(combinedRhymeExamples.length, 22);
+  assert.equal(manifest.clips.length, 22);
+  for (const example of combinedRhymeExamples) {
+    assert.equal(listeningAudioUrl(example.rhyme), example.audioUrl);
+    assert.equal(example.zhuyin, example.rhyme + (example.rhyme === "ㄧㄞ" ? "ˊ" : ""));
+    assert.equal(example.tone, example.rhyme === "ㄧㄞ" ? "第二聲" : "第一聲");
+    assert.ok(example.sourceUrl.startsWith("https://dict.concised.moe.edu.tw/sound/word/"));
+    const clip = manifest.clips.find((item: { rhyme: string }) => item.rhyme === example.rhyme);
+    assert.ok(clip);
+    assert.equal(clip.record, example.record);
+    const bytes = readFileSync(new URL(`../../public${example.audioUrl}`, import.meta.url));
+    assert.equal(createHash("sha256").update(bytes).digest("hex"), clip.sha256);
+    assert.equal(bytes.length, clip.bytes);
+  }
+  assert.ok(
+    existsSync(new URL("../../public/listening-audio/moe-examples/使用說明.pdf", import.meta.url)),
+  );
 });

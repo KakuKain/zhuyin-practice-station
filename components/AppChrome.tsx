@@ -1,4 +1,26 @@
 "use client";
+import { ShowMsg } from "./ShowMsg";
+import { useSyncExternalStore, type ReactNode } from "react";
+import { createPortal } from "react-dom";
+
+const subscribeHeader = () => () => {};
+export function HeaderBack({ label, onBack }: { label: string; onBack: () => void }) {
+  const mounted = useSyncExternalStore(
+    subscribeHeader,
+    () => true,
+    () => false,
+  );
+  const target = mounted ? document.getElementById("app-header-back-slot") : null;
+  return target
+    ? createPortal(
+        <button className="header-back" type="button" onClick={onBack}>
+          <ArrowLeft size={18} weight="bold" aria-hidden="true" />
+          <span>{label}</span>
+        </button>,
+        target,
+      )
+    : null;
+}
 
 import type { InkStroke, View } from "../features/types";
 import { ArrowLeft, BookOpenText, Gear, PencilLine, SquaresFour } from "@phosphor-icons/react";
@@ -30,13 +52,19 @@ export function AppHeader({
   onCourses,
   onBack,
   backLabel,
+  materialSelector,
 }: {
   onCourses: () => void;
   onBack?: () => void;
   backLabel?: string;
+  materialSelector?: ReactNode;
 }) {
   return (
-    <header className={`app-header ${onBack ? "has-back" : ""}`}>
+    <header
+      className={`app-header ${onBack ? "has-back" : ""} ${materialSelector ? "has-material-selector" : ""}`}
+    >
+      <div id="app-header-back-slot" />
+      {materialSelector}
       {onBack && (
         <button className="header-back" type="button" onClick={onBack}>
           <ArrowLeft size={18} weight="bold" aria-hidden="true" />
@@ -50,7 +78,7 @@ export function AppHeader({
           <small>一年級學習站</small>
         </span>
       </button>
-      {!onBack && (
+      {!onBack && !materialSelector && (
         <div className="header-chip">
           <span className="status-dot" /> 不用登入也能練
         </div>
@@ -126,8 +154,6 @@ export function LoadingOverlay({ label }: { label: string }) {
 
 export function ResourceNotice({ failed }: { failed: boolean }) {
   return failed ? (
-    <p className="practice-storage-error" role="alert">
-      部分圖片或字型尚未載入，仍可繼續練習；請檢查網路後重新整理。
-    </p>
+    <ShowMsg error message="部分圖片或字型尚未載入，仍可繼續練習；請檢查網路後重新整理。" />
   ) : null;
 }

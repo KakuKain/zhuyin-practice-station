@@ -40,25 +40,6 @@
   padding-bottom: 34px;
 }
 
-.is-courses .journey-heading {
-  min-height: 145px;
-  margin-inline: -14px;
-  padding-inline: 14px;
-  border-radius: 0 0 28px 28px;
-  background:
-    linear-gradient(90deg, rgba(255, 254, 250, 0.93), rgba(255, 254, 250, 0.25)),
-    url("/course-art/lesson-watercolor-landscape.webp") center 45% / cover no-repeat;
-}
-
-.is-courses .journey-heading-copy {
-  padding-top: 29px;
-}
-
-.is-courses .journey-heading img {
-  right: -12px;
-  top: 0;
-}
-
 .is-courses .journey-list {
   gap: 12px;
   padding-top: 9px;
@@ -92,48 +73,6 @@
 }
 
 /* Practice: empty states feel encouraging, while saved work remains readable. */
-
-.is-practice .practice-page .section-heading {
-  position: relative;
-  min-height: 156px;
-  margin: 0 -14px 23px;
-  padding: 25px 18px 19px;
-  overflow: hidden;
-  border-radius: 0 0 27px 27px;
-  background:
-    linear-gradient(
-      90deg,
-      rgba(255, 254, 250, 0.96),
-      rgba(255, 254, 250, 0.57) 65%,
-      rgba(255, 254, 250, 0.12)
-    ),
-    url("/course-art/lesson-watercolor-landscape.webp") center 50% / cover no-repeat;
-}
-
-.is-practice .practice-page .section-heading::after {
-  position: absolute;
-  right: 2px;
-  bottom: 0;
-  width: 107px;
-  height: 118px;
-  background: url("/course-art/happy-watercolor.webp") center bottom / contain no-repeat;
-  content: "";
-  pointer-events: none;
-}
-
-.is-practice .practice-page .section-heading > * {
-  position: relative;
-  z-index: 1;
-  max-width: 72%;
-}
-
-.is-practice .practice-page .section-heading h1 {
-  font-size: 31px;
-}
-
-.is-practice .practice-page .section-heading p {
-  color: #526f81;
-}
 
 .is-practice .practice-page > .section-title-row {
   margin-top: 19px;
@@ -207,31 +146,6 @@
 
 /* More stays a familiar grouped settings list, now inside the same storybook. */
 
-.is-more .more-page:not(.more-detail-page) .more-title {
-  position: relative;
-  display: flex;
-  align-items: center;
-  min-height: 142px;
-  margin: 0 -14px 24px;
-  padding: 24px 20px;
-  overflow: hidden;
-  border-radius: 0 0 27px 27px;
-  background:
-    linear-gradient(90deg, rgba(255, 254, 250, 0.92), rgba(255, 254, 250, 0.25)),
-    url("/course-art/lesson-watercolor-landscape.webp") center 50% / cover no-repeat;
-}
-
-.is-more .more-page:not(.more-detail-page) .more-title::after {
-  position: absolute;
-  right: 11px;
-  bottom: -9px;
-  width: 128px;
-  height: 131px;
-  background: url("/course-art/goose-watercolor.webp") center bottom / contain no-repeat;
-  content: "";
-  pointer-events: none;
-}
-
 .is-more .more-group > h2 {
   margin-left: 6px;
   color: #587181;
@@ -279,12 +193,6 @@
   .app-shell:is(.is-courses, .is-symbols, .is-practice, .is-more) .bottom-nav {
     width: min(100%, var(--container-manage));
     max-width: var(--container-manage);
-  }
-  .is-courses .journey-heading,
-  .is-practice .practice-page .section-heading,
-  .is-more .more-page:not(.more-detail-page) .more-title {
-    margin-inline: -20px;
-    padding-inline: 20px;
   }
 }
 
@@ -336,6 +244,47 @@
   display: none;
 }
 
+#app-header-back-slot:empty {
+  display: none;
+}
+.app-header.has-material-selector {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.has-material-selector .brand-button {
+  flex: none;
+  margin-left: auto;
+}
+.header-material-selector {
+  min-width: 0;
+  max-width: min(55%, 360px);
+  min-height: 38px;
+  padding: 6px 8px;
+  border: 1px solid #c9dcd3;
+  border-radius: 10px;
+  background: #f5faf5;
+  color: #36594b;
+  font: inherit;
+  font-size: 13px;
+  text-overflow: ellipsis;
+}
+.header-material-selector:focus-visible {
+  outline: 3px solid #2868b9;
+  outline-offset: 2px;
+}
+.app-header:has(#app-header-back-slot:not(:empty)) {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.app-header:has(#app-header-back-slot:not(:empty)) .brand-button {
+  margin-left: auto;
+}
+.app-header:has(#app-header-back-slot:not(:empty)) .header-chip {
+  display: none;
+}
+
 .app-shell.is-courses .main-content {
   min-height: 0;
   padding-bottom: calc(90px + env(safe-area-inset-bottom));
@@ -344,42 +293,6 @@
 .is-courses .course-journey {
   padding-top: 0;
   padding-bottom: 0;
-}
-
-.is-courses .journey-heading {
-  min-height: 112px;
-  margin: 0 -14px;
-  padding: 0 14px;
-  overflow: visible;
-  border: 0;
-  border-radius: 0;
-  background: none;
-}
-
-.is-courses .journey-heading-copy {
-  padding: 12px 0 0 10px;
-}
-
-.is-courses .journey-heading h1 {
-  font-size: clamp(32px, 9vw, 40px);
-  letter-spacing: 0.055em;
-  line-height: 1.15;
-  box-shadow: inset 0 -8px #ffe8a0;
-}
-
-.is-courses .journey-heading p {
-  margin-top: 7px;
-  color: #637897;
-  font-size: 13px;
-  letter-spacing: 0.065em;
-}
-
-.is-courses .journey-heading img {
-  top: -17px;
-  right: -3px;
-  width: min(49vw, 205px);
-  height: auto;
-  max-width: none;
 }
 
 .is-courses .journey-list {
@@ -538,21 +451,41 @@
 }
 
 @media (min-width: 700px) {
-  .is-courses .journey-heading {
-    margin-inline: -20px;
-    padding-inline: 20px;
-  }
-  .is-courses .journey-heading-copy {
-    padding-left: 10px;
-  }
-  .is-courses .journey-heading img {
-    width: 228px;
-    right: 0;
-  }
   .is-courses .journey-list {
     margin-inline: 30px 0;
   }
   .is-courses .journey-footer {
     margin-inline: -80px;
   }
+}
+
+/* Keep the exploration sign at the end of the page, against the bottom navigation. */
+.app-shell.is-courses .main-content {
+  padding-bottom: calc(67px + env(safe-area-inset-bottom, 0px));
+}
+.is-courses .course-journey {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100dvh - 56px - 67px - env(safe-area-inset-bottom, 0px));
+}
+.is-courses .journey-footer {
+  flex-shrink: 0;
+  margin-top: auto;
+}
+.is-courses .journey-footer img {
+  top: auto;
+  bottom: 0;
+}
+.app-shell.is-courses {
+  background-position: center calc(100% - 67px - env(safe-area-inset-bottom, 0px));
+}
+
+/* Reviews are milestones in the same course journey. */
+.is-courses .is-review-step .journey-station {
+  background: #e9f3e9;
+  color: #4d795c;
+  font-size: 24px;
+}
+.is-courses .is-review-step .journey-card {
+  background: linear-gradient(110deg, #edf6ed, #f7f9ec);
 }

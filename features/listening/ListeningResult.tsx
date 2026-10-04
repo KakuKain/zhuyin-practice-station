@@ -1,5 +1,6 @@
 "use client";
 
+import { useCatalogLesson } from "../courses/MaterialContext";
 import type { AppController } from "../usePracticeApp";
 import { Headphones, PencilLine } from "@phosphor-icons/react";
 
@@ -30,6 +31,7 @@ export function ListeningResult({
     sessionAnsweredUnits,
     setView,
   } = app;
+  const lesson = useCatalogLesson(selectedLesson);
   return (
     <section className="page-section result-page">
       <div className="result-celebration">
@@ -39,20 +41,24 @@ export function ListeningResult({
       </div>
       <span className="eyebrow">PRACTICE COMPLETE</span>
       <h1>練習完成！</h1>
-      <p className="result-intro">今天的第{lessonNumber}課，你已經往前走了一小步。</p>
+      <p className="result-intro">
+        {lesson.listeningOnly ? lesson.title : `第${lessonNumber}課`}，你已經往前走了一小步。
+      </p>
       <div className="result-card">
-        <div>
-          <span className="result-icon fill">
-            <PencilLine size={22} weight="duotone" />
-          </span>
-          <span>
-            <strong>課文默寫</strong>
-            <small>
-              本輪 · {completedFillLessons.includes(selectedLesson) ? "已完成" : "未進行默寫"}
-            </small>
-          </span>
-          <b>{completedFillLessons.includes(selectedLesson) ? "✓" : "—"}</b>
-        </div>
+        {!lesson.listeningOnly && (
+          <div>
+            <span className="result-icon fill">
+              <PencilLine size={22} weight="duotone" />
+            </span>
+            <span>
+              <strong>課文默寫</strong>
+              <small>
+                本輪 · {completedFillLessons.includes(selectedLesson) ? "已完成" : "未進行默寫"}
+              </small>
+            </span>
+            <b>{completedFillLessons.includes(selectedLesson) ? "✓" : "—"}</b>
+          </div>
+        )}
         <div>
           <span className="result-icon listen">
             <Headphones size={22} weight="duotone" />
@@ -87,8 +93,12 @@ export function ListeningResult({
         <button className="secondary-button" type="button" onClick={() => setView("practice")}>
           查看練習紀錄
         </button>
-        <button className="secondary-button" type="button" onClick={() => setView("lesson")}>
-          回到課次
+        <button
+          className="secondary-button"
+          type="button"
+          onClick={() => setView(lesson.listeningOnly ? "courses" : "lesson")}
+        >
+          {lesson.listeningOnly ? "回到課程" : "回到課次"}
         </button>
       </div>
     </section>

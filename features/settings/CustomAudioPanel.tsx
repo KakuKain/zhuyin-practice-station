@@ -1,4 +1,5 @@
 "use client";
+import { ShowMsg } from "../../components/ShowMsg";
 import { useEffect, useRef, useState } from "react";
 import {
   Check,
@@ -19,7 +20,11 @@ import {
 import type { CustomAudioController } from "../../lib/audio/useCustomRecordings";
 import { audioDuration, createRecordingSession } from "../../lib/audio/recording-session";
 import type { ClipOptions } from "../../lib/audio/useAudioPlayer";
-import { priorityPrompts, recordingLessons, type RecordingPrompt } from "./recording-data";
+import { priorityPrompts, type RecordingPrompt } from "./recording-data";
+
+import { useCatalog } from "../courses/MaterialContext";
+import { questionSeedsForLesson } from "../listening/listening-data";
+import { recordingKey } from "../../lib/audio/custom-audio";
 
 type Props = {
   audio: CustomAudioController;
@@ -31,6 +36,19 @@ type Props = {
 type PreviewRecording = CustomRecording & { previewUrl: string };
 
 export function CustomAudioPanel(props: Props) {
+  const catalog = useCatalog();
+  const recordingLessons = catalog.map((lesson) => ({
+    label: `${lesson.materialName} · ${lesson.listeningOnly ? `${lesson.title}（${lesson.reviewRange}）` : `第${lesson.number}課 · ${lesson.title}`}`,
+    prompts: [
+      ...questionSeedsForLesson(lesson.index, catalog).characters,
+      ...questionSeedsForLesson(lesson.index, catalog).words,
+    ].map((seed) => ({
+      text: seed.audioText,
+      pronunciation: seed.answer,
+      category: seed.category as "characters" | "words",
+      key: recordingKey(seed.audioText, seed.answer),
+    })),
+  }));
   const [lessonIndex, setLessonIndex] = useState(-1);
   const [category, setCategory] = useState<"characters" | "words">("characters");
   const [selectedKey, setSelectedKey] = useState(priorityPrompts[0].key);
@@ -50,12 +68,11 @@ export function CustomAudioPanel(props: Props) {
         <p>限目前瀏覽器與這個網站；換裝置、清除網站資料或結束無痕模式會失去錄音。請下載備份。</p>
       </div>
       {props.audio.error && (
-        <div className="custom-audio-error" role="alert">
-          {props.audio.error}
+        <ShowMsg error message={props.audio.error}>
           <button type="button" onClick={() => void props.audio.reload()}>
             重新讀取
           </button>
-        </div>
+        </ShowMsg>
       )}
       <div className="custom-audio-picker">
         <label>
@@ -64,8 +81,16 @@ export function CustomAudioPanel(props: Props) {
             disabled={busy}
             value={lessonIndex}
             onChange={(event) => {
-              setLessonIndex(Number(event.target.value));
-              setCategory("characters");
+              const nextLessonIndex = Number(event.target.value);
+              setLessonIndex(nextLessonIndex);
+              setCategory(
+                nextLessonIndex >= 0 &&
+                  !recordingLessons[nextLessonIndex].prompts.some(
+                    (prompt) => prompt.category === "characters",
+                  )
+                  ? "words"
+                  : "characters",
+              );
               setSelectedKey("");
             }}
           >
@@ -85,7 +110,12 @@ export function CustomAudioPanel(props: Props) {
                 <button
                   key={item}
                   type="button"
-                  disabled={busy}
+                  disabled={
+                    busy ||
+                    !recordingLessons[lessonIndex].prompts.some(
+                      (prompt) => prompt.category === item,
+                    )
+                  }
                   aria-pressed={category === item}
                   onClick={() => {
                     setCategory(item);
@@ -151,6 +181,7 @@ function RecordingEditor({
   const importGeneration = useRef(0);
   const session = useRef<ReturnType<typeof createRecordingSession> | null>(null);
   const busy = status !== "idle";
+  const getRecording = audio.get;
   const info = audio.recordings.find((item) => item.key === prompt.key);
   const candidateUrl = candidate?.previewUrl;
   const savedUrl = saved?.previewUrl;
@@ -192,8 +223,7 @@ function RecordingEditor({
   useEffect(() => {
     let canceled = false;
     if (info)
-      void audio
-        .get(prompt.text, prompt.pronunciation)
+      void getRecording(prompt.text, prompt.pronunciation)
         .then((recording) => {
           if (!canceled && recording)
             setSaved({ ...recording, previewUrl: URL.createObjectURL(recording.blob) });
@@ -204,7 +234,7 @@ function RecordingEditor({
     return () => {
       canceled = true;
     };
-  }, [info, audio.get, prompt.text, prompt.pronunciation]);
+  }, [info, getRecording, prompt.text, prompt.pronunciation]);
 
   const prepare = async (blob: Blob) => {
     const token = ++importGeneration.current;
@@ -327,11 +357,7 @@ function RecordingEditor({
           <SpeakerHigh size={22} aria-hidden="true" />
           {audioLoading ? "讀音載入中…" : "試聽目前讀音"}
         </button>
-        {audioError && (
-          <p role="alert" className="custom-audio-error">
-            讀音無法播放。請確認音量、音檔或網路後再試。
-          </p>
-        )}
+        {audioError && <ShowMsg error message="讀音無法播放。請確認音量、音檔或網路後再試。" />}
       </div>
       <div className="custom-audio-capture">
         <h2>{info ? "替換這段錄音" : "錄製清楚的讀音"}</h2>
@@ -494,14 +520,8 @@ function RecordingEditor({
           )}
         </div>
       )}
-      {error && (
-        <p className="custom-audio-error" role="alert">
-          {error}
-        </p>
-      )}
-      <p className="custom-audio-status" role="status">
-        {message}
-      </p>
+      <ShowMsg error message={error} onClose={() => setError("")} />
+      <ShowMsg message={message} onClose={() => setMessage("")} />
     </section>
   );
 }

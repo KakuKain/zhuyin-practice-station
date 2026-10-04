@@ -1,0 +1,248 @@
+{
+  "dictionaryVersion": "2014_20260929",
+  "license": "CC BY-ND 3.0 TW",
+  "clips": [
+    {
+      "rhyme": "ㄧㄚ",
+      "character": "鴨",
+      "zhuyin": "ㄧㄚ",
+      "tone": "第一聲",
+      "record": "5947",
+      "sourceUrl": "https://dict.concised.moe.edu.tw/sound/word/5947.mp3",
+      "audioUrl": "/listening-audio/moe-examples/5947.mp3",
+      "sha256": "4d7968785920966b60fa39a92ec134a0a6bc5a52aaab9ca87c412e66d54cf894",
+      "bytes": 61677
+    },
+    {
+      "rhyme": "ㄧㄛ",
+      "character": "唷",
+      "zhuyin": "ㄧㄛ",
+      "tone": "第一聲",
+      "record": "5965",
+      "sourceUrl": "https://dict.concised.moe.edu.tw/sound/word/5965.mp3",
+      "audioUrl": "/listening-audio/moe-examples/5965.mp3",
+      "sha256": "535d494d3fcf203e16599badb6aa1ea1da5b37f47df14a0c17e2e3d245b011fb",
+      "bytes": 61211
+    },
+    {
+      "rhyme": "ㄧㄝ",
+      "character": "噎",
+      "zhuyin": "ㄧㄝ",
+      "tone": "第一聲",
+      "record": "5967",
+      "sourceUrl": "https://dict.concised.moe.edu.tw/sound/word/5967.mp3",
+      "audioUrl": "/listening-audio/moe-examples/5967.mp3",
+      "sha256": "8ee15e474abe4a59c53a4b555b75782fde8144d6f46a4b45d1b925590af7ba80",
+      "bytes": 61967
+    },
+    {
+      "rhyme": "ㄧㄞ",
+      "character": "崖",
+      "zhuyin": "ㄧㄞˊ",
+      "tone": "第二聲",
+      "record": "5993",
+      "sourceUrl": "https://dict.concised.moe.edu.tw/sound/word/5993.mp3",
+      "audioUrl": "/listening-audio/moe-examples/5993.mp3",
+      "sha256": "09970cceca15082dff004a09a5c47e401ad1ba7453a8bd52e286729e2d63ed52",
+      "bytes": 62957
+    },
+    {
+      "rhyme": "ㄧㄠ",
+      "character": "腰",
+      "zhuyin": "ㄧㄠ",
+      "tone": "第一聲",
+      "record": "5999",
+      "sourceUrl": "https://dict.concised.moe.edu.tw/sound/word/5999.mp3",
+      "audioUrl": "/listening-audio/moe-examples/5999.mp3",
+      "sha256": "eed29d996003245581f3a858a80cca6cadbeaab1d1418dfd2dc29bc1631154cb",
+      "bytes": 61607
+    },
+    {
+      "rhyme": "ㄧㄡ",
+      "character": "悠",
+      "zhuyin": "ㄧㄡ",
+      "tone": "第一聲",
+      "record": "6029",
+      "sourceUrl": "https://dict.concised.moe.edu.tw/sound/word/6029.mp3",
+      "audioUrl": "/listening-audio/moe-examples/6029.mp3",
+      "sha256": "f63a4ee154c43c52036c225130a34bac61a73308fe9d5628bf7adf3910337dd9",
+      "bytes": 65472
+    },
+    {
+      "rhyme": "ㄧㄢ",
+      "character": "煙",
+      "zhuyin": "ㄧㄢ",
+      "tone": "第一聲",
+      "record": "6079",
+      "sourceUrl": "https://dict.concised.moe.edu.tw/sound/word/6079.mp3",
+      "audioUrl": "/listening-audio/moe-examples/6079.mp3",
+      "sha256": "1391596c5a894bd3d7336ddf48604684b7dc317eea4874a7c61f847e0ff3ad02",
+      "bytes": 60035
+    },
+    {
+      "rhyme": "ㄧㄣ",
+      "character": "音",
+      "zhuyin": "ㄧㄣ",
+      "tone": "第一聲",
+      "record": "6132",
+      "sourceUrl": "https://dict.concised.moe.edu.tw/sound/word/6132.mp3",
+      "audioUrl": "/listening-audio/moe-examples/6132.mp3",
+      "sha256": "ae5278208c7cd2d9c88560f158c2f2dfbfd73cbec62486c543e369d2cb5d0ab7",
+      "bytes": 60813
+    },
+    {
+      "rhyme": "ㄧㄤ",
+      "character": "央",
+      "zhuyin": "ㄧㄤ",
+      "tone": "第一聲",
+      "record": "6160",
+      "sourceUrl": "https://dict.concised.moe.edu.tw/sound/word/6160.mp3",
+      "audioUrl": "/listening-audio/moe-examples/6160.mp3",
+      "sha256": "a20b666ea412480378f03a5e549ff7020c325b97240876aa0802ab93733de654",
+      "bytes": 58217
+    },
+    {
+      "rhyme": "ㄧㄥ",
+      "character": "英",
+      "zhuyin": "ㄧㄥ",
+      "tone": "第一聲",
+      "record": "6186",
+      "sourceUrl": "https://dict.concised.moe.edu.tw/sound/word/6186.mp3",
+      "audioUrl": "/listening-audio/moe-examples/6186.mp3",
+      "sha256": "ef29596ee2c5a944f7c0bb1497b4253d501e8602b8f00d96d5d3996821365baf",
+      "bytes": 59625
+    },
+    {
+      "rhyme": "ㄨㄚ",
+      "character": "蛙",
+      "zhuyin": "ㄨㄚ",
+      "tone": "第一聲",
+      "record": "6276",
+      "sourceUrl": "https://dict.concised.moe.edu.tw/sound/word/6276.mp3",
+      "audioUrl": "/listening-audio/moe-examples/6276.mp3",
+      "sha256": "1212213f97e9ad130808c38bce1278cc991b8dfbbc48d54457b9a3653086edac",
+      "bytes": 55982
+    },
+    {
+      "rhyme": "ㄨㄛ",
+      "character": "窩",
+      "zhuyin": "ㄨㄛ",
+      "tone": "第一聲",
+      "record": "6286",
+      "sourceUrl": "https://dict.concised.moe.edu.tw/sound/word/6286.mp3",
+      "audioUrl": "/listening-audio/moe-examples/6286.mp3",
+      "sha256": "3045c3e17c39f600f65bd1a60fadd9708436f41c3dcffbe30e606f35a5321922",
+      "bytes": 62514
+    },
+    {
+      "rhyme": "ㄨㄞ",
+      "character": "歪",
+      "zhuyin": "ㄨㄞ",
+      "tone": "第一聲",
+      "record": "6296",
+      "sourceUrl": "https://dict.concised.moe.edu.tw/sound/word/6296.mp3",
+      "audioUrl": "/listening-audio/moe-examples/6296.mp3",
+      "sha256": "4ad9b431a4ae6c922564eb450c5b576d5ceb85f0e2524023e4145dae780ed4e6",
+      "bytes": 57861
+    },
+    {
+      "rhyme": "ㄨㄟ",
+      "character": "威",
+      "zhuyin": "ㄨㄟ",
+      "tone": "第一聲",
+      "record": "6302",
+      "sourceUrl": "https://dict.concised.moe.edu.tw/sound/word/6302.mp3",
+      "audioUrl": "/listening-audio/moe-examples/6302.mp3",
+      "sha256": "efb249bc47e1981b9790ec50e737c98ae0b72749dc208a5996e9cd88bac31af7",
+      "bytes": 57754
+    },
+    {
+      "rhyme": "ㄨㄢ",
+      "character": "彎",
+      "zhuyin": "ㄨㄢ",
+      "tone": "第一聲",
+      "record": "6358",
+      "sourceUrl": "https://dict.concised.moe.edu.tw/sound/word/6358.mp3",
+      "audioUrl": "/listening-audio/moe-examples/6358.mp3",
+      "sha256": "9149bee8dfd602146e8ccd25ff3c5cd2997d1e001f6d910452f7c51e8d9175f2",
+      "bytes": 61270
+    },
+    {
+      "rhyme": "ㄨㄣ",
+      "character": "溫",
+      "zhuyin": "ㄨㄣ",
+      "tone": "第一聲",
+      "record": "6384",
+      "sourceUrl": "https://dict.concised.moe.edu.tw/sound/word/6384.mp3",
+      "audioUrl": "/listening-audio/moe-examples/6384.mp3",
+      "sha256": "88cdb068456a69d94fc592476d264dc780a0ce43d55ab998c61ed2e1b24b73cd",
+      "bytes": 57364
+    },
+    {
+      "rhyme": "ㄨㄤ",
+      "character": "汪",
+      "zhuyin": "ㄨㄤ",
+      "tone": "第一聲",
+      "record": "6402",
+      "sourceUrl": "https://dict.concised.moe.edu.tw/sound/word/6402.mp3",
+      "audioUrl": "/listening-audio/moe-examples/6402.mp3",
+      "sha256": "d2924011a2bc7a6ba08fc0685edff6a95284e297460db5310a586d6c74874c45",
+      "bytes": 56405
+    },
+    {
+      "rhyme": "ㄨㄥ",
+      "character": "翁",
+      "zhuyin": "ㄨㄥ",
+      "tone": "第一聲",
+      "record": "6418",
+      "sourceUrl": "https://dict.concised.moe.edu.tw/sound/word/6418.mp3",
+      "audioUrl": "/listening-audio/moe-examples/6418.mp3",
+      "sha256": "3ec8bee5f311d3301eedde761b8099f3ba4bf70ac9064a475b64768843722c4d",
+      "bytes": 58693
+    },
+    {
+      "rhyme": "ㄩㄝ",
+      "character": "約",
+      "zhuyin": "ㄩㄝ",
+      "tone": "第一聲",
+      "record": "6522",
+      "sourceUrl": "https://dict.concised.moe.edu.tw/sound/word/6522.mp3",
+      "audioUrl": "/listening-audio/moe-examples/6522.mp3",
+      "sha256": "d83dd565bde4534fb8f567985da45a68f062d09a9e0b6176640eabd44bf98e31",
+      "bytes": 59080
+    },
+    {
+      "rhyme": "ㄩㄢ",
+      "character": "冤",
+      "zhuyin": "ㄩㄢ",
+      "tone": "第一聲",
+      "record": "6537",
+      "sourceUrl": "https://dict.concised.moe.edu.tw/sound/word/6537.mp3",
+      "audioUrl": "/listening-audio/moe-examples/6537.mp3",
+      "sha256": "0129e5ea7bac623b3103372cf146be8ca6342f1ceb457ac03a50edf2ae8644c7",
+      "bytes": 57530
+    },
+    {
+      "rhyme": "ㄩㄣ",
+      "character": "暈",
+      "zhuyin": "ㄩㄣ",
+      "tone": "第一聲",
+      "record": "6568",
+      "sourceUrl": "https://dict.concised.moe.edu.tw/sound/word/6568.mp3",
+      "audioUrl": "/listening-audio/moe-examples/6568.mp3",
+      "sha256": "dbda192b555bf58ab3d96c4fdab136c75e33ac7f766123de5ae07a9a5150b333",
+      "bytes": 58296
+    },
+    {
+      "rhyme": "ㄩㄥ",
+      "character": "雍",
+      "zhuyin": "ㄩㄥ",
+      "tone": "第一聲",
+      "record": "6602",
+      "sourceUrl": "https://dict.concised.moe.edu.tw/sound/word/6602.mp3",
+      "audioUrl": "/listening-audio/moe-examples/6602.mp3",
+      "sha256": "a0e813cbbd96bb43dde2f999a0ef8a59fddd41c0a308f978a563bb157edbbd57",
+      "bytes": 60068
+    }
+  ]
+}

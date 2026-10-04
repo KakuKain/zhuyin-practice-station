@@ -1,14 +1,15 @@
 "use client";
+import { ShowMsg } from "../../components/ShowMsg";
 
 import { useState } from "react";
 import { SoundPractice } from "../sound-practice/SoundPractice";
 import type { AppController } from "../usePracticeApp";
-import { SectionHeading } from "../../components/AppChrome";
+import { PageHeading } from "../../components/PageHeading";
 import { fillFavoriteKey, fillLocation } from "./practice-storage";
-import { ArrowRight, Headphones, PencilLine, SpeakerHigh, X } from "@phosphor-icons/react";
+import { ArrowRight, Headphones, PencilLine, SpeakerHigh } from "@phosphor-icons/react";
 import { FavoriteButton } from "../../components/ReviewActions";
 import { LessonLabel } from "../../components/LessonTitle";
-import { lessonNumerals, lessons } from "../courses/course-data";
+import { useCatalog } from "../courses/MaterialContext";
 import { findQuestionSeed, listenCategoryLabels } from "../listening/listening-data";
 
 export function PracticeList({
@@ -41,6 +42,9 @@ export function PracticeList({
     | "storageError"
   >;
 }) {
+  const catalog = useCatalog();
+  const lessonNumerals = Object.fromEntries(catalog.map((item) => [item.index, item.number]));
+  const lessons = Object.fromEntries(catalog.map((item) => [item.index, item]));
   const [soundPracticeOpen, setSoundPracticeOpen] = useState(false);
   const {
     fillFavorites,
@@ -67,8 +71,8 @@ export function PracticeList({
     return <SoundPractice audio={app} onBack={() => setSoundPracticeOpen(false)} />;
   return (
     <section className="page-section practice-page">
-      <SectionHeading
-        eyebrow="YOUR PRACTICE"
+      <PageHeading
+        artwork="/course-art/happy-watercolor.webp"
         title="練習紀錄"
         description="收藏與待補強，隨時重練。"
       />
@@ -88,36 +92,24 @@ export function PracticeList({
           開始辨音
         </button>
       </div>
-      {storageError && (
-        <p className="practice-storage-error" role="alert">
-          這個瀏覽器目前無法儲存收藏；關閉頁面後，紀錄可能會消失。
-        </p>
-      )}
-      {practiceNotice && (
-        <div className="practice-notice" role="status">
-          <button
-            type="button"
-            className="notice-dismiss"
-            aria-label="關閉提示"
-            onClick={() => {
-              setPracticeNotice("");
-              setUnfavoriteUndo(null);
-              setUnfavoriteFillUndo(null);
-            }}
-          >
-            <X size={18} aria-hidden="true" />
+      <ShowMsg
+        error
+        message={storageError ? "這個瀏覽器目前無法儲存收藏；關閉頁面後，紀錄可能會消失。" : ""}
+      />
+      <ShowMsg
+        message={practiceNotice}
+        onClose={() => {
+          setPracticeNotice("");
+          setUnfavoriteUndo(null);
+          setUnfavoriteFillUndo(null);
+        }}
+      >
+        {(unfavoriteUndo || unfavoriteFillUndo) && (
+          <button type="button" onClick={unfavoriteFillUndo ? undoFillUnfavorite : undoUnfavorite}>
+            復原取消收藏
           </button>
-          <p>{practiceNotice}</p>
-          {(unfavoriteUndo || unfavoriteFillUndo) && (
-            <button
-              type="button"
-              onClick={unfavoriteFillUndo ? undoFillUnfavorite : undoUnfavorite}
-            >
-              復原取消收藏
-            </button>
-          )}
-        </div>
-      )}
+        )}
+      </ShowMsg>
       <div className="section-title-row">
         <h2>課文默寫 · 待補強與收藏</h2>
         <span className="list-count">
@@ -136,7 +128,7 @@ export function PracticeList({
                   <LessonLabel lessonIndex={favorite.lessonIndex} /> · {favorite.character}
                 </strong>
                 <small>
-                  {fillLocation(favorite.lessonIndex, favorite.positions[0])}
+                  {fillLocation(favorite.lessonIndex, favorite.positions[0], catalog)}
                   {favorite.positions.length > 1
                     ? ` 等 ${favorite.positions.length} 格`
                     : ""} ·{" "}
@@ -190,7 +182,7 @@ export function PracticeList({
           {[...practiceState.savedQuestions]
             .sort((a, b) => Number(Boolean(b.needsPractice)) - Number(Boolean(a.needsPractice)))
             .map(({ lessonIndex, questionId, needsPractice, isFavorite }) => {
-              const question = findQuestionSeed(lessonIndex, questionId);
+              const question = findQuestionSeed(lessonIndex, questionId, catalog);
               if (!question) return null;
               return (
                 <div className="saved-question" key={`${lessonIndex}-${questionId}`}>
@@ -199,11 +191,16 @@ export function PracticeList({
                   </span>
                   <div className="saved-question-copy">
                     <strong>
-                      第{lessonNumerals[lessonIndex]}課 · {listenCategoryLabels[question.category]}
+                      {lessons[lessonIndex].listeningOnly
+                        ? lessons[lessonIndex].title
+                        : `第${lessonNumerals[lessonIndex]}課`}{" "}
+                      · {listenCategoryLabels[question.category]}
                     </strong>
                     <small>
-                      {lessons[lessonIndex].title} · {question.audioText} ·{" "}
-                      {needsPractice ? "待補強" : "已收藏"}
+                      {lessons[lessonIndex].listeningOnly
+                        ? lessons[lessonIndex].reviewRange
+                        : lessons[lessonIndex].title}{" "}
+                      · {question.audioText} · {needsPractice ? "待補強" : "已收藏"}
                       {needsPractice && isFavorite ? " · 已收藏" : ""}
                     </small>
                   </div>
@@ -211,7 +208,7 @@ export function PracticeList({
                     <button
                       type="button"
                       onClick={() => speak(question.audioText, { pronunciation: question.answer })}
-                      aria-label={`播放第${lessonNumerals[lessonIndex]}課 ${question.audioText}`}
+                      aria-label={`播放${lessons[lessonIndex].listeningOnly ? lessons[lessonIndex].title : `第${lessonNumerals[lessonIndex]}課`} ${question.audioText}`}
                     >
                       <SpeakerHigh size={18} aria-hidden="true" /> 播放
                     </button>
@@ -229,7 +226,7 @@ export function PracticeList({
                         setUnfavoriteFillUndo(null);
                         toggleSavedQuestion(lessonIndex, questionId, isFavorite);
                       }}
-                      ariaLabel={`${isFavorite ? "取消收藏" : "收藏"}第${lessonNumerals[lessonIndex]}課 ${question.audioText}`}
+                      ariaLabel={`${isFavorite ? "取消收藏" : "收藏"}${lessons[lessonIndex].listeningOnly ? lessons[lessonIndex].title : `第${lessonNumerals[lessonIndex]}課`} ${question.audioText}`}
                       label={isFavorite ? "取消收藏" : "收藏這題"}
                     />
                   </div>
@@ -269,8 +266,9 @@ export function PracticeList({
               </span>
               <span>
                 <strong>
-                  第{lessonNumerals[session.lessonIndex]}課・
-                  {lessons[session.lessonIndex].title}
+                  {lessons[session.lessonIndex].listeningOnly
+                    ? lessons[session.lessonIndex].title
+                    : `第${lessonNumerals[session.lessonIndex]}課・${lessons[session.lessonIndex].title}`}
                 </strong>
                 <small>
                   {new Date(session.completedAt).toLocaleString("zh-TW", {

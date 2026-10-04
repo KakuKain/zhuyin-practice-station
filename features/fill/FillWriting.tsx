@@ -2,9 +2,11 @@
 
 import type { AppController } from "../usePracticeApp";
 import { LoadingOverlay, ResourceNotice } from "../../components/AppChrome";
-import { InkNotice, InkTools } from "../../components/InkTools";
+import { InkTools } from "../../components/InkTools";
 import { FocusHeader } from "../../components/FocusHeader";
 import { Check } from "@phosphor-icons/react";
+import { ShowMsg } from "../../components/ShowMsg";
+import { useCatalogLesson } from "../courses/MaterialContext";
 import { FillPositionPeek } from "./FillPositionPeek";
 
 export function FillWriting({
@@ -67,6 +69,7 @@ export function FillWriting({
     fillDraftRef,
   } = app;
 
+  const catalogLesson = useCatalogLesson(selectedLesson);
   if (activeFillCell === null) return null;
   const lineIndex = fillLineForCell(activeFillCell);
   const position = activeFillCell - fillLineStarts[lineIndex] + 1;
@@ -78,6 +81,20 @@ export function FillWriting({
         backLabel="回到默寫"
         lessonIndex={selectedLesson}
         stage="課文默寫"
+        hideLessonTitle
+        status={
+          <FillPositionPeek
+            key={activeFillCell}
+            compact
+            lineLengths={lessonLines.map((line) => line.length)}
+            lineStarts={fillLineStarts}
+            hasTitle={!catalogLesson.custom}
+            activeCell={activeFillCell}
+            strokes={fillStrokes}
+            pending={fillPendingCells}
+            readDraft={() => fillDraftRef.current}
+          />
+        }
       />
       <div className="fill-focus-body">
         <ResourceNotice failed={resourceError} />
@@ -91,7 +108,7 @@ export function FillWriting({
               <strong>{writtenCount}</strong> / {lessonItems.length} 格
             </span>
           </div>
-          <p id="fill-writing-hint">記得寫聲調，寫好後按「完成這格」。</p>
+
           <progress
             className="fill-writing-progress"
             value={writtenCount}
@@ -102,20 +119,13 @@ export function FillWriting({
         <section className="fill-writing-workspace" aria-label="注音書寫工作區">
           <div className="fill-writing-position">
             <div className="fill-writing-location">
-              <span>正在寫</span>
               <strong>
-                第 {lineIndex + 1} 行 · 第 {position} 格
+                {!catalogLesson.custom && lineIndex === 0
+                  ? "標題"
+                  : `第 ${lineIndex + (catalogLesson.custom ? 1 : 0)} 行`}{" "}
+                · 第 {position} 格
               </strong>
             </div>
-            <FillPositionPeek
-              key={activeFillCell}
-              compact
-              lineLengths={lessonLines.map((line) => line.length)}
-              activeCell={activeFillCell}
-              strokes={fillStrokes}
-              pending={fillPendingCells}
-              readDraft={() => fillDraftRef.current}
-            />
           </div>
           <div className="fill-writing-grid">
             <canvas
@@ -125,8 +135,8 @@ export function FillWriting({
               onPointerMove={moveFillDrawing}
               onPointerUp={endFillDrawing}
               onPointerCancel={endFillDrawing}
-              aria-describedby="fill-writing-hint"
-              aria-label={`第 ${lineIndex + 1} 行第 ${position} 格手寫區`}
+
+              aria-label={`${!catalogLesson.custom && lineIndex === 0 ? "標題" : `第 ${lineIndex + (catalogLesson.custom ? 1 : 0)} 行`}第 ${position} 格手寫區`}
             />
           </div>
           <div className="fill-canvas-tools">
@@ -140,7 +150,7 @@ export function FillWriting({
             />
           </div>
         </section>
-        <InkNotice erasing={fillEraserActive} notice={fillInkNotice} />
+        <ShowMsg message={fillInkNotice} />
         <div className="fill-writing-actions">
           <button
             type="button"

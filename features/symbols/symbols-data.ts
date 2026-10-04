@@ -2,6 +2,20 @@ export const consonants = Array.from("ㄅㄆㄇㄈㄉㄊㄋㄌㄍㄎㄏㄐㄑㄒ
 export const vowels = Array.from("ㄚㄛㄜㄝㄞㄟㄠㄡㄢㄣㄤㄥㄦㄧㄨㄩ");
 export const allSymbols = [...consonants, ...vowels];
 
+export const combinedRhymeGroups = [
+  {
+    id: "i",
+    title: "ㄧ 的結合韻",
+    cells: ["ㄧㄚ", "ㄧㄛ", "ㄧㄝ", "ㄧㄞ", "ㄧㄠ", "ㄧㄡ", "ㄧㄢ", "ㄧㄣ", "ㄧㄤ", "ㄧㄥ"],
+  },
+  {
+    id: "u",
+    title: "ㄨ 的結合韻",
+    cells: ["ㄨㄚ", "ㄨㄛ", "ㄨㄞ", "ㄨㄟ", "ㄨㄢ", "ㄨㄣ", "ㄨㄤ", "ㄨㄥ"],
+  },
+  { id: "yu", title: "ㄩ 的結合韻", cells: ["ㄩㄝ", "ㄩㄢ", "ㄩㄣ", "ㄩㄥ"] },
+] as const;
+
 // Columns flow right to left; reading down each keeps related sounds together.
 export const symbolGroups = [
   {

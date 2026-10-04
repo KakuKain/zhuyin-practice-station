@@ -1,12 +1,12 @@
 "use client";
+import { ShowMsg } from "../../components/ShowMsg";
 import { isFillCellComplete } from "./fill-draft-policy";
 
 import type { AppController } from "../usePracticeApp";
-import { courseArtwork } from "../courses/course-data";
+import { useCatalogLesson } from "../courses/MaterialContext";
 import { InkPreview } from "../../components/AppChrome";
-import { LessonTitle } from "../../components/LessonTitle";
+
 import { ArrowRight } from "@phosphor-icons/react";
-import { useRef } from "react";
 
 export function FillBlank({
   app,
@@ -31,7 +31,6 @@ export function FillBlank({
     | "writtenCount"
   >;
 }) {
-  const columnRefs = useRef<(HTMLDivElement | null)[]>([]);
   const {
     fillComplete,
     fillLineStarts,
@@ -50,28 +49,38 @@ export function FillBlank({
     storageError,
     writtenCount,
   } = app;
+  const catalogLesson = useCatalogLesson(app.selectedLesson);
   return (
     <section className={`page-section fill-page ${fillParentChecked ? "is-complete" : ""}`}>
       <div className="fill-story-heading">
         <div className="fill-story-copy">
-          <span className="fill-story-kicker">第{lessonNumber}課 · 課文默寫</span>
-          <LessonTitle lessonIndex={selectedLesson} />
-          <p className="fill-sheet-help">
-            {fillParentChecked
-              ? "家長已檢查。修改任何一格後，需要再檢查一次。"
-              : "先寫完整篇，再請家長對照答案。"}
-            {fillNeedsRetry.length > 0 && `有 ${fillNeedsRetry.length} 格待重寫。`}
-          </p>
+          <h1 className="fill-story-kicker">
+            第{lessonNumber}課{catalogLesson.custom ? " · 注音默寫" : ""}
+          </h1>
+          {catalogLesson.custom && (
+            <p className="fill-sheet-help">
+              {fillParentChecked
+                ? "家長已檢查。修改任何一格後，需要再檢查一次。"
+                : catalogLesson.custom
+                  ? "依字詞順序寫注音，再請家長對照答案。"
+                  : "先寫完整篇，再請家長對照答案。"}
+              {fillNeedsRetry.length > 0 && `有 ${fillNeedsRetry.length} 格待重寫。`}
+            </p>
+          )}
         </div>
-        <img
-          className="fill-story-art"
-          src={
-            selectedLesson === 7
-              ? "/course-art/radish-story.webp"
-              : `/course-art/${courseArtwork[selectedLesson]}-watercolor.webp`
-          }
-          alt=""
-        />
+        {!catalogLesson.custom && (
+          <img
+            className="fill-story-art"
+            src={
+              selectedLesson === 7
+                ? "/course-art/radish-story.webp"
+                : catalogLesson.artwork
+                  ? `/course-art/${catalogLesson.artwork}-watercolor.webp`
+                  : "/course-art/lesson-watercolor-paper.webp"
+            }
+            alt=""
+          />
+        )}
       </div>
       <div className="fill-status-line">
         <span>
@@ -81,53 +90,17 @@ export function FillBlank({
             ` · ${Object.keys(fillPendingCells).length} 格未完成`}
         </span>
         <small>
-          {lesson.title} ·{" "}
+          {catalogLesson.custom ? `${lesson.title} · ` : ""}
           {fillParentChecked
             ? `完成 ${lessonItems.length} / ${lessonItems.length} 格`
             : "逐格完成注音"}
         </small>
       </div>
       {storageError && (
-        <p className="fill-storage-error" role="alert">
-          這台裝置目前無法保存默寫；請先不要關閉頁面，檢查瀏覽器的儲存設定。
-        </p>
-      )}
-      {lessonLines.length > 5 && (
-        <div
-          className="fill-line-progress"
-          dir="rtl"
-          role="group"
-          aria-label="各行完成進度"
-          style={
-            { "--line-progress-columns": lessonLines.length <= 9 ? 3 : 4 } as React.CSSProperties
-          }
-        >
-          {lessonLines.map((line, lineIndex) => {
-            const complete = line.filter((_, offset) =>
-              isFillCellComplete(fillLineStarts[lineIndex] + offset, fillStrokes, fillPendingCells),
-            ).length;
-            return (
-              <button
-                type="button"
-                className={complete === line.length ? "is-complete" : ""}
-                key={lineIndex}
-                aria-label={`第 ${lineIndex + 1} 行，已寫 ${complete} / ${line.length} 格`}
-                onClick={() =>
-                  columnRefs.current[lineIndex]?.scrollIntoView({
-                    block: "nearest",
-                    inline: "nearest",
-                    behavior: "instant",
-                  })
-                }
-              >
-                <span>第{lineIndex + 1}行</span>
-                <small>
-                  {complete} / {line.length} 格
-                </small>
-              </button>
-            );
-          })}
-        </div>
+        <ShowMsg
+          error
+          message="這台裝置目前無法保存默寫；請先不要關閉頁面，檢查瀏覽器的儲存設定。"
+        />
       )}
       <div className="zhuyin-sheet">
         <div
@@ -141,13 +114,23 @@ export function FillBlank({
               <div
                 className="syllable-column"
                 role="group"
-                aria-label={`第 ${lineIndex + 1} 行`}
+                aria-label={
+                  !catalogLesson.custom && lineIndex === 0
+                    ? "標題"
+                    : `第 ${lineIndex + (catalogLesson.custom ? 1 : 0)} 行`
+                }
                 key={lineIndex}
-                ref={(element) => {
-                  columnRefs.current[lineIndex] = element;
-                }}
               >
-                <span className="fill-line-label">第{lineIndex + 1}行</span>
+                <span className="fill-line-label">
+                  {!catalogLesson.custom && lineIndex === 0
+                    ? lessonNumber
+                    : `第${lineIndex + (catalogLesson.custom ? 1 : 0)}行`}
+                </span>
+                {!catalogLesson.custom && lineIndex === 0 && (
+                  <span className="fill-title-number" dir="ltr">
+                    。
+                  </span>
+                )}
                 {line.map((_, itemIndex) => {
                   const index = lineStart + itemIndex;
                   const hasPending = fillPendingCells[index] !== undefined;
@@ -156,7 +139,7 @@ export function FillBlank({
                       className={`syllable-cell fill-cell ${isFillCellComplete(index, fillStrokes, fillPendingCells) ? "is-filled" : "is-target"} ${hasPending ? "is-in-progress" : ""} ${fillNeedsRetry.includes(index) ? "is-needs-retry" : ""}`}
                       key={index}
                       type="button"
-                      aria-label={`第 ${lineIndex + 1} 行第 ${itemIndex + 1} 格，${hasPending ? "尚未完成，繼續寫注音" : fillNeedsRetry.includes(index) ? "待重寫" : fillStrokes[index]?.length ? "修改注音" : "寫注音"}`}
+                      aria-label={`${!catalogLesson.custom && lineIndex === 0 ? "標題" : `第 ${lineIndex + (catalogLesson.custom ? 1 : 0)} 行`}第 ${itemIndex + 1} 格，${hasPending ? "尚未完成，繼續寫注音" : fillNeedsRetry.includes(index) ? "待重寫" : fillStrokes[index]?.length ? "修改注音" : "寫注音"}`}
                       onClick={() => openFillCell(index)}
                     >
                       {hasPending ? (
@@ -176,7 +159,14 @@ export function FillBlank({
           })}
         </div>
         {!fillParentChecked && (
-          <img className="fill-pencil-art" src="/course-art/blue-watercolor-pencil.webp" alt="" />
+          <img
+            className="fill-pencil-art"
+            src="/course-art/blue-watercolor-pencil-v2.webp"
+            alt=""
+            onError={(event) => {
+              event.currentTarget.hidden = true;
+            }}
+          />
         )}
       </div>
       {!fillComplete && (
@@ -185,9 +175,9 @@ export function FillBlank({
           type="button"
           onClick={() =>
             openFillCell(
-              lessonItems.findIndex(
-                (_, index) => !isFillCellComplete(index, fillStrokes, fillPendingCells),
-              ),
+              lessonLines
+                .flatMap((line, row) => line.map((_, offset) => fillLineStarts[row] + offset))
+                .find((index) => !isFillCellComplete(index, fillStrokes, fillPendingCells)) ?? 0,
             )
           }
         >
@@ -220,8 +210,11 @@ export function FillBlank({
           </p>
           <img
             className="completion-pencil-art"
-            src="/course-art/blue-watercolor-pencil.webp"
+            src="/course-art/blue-watercolor-pencil-v2.webp"
             alt=""
+            onError={(event) => {
+              event.currentTarget.hidden = true;
+            }}
           />
           <button type="button" className="primary-button" onClick={openListening}>
             進入聽寫 <span>→</span>

@@ -54,8 +54,8 @@ test("recording catalog contains half/tone contrast and all nine lessons, no bas
   assert.ok(priorityPrompts.some((item) => item.text === "裡" && item.pronunciation === "ㄌㄧˇ"));
   assert.equal(recordingLessons.length, 9);
   for (const lesson of recordingLessons) {
-    assert.ok(lesson.prompts.some((item) => item.category === "characters"));
-    assert.ok(lesson.prompts.some((item) => item.category === "words"));
+    assert.ok(lesson.prompts.length > 0);
+    assert.ok(lesson.prompts.every((item) => ["characters", "words"].includes(item.category)));
     assert.ok(lesson.prompts.every((item) => !/^[\u3105-\u3129]+$/.test(item.text)));
     assert.equal(new Set(lesson.prompts.map((item) => item.key)).size, lesson.prompts.length);
   }

@@ -1,4 +1,5 @@
 "use client";
+import { ShowMsg } from "../../components/ShowMsg";
 
 import type { AppController } from "../usePracticeApp";
 import { InkPreview, LoadingOverlay, ResourceNotice } from "../../components/AppChrome";
@@ -6,7 +7,7 @@ import { ArrowRight, PencilLine } from "@phosphor-icons/react";
 import { FavoriteButton } from "../../components/ReviewActions";
 import { FocusHeader } from "../../components/FocusHeader";
 import { LessonTitle } from "../../components/LessonTitle";
-import { courseArtwork } from "../courses/course-data";
+import { useCatalogLesson } from "../courses/MaterialContext";
 import { fillFavoriteKey } from "../practice/practice-storage";
 import { ZhuyinStack } from "../../components/Zhuyin";
 
@@ -48,6 +49,7 @@ export function FillReview({
     toggleFillFavorite,
   } = app;
 
+  const catalogLesson = useCatalogLesson(app.selectedLesson);
   if (!fillReviewOpen) return null;
   const savedCount = fillFavorites
     .filter((favorite) => favorite.lessonIndex === selectedLesson && favorite.isFavorite !== false)
@@ -71,16 +73,20 @@ export function FillReview({
               {fillNeedsRetry.length ? ` · ${fillNeedsRetry.length} 格待重寫` : ""}
             </small>
           </div>
-          <img
-            src={
-              selectedLesson === 0
-                ? "/course-art/review-sleeping-cat-watercolor-v2.webp"
-                : selectedLesson === 7
-                  ? "/course-art/radish-story.webp"
-                  : `/course-art/${courseArtwork[selectedLesson]}-watercolor.webp`
-            }
-            alt=""
-          />
+          {!catalogLesson.custom && (
+            <img
+              src={
+                selectedLesson === 0
+                  ? "/course-art/review-sleeping-cat-watercolor-v2.webp"
+                  : selectedLesson === 7
+                    ? "/course-art/radish-story.webp"
+                    : catalogLesson.artwork
+                      ? `/course-art/${catalogLesson.artwork}-watercolor.webp`
+                      : "/course-art/lesson-watercolor-paper.webp"
+              }
+              alt=""
+            />
+          )}
         </div>
         <div className="fill-compare-list">
           {lessonLines.map((line, lineIndex) => (
@@ -89,7 +95,11 @@ export function FillReview({
               key={lineIndex}
               aria-label={`第 ${lineIndex + 1} 行`}
             >
-              <h2>第 {lineIndex + 1} 行</h2>
+              <h2>
+                {!catalogLesson.custom && lineIndex === 0
+                  ? "標題"
+                  : `第 ${lineIndex + (catalogLesson.custom ? 1 : 0)} 行`}
+              </h2>
               {line.map((item, offset) => {
                 const index = fillLineStarts[lineIndex] + offset;
                 const key = fillFavoriteKey({ lessonIndex: selectedLesson, ...item });
@@ -142,7 +152,7 @@ export function FillReview({
         </div>
         <div className="fill-review-footer">
           {fillNeedsRetry.length > 0 && (
-            <p role="status">請先點上方對應的「重寫這格」，完成後再確認檢查。</p>
+            <ShowMsg message="請先點上方對應的「重寫這格」，完成後再確認檢查。" />
           )}
           <div className="fill-review-actions">
             <button type="button" onClick={() => setFillReviewOpen(false)}>

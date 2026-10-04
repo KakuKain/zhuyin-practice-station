@@ -48,7 +48,8 @@ test("writing workspace keeps location and tools outside the square in every les
     assert.match(html, /<progress[^>]+aria-label="整課默寫完成進度"/);
     assert.match(html, /class="fill-position-peek is-compact"/);
     assert.match(html, /id="position-peek-help" class="visually-hidden"/);
-    assert.match(html, /aria-describedby="fill-writing-hint"/);
+    assert.doesNotMatch(html, /fill-writing-hint/);
+    assert.ok(html.indexOf("fill-position-peek") < html.indexOf("</header>"));
     assert.match(html, /<\/canvas><\/div><div class="fill-canvas-tools"/);
     assert.ok(html.indexOf("fill-writing-position") < html.indexOf("<canvas"));
     const workspace = html.match(/<section[^>]+fill-writing-workspace[\s\S]*?<\/section>/)![0];
@@ -64,6 +65,6 @@ test("writing completion and eraser state still follow the current ink", () => {
   assert.match(html, /class="is-erasing"/);
   assert.match(html, /class="ink-tool ink-eraser is-active"/);
   assert.match(html, /aria-pressed="true"/);
-  assert.match(html, /圈住想擦掉的地方/);
+  assert.doesNotMatch(html, /圈住想擦掉的地方/);
   assert.doesNotMatch(html, /disabled=""/);
 });

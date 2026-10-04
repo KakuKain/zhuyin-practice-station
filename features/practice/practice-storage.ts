@@ -4,7 +4,12 @@ import {
   legacySavedQuestionIndexes,
   questionId,
 } from "../listening/listening-data";
-import { exercises } from "../courses/course-data";
+import {
+  catalogExercises,
+  storedCatalog,
+  type CatalogLesson,
+  validSyllable,
+} from "../courses/materials";
 
 export const practiceStorageKey = "zhuyin-practice-state-v4";
 export const thirdPracticeStorageKey = "zhuyin-practice-state-v3";
@@ -22,7 +27,13 @@ export const initialPracticeState: PracticeState = {
   history: [],
 };
 
-export function validatePracticeState(raw: unknown, version: 1 | 2 | 3 | 4 = 4): PracticeState {
+export function validatePracticeState(
+  raw: unknown,
+  version: 1 | 2 | 3 | 4 = 4,
+  catalog = storedCatalog(),
+  preserveUnavailableLessons = false,
+): PracticeState {
+  const exercises = catalogExercises(catalog);
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) return initialPracticeState;
   const parsed = raw as Record<string, unknown>;
   const savedQuestions = (
@@ -31,8 +42,8 @@ export function validatePracticeState(raw: unknown, version: 1 | 2 | 3 | 4 = 4):
     if (
       !item ||
       typeof item !== "object" ||
-      !Number.isInteger(item.lessonIndex) ||
-      !exercises[item.lessonIndex]
+      !Number.isSafeInteger(item.lessonIndex) ||
+      (!exercises[item.lessonIndex] && !(preserveUnavailableLessons && item.lessonIndex >= 9))
     )
       return [];
     let id = item.questionId;
@@ -43,10 +54,15 @@ export function validatePracticeState(raw: unknown, version: 1 | 2 | 3 | 4 = 4):
           : legacySavedQuestionIndexes[item.lessonIndex]?.[item.questionIndex]
         : undefined;
       const legacy =
-        legacyIndex === undefined ? undefined : exercises[item.lessonIndex].questions[legacyIndex];
+        legacyIndex === undefined ? undefined : exercises[item.lessonIndex]?.questions[legacyIndex];
       id = legacy ? questionId(legacy) : undefined;
     }
-    return typeof id === "string" && findQuestionSeed(item.lessonIndex, id)
+    return typeof id === "string" &&
+      (findQuestionSeed(item.lessonIndex, id, catalog) ||
+        (preserveUnavailableLessons &&
+          item.lessonIndex >= 9 &&
+          !exercises[item.lessonIndex] &&
+          /^(characters|words):[\p{Script=Han}]{1,8}$/u.test(id)))
       ? [
           {
             lessonIndex: item.lessonIndex,
@@ -77,8 +93,8 @@ export function validatePracticeState(raw: unknown, version: 1 | 2 | 3 | 4 = 4):
         typeof item !== "object" ||
         typeof item.id !== "string" ||
         !item.id ||
-        !Number.isInteger(item.lessonIndex) ||
-        !exercises[item.lessonIndex] ||
+        !Number.isSafeInteger(item.lessonIndex) ||
+        (!exercises[item.lessonIndex] && !(preserveUnavailableLessons && item.lessonIndex >= 9)) ||
         !["fill", "listening", "single"].includes(item.mode) ||
         !Number.isFinite(item.completedAt) ||
         item.completedAt <= 0 ||
@@ -115,7 +131,7 @@ export function validatePracticeState(raw: unknown, version: 1 | 2 | 3 | 4 = 4):
     recentLesson:
       typeof parsed.recentLesson === "number" &&
       Number.isInteger(parsed.recentLesson) &&
-      exercises[parsed.recentLesson]
+      (exercises[parsed.recentLesson] || (preserveUnavailableLessons && parsed.recentLesson >= 9))
         ? parsed.recentLesson
         : null,
     completedSessions:
@@ -125,7 +141,11 @@ export function validatePracticeState(raw: unknown, version: 1 | 2 | 3 | 4 = 4):
   };
 }
 
-export function readPracticeState(storage: Storage): PracticeState {
+export function readPracticeState(
+  storage: Storage,
+  catalog = storedCatalog(),
+  preserveUnavailableLessons = false,
+): PracticeState {
   for (const [key, version] of [
     [practiceStorageKey, 4],
     [thirdPracticeStorageKey, 3],
@@ -133,14 +153,26 @@ export function readPracticeState(storage: Storage): PracticeState {
     [firstPracticeStorageKey, 1],
   ] as const) {
     const stored = storage.getItem(key);
-    if (stored !== null) return validatePracticeState(JSON.parse(stored), version);
+    if (stored !== null)
+      return validatePracticeState(
+        JSON.parse(stored),
+        version,
+        catalog,
+        preserveUnavailableLessons,
+      );
   }
   return initialPracticeState;
 }
 
-export function readFillFavorites(storage: Storage): FillFavorite[] {
+export function readFillFavorites(
+  storage: Storage,
+  catalog = storedCatalog(),
+  preserveUnavailableLessons = false,
+): FillFavorite[] {
   const stored = storage.getItem(fillFavoritesStorageKey);
-  return stored ? validatedFillFavorites(JSON.parse(stored)) : [];
+  return stored
+    ? validatedFillFavorites(JSON.parse(stored), catalog, preserveUnavailableLessons)
+    : [];
 }
 
 export function fillFavoriteKey(
@@ -149,8 +181,12 @@ export function fillFavoriteKey(
   return `${item.lessonIndex}:${item.character}:${item.zhuyin}`;
 }
 
-export function fillLocation(lessonIndex: number, position: number): string {
-  const lines = exercises[lessonIndex].lines;
+export function fillLocation(
+  lessonIndex: number,
+  position: number,
+  catalog: readonly CatalogLesson[] = storedCatalog(),
+): string {
+  const lines = catalogExercises([...catalog])[lessonIndex]?.lines ?? [];
   let start = 0;
   for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
     if (position < start + lines[lineIndex].length)
@@ -160,8 +196,13 @@ export function fillLocation(lessonIndex: number, position: number): string {
   return "課文";
 }
 
-export function validatedFillFavorites(raw: unknown): FillFavorite[] {
+export function validatedFillFavorites(
+  raw: unknown,
+  catalog = storedCatalog(),
+  preserveUnavailableLessons = false,
+): FillFavorite[] {
   if (!Array.isArray(raw)) return [];
+  const exercises = catalogExercises(catalog);
   const result = new Map<string, FillFavorite>();
   for (const item of raw) {
     if (!item || typeof item !== "object") continue;
@@ -169,24 +210,30 @@ export function validatedFillFavorites(raw: unknown): FillFavorite[] {
     const lessonIndex = candidate.lessonIndex;
     if (
       typeof lessonIndex !== "number" ||
-      !Number.isInteger(lessonIndex) ||
-      !exercises[lessonIndex]
+      !Number.isSafeInteger(lessonIndex) ||
+      (!exercises[lessonIndex] && !(preserveUnavailableLessons && lessonIndex >= 9))
     )
       continue;
-    const lessonItems = exercises[lessonIndex].lines.flat();
+    const lessonItems = exercises[lessonIndex]?.lines.flat();
+    const unavailable = !lessonItems && preserveUnavailableLessons && lessonIndex >= 9;
     const positions = Array.isArray(candidate.positions)
       ? candidate.positions.filter(
           (position): position is number =>
             typeof position === "number" &&
             Number.isInteger(position) &&
-            lessonItems[position]?.character === candidate.character &&
-            lessonItems[position]?.zhuyin === candidate.zhuyin,
+            position >= 0 &&
+            position < 200 &&
+            (unavailable ||
+              (lessonItems?.[position]?.character === candidate.character &&
+                lessonItems?.[position]?.zhuyin === candidate.zhuyin)),
         )
       : [];
     if (
       !positions.length ||
       typeof candidate.character !== "string" ||
-      typeof candidate.zhuyin !== "string"
+      typeof candidate.zhuyin !== "string" ||
+      (unavailable &&
+        (!/^[\p{Script=Han}]$/u.test(candidate.character) || !validSyllable(candidate.zhuyin)))
     )
       continue;
     const key = fillFavoriteKey({

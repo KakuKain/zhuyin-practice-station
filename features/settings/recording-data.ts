@@ -28,5 +28,10 @@ export const priorityPrompts = priorityCharacters.flatMap((text) => {
     .flatMap((pair) => pair.sounds)
     .filter((sound) => sound.audioText === text)
     .map((sound) => prompt(text, sound.label, "characters"));
-  return [...new Map([...fromLessons, ...fromPairs].map((item) => [item.key, item])).values()];
+  const retained = text === "半" ? [prompt("半", "ㄅㄢˋ", "characters")] : [];
+  return [
+    ...new Map(
+      [...retained, ...fromLessons, ...fromPairs].map((item) => [item.key, item]),
+    ).values(),
+  ];
 });

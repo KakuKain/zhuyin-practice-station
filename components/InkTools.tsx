@@ -1,5 +1,6 @@
 "use client";
 
+import { ShowMsg } from "./ShowMsg";
 import { ArrowUUpLeft, Eraser, Trash } from "@phosphor-icons/react";
 
 export function InkTools({
@@ -77,10 +78,13 @@ export function InkNotice({
   cellLabel?: string;
 }) {
   return (
-    <p className={`ink-notice${erasing ? " is-erasing" : ""}`} role="status" aria-live="polite">
-      {erasing
-        ? `${cellLabel ? `${cellLabel}：` : ""}圈住想擦掉的地方，放開就擦除；再按橡皮擦可取消。`
-        : notice || "擦錯了可以按復原，再繼續寫。"}
-    </p>
+    <>
+      <p className={`ink-notice${erasing ? " is-erasing" : ""}`}>
+        {erasing
+          ? `${cellLabel ? `${cellLabel}：` : ""}圈住想擦掉的地方，放開就擦除；再按橡皮擦可取消。`
+          : "擦錯了可以按復原，再繼續寫。"}
+      </p>
+      <ShowMsg message={erasing ? "" : notice} />
+    </>
   );
 }

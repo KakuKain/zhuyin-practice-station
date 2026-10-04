@@ -10,6 +10,7 @@ export function FocusHeader({
   progress,
   status,
   heading = false,
+  hideLessonTitle = false,
 }: {
   onBack: () => void;
   backLabel: string;
@@ -18,6 +19,7 @@ export function FocusHeader({
   progress?: string;
   status?: ReactNode;
   heading?: boolean;
+  hideLessonTitle?: boolean;
 }) {
   const Title = heading ? "h1" : "div";
   return (
@@ -27,7 +29,7 @@ export function FocusHeader({
         <span>{backLabel}</span>
       </button>
       <Title className="focus-header-title" tabIndex={heading ? -1 : undefined}>
-        <LessonLabel lessonIndex={lessonIndex} />
+        <LessonLabel lessonIndex={lessonIndex} hideTitle={hideLessonTitle} />
         <span className="focus-header-stage">{stage}</span>
         {progress && <span className="focus-header-progress">{progress}</span>}
       </Title>

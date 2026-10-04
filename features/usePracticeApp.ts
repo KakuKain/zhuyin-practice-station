@@ -15,7 +15,7 @@ import { usePracticeCollection } from "./practice/usePracticeCollection";
 import { useFillCollection } from "./practice/useFillCollection";
 import { useLessonPreview } from "./lesson/useLessonPreview";
 import { listeningDuration } from "./settings/listening-settings";
-import { useCallback, useEffect, useEffectEvent, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import type {
   FillDraft,
   FillFavorite,
@@ -36,12 +36,17 @@ import {
   sectionPosition,
 } from "./listening/listening-data";
 
-import { exercises, lessonNumerals, lessons } from "./courses/course-data";
-import { clearFillDraft, readFillDraft, writeFillDraft } from "./fill/fill-storage";
+import { useListeningTimers } from "./listening/useListeningTimers";
+import { useListeningPlayback } from "./listening/useListeningPlayback";
+import { usePracticeNavigation } from "./navigation/practice-navigation";
+import { useMaterials } from "./courses/useMaterials";
+import { clearFillDraft, readFillDraft } from "./fill/fill-storage";
 import { isFillCellComplete } from "./fill/fill-draft-policy";
-import { fillFavoriteKey } from "./practice/practice-storage";
+import { useFillProgress } from "./fill/fill-progress";
 
 export function usePracticeApp() {
+  const materials = useMaterials();
+  const { catalog } = materials;
   const [view, setView] = useState<View>("courses");
 
   const [selectedLesson, setSelectedLesson] = useState(0);
@@ -106,17 +111,8 @@ export function usePracticeApp() {
 
   const persistFillRef = useRef<() => void>(() => {});
 
-  const timerRef = useRef<number | null>(null);
-
-  const timeoutRefs = useRef<number[]>([]);
-
-  const repeatTimeoutRef = useRef<number | null>(null);
-
-  const repeatRemainingRef = useRef(0);
-
-  const autoRepeatEnabledRef = useRef(false);
-
-  const playbackEndedRef = useRef<() => void>(() => {});
+  const timers = useListeningTimers();
+  const { clearListenTimers, playbackEndedRef, onStopRepeat } = timers;
 
   const {
     practiceState,
@@ -132,7 +128,7 @@ export function usePracticeApp() {
     undoUnfavorite,
     toggleSavedQuestion,
     recordSession,
-  } = usePracticeCollection(selectedLesson);
+  } = usePracticeCollection(selectedLesson, catalog);
   const [listeningSettings, setListeningSettings, settingsStorageError] = usePersistentState(
     listeningSettingsStorageKey,
     defaultListeningSettings,
@@ -140,7 +136,7 @@ export function usePracticeApp() {
     validateListeningSettings,
   );
 
-  const lesson = lessons[selectedLesson];
+  const lesson = catalog.find((item) => item.index === selectedLesson) ?? catalog[0];
   const {
     previewMode,
     setPreviewMode,
@@ -153,11 +149,13 @@ export function usePracticeApp() {
     previewPageStart,
     previewVisibleLines,
   } = useLessonPreview(lesson.lines);
-  const exercise = exercises[selectedLesson] ?? exercises[0];
+  const exercise = lesson.exercise;
 
-  const lessonLines = exercise.lines;
+  const lessonLines = lesson.custom || lesson.listeningOnly
+    ? exercise.lines
+    : [exercise.lines[exercise.lines.length - 1], ...exercise.lines.slice(0, -1)];
 
-  const lessonItems = lessonLines.flat();
+  const lessonItems = exercise.lines.flat();
   const {
     fillFavorites,
     setFillFavorites,
@@ -169,12 +167,16 @@ export function usePracticeApp() {
     unfavoriteFillUndo,
     setUnfavoriteFillUndo,
     undoFillUnfavorite,
-  } = useFillCollection(selectedLesson, lessonItems, setPracticeNotice);
+  } = useFillCollection(selectedLesson, lessonItems, setPracticeNotice, catalog);
   const storageError =
     draftStorageError || practiceStorageError || favoritesStorageError || settingsStorageError;
 
   const fillLineStarts = lessonLines.map((_, lineIndex) =>
-    lessonLines.slice(0, lineIndex).reduce((count, line) => count + line.length, 0),
+    !lesson.custom && lineIndex === 0
+      ? lessonItems.length - lessonLines[0].length
+      : lessonLines
+          .slice(lesson.custom ? 0 : 1, lineIndex)
+          .reduce((count, line) => count + line.length, 0),
   );
 
   const writtenCount = lessonItems.filter((_, index) =>
@@ -216,10 +218,6 @@ export function usePracticeApp() {
     persistFillRef,
   });
 
-  const onStopRepeat = useCallback(() => {
-    if (repeatTimeoutRef.current !== null) window.clearTimeout(repeatTimeoutRef.current);
-    repeatTimeoutRef.current = null;
-  }, []);
   const customAudio = useCustomRecordings();
   const {
     playingSymbol,
@@ -319,7 +317,7 @@ export function usePracticeApp() {
 
   const isFocusMode = view === "listen";
 
-  const lessonNumber = lessonNumerals[selectedLesson];
+  const lessonNumber = lesson.number;
 
   const currentQuestionSaved = practiceState.savedQuestions.some(
     (item) =>
@@ -355,12 +353,39 @@ export function usePracticeApp() {
     },
   );
 
+  const { finishListening, startListening, startRetryWriting, replayQuestion } =
+    useListeningPlayback({
+      timers,
+      listeningSettings,
+      currentQuestion,
+      speak,
+      stopPlayback,
+      clearCanvas,
+      listenPhase,
+      listenIndex,
+      listenExitOpen,
+      audioLoading,
+      secondsLeft,
+      questionDuration,
+      setSecondsLeft,
+      setListenPhase,
+      setPlayCount,
+      setListenMessage,
+    });
+
   const toggleCurrentQuestionSaved = () => {
     if (currentQuestionSaved) removeQuestion(selectedLesson, currentQuestion.id);
     else saveQuestion(selectedLesson, currentQuestion.id);
   };
 
   const openLesson = (index: number) => {
+    const nextLesson = catalog.find((item) => item.index === index);
+    if (nextLesson?.listeningOnly) {
+      setSelectedLesson(index);
+      setPracticeState((current) => ({ ...current, recentLesson: index }));
+      prepareListening(index);
+      return;
+    }
     showLoading("正在開啟課文…");
     setSelectedLesson(index);
     setPreviewMode("annotated");
@@ -369,38 +394,6 @@ export function usePracticeApp() {
     setPracticeState((current) => ({ ...current, recentLesson: index }));
     setView("lesson");
   };
-
-  const clearAnswerTimers = useCallback(() => {
-    if (timerRef.current !== null) window.clearInterval(timerRef.current);
-    timerRef.current = null;
-    timeoutRefs.current.forEach((id) => window.clearTimeout(id));
-    timeoutRefs.current = [];
-  }, []);
-  const clearListenTimers = useCallback(() => {
-    clearAnswerTimers();
-    if (repeatTimeoutRef.current !== null) window.clearTimeout(repeatTimeoutRef.current);
-    repeatTimeoutRef.current = null;
-    repeatRemainingRef.current = 0;
-    autoRepeatEnabledRef.current = false;
-  }, [clearAnswerTimers]);
-
-  useEffect(() => {
-    playbackEndedRef.current = () => {
-      if (!autoRepeatEnabledRef.current || repeatRemainingRef.current <= 0) return;
-      const nextPlay = listeningSettings.repeatCount - repeatRemainingRef.current + 1;
-      setListenMessage(
-        `等待 ${listeningSettings.intervalSeconds} 秒後播放第 ${nextPlay} 次，可以繼續寫。`,
-      );
-      repeatTimeoutRef.current = window.setTimeout(() => {
-        repeatTimeoutRef.current = null;
-        if (!autoRepeatEnabledRef.current || repeatRemainingRef.current <= 0) return;
-        repeatRemainingRef.current -= 1;
-        setPlayCount((current) => current + 1);
-        setListenMessage(`第 ${nextPlay} 次播放中，可以繼續寫。`);
-        speak(currentQuestion.audioText, { pronunciation: currentQuestion.answer });
-      }, listeningSettings.intervalSeconds * 1000);
-    };
-  }, [listeningSettings, currentQuestion.audioText, currentQuestion.answer, speak]);
 
   const resetListeningQuestion = (index = 0) => {
     clearListenTimers();
@@ -416,12 +409,12 @@ export function usePracticeApp() {
     setListenMessage("按下「開始聽」才會播放題目。時間會從這裡開始倒數。 ");
   };
 
-  const openListening = () => {
+  const prepareListening = (lessonIndex: number) => {
     showLoading("正在準備聽寫…");
     setPracticeNotice("");
     setUnfavoriteUndo(null);
     setUnfavoriteFillUndo(null);
-    setSessionQuestions(buildListeningSession(selectedLesson));
+    setSessionQuestions(buildListeningSession(lessonIndex, catalog));
     resetListeningQuestion(0);
     setSessionScore({ listeningCorrect: 0 });
     setReviewedIndexes([]);
@@ -429,8 +422,10 @@ export function usePracticeApp() {
     setView("listen");
   };
 
+  const openListening = () => prepareListening(selectedLesson);
+
   const openSavedQuestion = (lessonIndex: number, id: string) => {
-    const seed = findQuestionSeed(lessonIndex, id);
+    const seed = findQuestionSeed(lessonIndex, id, catalog);
     if (!seed) return;
     showLoading("正在開啟收藏題目…");
     setSelectedLesson(lessonIndex);
@@ -496,6 +491,32 @@ export function usePracticeApp() {
     setFillReviewOpen(true);
   };
 
+  const { fillLineForCell, openFillCell, saveFillDrawing, leaveFillCell, confirmFillReview } =
+    useFillProgress({
+      activeFillCell,
+      fillDraftRef,
+      fillStrokes,
+      fillPendingCells,
+      fillNeedsRetry,
+      fillLineStarts,
+      lessonLines,
+      lessonItems,
+      selectedLesson,
+      setStorageError,
+      setFillStrokes,
+      setFillPendingCells,
+      setActiveFillCell,
+      setFillParentChecked,
+      setCompletedFillLessons,
+      setFillNeedsRetry,
+      setFillFavorites,
+      setFillReviewOpen,
+      persistFillRef,
+      fillComplete,
+      recordSession,
+      openFillReview,
+    });
+
   const rewriteFillCell = (index: number) => {
     setFillNeedsRetry((current) => (current.includes(index) ? current : [...current, index]));
     openFillCell(index);
@@ -543,181 +564,10 @@ export function usePracticeApp() {
     clearListenTimers();
     stopPlayback();
     setListenExitOpen(false);
-    setView(singleQuestionPractice ? "practice" : "lesson");
+    setView(singleQuestionPractice ? "practice" : lesson.listeningOnly ? "courses" : "lesson");
     setListenPhase("ready");
   };
 
-  const finishListening = useCallback(
-    (early = false) => {
-      clearListenTimers();
-      stopPlayback();
-      setSecondsLeft(0);
-      setListenPhase("review");
-      setListenMessage(early ? "已交卷，請家長一起看看。" : "時間到，請把平板交給家長一起看看。");
-    },
-    [clearListenTimers, stopPlayback],
-  );
-
-  const remainingSeconds = useEffectEvent(() => secondsLeft);
-  useEffect(() => {
-    if (listenExitOpen || audioLoading || (listenPhase !== "active" && listenPhase !== "retry"))
-      return;
-
-    timerRef.current = window.setInterval(() => {
-      setSecondsLeft((current) => (current <= 1 ? 0 : current - 1));
-    }, 1000);
-
-    const timeUp = window.setTimeout(() => finishListening(), remainingSeconds() * 1000);
-    timeoutRefs.current = [timeUp];
-
-    return clearAnswerTimers;
-  }, [
-    clearAnswerTimers,
-    finishListening,
-    listenIndex,
-    listenPhase,
-    questionDuration,
-    listenExitOpen,
-    audioLoading,
-  ]);
-
-  useEffect(
-    () => () => {
-      clearListenTimers();
-      stopPlayback();
-    },
-    [clearListenTimers, stopPlayback],
-  );
-
-  const startListening = () => {
-    repeatRemainingRef.current = listeningSettings.repeatCount - 1;
-    autoRepeatEnabledRef.current = true;
-    setListenPhase("active");
-    setSecondsLeft(questionDuration);
-    setPlayCount(1);
-    clearCanvas();
-    setListenMessage("第一次播放中，Canvas 已開放，可以邊聽邊寫。 ");
-    speak(currentQuestion.audioText, { pronunciation: currentQuestion.answer });
-  };
-
-  const startRetryWriting = () => {
-    repeatRemainingRef.current = listeningSettings.repeatCount - 1;
-    autoRepeatEnabledRef.current = true;
-    clearCanvas();
-    setListenPhase("retry");
-    setSecondsLeft(questionDuration);
-    setPlayCount((current) => current + 1);
-    setListenMessage("題目正在播放，請重新寫一次；需要時可按重播。 ");
-    speak(currentQuestion.audioText, { pronunciation: currentQuestion.answer });
-  };
-
-  const replayQuestion = () => {
-    setPlayCount((current) => current + 1);
-    speak(currentQuestion.audioText, { pronunciation: currentQuestion.answer });
-  };
-
-  const fillLineForCell = (index: number) =>
-    fillLineStarts.findIndex(
-      (start, lineIndex) => index >= start && index < start + lessonLines[lineIndex].length,
-    );
-
-  const openFillCell = (index: number) => {
-    setFillReviewOpen(false);
-    setActiveFillCell(index);
-  };
-
-  const saveFillDrawing = () => {
-    if (activeFillCell === null || !fillDraftRef.current.length) return;
-    const index = activeFillCell;
-    const lineIndex = fillLineForCell(index);
-    const wasFilled = Boolean(fillStrokes[index]?.length);
-    const next = {
-      ...fillStrokes,
-      [index]: fillDraftRef.current.map((stroke) => stroke.map((point) => ({ ...point }))),
-    };
-    const pending = { ...fillPendingCells };
-    delete pending[index];
-    const remainingRetry = fillNeedsRetry.filter((item) => item !== index);
-    try {
-      writeFillDraft({
-        version: 1,
-        lessonIndex: selectedLesson,
-        savedAt: Date.now(),
-        strokes: next,
-        pendingCells: pending,
-        needsRetry: remainingRetry,
-        reviewOpen: false,
-      });
-    } catch {
-      setStorageError(true);
-    }
-    fillDraftRef.current = [];
-    setFillStrokes(next);
-    setFillPendingCells(pending);
-    setActiveFillCell(null);
-    setFillParentChecked(false);
-    setCompletedFillLessons((current) => current.filter((item) => item !== selectedLesson));
-    setFillNeedsRetry(remainingRetry);
-    if (fillNeedsRetry.includes(index)) {
-      const item = lessonItems[index];
-      const key = fillFavoriteKey({ lessonIndex: selectedLesson, ...item });
-      if (
-        !remainingRetry.some(
-          (position) =>
-            lessonItems[position].character === item.character &&
-            lessonItems[position].zhuyin === item.zhuyin,
-        )
-      ) {
-        setFillFavorites((current) =>
-          current.map((favorite) =>
-            fillFavoriteKey(favorite) === key ? { ...favorite, status: "review_later" } : favorite,
-          ),
-        );
-      }
-    }
-    if (wasFilled) {
-      if (remainingRetry.length) setActiveFillCell(remainingRetry[0]);
-      else if (lessonItems.every((_, itemIndex) => isFillCellComplete(itemIndex, next, pending)))
-        openFillReview();
-      return;
-    }
-    const lineStart = fillLineStarts[lineIndex];
-    const nextEmpty = lessonLines[lineIndex].findIndex(
-      (_, offset) => !isFillCellComplete(lineStart + offset, next, pending),
-    );
-    if (nextEmpty >= 0) setActiveFillCell(lineStart + nextEmpty);
-    else if (lessonItems.every((_, itemIndex) => isFillCellComplete(itemIndex, next, pending)))
-      openFillReview();
-    else {
-      const nextUnwritten = lessonItems.findIndex(
-        (_, itemIndex) => !isFillCellComplete(itemIndex, next, pending),
-      );
-      if (nextUnwritten >= 0) setActiveFillCell(nextUnwritten);
-    }
-  };
-
-  const leaveFillCell = () => {
-    if (fillDraftRef.current.length && activeFillCell !== null) {
-      setFillPendingCells((current) => ({
-        ...current,
-        [activeFillCell]: fillDraftRef.current.map((stroke) =>
-          stroke.map((point) => ({ ...point })),
-        ),
-      }));
-      persistFillRef.current();
-    }
-    setActiveFillCell(null);
-  };
-
-  const confirmFillReview = () => {
-    if (fillNeedsRetry.length || !fillComplete) return;
-    setFillReviewOpen(false);
-    setFillParentChecked(true);
-    setCompletedFillLessons((current) =>
-      current.includes(selectedLesson) ? current : [...current, selectedLesson],
-    );
-    recordSession("fill", lessonItems.length, lessonItems.length, 0);
-  };
   const goToNextQuestion = (
     correctUnits = sessionScore.listeningCorrect,
     pendingQuestions = pendingSessionCount,
@@ -800,27 +650,20 @@ export function usePracticeApp() {
     setListenMessage("這是補強後的手寫答案，請家長再次判定。 ");
   };
 
-  const navigate = (next: View) => {
-    if (view === "fill" && next !== "fill" && !fillParentChecked && hasFillDraft) {
-      persistFillRef.current();
-      setFillExitTarget(next);
-      return;
-    }
-    if (next !== "listen") clearListenTimers();
-    if (next === "more") setMorePanel("home");
-    if (next !== view) showLoading(next === "symbols" ? "正在準備注音…" : "正在開啟頁面…");
-    setView(next);
-  };
-
-  const leaveFill = () => {
-    if (!fillExitTarget) return;
-    persistFillRef.current();
-    const target = fillExitTarget;
-    setFillExitTarget(null);
-    if (target === "more") setMorePanel("home");
-    setView(target);
-  };
+  const { navigate, leaveFill } = usePracticeNavigation({
+    view,
+    fillParentChecked,
+    hasFillDraft,
+    persistFillRef,
+    fillExitTarget,
+    setFillExitTarget,
+    setMorePanel,
+    setView,
+    showLoading,
+    clearListenTimers,
+  });
   return {
+    ...materials,
     activeFillCell,
     customAudio,
     audioError,

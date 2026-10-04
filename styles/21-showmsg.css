@@ -1,0 +1,59 @@
+.showmsg-stack {
+  position: fixed;
+  z-index: 220;
+  top: calc(env(safe-area-inset-top, 0px) + 16px);
+  right: 16px;
+  width: min(380px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+.showmsg {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 12px 14px 18px;
+  background: #f5faf2;
+  color: #304c38;
+  border: 1px solid #b8cbb0;
+  border-radius: 16px;
+  box-shadow: 0 6px 24px #304c3826;
+  pointer-events: auto;
+}
+.showmsg.is-error {
+  background: #fff4ef;
+  color: #793f32;
+  border-color: #ddb5a9;
+}
+.showmsg > div {
+  flex: 1;
+  min-width: 0;
+}
+.showmsg p {
+  margin: 0;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.showmsg button {
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 10px;
+}
+.showmsg > button {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: inherit;
+}
+.showmsg button:focus-visible {
+  outline: 3px solid #597c49;
+  outline-offset: 2px;
+}
+.showmsg > div > button {
+  margin-top: 8px;
+}

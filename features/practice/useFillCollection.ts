@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { builtinCatalog, type CatalogLesson } from "../courses/materials";
 import { usePersistentState } from "../../lib/storage/usePersistentState";
 import type { FillFavorite, StateSetter, SyllableItem } from "../types";
 import {
@@ -15,10 +16,20 @@ export function useFillCollection(
   lessonIndex: number,
   items: SyllableItem[],
   setNotice: StateSetter<string>,
+  catalog: CatalogLesson[] = builtinCatalog,
 ) {
+  const catalogRef = useRef(catalog);
+  useEffect(() => {
+    catalogRef.current = catalog;
+  }, [catalog]);
   const [fillFavorites, setFillFavorites, favoritesStorageError] = usePersistentState<
     FillFavorite[]
-  >(fillFavoritesStorageKey, [], readFillFavorites, validatedFillFavorites);
+  >(
+    fillFavoritesStorageKey,
+    [],
+    (storage) => readFillFavorites(storage, catalogRef.current, true),
+    (raw) => validatedFillFavorites(raw, catalogRef.current, true),
+  );
   const [unfavoriteFillUndo, setUnfavoriteFillUndo] = useState<FillFavorite | null>(null);
   const toggleFillFavorite = (index: number) => {
     const target: FillFavorite = {

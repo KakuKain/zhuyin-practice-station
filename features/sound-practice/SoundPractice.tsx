@@ -1,4 +1,5 @@
 "use client";
+import { ShowMsg } from "../../components/ShowMsg";
 
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, Check, Headphones, SpeakerHigh } from "@phosphor-icons/react";
@@ -14,6 +15,7 @@ import {
 
 type Audio = Pick<AppController, "speak" | "stopPlayback" | "audioLoading" | "audioError">;
 export function SoundPractice({ audio, onBack }: { audio: Audio; onBack: () => void }) {
+  const stopPlayback = audio.stopPlayback;
   const [pair, setPair] = useState<SoundPair | null>(null);
   const [heard, setHeard] = useState<number[]>([]);
   const [round, setRound] = useState<SoundQuestion[]>([]);
@@ -25,7 +27,13 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack: () => v
   const [playing, setPlaying] = useState(false);
   const generation = useRef(0);
   const titleRef = useRef<HTMLHeadingElement>(null);
-  useEffect(() => () => audio.stopPlayback(), [audio.stopPlayback]);
+  useEffect(
+    () => () => {
+      generation.current += 1;
+      stopPlayback();
+    },
+    [stopPlayback],
+  );
   useEffect(() => {
     titleRef.current?.focus({ preventScroll: true });
   }, [pair, round.length, index]);
@@ -237,16 +245,14 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack: () => v
               );
             })}
           </div>
-          <p
-            className={`sound-feedback${feedback === "correct" ? " is-correct" : ""}`}
-            role="status"
-          >
-            {feedback === "correct"
-              ? "聽出來了！"
-              : feedback === "retry"
-                ? "還不是這個音，再聽一次試試看。"
-                : "聽完聲音，再選一個。"}
-          </p>
+          {feedback ? (
+            <ShowMsg
+              key={`${index}-${feedback}`}
+              message={feedback === "correct" ? "聽出來了！" : "還不是這個音，再聽一次試試看。"}
+            />
+          ) : (
+            <p>聽完聲音，再選一個。</p>
+          )}
           {feedback === "correct" && (
             <button
               type="button"
@@ -266,11 +272,9 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack: () => v
           )}
         </div>
       )}
-      {audio.audioLoading && <p role="status">正在載入聲音…</p>}
+      {audio.audioLoading && <ShowMsg message={"正在載入聲音…"} />}
       {audio.audioError && (
-        <p className="practice-storage-error" role="alert">
-          聲音未能播放，請檢查音量與網路，再點一次播放。
-        </p>
+        <ShowMsg error message="聲音未能播放，請檢查音量與網路，再點一次播放。" />
       )}
     </section>
   );

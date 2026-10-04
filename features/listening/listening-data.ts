@@ -1,12 +1,9 @@
-import type {
-  ListenCategory,
-  ListeningQuestion,
-  ListeningSeed,
-  ListeningSettings,
-  SyllableItem,
-} from "../types";
-import { exercises, firstListeningQuestions, lessons } from "../courses/course-data";
-import { circledVocabulary } from "../courses/circled-vocabulary";
+import type { ListenCategory, ListeningQuestion, ListeningSeed, ListeningSettings } from "../types";
+import { exercises, firstListeningQuestions } from "../courses/course-data";
+import { legacyCircledVocabulary } from "../courses/legacy-circled-vocabulary";
+import type { CircledTerm } from "../courses/circled-vocabulary";
+import { builtinCatalog, type CatalogLesson } from "../courses/materials";
+import { combinedRhymeExample } from "../symbols/combined-rhyme-audio";
 
 export const listeningSettingsStorageKey = "zhuyin-listening-settings-v1";
 
@@ -95,6 +92,8 @@ export function questionId(question: ListeningSeed): string {
 }
 
 export function listeningAudioUrl(text: string): string {
+  const example = combinedRhymeExample(text);
+  if (example) return example.audioUrl;
   const filename = [...text].map((character) => character.codePointAt(0)!.toString(16)).join("-");
   // These 37 clips changed source in v44; the query bypasses older browser caches.
   return `/listening-audio/${filename}.m4a${/^[\u3105-\u3129]$/.test(text) ? "?v=44" : ""}`;
@@ -102,36 +101,26 @@ export function listeningAudioUrl(text: string): string {
 
 export function questionSeedsForLesson(
   lessonIndex: number,
+  catalog: readonly CatalogLesson[] = builtinCatalog,
 ): Record<ListenCategory, ListeningSeed[]> {
-  const lesson = lessons[lessonIndex] ?? lessons[0];
-  const terms = circledVocabulary[lessonIndex] ?? circledVocabulary[0];
+  const lesson = catalog.find((item) => item.index === lessonIndex);
+  if (!lesson) return { symbols: [], characters: [], words: [] };
+  const terms = lesson.terms;
   const symbols: ListeningSeed[] = lesson.symbols.map((symbol) => ({
     category: "symbols",
     answer: symbol,
     audioText: symbol,
     distractors: lesson.symbols.filter((other) => other !== symbol).slice(0, 2),
   }));
-  const seenCharacters = new Map<string, SyllableItem>();
-  for (const term of terms) {
-    Array.from(term.text).forEach((character, index) => {
-      if (!seenCharacters.has(character))
-        seenCharacters.set(character, { character, zhuyin: term.syllables[index] });
-    });
-  }
-  // Neutral-tone and sandhi readings need their surrounding word; do not ask
-  // children to identify them from an isolated character recording.
-  const uniqueCharacters = [...seenCharacters.values()].filter(
-    (item) =>
-      !item.zhuyin.startsWith("˙") &&
-      !(item.character === "一" && item.zhuyin !== "ㄧ") &&
-      !(item.character === "不" && item.zhuyin === "ㄅㄨˊ"),
-  );
-  const uniqueSounds = [...new Set(uniqueCharacters.map((item) => item.zhuyin))];
-  const characters: ListeningSeed[] = uniqueCharacters.map((item) => ({
+  // Exam prompts stay intact: only explicitly listed single characters become
+  // character questions; whole words and sentences are never split.
+  const singleTerms = terms.filter((term) => term.syllables.length === 1);
+  const uniqueSounds = [...new Set(singleTerms.map((term) => term.syllables[0]))];
+  const characters: ListeningSeed[] = singleTerms.map((term) => ({
     category: "characters",
-    answer: item.zhuyin,
-    audioText: item.character,
-    distractors: uniqueSounds.filter((sound) => sound !== item.zhuyin).slice(0, 2),
+    answer: term.syllables[0],
+    audioText: term.text,
+    distractors: uniqueSounds.filter((sound) => sound !== term.syllables[0]).slice(0, 2),
   }));
   const wordSounds = [...new Set(terms.flatMap((term) => term.syllables))];
   const words: ListeningSeed[] = terms
@@ -161,23 +150,62 @@ export function makeQuestion(seed: ListeningSeed): ListeningQuestion {
   };
 }
 
-export function buildListeningSession(lessonIndex: number): ListeningQuestion[] {
-  const pools = questionSeedsForLesson(lessonIndex);
+export function customListeningSeed(term: CircledTerm): ListeningSeed {
+  const first = term.syllables[0];
+  const base = first.replace(/[˙ˊˇˋ]/g, "");
+  const alternatives = [base, `${base}ˊ`, `${base}ˇ`, `${base}ˋ`, `˙${base}`]
+    .filter((reading) => reading !== first)
+    .slice(0, 2);
+  return {
+    category: term.syllables.length > 1 ? "words" : "characters",
+    audioText: term.text,
+    answer: term.syllables.join("|"),
+    distractors: alternatives.map((reading) => [reading, ...term.syllables.slice(1)].join("|")),
+  };
+}
+
+export function buildListeningSession(
+  lessonIndex: number,
+  catalog: readonly CatalogLesson[] = builtinCatalog,
+): ListeningQuestion[] {
+  const lesson = catalog.find((item) => item.index === lessonIndex);
+  if (!lesson) return [];
+  const seeds = lesson.terms.map(customListeningSeed);
+  const symbols =
+    lesson.custom || lesson.listeningOnly
+      ? []
+      : shuffleItems(questionSeedsForLesson(lessonIndex, catalog).symbols).slice(0, 4);
   return [
-    ...shuffleItems(pools.symbols).slice(0, 4),
-    ...shuffleItems(pools.characters).slice(0, 4),
-    ...shuffleItems(pools.words).slice(0, 2),
+    ...symbols,
+    ...shuffleItems(seeds.filter((seed) => seed.category === "characters")),
+    ...shuffleItems(seeds.filter((seed) => seed.category === "words")),
   ].map(makeQuestion);
 }
 
-export function findQuestionSeed(lessonIndex: number, id: string): ListeningSeed | undefined {
-  const pools = questionSeedsForLesson(lessonIndex);
+export function findQuestionSeed(
+  lessonIndex: number,
+  id: string,
+  catalog: readonly CatalogLesson[] = builtinCatalog,
+): ListeningSeed | undefined {
+  const lesson = catalog.find((item) => item.index === lessonIndex);
+  if (lesson) {
+    const term = lesson.terms.find(
+      (term) => id === `${term.syllables.length > 1 ? "words" : "characters"}:${term.text}`,
+    );
+    if (term) return customListeningSeed(term);
+    if (lesson.custom || lesson.listeningOnly) return undefined;
+  }
+  const pools = questionSeedsForLesson(lessonIndex, catalog);
   const current = [...pools.symbols, ...pools.characters, ...pools.words].find(
     (question) => questionId(question) === id,
   );
   if (current) return current;
   // Previously saved questions remain available even when they are outside
   // the teacher's new exam range; they no longer appear in fresh sessions.
+  const legacyTerm = legacyCircledVocabulary[lessonIndex]?.find(
+    (term) => id === `${term.syllables.length > 1 ? "words" : "characters"}:${term.text}`,
+  );
+  if (legacyTerm) return customListeningSeed(legacyTerm);
   const exercise = exercises[lessonIndex];
   if (!exercise) return undefined;
   const legacyCharacter = exercise.lines

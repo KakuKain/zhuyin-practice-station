@@ -29,7 +29,8 @@ test("server-renders the public zhuyin practice station", async () => {
   assert.match(html, /笑嘻嘻/);
   for (const title of ["翹翹板", "謝謝老師", "龜兔賽跑", "拔蘿蔔", "動物狂歡會"])
     assert.match(html, new RegExp(title));
-  assert.match(html, /不用登入也能練/);
+  assert.match(html, /選擇教材/);
+  for (const review of ["複習一", "複習二", "複習三"]) assert.match(html, new RegExp(review));
   assert.match(html, /選擇課程/);
   assert.match(html, /class="journey-footer"/);
   assert.doesNotMatch(html, /id="course-lesson-7" hidden/);

@@ -1,10 +1,13 @@
 "use client";
+import { ShowMsg } from "../../components/ShowMsg";
+import { HeaderBack } from "../../components/AppChrome";
 
+import { PageHeading } from "../../components/PageHeading";
 import type { AppController } from "../usePracticeApp";
 import { useState } from "react";
 import type { ListeningSettings } from "../types";
 import {
-  ArrowLeft,
+  BookOpenText,
   ArrowRight,
   Info,
   Microphone,
@@ -12,6 +15,8 @@ import {
   Question,
 } from "@phosphor-icons/react";
 import { siteReleaseNotes } from "../courses/course-data";
+import { MaterialsPanel } from "./MaterialsPanel";
+import { builtinMaterialName } from "../courses/materials";
 import { CustomAudioPanel } from "./CustomAudioPanel";
 
 export function SettingsScreen({
@@ -19,6 +24,10 @@ export function SettingsScreen({
 }: {
   app: Pick<
     AppController,
+    | "materialsState"
+    | "setMaterialsState"
+    | "materialsStorageError"
+    | "catalog"
     | "listeningSettings"
     | "morePanel"
     | "setListeningSettings"
@@ -49,12 +58,27 @@ export function SettingsScreen({
   if (morePanel === "home")
     return (
       <section className="page-section more-page">
-        <h1 className="more-title">
-          <span>更多</span>
-        </h1>
+        <PageHeading title="更多" artwork="/course-art/swan-riding-family-watercolor.webp" />
         <div className="more-group">
           <h2>練習設定</h2>
           <div className="more-settings-list">
+            <button type="button" onClick={() => setMorePanel("materials")}>
+              <span className="more-row-icon green">
+                <BookOpenText size={21} aria-hidden="true" />
+              </span>
+              <span>
+                <strong>教材與題庫</strong>
+                <small>
+                  {app.materialsState.materials.find(
+                    (item) => item.id === app.materialsState.activeId && !item.archived,
+                  )?.name ?? builtinMaterialName}{" "}
+                  · 選擇或匯入
+                </small>
+              </span>
+              <span className="more-arrow" aria-hidden="true">
+                <ArrowRight size={21} weight="bold" />
+              </span>
+            </button>
             <button type="button" onClick={() => setMorePanel("listening")}>
               <span className="more-row-icon blue">
                 <MusicNotes size={21} aria-hidden="true" />
@@ -119,16 +143,16 @@ export function SettingsScreen({
 
   return (
     <section className="page-section more-page more-detail-page">
-      <button
-        type="button"
-        className="more-back"
-        onClick={() => {
-          setSaveRequested(false);
-          setMorePanel("home");
-        }}
-      >
-        <ArrowLeft size={19} aria-hidden="true" /> 更多
-      </button>
+      {morePanel !== "materials" && (
+        <HeaderBack
+          label="更多"
+          onBack={() => {
+            setSaveRequested(false);
+            setMorePanel("home");
+          }}
+        />
+      )}
+      {morePanel === "materials" && <MaterialsPanel app={app} />}
       {morePanel === "audio" && (
         <CustomAudioPanel
           audio={app.customAudio}
@@ -144,13 +168,17 @@ export function SettingsScreen({
           <p className="more-detail-intro">
             聲音速度不變；可以依孩子的書寫速度調整時間。設定只留在這台裝置。
           </p>
-          <p className="setting-save-notice" role="status">
-            {saveRequested
-              ? settingsStorageError
-                ? "這台裝置無法儲存設定；目前頁面仍會使用你的選擇。"
-                : "已儲存到這台裝置"
-              : ""}
-          </p>
+          <ShowMsg
+            message={
+              saveRequested
+                ? settingsStorageError
+                  ? "這台裝置無法儲存設定；目前頁面仍會使用你的選擇。"
+                  : "已儲存到這台裝置"
+                : ""
+            }
+            error={Boolean(settingsStorageError)}
+            onClose={() => setSaveRequested(false)}
+          />
           <div className="more-setting-group">
             <fieldset>
               <legend>作答時間</legend>

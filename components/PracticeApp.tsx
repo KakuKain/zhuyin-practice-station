@@ -1,10 +1,12 @@
 "use client";
 
+import { ShowMsgProvider } from "./ShowMsg";
 import { useSyncExternalStore } from "react";
 import { usePracticeApp } from "../features/usePracticeApp";
 import { AppHeader, BottomNav, LoadingOverlay, ResourceNotice } from "./AppChrome";
 import { FillDialogs } from "../features/fill/FillDialogs";
 import { CourseList } from "../features/courses/CourseList";
+import { MaterialSelector } from "../features/courses/MaterialSelector";
 import { LessonReader } from "../features/lesson/LessonReader";
 import { FillBlank } from "../features/fill/FillBlank";
 import { FillWriting } from "../features/fill/FillWriting";
@@ -16,6 +18,8 @@ import { ListeningResult } from "../features/listening/ListeningResult";
 import { ListeningScreen } from "../features/listening/ListeningScreen";
 import { SymbolChart } from "../features/symbols/SymbolChart";
 
+import { MaterialContext } from "../features/courses/MaterialContext";
+
 const subscribeToHydration = () => () => {};
 const clientReady = () => true;
 const serverReady = () => false;
@@ -23,6 +27,22 @@ const serverReady = () => false;
 export function PracticeApp() {
   const hydrated = useSyncExternalStore(subscribeToHydration, clientReady, serverReady);
   const app = usePracticeApp();
+  return (
+    <ShowMsgProvider>
+      <MaterialContext.Provider value={app.catalog}>
+        <PracticeContent app={app} hydrated={hydrated} />
+      </MaterialContext.Provider>
+    </ShowMsgProvider>
+  );
+}
+
+function PracticeContent({
+  app,
+  hydrated,
+}: {
+  app: ReturnType<typeof usePracticeApp>;
+  hydrated: boolean;
+}) {
   const {
     view,
     isFocusMode,
@@ -76,6 +96,7 @@ export function PracticeApp() {
     <div className={`app-shell is-${view}`} aria-busy={!hydrated}>
       <audio ref={playbackRef} onEnded={finishPlayback} preload="none" hidden aria-hidden="true" />
       <AppHeader
+        materialSelector={view === "courses" ? <MaterialSelector app={app} /> : undefined}
         onCourses={() => navigate("courses")}
         onBack={
           view === "lesson"

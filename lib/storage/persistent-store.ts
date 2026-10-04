@@ -9,10 +9,12 @@ export function createPersistentStore<T>(
   initialValue: T,
   read: (storage: Storage) => T,
   validate: (raw: unknown) => T,
+  options: { protectUnreadData?: boolean } = {},
 ) {
   const serverSnapshot: StorageSnapshot<T> = { value: initialValue, error: false };
   let snapshot = serverSnapshot;
   let hydrated = false;
+  let unreadData = false;
   const listeners = new Set<() => void>();
   const emit = () => listeners.forEach((listener) => listener());
   const hydrate = () => {
@@ -20,8 +22,10 @@ export function createPersistentStore<T>(
     hydrated = true;
     try {
       snapshot = { value: read(window.localStorage), error: false };
+      unreadData = false;
     } catch {
       snapshot = { value: initialValue, error: true };
+      unreadData = true;
     }
   };
   const onStorage = (event: StorageEvent) => {
@@ -31,8 +35,10 @@ export function createPersistentStore<T>(
         value: event.newValue === null ? initialValue : validate(JSON.parse(event.newValue)),
         error: false,
       };
+      unreadData = false;
     } catch {
       snapshot = { ...snapshot, error: true };
+      unreadData = true;
     }
     emit();
   };
@@ -52,15 +58,20 @@ export function createPersistentStore<T>(
       hydrate();
       const value =
         typeof action === "function" ? (action as (previous: T) => T)(snapshot.value) : action;
-      if (value === snapshot.value) return;
+      if (value === snapshot.value) return !snapshot.error;
       snapshot = { value, error: snapshot.error };
       try {
+        if (options.protectUnreadData && unreadData) {
+          // Never overwrite an existing bank that failed to decode. Keep this session usable.
+          throw new Error("Existing data could not be read; reload before replacing it.");
+        }
         window.localStorage.setItem(key, JSON.stringify(value));
         snapshot = { value, error: false };
       } catch {
         snapshot = { value, error: true };
       }
       emit();
+      return !snapshot.error;
     }) satisfies StateSetter<T>,
   };
 }

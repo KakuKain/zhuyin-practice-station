@@ -8,8 +8,9 @@ export function usePersistentState<T>(
   initialValue: T,
   read: (storage: Storage) => T,
   validate: (raw: unknown) => T,
+  options?: { protectUnreadData?: boolean },
 ) {
-  const [store] = useState(() => createPersistentStore(key, initialValue, read, validate));
+  const [store] = useState(() => createPersistentStore(key, initialValue, read, validate, options));
   const snapshot = useSyncExternalStore(
     store.subscribe,
     store.getSnapshot,

@@ -21,61 +21,6 @@
   padding-top: 0;
 }
 
-.is-practice .practice-page .section-heading {
-  min-height: 94px;
-  margin: 0 -14px 4px;
-  padding: 12px 24px 0;
-  overflow: visible;
-  border-radius: 0;
-  background: none;
-}
-
-.is-practice .practice-page .section-heading::before {
-  position: absolute;
-  right: -10px;
-  bottom: -4px;
-  width: 180px;
-  height: 118px;
-  border-radius: 50%;
-  background: radial-gradient(ellipse, rgba(218, 241, 252, 0.78), transparent 72%);
-  content: "";
-  pointer-events: none;
-}
-
-.is-practice .practice-page .section-heading::after {
-  right: 18px;
-  bottom: 1px;
-  width: 96px;
-  height: 96px;
-}
-
-.is-practice .practice-page .section-heading > * {
-  max-width: 75%;
-}
-
-.is-practice .practice-page .section-heading .eyebrow {
-  display: none;
-}
-
-.is-practice .practice-page .section-heading h1 {
-  width: fit-content;
-  margin: 0;
-  font-size: clamp(32px, 9vw, 40px);
-  font-weight: 900;
-  letter-spacing: 0.055em;
-  line-height: 1.15;
-  box-shadow: inset 0 -8px #ffe8a0;
-}
-
-.is-practice .practice-page .section-heading p {
-  max-width: 252px;
-  margin-top: 10px;
-  color: #637897;
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 1.55;
-}
-
 .is-practice .practice-page > .section-title-row,
 .is-practice .practice-list .section-title-row {
   margin: 23px 5px 11px;
@@ -282,44 +227,6 @@
   padding-top: 0;
 }
 
-.is-more .more-page:not(.more-detail-page) .more-title {
-  min-height: 80px;
-  margin: 0 -14px 2px;
-  padding: 0 24px;
-  overflow: visible;
-  border-radius: 0;
-  background: none;
-  font-size: clamp(32px, 9vw, 40px);
-  font-weight: 900;
-  letter-spacing: 0.055em;
-}
-
-.is-more .more-page:not(.more-detail-page) .more-title::before {
-  position: absolute;
-  right: -10px;
-  bottom: -4px;
-  width: 160px;
-  height: 92px;
-  border-radius: 50%;
-  background: radial-gradient(ellipse, rgba(224, 242, 225, 0.84), transparent 72%);
-  content: "";
-  pointer-events: none;
-}
-
-.is-more .more-page:not(.more-detail-page) .more-title::after {
-  right: 16px;
-  bottom: 0;
-  width: 102px;
-  height: 84px;
-  background-image: url("/course-art/swan-riding-family-watercolor.webp");
-}
-
-.is-more .more-page:not(.more-detail-page) .more-title span {
-  position: relative;
-  z-index: 1;
-  box-shadow: inset 0 -8px #ffe8a0;
-}
-
 .is-more .more-group {
   margin-bottom: 23px;
 }
@@ -445,35 +352,7 @@
   border-color: #dce9ef;
 }
 
-@media (max-width: 380px) {
-  .is-practice .practice-page .section-heading::after {
-    right: 3px;
-    width: 88px;
-  }
-  .is-practice .practice-page .section-heading > * {
-    max-width: 78%;
-  }
-  .is-practice .practice-page .section-heading p {
-    font-size: 13px;
-  }
-  .is-more .more-page:not(.more-detail-page) .more-title::after {
-    right: 3px;
-    width: 88px;
-  }
-}
-
 @media (min-width: 700px) {
-  .is-practice .practice-page .section-heading,
-  .is-more .more-page:not(.more-detail-page) .more-title {
-    margin-inline: -20px;
-    padding-inline: 30px;
-  }
-  .is-practice .practice-page .section-heading::after {
-    right: 45px;
-  }
-  .is-more .more-page:not(.more-detail-page) .more-title::after {
-    right: 45px;
-  }
   .is-more .more-detail-content {
     margin-inline: -20px;
     padding-inline: 30px;

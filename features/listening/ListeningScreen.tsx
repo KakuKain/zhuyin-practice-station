@@ -1,14 +1,15 @@
 "use client";
+import { ShowMsg } from "../../components/ShowMsg";
 
 import type { AppController } from "../usePracticeApp";
 import { listenCategoryLabels } from "./listening-data";
-import { Clock, Headphones, PencilLine, SpeakerHigh, Timer } from "@phosphor-icons/react";
+import { SpeakerHigh, Timer } from "@phosphor-icons/react";
 import { FavoriteButton, ReviewActions } from "../../components/ReviewActions";
-import { courseArtwork } from "../courses/course-data";
+import { useCatalogLesson } from "../courses/MaterialContext";
 import { FocusHeader } from "../../components/FocusHeader";
 import { listeningPhaseLabel } from "./listening-policy";
 import { AnswerDisplay } from "../../components/Zhuyin";
-import { LoadingOverlay, ResourceNotice } from "../../components/AppChrome";
+import { AppHeader, LoadingOverlay, ResourceNotice } from "../../components/AppChrome";
 import { ListeningCanvas } from "./ListeningCanvas";
 
 export function ListeningScreen({ app }: { app: AppController }) {
@@ -33,7 +34,6 @@ export function ListeningScreen({ app }: { app: AppController }) {
     resourceError,
     playCount,
     playbackRef,
-    questionDuration,
     replayQuestion,
     retryMessage,
     secondsLeft,
@@ -53,18 +53,27 @@ export function ListeningScreen({ app }: { app: AppController }) {
   } = app;
 
   const choiceAnswers = currentQuestion.choices;
+  const catalogLesson = useCatalogLesson(app.selectedLesson);
   return (
     <main className={`focus-shell phase-${listenPhase}`}>
       <audio ref={playbackRef} onEnded={finishPlayback} preload="none" hidden aria-hidden="true" />
-      <FocusHeader
-        onBack={leaveFocus}
-        backLabel={singleQuestionPractice ? "回到練習" : "回到課文預覽"}
-        lessonIndex={selectedLesson}
-        stage={`${listenCategoryLabels[currentQuestion.category]} · ${listeningPhaseLabel(listenPhase)}`}
-        progress={sectionProgress}
-        heading={listenPhase !== "ready"}
-        status={
-          listenPhase !== "ready" ? (
+      {listenPhase === "ready" ? (
+        <AppHeader onCourses={leaveFocus} onBack={leaveFocus} backLabel="返回" />
+      ) : (
+        <FocusHeader
+          onBack={leaveFocus}
+          backLabel={
+            singleQuestionPractice
+              ? "回到練習"
+              : catalogLesson.listeningOnly
+                ? "回到課程"
+                : "回到課文預覽"
+          }
+          lessonIndex={selectedLesson}
+          stage={`${listenCategoryLabels[currentQuestion.category]} · ${listeningPhaseLabel(listenPhase)}`}
+          progress={sectionProgress}
+          heading
+          status={
             <>
               <span
                 className={
@@ -82,9 +91,9 @@ export function ListeningScreen({ app }: { app: AppController }) {
                 <SpeakerHigh size={14} weight="bold" /> {playCount} 次
               </span>
             </>
-          ) : undefined
-        }
-      />
+          }
+        />
+      )}
       <div className="focus-content">
         <ResourceNotice failed={resourceError} />
         <p className="sr-only" aria-live="polite">
@@ -92,45 +101,36 @@ export function ListeningScreen({ app }: { app: AppController }) {
         </p>
         {listenPhase === "ready" ? (
           <>
-            <div
-              className="listen-ready-progress"
-              aria-label={`第 ${sectionQuestionIndex + 1} 小題，共 ${sectionQuestionCount} 題`}
-            >
-              <div
-                className={`listen-progress-dots ${sectionQuestionCount === 1 ? "is-single" : ""}`}
-                style={{ "--question-count": sectionQuestionCount } as React.CSSProperties}
-                aria-hidden="true"
+            <div className="listen-ready-progress">
+              <span>
+                {catalogLesson.listeningOnly
+                  ? catalogLesson.title
+                  : `第${catalogLesson.number}課 · ${catalogLesson.title}`}
+              </span>
+              <strong
+                aria-label={`第 ${sectionQuestionIndex + 1} 題，共 ${sectionQuestionCount} 題`}
               >
-                {Array.from({ length: sectionQuestionCount }, (_, index) => (
-                  <span
-                    key={index}
-                    className={
-                      index === sectionQuestionIndex
-                        ? "is-active"
-                        : index < sectionQuestionIndex
-                          ? "is-done"
-                          : ""
-                    }
-                  />
-                ))}
-              </div>
-              <strong>{sectionProgress}</strong>
+                第 {sectionQuestionIndex + 1} 題 / {sectionQuestionCount}
+              </strong>
             </div>
             <div className="listen-ready-card">
               <div className="listen-ready-context">
                 <span className="listen-ready-category">
-                  {listenCategoryLabels[currentQuestion.category]}
+                  {
+                    { symbols: "注音符號", characters: "生字", words: "語詞" }[
+                      currentQuestion.category
+                    ]
+                  }
                 </span>
-                <h1>準備聽寫</h1>
+                <h1>聽一聽，寫注音</h1>
               </div>
               <p>
                 {isWordQuestion
-                  ? "聽一個語詞，每格寫一個字的注音。"
+                  ? "按播放，聽完後每格寫一個字的注音。"
                   : currentQuestion.category === "symbols"
-                    ? "聽題目，在田字格寫下聽到的注音符號。"
-                    : "聽題目，在田字格寫下完整注音。"}
+                    ? "按播放，聽完後在格子裡寫注音。"
+                    : "按播放，聽完後在格子裡寫完整注音。"}
               </p>
-              <small className="listen-audio-note">播放後會留一小段空白，準備好就按下開始。</small>
               <div className="listen-ready-stage">
                 <button
                   type="button"
@@ -148,42 +148,31 @@ export function ListeningScreen({ app }: { app: AppController }) {
                     fetchPriority="high"
                   />
                 </button>
-                <img
-                  className="listen-ready-art"
-                  src={
-                    selectedLesson === 7
-                      ? "/course-art/radish-story.webp"
-                      : `/course-art/${courseArtwork[selectedLesson]}-watercolor.webp`
-                  }
-                  alt=""
-                />
+                {!catalogLesson.custom && (
+                  <img
+                    className="listen-ready-art"
+                    src={
+                      selectedLesson === 7
+                        ? "/course-art/radish-story.webp"
+                        : catalogLesson.artwork
+                          ? `/course-art/${catalogLesson.artwork}-watercolor.webp`
+                          : "/course-art/lesson-watercolor-paper.webp"
+                    }
+                    alt=""
+                  />
+                )}
               </div>
-              <div className="listen-ready-summary">
-                <span>
-                  <Headphones size={30} weight="duotone" aria-hidden="true" />
-                  <small>播放</small>
-                  <strong>{listeningSettings.repeatCount} 次</strong>
-                </span>
-                <span>
-                  <Clock size={30} weight="duotone" aria-hidden="true" />
-                  <small>間隔</small>
-                  <strong>{listeningSettings.intervalSeconds} 秒</strong>
-                </span>
-                <span>
-                  <PencilLine size={30} weight="duotone" aria-hidden="true" />
-                  <small>作答</small>
-                  <strong>{questionDuration} 秒</strong>
-                </span>
-              </div>
+              <p className="listen-ready-summary">
+                播放 {listeningSettings.repeatCount} 次 · 間隔 {listeningSettings.intervalSeconds}{" "}
+                秒
+              </p>
             </div>
           </>
         ) : (
           <ListeningCanvas app={app} />
         )}
         {audioError && (
-          <p className="audio-error" role="alert">
-            音訊無法播放。請檢查音量或網路，再按「再聽一次」。
-          </p>
+          <ShowMsg error message="音訊無法播放。請檢查音量或網路，再按「再聽一次」。" />
         )}
         {(listenPhase === "active" || listenPhase === "retry") && (
           <button type="button" className="listen-replay-button" onClick={replayQuestion}>

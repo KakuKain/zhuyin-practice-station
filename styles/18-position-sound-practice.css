@@ -1,13 +1,38 @@
 /* Writing-first layout; tools and location stay outside the actual square. */
+.has-position-peek .practice-focus-header {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+}
+.has-position-peek .focus-header-status {
+  grid-column: 3;
+  grid-row: 1;
+}
+@media (max-width: 480px) {
+  .has-position-peek .practice-focus-header {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 4px 8px;
+  }
+  .has-position-peek .focus-header-title {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    font-size: 14px;
+  }
+  .has-position-peek .focus-header-stage {
+    display: none;
+  }
+  .has-position-peek .focus-header-status {
+    grid-column: 2;
+  }
+}
 .has-position-peek .fill-focus-body {
   justify-content: flex-start;
   gap: 0;
-  padding: 20px 18px max(22px, env(safe-area-inset-bottom));
+  padding: 12px 18px max(12px, env(safe-area-inset-bottom));
 }
 .fill-writing-intro {
   width: 100%;
   max-width: 440px;
-  margin: 0 auto 18px;
+  margin: 0 auto 10px;
 }
 .fill-writing-heading {
   display: flex;
@@ -38,6 +63,7 @@
   line-height: 1.6;
 }
 .fill-writing-progress {
+  margin-top: 8px;
   display: block;
   width: 100%;
   height: 5px;
@@ -63,7 +89,7 @@
 .fill-writing-workspace {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   width: 100%;
   max-width: 440px;
   margin: 0 auto;
@@ -116,7 +142,7 @@
   color: #815610;
 }
 .has-position-peek .fill-writing-grid {
-  width: min(100%, 52dvh, 400px);
+  width: min(100%, max(120px, calc(100dvh - 340px)), 400px);
   flex: 0 0 auto;
   border: 2px solid #b6d5c9;
   border-radius: 18px;
@@ -166,7 +192,7 @@
 }
 .has-position-peek .fill-writing-actions {
   flex: 0 0 auto;
-  margin: 16px auto 0;
+  margin: 10px auto 0;
 }
 .has-position-peek .fill-save-button {
   min-height: 56px;
@@ -297,25 +323,24 @@
 }
 .fill-position-map {
   display: flex;
-  gap: 8px;
+  gap: 3px;
   width: 100%;
   min-height: 0;
-  max-height: min(52dvh, 460px);
-  overflow: auto;
-  padding: 8px 8px 14px;
+  justify-content: center;
+  overflow: hidden;
+  padding: 8px 0;
   scroll-behavior: auto;
 }
 .fill-position-column {
-  flex: 1 0 50px;
-  min-width: 50px;
-  max-width: 72px;
+  flex: 0 0 var(--position-cell-size, 40px);
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 3px;
 }
 .fill-position-column > span {
   color: #416482;
-  font-size: 0.875rem;
+  font-size: clamp(8px, calc(var(--position-cell-size, 40px) / 4), 12px);
   font-weight: 750;
   white-space: nowrap;
 }

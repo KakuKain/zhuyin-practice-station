@@ -1,0 +1,65 @@
+/* Main navigation titles follow the course page's type and starting position. */
+.app-shell:is(.is-courses, .is-symbols, .is-practice, .is-more)
+  .page-section:not(.more-detail-page) {
+  padding-top: 0;
+}
+.page-heading {
+  position: relative;
+  min-height: 112px;
+  margin: 0 -14px;
+  padding: 0 14px;
+  isolation: isolate;
+}
+.page-heading-copy {
+  position: relative;
+  z-index: 1;
+  padding: 12px 0 0 10px;
+}
+.page-heading h1 {
+  width: fit-content;
+  margin: 0;
+  color: var(--ref-navy);
+  font-family: inherit;
+  font-size: clamp(32px, 9vw, 40px);
+  font-weight: 900;
+  letter-spacing: 0.055em;
+  line-height: 1.15;
+  box-shadow: inset 0 -8px #ffe8a0;
+}
+.page-heading p {
+  margin: 7px 0 0;
+  color: #637897;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.065em;
+  line-height: 1.55;
+}
+.page-heading-art {
+  position: absolute;
+  z-index: 0;
+  top: -17px;
+  right: -3px;
+  width: min(49vw, 205px);
+  height: auto;
+  pointer-events: none;
+}
+.page-heading-art:not([src*="course-journey-hero"]) {
+  top: 5px;
+  right: 4px;
+  width: 102px;
+  height: 88px;
+  object-fit: contain;
+}
+@media (min-width: 700px) {
+  .page-heading {
+    margin-inline: -20px;
+    padding-inline: 20px;
+  }
+  .page-heading-art[src*="course-journey-hero"] {
+    width: 228px;
+    right: 0;
+  }
+}
+.page-heading h1:focus {
+  outline: none;
+}

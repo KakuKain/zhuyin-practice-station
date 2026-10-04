@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MapPin } from "@phosphor-icons/react";
 import { InkPreview } from "../../components/AppChrome";
 import type { InkStroke } from "../types";
@@ -9,20 +9,31 @@ import type { CSSProperties } from "react";
 
 export type PositionMapProps = {
   lineLengths: number[];
+  lineStarts?: number[];
+  hasTitle?: boolean;
   activeCell: number;
   strokes: Record<number, InkStroke[]>;
   pending: Record<number, InkStroke[]>;
 };
 
 /** Only lengths and the child's own ink enter this component, never answers. */
-export function FillPositionMap({ lineLengths, activeCell, strokes, pending }: PositionMapProps) {
+export function FillPositionMap({
+  lineLengths,
+  lineStarts,
+  hasTitle = false,
+  activeCell,
+  strokes,
+  pending,
+}: PositionMapProps) {
   return (
     <div className="fill-position-map" dir="rtl" aria-label="整課默寫位置">
       {lineLengths.map((length, line) => {
-        const offset = lineLengths.slice(0, line).reduce((sum, count) => sum + count, 0);
+        const label = hasTitle && line === 0 ? "標題" : `第 ${line + (hasTitle ? 0 : 1)} 行`;
+        const offset =
+          lineStarts?.[line] ?? lineLengths.slice(0, line).reduce((sum, count) => sum + count, 0);
         return (
           <div className="fill-position-column" key={line}>
-            <span>第 {line + 1} 行</span>
+            <span>{label}</span>
             {Array.from({ length }, (_, position) => {
               const index = offset + position;
               const ink = pending[index] ?? strokes[index] ?? [];
@@ -31,7 +42,7 @@ export function FillPositionMap({ lineLengths, activeCell, strokes, pending }: P
                   key={index}
                   className={`fill-position-cell${index === activeCell ? " is-current" : ""}${ink.length ? " has-ink" : ""}`}
                   aria-current={index === activeCell ? "location" : undefined}
-                  aria-label={`第 ${line + 1} 行第 ${position + 1} 格${index === activeCell ? "，正在寫這格" : ""}`}
+                  aria-label={`${label}第 ${position + 1} 格${index === activeCell ? "，正在寫這格" : ""}`}
                 >
                   {ink.length > 0 && <InkPreview strokes={ink} />}
                   {index === activeCell && <span className="position-light" aria-hidden="true" />}
@@ -54,6 +65,18 @@ export function FillPositionPeek({
   const [heldDraft, setHeldDraft] = useState<InkStroke[] | null>(null);
   const [hold] = useState(() => createPositionHold(setHeld));
   const [panelTop, setPanelTop] = useState(0);
+  const [cellSize, setCellSize] = useState(40);
+  const fitPanel = (button: HTMLButtonElement) => {
+    const top = button.getBoundingClientRect().bottom + 8;
+    const columns = props.lineLengths.length;
+    const rows = Math.max(...props.lineLengths, 1);
+    const width = Math.min(window.innerWidth - 24, 660) - 40;
+    const height = window.innerHeight - top - 120;
+    setPanelTop(top);
+    setCellSize(
+      Math.max(4, Math.min(56, (width - (columns - 1) * 3) / columns, (height - rows * 3) / rows)),
+    );
+  };
   const mapRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const close = hold.cancel;
@@ -69,20 +92,6 @@ export function FillPositionPeek({
       document.removeEventListener("visibilitychange", visibility);
     };
   }, [hold]);
-  useLayoutEffect(() => {
-    if (!held) return;
-    const map = mapRef.current?.querySelector<HTMLElement>(".fill-position-map");
-    const cell = map?.querySelector<HTMLElement>(".is-current");
-    if (!map || !cell) return;
-    // Scroll the map only: the actual writing screen and canvas never move.
-    const bounds = map.getBoundingClientRect();
-    const target = cell.getBoundingClientRect();
-    map.scrollBy({
-      left: target.left - bounds.left - (bounds.width - target.width) / 2,
-      top: target.top - bounds.top - (bounds.height - target.height) / 2,
-      behavior: "instant",
-    });
-  }, [held]);
   return (
     <div className={`fill-position-peek${compact ? " is-compact" : ""}`}>
       <button
@@ -99,7 +108,7 @@ export function FillPositionPeek({
           );
           event.preventDefault();
           event.currentTarget.setPointerCapture(event.pointerId);
-          setPanelTop(event.currentTarget.getBoundingClientRect().bottom + 12);
+          fitPanel(event.currentTarget);
         }}
         onPointerUp={(event) => hold.pointerUp(event.pointerId)}
         onPointerCancel={(event) => hold.pointerUp(event.pointerId)}
@@ -111,7 +120,7 @@ export function FillPositionPeek({
               readDraft?.().map((stroke) => stroke.map((point) => ({ ...point }))) ?? null,
             );
             event.preventDefault();
-            setPanelTop(event.currentTarget.getBoundingClientRect().bottom + 12);
+            fitPanel(event.currentTarget);
           }
         }}
         onKeyUp={(event) => {
@@ -130,11 +139,16 @@ export function FillPositionPeek({
           className="fill-position-overlay"
           id="fill-position-overlay"
           ref={mapRef}
-          style={{ "--position-panel-top": `${panelTop}px` } as CSSProperties}
+          style={
+            {
+              "--position-panel-top": `${panelTop}px`,
+              "--position-cell-size": `${cellSize}px`,
+            } as CSSProperties
+          }
         >
           <div className="fill-position-card">
             <strong>正在寫這裡</strong>
-            <p>只顯示你的筆跡，不顯示答案。</p>
+
             <FillPositionMap
               {...props}
               pending={

@@ -1,24 +1,37 @@
+"use client";
 import { AnnotatedText } from "./AnnotatedText";
-import { lessons, lessonNumerals } from "../features/courses/course-data";
+import { useCatalogLesson } from "../features/courses/MaterialContext";
 import { lessonTitleGroups, lessonTitleVariants } from "../features/lesson/annotated-text";
 
 /** One pronunciation source for every view of the same lesson. */
 export function LessonName({ lessonIndex }: { lessonIndex: number }) {
+  const lesson = useCatalogLesson(lessonIndex);
   return (
     <AnnotatedText
-      text={lessons[lessonIndex].title}
+      text={lesson.title}
       variants={lessonTitleVariants[lessonIndex]}
       groups={lessonTitleGroups[lessonIndex]}
     />
   );
 }
 
-export function LessonLabel({ lessonIndex }: { lessonIndex: number }) {
+export function LessonLabel({
+  lessonIndex,
+  hideTitle = false,
+}: {
+  lessonIndex: number;
+  hideTitle?: boolean;
+}) {
+  const lesson = useCatalogLesson(lessonIndex);
   return (
     <span className="lesson-label">
-      <AnnotatedText text={`第${lessonNumerals[lessonIndex]}課`} />
-      <span aria-hidden="true"> · </span>
-      <LessonName lessonIndex={lessonIndex} />
+      <AnnotatedText text={lesson.listeningOnly ? lesson.title : `第${lesson.number}課`} />
+      {!hideTitle && !lesson.listeningOnly && (
+        <>
+          <span aria-hidden="true"> · </span>
+          <LessonName lessonIndex={lessonIndex} />
+        </>
+      )}
     </span>
   );
 }
