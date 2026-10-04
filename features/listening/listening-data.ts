@@ -98,10 +98,12 @@ export function listeningAudioUrl(text: string): string {
 }
 
 // Exam playback uses reading-only clips, never dictionary attribute narration.
+export const naturalReadingPrompts = new Set(["包", "皮包", "包子", "毛", "衣", "毛衣"]);
+
 export function dictationAudioUrl(text: string): string {
   const filename = [...text].map((character) => character.codePointAt(0)!.toString(16)).join("-");
   // These 37 clips changed source in v44; the query bypasses older browser caches.
-  return `/listening-audio/${filename}.m4a${/^[\u3105-\u3129]$/.test(text) ? "?v=44" : ""}`;
+  return `/listening-audio/${filename}.m4a${naturalReadingPrompts.has(text) ? "?v=57" : /^[\u3105-\u3129]$/.test(text) ? "?v=44" : ""}`;
 }
 
 export function questionSeedsForLesson(

@@ -26,23 +26,34 @@ export function ListeningBatchReview({ app }: { app: AppController }) {
             <h2>
               第 {index + 1} 題 · {listeningSectionLabel(app.listeningQuestions, index)}
             </h2>
-            <div className="listening-review-ink" aria-label={`第 ${index + 1} 題的作答`}>
-              {question.answer.split("|").map((_, cellIndex) => (
-                <div className="listening-review-cell" key={cellIndex}>
-                  {cells[cellIndex]?.length ? (
-                    <InkPreview strokes={cells[cellIndex]} />
-                  ) : (
-                    <span>未作答</span>
-                  )}
-                </div>
-              ))}
-            </div>
-            <div className="answer-reveal">
-              <span>答案</span>
-              <AnswerDisplay
-                answer={question.answer}
-                literalSymbols={question.category === "symbols"}
-              />
+            <div className="listening-review-comparison">
+              <div className="listening-review-column">
+                <span className="listening-review-label">作答</span>
+                {question.answer.split("|").map((_, cellIndex) => (
+                  <div
+                    className="listening-review-cell"
+                    key={cellIndex}
+                    aria-label={`第 ${cellIndex + 1} 字作答`}
+                  >
+                    {cells[cellIndex]?.length ? (
+                      <InkPreview strokes={cells[cellIndex]} />
+                    ) : (
+                      <span>未作答</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <div className="listening-review-column">
+                <span className="listening-review-label">答案</span>
+                {question.answer.split("|").map((syllable, cellIndex) => (
+                  <div className="listening-review-cell listening-answer-cell" key={cellIndex}>
+                    <AnswerDisplay
+                      answer={syllable}
+                      literalSymbols={question.category === "symbols"}
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
             <div className="listening-review-controls">
               <button

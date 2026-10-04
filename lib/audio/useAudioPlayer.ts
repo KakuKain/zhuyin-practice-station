@@ -1,4 +1,5 @@
 "use client";
+import { naturalReadingPrompts } from "../../features/listening/listening-data";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { RefObject } from "react";
 import type { ListeningQuestion, StateSetter, View } from "../../features/types";
@@ -148,7 +149,11 @@ export function useAudioPlayer({
             ? await getCustomRecording(text, options.pronunciation)
             : null;
         if (playbackToken !== playbackTokenRef.current) return;
-        const policy = clipPolicy(!!custom, isZhuyinPrompt, options.playbackRate);
+        const policy = clipPolicy(
+          !!custom,
+          isZhuyinPrompt,
+          options.playbackRate ?? (naturalReadingPrompts.has(text) ? 1 : undefined),
+        );
         audio.playbackRate = policy.playbackRate;
         audio.preservesPitch = true;
         (audio as HTMLAudioElement & { webkitPreservesPitch?: boolean }).webkitPreservesPitch =

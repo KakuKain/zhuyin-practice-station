@@ -29,6 +29,8 @@ mkdirSync(output, { recursive: true });
 const temporary = mkdtempSync(join(tmpdir(), "zhuyin-audio-"));
 let created = 0;
 const refreshAll = process.argv.includes("--refresh-all");
+const naturalReadingTexts = new Set(["包", "皮包", "包子", "毛", "衣", "毛衣"]);
+const refreshReported = process.argv.includes("--refresh-reported");
 const refreshSymbols = process.argv.includes("--refresh-symbols");
 // F1–F37 follow the symbol order in the Ministry of Education's Bopomofo manual.
 // Its individual audio files are CC BY 4.0; attribution is in public/listening-audio/ATTRIBUTION.md.
@@ -82,6 +84,7 @@ try {
       existsSync(destination) &&
       statSync(destination).size > 1024 &&
       !refreshAll &&
+      !(refreshReported && naturalReadingTexts.has(text)) &&
       !(refreshSymbols && officialIndex >= 0)
     )
       continue;
@@ -99,7 +102,7 @@ try {
         "-v",
         "Meijia",
         "-r",
-        "100",
+        naturalReadingTexts.has(text) ? "175" : "100",
         "-o",
         sourceAudio,
         spokenTextOverrides.get(text) ?? text,
