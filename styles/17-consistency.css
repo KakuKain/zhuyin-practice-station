@@ -94,7 +94,7 @@
   background: rgba(239, 249, 255, 0.68);
 }
 
-/* Keep the square centered. Labels and erasers live in an external side rail. */
+/* Each writing cell has the same horizontal tool row above its square. */
 .canvas-zone.is-word {
   width: 100%;
   max-width: 380px;
@@ -107,44 +107,31 @@
   gap: 12px;
 }
 .word-canvas-row {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: 100%;
-  direction: ltr;
-  min-height: 170px;
-  align-items: start;
-}
-.canvas-zone.is-word .word-paper {
-  width: min(var(--word-cell-size), calc(100% - 104px));
-  flex-shrink: 0;
-}
-.word-canvas-tools {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: calc(50% - min(var(--word-cell-size), calc(100% - 104px)) / 2 - 52px);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  gap: 3px;
-  width: 44px;
+  gap: 8px;
+  width: 100%;
+  direction: ltr;
+}
+.canvas-zone.is-word .word-paper {
+  width: min(var(--word-cell-size), 100%);
+  flex-shrink: 0;
+}
+.word-canvas-tools {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  width: 100%;
 }
 .word-canvas-tools .word-paper-label {
   position: static;
-  padding: 3px 0;
-  width: 44px;
-  text-align: center;
+  align-self: flex-start;
+  padding: 3px 7px;
   font-size: 0.875rem;
   line-height: 1.5;
   white-space: nowrap;
-}
-.word-canvas-tools .word-paper-clear {
-  position: static;
-  flex-shrink: 0;
-  width: 44px;
-  height: 44px;
 }
 .phase-review .canvas-zone.is-word,
 .phase-choice .canvas-zone.is-word,
@@ -157,9 +144,6 @@
   align-self: stretch;
   flex-direction: column;
   gap: 4px;
-}
-.canvas-zone:not(.is-word) .canvas-toolbar {
-  order: -1;
 }
 .canvas-toolbar button,
 .fill-clear-button {
@@ -174,25 +158,28 @@
 
 /* Ink tools stay outside the paper and share the same behavior in both modes. */
 .ink-tools {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1.35fr 1fr 1fr;
   align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 6px;
+  gap: 3px;
+  width: 100%;
+  padding: 3px;
+  border-radius: 14px;
+  background: #f1f6f7;
 }
 .ink-tools .ink-tool {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 4px;
   min-width: 44px;
   min-height: 44px;
-  padding: 5px 9px;
-  border: 1px solid #c9dce8;
-  border-radius: 12px;
-  background: #fbfdff;
-  color: #365a77;
-  font-size: 0.875rem;
+  padding: 5px 4px;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  background: transparent;
+  color: #355e75;
+  font-size: 13px;
   font-weight: 800;
   white-space: nowrap;
   cursor: pointer;
@@ -201,7 +188,8 @@
   background: #edf6ff;
 }
 .ink-tools .ink-tool:disabled {
-  opacity: 0.42;
+  color: #7a8d99;
+  opacity: 1;
   cursor: default;
 }
 .ink-tools .ink-tool.is-active {

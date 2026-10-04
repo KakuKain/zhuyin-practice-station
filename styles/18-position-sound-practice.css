@@ -153,35 +153,6 @@
   min-height: 48px;
   margin: 0;
 }
-.fill-writing-workspace .ink-tools {
-  display: grid;
-  grid-template-columns: 1.35fr 1fr 1fr;
-  gap: 3px;
-  width: 100%;
-  padding: 3px;
-  border-radius: 14px;
-  background: #f1f6f7;
-}
-.fill-writing-workspace .ink-tool {
-  gap: 4px;
-  min-height: 44px;
-  padding: 5px 4px;
-  border: 1px solid transparent;
-  border-radius: 11px;
-  background: transparent;
-  color: #355e75;
-  font-size: 13px;
-}
-.fill-writing-workspace .ink-tool:disabled {
-  color: #7a8d99;
-  opacity: 1;
-}
-.fill-writing-workspace .ink-tool.is-active {
-  border-color: #e4c17b;
-  background: #fff3cf;
-  color: #895511;
-  box-shadow: 0 2px 4px rgba(130, 95, 24, 0.08);
-}
 .has-position-peek .fill-focus-body > .ink-notice {
   width: 100%;
   min-height: 21px;

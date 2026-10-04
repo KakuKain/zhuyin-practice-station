@@ -50,7 +50,7 @@ test("writing workspace keeps location and tools outside the square in every les
     assert.match(html, /id="position-peek-help" class="visually-hidden"/);
     assert.doesNotMatch(html, /fill-writing-hint/);
     assert.ok(html.indexOf("fill-position-peek") < html.indexOf("</header>"));
-    assert.match(html, /<\/canvas><\/div><div class="fill-canvas-tools"/);
+    assert.ok(html.indexOf("fill-canvas-tools") < html.indexOf("<canvas"));
     assert.ok(html.indexOf("fill-writing-position") < html.indexOf("<canvas"));
     const workspace = html.match(/<section[^>]+fill-writing-workspace[\s\S]*?<\/section>/)![0];
     assert.doesNotMatch(workspace, /[\u3105-\u3129]/);

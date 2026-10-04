@@ -127,6 +127,16 @@ export function FillWriting({
               </strong>
             </div>
           </div>
+          <div className="fill-canvas-tools">
+            <InkTools
+              erasing={fillEraserActive}
+              hasInk={fillHasInk}
+              canUndo={fillCanUndo}
+              onEraser={() => toggleFillEraser()}
+              onUndo={() => undoFillInk()}
+              onClear={clearFillDrawing}
+            />
+          </div>
           <div className="fill-writing-grid">
             <canvas
               className={fillEraserActive ? "is-erasing" : undefined}
@@ -137,16 +147,6 @@ export function FillWriting({
               onPointerCancel={endFillDrawing}
 
               aria-label={`${!catalogLesson.custom && lineIndex === 0 ? "標題" : `第 ${lineIndex + (catalogLesson.custom ? 1 : 0)} 行`}第 ${position} 格手寫區`}
-            />
-          </div>
-          <div className="fill-canvas-tools">
-            <InkTools
-              erasing={fillEraserActive}
-              hasInk={fillHasInk}
-              canUndo={fillCanUndo}
-              onEraser={() => toggleFillEraser()}
-              onUndo={() => undoFillInk()}
-              onClear={clearFillDrawing}
             />
           </div>
         </section>

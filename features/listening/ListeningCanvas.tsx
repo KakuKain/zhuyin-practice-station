@@ -55,6 +55,21 @@ export function ListeningCanvas({
       className={`canvas-zone ${isWordQuestion ? "is-word" : ""} ${["review", "remediation_offer", "choice", "retry_ready"].includes(listenPhase) ? "is-locked" : ""}`}
       style={isWordQuestion ? ({ "--word-count": wordLength } as CSSProperties) : undefined}
     >
+      {!isWordQuestion && (
+        <div className="canvas-ink-tools">
+          {
+            <InkTools
+              erasing={listeningEraserCell === 0}
+              hasInk={Boolean(wordInk[0])}
+              canUndo={Boolean(listeningUndoAvailable[0])}
+              disabled={listenPhase !== "active" && listenPhase !== "retry"}
+              onEraser={() => toggleListeningEraser(0)}
+              onUndo={() => undoListeningInk(0)}
+              onClear={() => clearListeningCell(0)}
+            />
+          }
+        </div>
+      )}
       <div className="canvas-surface">
         {isWordQuestion ? (
           <div
@@ -70,7 +85,6 @@ export function ListeningCanvas({
                     第{index + 1}字
                   </span>
                   <InkTools
-                    compact
                     cellLabel={`語詞第 ${index + 1} 字`}
                     erasing={listeningEraserCell === index}
                     hasInk={Boolean(wordInk[index])}
@@ -134,17 +148,6 @@ export function ListeningCanvas({
         )}
       </div>
       <div className="canvas-toolbar">
-        {!isWordQuestion && (
-          <InkTools
-            erasing={listeningEraserCell === 0}
-            hasInk={Boolean(wordInk[0])}
-            canUndo={Boolean(listeningUndoAvailable[0])}
-            disabled={listenPhase !== "active" && listenPhase !== "retry"}
-            onEraser={() => toggleListeningEraser(0)}
-            onUndo={() => undoListeningInk(0)}
-            onClear={() => clearListeningCell(0)}
-          />
-        )}
         {(listenPhase === "active" || listenPhase === "retry") && (
           <InkNotice
             erasing={listeningEraserCell !== null}
