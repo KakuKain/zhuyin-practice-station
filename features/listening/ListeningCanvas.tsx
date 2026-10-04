@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type CSSProperties } from "react";
+import type { CSSProperties } from "react";
 import type { AppController } from "../usePracticeApp";
 import { ShowMsg } from "../../components/ShowMsg";
 import { Play } from "@phosphor-icons/react";
@@ -51,7 +51,6 @@ export function ListeningCanvas({
     wordInk,
     wordLength,
   } = app;
-  const [activeWordCell, setActiveWordCell] = useState(0);
   return (
     <div
       className={`canvas-zone ${isWordQuestion ? "is-word" : ""} ${["review", "remediation_offer", "choice", "retry_ready"].includes(listenPhase) ? "is-locked" : ""}`}
@@ -72,27 +71,6 @@ export function ListeningCanvas({
           }
         </div>
       )}
-      {isWordQuestion && (
-        <div className="word-cell-navigation">
-          <button
-            type="button"
-            disabled={activeWordCell === 0}
-            onClick={() => setActiveWordCell((index) => index - 1)}
-          >
-            上一字
-          </button>
-          <strong>
-            第 {activeWordCell + 1} 字 / {wordLength}
-          </strong>
-          <button
-            type="button"
-            disabled={activeWordCell === wordLength - 1}
-            onClick={() => setActiveWordCell((index) => index + 1)}
-          >
-            下一字
-          </button>
-        </div>
-      )}
       <div className="canvas-surface">
         {isWordQuestion ? (
           <div
@@ -102,7 +80,7 @@ export function ListeningCanvas({
             aria-label={`語詞 ${wordLength} 格田字格`}
           >
             {Array.from({ length: wordLength }, (_, index) => (
-              <div className="word-canvas-row" key={index} hidden={index !== activeWordCell}>
+              <div className="word-canvas-row" key={index}>
                 <div className="word-canvas-tools">
                   <span className="word-paper-label" aria-hidden="true">
                     第{index + 1}字
