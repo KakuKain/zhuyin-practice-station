@@ -398,6 +398,8 @@
 }
 
 .is-courses .journey-arrow {
+  grid-column: 3;
+  justify-self: end;
   width: 36px;
   height: 36px;
   box-shadow: none;

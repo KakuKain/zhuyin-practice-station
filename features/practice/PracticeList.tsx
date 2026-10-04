@@ -156,6 +156,13 @@ export function PracticeList({ app }: { app: AppController }) {
                 <div id={`practice-course-${lesson.index}`} className="practice-course-content">
                   {rows.map((entry) => (
                     <div className="practice-item" key={entry.key}>
+                      <FavoriteButton
+                        iconOnly
+                        saved={entry.saved}
+                        className="practice-star"
+                        ariaLabel={`${entry.saved ? "取消收藏" : "收藏"}${entry.word}`}
+                        onToggle={entry.toggle}
+                      />
                       <button
                         className="practice-item-open"
                         type="button"
@@ -170,13 +177,6 @@ export function PracticeList({ app }: { app: AppController }) {
                           {entry.pending ? "待補強" : entry.mastered ? "已掌握" : "待複習"}
                         </small>
                       </button>
-                      <FavoriteButton
-                        iconOnly
-                        saved={entry.saved}
-                        className="practice-star"
-                        ariaLabel={`${entry.saved ? "取消收藏" : "收藏"}${entry.word}`}
-                        onToggle={entry.toggle}
-                      />
                       <button
                         className="practice-item-arrow"
                         type="button"
