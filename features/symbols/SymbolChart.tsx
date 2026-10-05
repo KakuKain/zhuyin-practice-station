@@ -32,9 +32,7 @@ export function SymbolChart({
           message={`${playingSymbol ?? ""}${playingExample ? ` · 例字「${playingExample.character}」${playingExample.tone}` : ""} ${message}`}
           error={Boolean(audioError)}
         />
-      ) : (
-        <p>點一下格子，就能聽到發音。</p>
-      )}
+      ) : null}
       {symbolGroups.map((group) => (
         <section
           key={group.id}
