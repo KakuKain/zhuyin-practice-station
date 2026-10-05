@@ -1,0 +1,52 @@
+.free-board-tools {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px;
+  margin: 16px 0;
+  border: 1px solid #c8dce9;
+  border-radius: 18px;
+  background: #f7fbff;
+}
+.free-board-tools button,
+.free-board-tools select {
+  padding: 10px 12px;
+  min-height: 44px;
+  border: 1px solid #c8dce9;
+  border-radius: 10px;
+  background: white;
+  color: #193458;
+  font: inherit;
+}
+.free-board-tools button[aria-pressed="true"] {
+  background: #3479ce;
+  color: white;
+}
+.free-board-tools button:disabled {
+  opacity: 0.45;
+}
+.free-board-paper {
+  background-color: white;
+  border: 1px solid #b6ccd5;
+  overflow: hidden;
+}
+.free-board-paper.has-grid {
+  background-image:
+    linear-gradient(#b6ccd5 1px, transparent 1px),
+    linear-gradient(90deg, #b6ccd5 1px, transparent 1px),
+    repeating-linear-gradient(0deg, transparent 0 44px, #dbe5eb 44px 45px, transparent 45px 90px),
+    repeating-linear-gradient(90deg, transparent 0 44px, #dbe5eb 44px 45px, transparent 45px 90px);
+  background-size: 90px 90px;
+}
+.free-board-paper canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.free-board-note {
+  margin: 16px 0;
+  color: #526b7f;
+}
