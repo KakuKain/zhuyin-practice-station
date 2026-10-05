@@ -44,6 +44,7 @@ export const syllableGlyphs: Record<string, string> = {
   "˙ㄗ": "子\u{E01E1}",
   "˙ㄉㄜ": "得\u{E01E1}",
   "˙ㄅㄛ": "蔔\u{E01E1}",
+  ㄐㄧㄠ: "教\u{E01E1}",
   ㄐㄧㄠˋ: "覺\u{E01E1}",
   ㄅㄨˊ: "不\u{E01E1}",
   ㄓㄤˇ: "長\u{E01E1}",
