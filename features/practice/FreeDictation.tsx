@@ -102,19 +102,23 @@ export function FreeDictation() {
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, 720, 2400);
     if (paper === "grid") {
-      const step = (90 * 720) / (canvas.current?.clientWidth ?? 360);
-      ctx.strokeStyle = "#b6ccd5";
-      ctx.lineWidth = 1;
+      const scale = 720 / (canvas.current?.clientWidth ?? 304);
+      const step = 152 * scale;
+      const size = 138 * scale;
       for (let x = 0; x < 720; x += step)
         for (let y = 0; y < 2400; y += step) {
           ctx.setLineDash([]);
-          ctx.strokeRect(x, y, step, step);
-          ctx.setLineDash([4, 4]);
+          ctx.strokeStyle = "#97b3c2";
+          ctx.lineWidth = 2 * scale;
+          ctx.strokeRect(x + scale, y + scale, size, size);
+          ctx.strokeStyle = "#ccdbe4";
+          ctx.lineWidth = scale;
+          ctx.setLineDash([5 * scale, 5 * scale]);
           ctx.beginPath();
-          ctx.moveTo(x + step / 2, y);
-          ctx.lineTo(x + step / 2, y + step);
-          ctx.moveTo(x, y + step / 2);
-          ctx.lineTo(x + step, y + step / 2);
+          ctx.moveTo(x + 70 * scale, y + 2 * scale);
+          ctx.lineTo(x + 70 * scale, y + 138 * scale);
+          ctx.moveTo(x + 2 * scale, y + 70 * scale);
+          ctx.lineTo(x + 138 * scale, y + 70 * scale);
           ctx.stroke();
         }
     }
