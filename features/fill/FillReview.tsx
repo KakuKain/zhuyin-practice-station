@@ -1,4 +1,7 @@
 "use client";
+
+import { ProgressiveImage } from "../../components/ProgressiveImage";
+
 import { ShowMsg } from "../../components/ShowMsg";
 
 import type { AppController } from "../usePracticeApp";
@@ -74,7 +77,7 @@ export function FillReview({
             </small>
           </div>
           {!catalogLesson.custom && (
-            <img
+            <ProgressiveImage
               src={
                 selectedLesson === 0
                   ? "/course-art/review-sleeping-cat-watercolor-v2.webp"

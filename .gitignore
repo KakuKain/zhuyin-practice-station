@@ -46,3 +46,6 @@ next-env.d.ts
 /docs/visual-qa/parent-review-*.png
 /playwright-report/
 /test-results/
+
+# Full-resolution artwork backups used by the optimizer.
+/assets/artwork/optimized-originals/

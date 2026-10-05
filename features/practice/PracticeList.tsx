@@ -1,4 +1,7 @@
 "use client";
+
+import { ProgressiveImage } from "../../components/ProgressiveImage";
+
 import { useState } from "react";
 import {
   ArrowRight,
@@ -136,7 +139,7 @@ export function PracticeList({ app }: { app: AppController }) {
                 onClick={() => setExpanded(open ? null : lesson.index)}
               >
                 {lesson.artwork && (
-                  <img src={`/course-art/${lesson.artwork}-watercolor.webp`} alt="" />
+                  <ProgressiveImage src={`/course-art/${lesson.artwork}-watercolor.webp`} alt="" />
                 )}
                 <span>
                   <strong>

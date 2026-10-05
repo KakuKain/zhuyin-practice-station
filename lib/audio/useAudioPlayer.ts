@@ -63,9 +63,29 @@ export function useAudioPlayer({
   useEffect(() => {
     if (view !== "lesson" && view !== "symbols") return;
     void document.fonts.load('400 48px "KidLessonYoOnly"').catch(() => {});
-    // The full chart loads clips on demand, avoiding 37 downloads on slower phones.
+    // Lesson clips can be prepared together; the chart warms only visible buttons.
     if (view === "lesson") audioPreloaderRef.current?.warm(lessonSymbols.map(listeningAudioUrl));
   }, [view, lessonSymbols]);
+
+  useEffect(() => {
+    if (view !== "symbols") return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const urls = entries
+          .filter((entry) => entry.isIntersecting)
+          .map((entry) => (entry.target as HTMLElement).dataset.audioText)
+          .filter((text): text is string => Boolean(text))
+          .map(listeningAudioUrl);
+        audioPreloaderRef.current?.warm(urls);
+        entries
+          .filter((entry) => entry.isIntersecting)
+          .forEach((entry) => observer.unobserve(entry.target));
+      },
+      { rootMargin: "120px" },
+    );
+    document.querySelectorAll("[data-audio-text]").forEach((button) => observer.observe(button));
+    return () => observer.disconnect();
+  }, [view]);
 
   useEffect(() => {
     if (view !== "listen") return;
@@ -163,6 +183,8 @@ export function useAudioPlayer({
           .play()
           .then(() => {
             loaded();
+            // Retain downloaded official clips for subsequent taps and replay.
+            if (!custom) audioPreloaderRef.current?.warm([url]);
           })
           .catch(() => {
             if (playbackToken !== playbackTokenRef.current) return;

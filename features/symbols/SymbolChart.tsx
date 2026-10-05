@@ -58,6 +58,7 @@ export function SymbolChart({
                   key={symbol}
                   type="button"
                   className={`symbol-chart-button${playingSymbol === symbol ? " is-playing" : ""}`}
+                  data-audio-text={symbol}
                   aria-label={`播放注音符號 ${symbol}`}
                   aria-pressed={playingSymbol === symbol}
                   aria-busy={playingSymbol === symbol && audioLoading}
@@ -102,6 +103,7 @@ export function SymbolChart({
                   key={rhyme}
                   type="button"
                   className={`symbol-chart-button${playingSymbol === rhyme ? " is-playing" : ""}`}
+                  data-audio-text={rhyme}
                   aria-label={`播放結合韻 ${rhyme}，例字${combinedRhymeExample(rhyme)?.character}，${combinedRhymeExample(rhyme)?.tone}完整錄音`}
                   aria-pressed={playingSymbol === rhyme}
                   aria-busy={playingSymbol === rhyme && audioLoading}

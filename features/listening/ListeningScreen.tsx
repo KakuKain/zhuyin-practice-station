@@ -1,4 +1,7 @@
 "use client";
+
+import { ProgressiveImage } from "../../components/ProgressiveImage";
+
 import { ShowMsg } from "../../components/ShowMsg";
 
 import type { AppController } from "../usePracticeApp";
@@ -120,7 +123,7 @@ export function ListeningScreen({ app }: { app: AppController }) {
                   onClick={startListening}
                   aria-label="開始聽"
                 >
-                  <img
+                  <ProgressiveImage
                     className="listen-start-art"
                     src="/course-art/listening-play-button-watercolor-v1.webp"
                     width={640}
@@ -131,7 +134,7 @@ export function ListeningScreen({ app }: { app: AppController }) {
                   />
                 </button>
                 {!catalogLesson.custom && (
-                  <img
+                  <ProgressiveImage
                     className="listen-ready-art"
                     src={
                       catalogLesson.listeningOnly

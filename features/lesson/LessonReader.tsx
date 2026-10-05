@@ -1,5 +1,7 @@
 "use client";
 
+import { ProgressiveImage } from "../../components/ProgressiveImage";
+
 import type { AppController } from "../usePracticeApp";
 import { previewPronunciationVariants } from "../courses/course-data";
 import { AnnotatedText } from "../../components/AnnotatedText";
@@ -61,7 +63,7 @@ export function LessonReader({
           <LessonTitle lessonIndex={selectedLesson} />
         </div>
         {!lesson.custom && (
-          <img
+          <ProgressiveImage
             className="lesson-heading-art"
             src={
               selectedLesson === 7

@@ -14,8 +14,6 @@
   font-size: 14px;
   font-weight: 850;
   letter-spacing: 0.04em;
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
 }
 
 .loading-orbit {

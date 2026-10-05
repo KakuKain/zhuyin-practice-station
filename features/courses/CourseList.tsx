@@ -1,5 +1,7 @@
 "use client";
 
+import { ProgressiveImage } from "../../components/ProgressiveImage";
+
 import { PageHeading } from "../../components/PageHeading";
 import type { AppController } from "../usePracticeApp";
 import { builtinMaterialId } from "./materials";
@@ -49,7 +51,7 @@ export function CourseList({
             >
               <span className="journey-station" aria-hidden="true">
                 {index === 0 && (
-                  <img
+                  <ProgressiveImage
                     className="journey-flag-scene"
                     src="/course-art/course-flag-grass-v1.webp"
                     alt=""
@@ -79,7 +81,7 @@ export function CourseList({
                   {isRecent && <em>最近開啟</em>}
                 </span>
                 {item.artwork && (
-                  <img
+                  <ProgressiveImage
                     className="journey-art"
                     src={`/course-art/${item.artwork}-watercolor.webp`}
                     alt=""
@@ -96,7 +98,7 @@ export function CourseList({
         })}
       </div>
       <div className="journey-footer" aria-hidden="true">
-        <img src="/course-art/course-journey-footer-sign-v2.webp" alt="" />
+        <ProgressiveImage src="/course-art/course-journey-footer-sign-v2.webp" alt="" />
       </div>
     </section>
   );

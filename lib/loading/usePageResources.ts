@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import previews from "../../components/artwork-previews.json";
 import type { View } from "../../features/types";
 
 export function imageReady(image: HTMLImageElement): Promise<void> {
@@ -24,7 +25,7 @@ export function imageReady(image: HTMLImageElement): Promise<void> {
   });
 }
 
-/** Wait for visible artwork/fonts, not an artificial minimum duration. Audio has its own readiness. */
+/** Wait only for teaching fonts, not an artificial minimum duration. Audio has its own readiness. */
 export function usePageResources(view: View) {
   const [request, setRequest] = useState<{ label: string; id: number } | null>({
     label: "正在準備課程…",
@@ -48,22 +49,46 @@ export function usePageResources(view: View) {
   }, [view]);
 
   useEffect(() => {
-    if (!request) return;
     let canceled = false;
-    const images = Array.from(
-      document.querySelectorAll<HTMLImageElement>("main img:not([loading='lazy'])"),
-    );
-    const resources: Promise<unknown>[] = images.map(imageReady);
-    for (const element of document.querySelectorAll(
-      "main, .lesson-heading, .lesson-curriculum, .listen-start-button",
+    const restore: (() => void)[] = [];
+    for (const element of document.querySelectorAll<HTMLElement>(
+      "main, .lesson-heading, .lesson-curriculum, .listen-start-button, .journey-card",
     )) {
       const background = getComputedStyle(element).backgroundImage;
+      let placeholder = background;
+      const images: Promise<void>[] = [];
       for (const match of background.matchAll(/url\(["']?([^"')]+)["']?\)/g)) {
+        const pathname = new URL(match[1], location.href).pathname;
+        const preview = (previews as Record<string, { src: string }>)[pathname];
+        if (!preview) continue;
+        placeholder = placeholder.replace(match[0], `url("${preview.src}")`);
         const image = new Image();
         image.src = match[1];
-        resources.push(imageReady(image));
+        images.push(image.decode());
       }
+      if (!images.length) continue;
+      const original = element.style.backgroundImage;
+      element.style.backgroundImage = placeholder;
+      const reset = () => {
+        element.style.backgroundImage = original;
+      };
+      restore.push(reset);
+      void Promise.all(images)
+        .then(() => {
+          if (!canceled) reset();
+        })
+        .catch(() => {});
     }
+    return () => {
+      canceled = true;
+      restore.forEach((reset) => reset());
+    };
+  }, [view]);
+
+  useEffect(() => {
+    if (!request) return;
+    let canceled = false;
+    const resources: Promise<unknown>[] = [];
     if (view === "lesson" || view === "courses" || view === "fill") {
       resources.push(document.fonts.load('400 29px "KidLessonYoSans"'));
     }

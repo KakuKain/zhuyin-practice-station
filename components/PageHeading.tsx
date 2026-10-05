@@ -1,3 +1,4 @@
+import { ProgressiveImage } from "./ProgressiveImage";
 export function PageHeading({
   title,
   description,
@@ -13,7 +14,9 @@ export function PageHeading({
         <h1>{title}</h1>
         {description && <p>{description}</p>}
       </div>
-      {artwork && <img className="page-heading-art" src={artwork} alt="" aria-hidden="true" />}
+      {artwork && (
+        <ProgressiveImage className="page-heading-art" src={artwork} alt="" aria-hidden="true" />
+      )}
     </div>
   );
 }

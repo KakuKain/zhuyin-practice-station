@@ -1,4 +1,7 @@
 "use client";
+
+import { ProgressiveImage } from "../../components/ProgressiveImage";
+
 import { ShowMsg } from "../../components/ShowMsg";
 import { isFillCellComplete } from "./fill-draft-policy";
 
@@ -124,7 +127,7 @@ export function FillBlank({
           })}
         </div>
         {!fillParentChecked && (
-          <img
+          <ProgressiveImage
             className="fill-sheet-art"
             src={
               catalogLesson.artwork
@@ -177,7 +180,7 @@ export function FillBlank({
             <strong>家長檢查完成！</strong>
             <small>全部注音都已對照；也可以點格子修改。</small>
           </p>
-          <img
+          <ProgressiveImage
             className="completion-pencil-art"
             src={
               catalogLesson.artwork
