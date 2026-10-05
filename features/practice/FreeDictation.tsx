@@ -1,5 +1,16 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import {
+  PencilSimple,
+  Eraser,
+  Hand,
+  ArrowCounterClockwise,
+  ArrowClockwise,
+  Trash,
+  DownloadSimple,
+  GridFour,
+  Square,
+} from "@phosphor-icons/react";
 import type { PointerEvent } from "react";
 
 type Stroke = { color: string; erase: boolean; points: [number, number][] };
@@ -122,34 +133,47 @@ export function FreeDictation() {
     <section className="free-dictation" aria-label="自由聽寫畫板">
       <p>家長念題，孩子自由寫；切換紅筆即可檢查。</p>
       <div className="free-board-tools" role="group" aria-label="畫板工具">
-        {[
-          ["pen", "畫筆"],
-          ["red", "紅筆"],
-          ["erase", "橡皮擦"],
-          ["scroll", "捲動"],
-        ].map(([value, label]) => (
+        {(
+          [
+            ["pen", "畫筆", PencilSimple],
+            ["red", "紅筆", PencilSimple],
+            ["erase", "橡皮擦", Eraser],
+            ["scroll", "捲動", Hand],
+          ] as const
+        ).map(([value, label, Icon]) => (
           <button
             type="button"
             key={value}
+            aria-label={label}
+            title={label}
+            className={value === "red" ? "is-red-pen" : undefined}
             aria-pressed={tool === value}
             onClick={() => setTool(value)}
           >
-            {label}
+            <Icon size={22} aria-hidden="true" />
           </button>
         ))}
-        <select
-          aria-label="底紙"
-          value={paper}
-          onChange={(e) => {
-            setPaper(e.target.value);
-            paperRef.current = e.target.value;
+        <button
+          type="button"
+          aria-label={paper === "grid" ? "改用空白底紙" : "改用田字格"}
+          title={paper === "grid" ? "田字格（點一下切換空白）" : "空白（點一下切換田字格）"}
+          aria-pressed={paper === "grid"}
+          onClick={() => {
+            const next = paper === "grid" ? "blank" : "grid";
+            setPaper(next);
+            paperRef.current = next;
             save();
           }}
         >
-          <option value="grid">田字格</option>
-          <option value="blank">空白</option>
-        </select>
+          {paper === "grid" ? (
+            <GridFour size={22} aria-hidden="true" />
+          ) : (
+            <Square size={22} aria-hidden="true" />
+          )}
+        </button>
         <button
+          aria-label="復原"
+          title="復原"
           type="button"
           disabled={!counts.ink}
           onClick={() => {
@@ -158,9 +182,11 @@ export function FreeDictation() {
             paint();
           }}
         >
-          復原
+          <ArrowCounterClockwise size={22} aria-hidden="true" />
         </button>
         <button
+          aria-label="重做"
+          title="重做"
           type="button"
           disabled={!counts.redo}
           onClick={() => {
@@ -169,9 +195,11 @@ export function FreeDictation() {
             paint();
           }}
         >
-          重做
+          <ArrowClockwise size={22} aria-hidden="true" />
         </button>
         <button
+          aria-label="清空"
+          title="清空"
           type="button"
           onClick={() => {
             if (window.confirm("清空整張畫板？")) {
@@ -182,10 +210,10 @@ export function FreeDictation() {
             }
           }}
         >
-          清空
+          <Trash size={22} aria-hidden="true" />
         </button>
-        <button type="button" onClick={download}>
-          儲存圖片
+        <button aria-label="儲存圖片" title="儲存圖片" type="button" onClick={download}>
+          <DownloadSimple size={22} aria-hidden="true" />
         </button>
       </div>
       {notice && <p role="status">{notice}</p>}
