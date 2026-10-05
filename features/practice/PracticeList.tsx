@@ -103,20 +103,26 @@ export function PracticeList({ app }: { app: AppController }) {
         <FreeDictation />
       ) : (
         <>
-          <div className="practice-record-filter">
-            <label htmlFor="practice-record-type">練習類型</label>
-            <select
-              id="practice-record-type"
-              value={filter}
-              onChange={(e) => {
-                setFilter(e.target.value as Filter);
-                setExpanded(undefined);
-              }}
-            >
-              <option value="all">全部紀錄</option>
-              <option value="fill">默寫</option>
-              <option value="listening">聽寫</option>
-            </select>
+          <div className="practice-mode-tabs" role="group" aria-label="篩選練習類型">
+            {(
+              [
+                ["all", "全部"],
+                ["fill", "默寫"],
+                ["listening", "聽寫"],
+              ] as const
+            ).map(([value, label]) => (
+              <button
+                type="button"
+                key={value}
+                aria-pressed={filter === value}
+                onClick={() => {
+                  setFilter(value);
+                  setExpanded(undefined);
+                }}
+              >
+                {label}
+              </button>
+            ))}
           </div>
           <ShowMsg
             error
