@@ -272,9 +272,9 @@ export const sixthLessonLines = annotateLessonLines(lessons[5].lines, [
   ["ㄨㄛˇ", "ㄧㄠˋ", "ㄙㄨㄥˋ", "ㄌㄠˇ", "ㄕ"],
   ["ㄧˋ", "ㄉㄨㄛˇ", "ㄒㄧㄠˇ", "ㄏㄨㄥˊ", "ㄏㄨㄚ"],
   ["ㄒㄧㄝˋ", "˙ㄒㄧㄝ", "ㄌㄠˇ", "ㄕ"],
-  ["ㄐㄧㄠˋ", "ㄨㄛˇ", "ㄉㄨˊ", "ㄕㄨ"],
+  ["ㄐㄧㄠ", "ㄨㄛˇ", "ㄉㄨˊ", "ㄕㄨ"],
   ["ㄧㄝˇ", "ㄒㄧㄝˋ", "˙ㄒㄧㄝ", "ㄌㄠˇ", "ㄕ"],
-  ["ㄐㄧㄠˋ", "ㄨㄛˇ", "ㄏㄨㄚˋ", "ㄏㄨㄚˋ"],
+  ["ㄐㄧㄠ", "ㄨㄛˇ", "ㄏㄨㄚˋ", "ㄏㄨㄚˋ"],
 ]);
 
 export const seventhLessonLines = annotateLessonLines(lessons[6].lines, [

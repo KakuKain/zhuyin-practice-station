@@ -103,6 +103,6 @@ test("all shipped font assets use WOFF2", async () => {
 });
 
 test("saved whole phrases remain available after the exam scope changes", () => {
-  assert.equal(findQuestionSeed(5, "words:教我畫畫")?.answer, "ㄐㄧㄠˋ|ㄨㄛˇ|ㄏㄨㄚˋ|ㄏㄨㄚˋ");
+  assert.equal(findQuestionSeed(5, "words:教我畫畫")?.answer, "ㄐㄧㄠ|ㄨㄛˇ|ㄏㄨㄚˋ|ㄏㄨㄚˋ");
   assert.ok(!buildListeningSession(5).some((q) => q.audioText === "教我畫畫"));
 });

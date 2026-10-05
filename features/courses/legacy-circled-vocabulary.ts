@@ -52,7 +52,7 @@ export const legacyCircledVocabulary: readonly (readonly CircledTerm[])[] = [
     term("讀書", "ㄉㄨˊ|ㄕㄨ"),
     term("送老師", "ㄙㄨㄥˋ|ㄌㄠˇ|ㄕ"),
     term("一朵紅花", "ㄧˋ|ㄉㄨㄛˇ|ㄏㄨㄥˊ|ㄏㄨㄚ"),
-    term("教我畫畫", "ㄐㄧㄠˋ|ㄨㄛˇ|ㄏㄨㄚˋ|ㄏㄨㄚˋ"),
+    term("教我畫畫", "ㄐㄧㄠ|ㄨㄛˇ|ㄏㄨㄚˋ|ㄏㄨㄚˋ"),
   ],
   [
     term("烏龜", "ㄨ|ㄍㄨㄟ"),
