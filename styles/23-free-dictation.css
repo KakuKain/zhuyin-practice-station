@@ -1,6 +1,6 @@
 .free-board-tools {
   position: sticky;
-  top: 0;
+  top: 56px;
   z-index: 5;
   display: flex;
   flex-wrap: wrap;
@@ -97,4 +97,8 @@
 }
 .free-board-tools .is-red-pen[aria-pressed="true"] {
   background: #d43838;
+}
+
+.free-board-paper.has-grid canvas {
+  height: 1812px;
 }

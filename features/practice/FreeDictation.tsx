@@ -97,16 +97,17 @@ export function FreeDictation() {
   const download = () => {
     const output = document.createElement("canvas");
     output.width = 720;
-    output.height = 2400;
+    output.height =
+      paper === "grid" ? Math.round((1812 * 720) / (canvas.current?.clientWidth ?? 304)) : 2400;
     const ctx = output.getContext("2d")!;
     ctx.fillStyle = "white";
-    ctx.fillRect(0, 0, 720, 2400);
+    ctx.fillRect(0, 0, 720, output.height);
     if (paper === "grid") {
       const scale = 720 / (canvas.current?.clientWidth ?? 304);
       const step = 152 * scale;
       const size = 138 * scale;
       for (let x = 0; x < 720; x += step)
-        for (let y = 0; y < 2400; y += step) {
+        for (let y = 0; y < output.height; y += step) {
           ctx.setLineDash([]);
           ctx.strokeStyle = "#97b3c2";
           ctx.lineWidth = 2 * scale;
@@ -122,7 +123,7 @@ export function FreeDictation() {
           ctx.stroke();
         }
     }
-    ctx.drawImage(canvas.current!, 0, 0);
+    ctx.drawImage(canvas.current!, 0, 0, output.width, output.height);
     output.toBlob((blob) => {
       if (!blob) return;
       const url = URL.createObjectURL(blob);
