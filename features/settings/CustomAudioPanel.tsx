@@ -159,10 +159,16 @@ export function CustomAudioPanel(props: Props) {
                 {tab === "courses" ? (
                   <>
                     <strong>{item.text}</strong>
-                    <AnswerDisplay answer={item.pronunciation} />
+                    <AnswerDisplay
+                      answer={item.pronunciation}
+                      literalSymbols={/^[\u3105-\u3129]+$/.test(item.text)}
+                    />
                   </>
                 ) : (
-                  <AnswerDisplay answer={item.pronunciation} />
+                  <AnswerDisplay
+                    answer={item.pronunciation}
+                    literalSymbols={/^[\u3105-\u3129]+$/.test(item.text)}
+                  />
                 )}
                 <small>{recorded ? "已錄音" : "預設讀音"}</small>
               </button>
@@ -401,7 +407,10 @@ function RecordingEditor({
           className={`custom-audio-pronunciation ${prompt.category === "words" ? "is-word" : ""}`}
         >
           <strong>{prompt.text}</strong>
-          <AnswerDisplay answer={prompt.pronunciation} />
+          <AnswerDisplay
+            answer={prompt.pronunciation}
+            literalSymbols={/^[\u3105-\u3129]+$/.test(prompt.text)}
+          />
         </div>
         <p>
           只唸「{prompt.text}」，不要唸注音拼法、字義或例句。
