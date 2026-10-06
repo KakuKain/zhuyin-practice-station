@@ -8,7 +8,14 @@ import { AnnotatedText } from "../../components/AnnotatedText";
 import { ZhuyinStack } from "../../components/Zhuyin";
 import { LessonTitle } from "../../components/LessonTitle";
 import { useReaderPosition } from "./useReaderPosition";
-import { ArrowLeft, ArrowRight, Headphones, PencilLine, SpeakerHigh } from "@phosphor-icons/react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Headphones,
+  PencilLine,
+  SpeakerHigh,
+  Stop,
+} from "@phosphor-icons/react";
 
 export function LessonReader({
   app,
@@ -21,6 +28,10 @@ export function LessonReader({
     | "openListening"
     | "playPreviewSymbol"
     | "playingSymbol"
+    | "speak"
+    | "stopPlayback"
+    | "audioLoading"
+    | "audioError"
     | "previewColumns"
     | "previewMode"
     | "previewPage"
@@ -53,6 +64,8 @@ export function LessonReader({
     setPreviewPage,
   } = app;
   const readerRef = useReaderPosition(previewPage, previewMode);
+  const readingKey = `lesson-reading-${selectedLesson + 1}`;
+  const reading = playingSymbol === readingKey;
   return (
     <section className="page-section lesson-page">
       <div className={`lesson-heading${selectedLesson === 7 ? " is-radish" : ""}`}>
@@ -115,6 +128,28 @@ export function LessonReader({
         </div>
       )}
       <div className="lesson-curriculum">
+        {!lesson.custom && selectedLesson < 9 && (
+          <div className="lesson-reading-controls">
+            <button
+              type="button"
+              className="lesson-reading-button"
+              aria-pressed={reading}
+              onClick={() =>
+                reading
+                  ? app.stopPlayback()
+                  : app.speak(readingKey, {
+                      url: `/listening-audio/gemini/lessons/${String(selectedLesson + 1).padStart(2, "0")}.m4a`,
+                      playbackRate: 1,
+                      allowSynthesis: false,
+                    })
+              }
+            >
+              {reading ? <Stop size={22} weight="fill" /> : <SpeakerHigh size={22} />}
+              {reading ? (app.audioLoading ? "載入語音…" : "停止朗讀") : "朗讀課文"}
+            </button>
+            {app.audioError && <span role="status">語音無法播放，請再試一次。</span>}
+          </div>
+        )}
         <div className="lesson-curriculum-heading">
           <strong>
             <AnnotatedText text={lesson.custom ? "字詞預覽" : "課文"} />

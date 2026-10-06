@@ -666,3 +666,30 @@
     font-size: 22px;
   }
 }
+
+.lesson-reading-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.lesson-reading-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid #bfd9ec;
+  border-radius: 14px;
+  background: #eef7ff;
+  color: #285981;
+  font: inherit;
+  font-weight: 700;
+}
+.lesson-reading-button[aria-pressed="true"] {
+  background: #dcecff;
+}
+.lesson-reading-controls > span {
+  font-size: 14px;
+  color: #795a35;
+}

@@ -1,0 +1,327 @@
+{
+  "model": "gemini-3.8-flash-tts",
+  "voice": "Fola",
+  "createdAt": "2026-10-06",
+  "rhymes": [
+    {
+      "text": "ㄧㄚ",
+      "prompt": "鴨",
+      "tone": "第一聲",
+      "path": "/listening-audio/gemini/rhymes/3127-311a.m4a",
+      "duration": 1.59,
+      "voicedDuration": 0.99,
+      "sourceRange": [
+        0.03,
+        1.62
+      ]
+    },
+    {
+      "text": "ㄧㄛ",
+      "prompt": "唷",
+      "tone": "第一聲",
+      "path": "/listening-audio/gemini/rhymes/3127-311b.m4a",
+      "duration": 1.64,
+      "voicedDuration": 1.04,
+      "sourceRange": [
+        2.88,
+        4.52
+      ]
+    },
+    {
+      "text": "ㄧㄝ",
+      "prompt": "噎",
+      "tone": "第一聲",
+      "path": "/listening-audio/gemini/rhymes/3127-311d.m4a",
+      "duration": 1.61,
+      "voicedDuration": 1.01,
+      "sourceRange": [
+        5.47,
+        7.08
+      ]
+    },
+    {
+      "text": "ㄧㄞ",
+      "prompt": "崖",
+      "tone": "第二聲",
+      "path": "/listening-audio/gemini/rhymes/3127-311e.m4a",
+      "duration": 1.56,
+      "voicedDuration": 0.96,
+      "sourceRange": [
+        8.11,
+        9.67
+      ]
+    },
+    {
+      "text": "ㄧㄠ",
+      "prompt": "腰",
+      "tone": "第一聲",
+      "path": "/listening-audio/gemini/rhymes/3127-3120.m4a",
+      "duration": 1.68,
+      "voicedDuration": 1.08,
+      "sourceRange": [
+        10.83,
+        12.51
+      ]
+    },
+    {
+      "text": "ㄧㄡ",
+      "prompt": "悠",
+      "tone": "第一聲",
+      "path": "/listening-audio/gemini/rhymes/3127-3121.m4a",
+      "duration": 1.65,
+      "voicedDuration": 1.05,
+      "sourceRange": [
+        13.69,
+        15.34
+      ]
+    },
+    {
+      "text": "ㄧㄢ",
+      "prompt": "煙",
+      "tone": "第一聲",
+      "path": "/listening-audio/gemini/rhymes/3127-3122.m4a",
+      "duration": 1.66,
+      "voicedDuration": 1.06,
+      "sourceRange": [
+        16.67,
+        18.33
+      ]
+    },
+    {
+      "text": "ㄧㄣ",
+      "prompt": "音",
+      "tone": "第一聲",
+      "path": "/listening-audio/gemini/rhymes/3127-3123.m4a",
+      "duration": 1.65,
+      "voicedDuration": 1.05,
+      "sourceRange": [
+        19.5,
+        21.15
+      ]
+    },
+    {
+      "text": "ㄧㄤ",
+      "prompt": "央",
+      "tone": "第一聲",
+      "path": "/listening-audio/gemini/rhymes/3127-3124.m4a",
+      "duration": 1.72,
+      "voicedDuration": 1.12,
+      "sourceRange": [
+        22.29,
+        24.01
+      ]
+    },
+    {
+      "text": "ㄧㄥ",
+      "prompt": "英",
+      "tone": "第一聲",
+      "path": "/listening-audio/gemini/rhymes/3127-3125.m4a",
+      "duration": 1.6,
+      "voicedDuration": 1.0,
+      "sourceRange": [
+        25.1,
+        26.7
+      ]
+    },
+    {
+      "text": "ㄨㄚ",
+      "prompt": "蛙",
+      "tone": "第一聲",
+      "path": "/listening-audio/gemini/rhymes/3128-311a.m4a",
+      "duration": 1.51,
+      "voicedDuration": 0.91,
+      "sourceRange": [
+        27.65,
+        29.16
+      ]
+    },
+    {
+      "text": "ㄨㄛ",
+      "prompt": "窩",
+      "tone": "第一聲",
+      "path": "/listening-audio/gemini/rhymes/3128-311b.m4a",
+      "duration": 1.59,
+      "voicedDuration": 0.99,
+      "sourceRange": [
+        30.25,
+        31.84
+      ]
+    },
+    {
+      "text": "ㄨㄞ",
+      "prompt": "歪",
+      "tone": "第一聲",
+      "path": "/listening-audio/gemini/rhymes/3128-311e.m4a",
+      "duration": 1.6,
+      "voicedDuration": 1.0,
+      "sourceRange": [
+        32.99,
+        34.59
+      ]
+    },
+    {
+      "text": "ㄨㄟ",
+      "prompt": "威",
+      "tone": "第一聲",
+      "path": "/listening-audio/gemini/rhymes/3128-311f.m4a",
+      "duration": 1.56,
+      "voicedDuration": 0.96,
+      "sourceRange": [
+        35.6,
+        37.16
+      ]
+    },
+    {
+      "text": "ㄨㄢ",
+      "prompt": "彎",
+      "tone": "第一聲",
+      "path": "/listening-audio/gemini/rhymes/3128-3122.m4a",
+      "duration": 1.58,
+      "voicedDuration": 0.98,
+      "sourceRange": [
+        38.15,
+        39.73
+      ]
+    },
+    {
+      "text": "ㄨㄣ",
+      "prompt": "溫",
+      "tone": "第一聲",
+      "path": "/listening-audio/gemini/rhymes/3128-3123.m4a",
+      "duration": 1.55,
+      "voicedDuration": 0.95,
+      "sourceRange": [
+        40.58,
+        42.13
+      ]
+    },
+    {
+      "text": "ㄨㄤ",
+      "prompt": "汪",
+      "tone": "第一聲",
+      "path": "/listening-audio/gemini/rhymes/3128-3124.m4a",
+      "duration": 1.56,
+      "voicedDuration": 0.96,
+      "sourceRange": [
+        43.08,
+        44.64
+      ]
+    },
+    {
+      "text": "ㄨㄥ",
+      "prompt": "翁",
+      "tone": "第一聲",
+      "path": "/listening-audio/gemini/rhymes/3128-3125.m4a",
+      "duration": 1.48,
+      "voicedDuration": 0.88,
+      "sourceRange": [
+        45.66,
+        47.14
+      ]
+    },
+    {
+      "text": "ㄩㄝ",
+      "prompt": "約",
+      "tone": "第一聲",
+      "path": "/listening-audio/gemini/rhymes/3129-311d.m4a",
+      "duration": 1.46,
+      "voicedDuration": 0.86,
+      "sourceRange": [
+        48.09,
+        49.55
+      ]
+    },
+    {
+      "text": "ㄩㄢ",
+      "prompt": "冤",
+      "tone": "第一聲",
+      "path": "/listening-audio/gemini/rhymes/3129-3122.m4a",
+      "duration": 1.6,
+      "voicedDuration": 1.0,
+      "sourceRange": [
+        50.64,
+        52.24
+      ]
+    },
+    {
+      "text": "ㄩㄣ",
+      "prompt": "暈",
+      "tone": "第一聲",
+      "path": "/listening-audio/gemini/rhymes/3129-3123.m4a",
+      "duration": 1.49,
+      "voicedDuration": 0.89,
+      "sourceRange": [
+        53.32,
+        54.81
+      ]
+    },
+    {
+      "text": "ㄩㄥ",
+      "prompt": "雍",
+      "tone": "第一聲",
+      "path": "/listening-audio/gemini/rhymes/3129-3125.m4a",
+      "duration": 1.44,
+      "voicedDuration": 0.9,
+      "sourceRange": [
+        55.64,
+        57.08
+      ]
+    }
+  ],
+  "lessons": [
+    {
+      "lesson": 1,
+      "path": "/listening-audio/gemini/lessons/01.m4a",
+      "duration": 12.4,
+      "sourceSha256": "8effed9d6aa6a2a60514d46ca645292cbe315c2842c5cced5978ef143cf80174"
+    },
+    {
+      "lesson": 2,
+      "path": "/listening-audio/gemini/lessons/02.m4a",
+      "duration": 15.04,
+      "sourceSha256": "fc48f47859cb918addf62c4780325ba00be1c94f278e67e01f67edb7e3eeab5c"
+    },
+    {
+      "lesson": 3,
+      "path": "/listening-audio/gemini/lessons/03.m4a",
+      "duration": 16.32,
+      "sourceSha256": "de58755f4267e539ddd29342de4be1cfbc79ef5ba95022f3b1cab1f7b9c81cb6"
+    },
+    {
+      "lesson": 4,
+      "path": "/listening-audio/gemini/lessons/04.m4a",
+      "duration": 17.36,
+      "sourceSha256": "fce215455e9cdb008afe766146a3c182fba91237b2471e19ee062d90680b7701"
+    },
+    {
+      "lesson": 5,
+      "path": "/listening-audio/gemini/lessons/05.m4a",
+      "duration": 18.4,
+      "sourceSha256": "901a1a898a80a04f19ac3d4e60fcfc18a04029e275b76c9647d7a604604b46a3"
+    },
+    {
+      "lesson": 6,
+      "path": "/listening-audio/gemini/lessons/06.m4a",
+      "duration": 23.24,
+      "sourceSha256": "ffef4241c73ca964604d1f4625809dcaea943c535be32c4f068e3deb792e36b2"
+    },
+    {
+      "lesson": 7,
+      "path": "/listening-audio/gemini/lessons/07.m4a",
+      "duration": 23.52,
+      "sourceSha256": "fec6542d1d1d34bb18bca18ffe01b17b0cc1efb4ded1f74cfb0a3a0453a52ea1"
+    },
+    {
+      "lesson": 8,
+      "path": "/listening-audio/gemini/lessons/08.m4a",
+      "duration": 38.24,
+      "sourceSha256": "b4c279e3f77cf9daa97f1e0a7984f1834207b4e3eee491bc3f7135353195ca5c"
+    },
+    {
+      "lesson": 9,
+      "path": "/listening-audio/gemini/lessons/09.m4a",
+      "duration": 32.24,
+      "sourceSha256": "09e0890189666ab02121d040f068bb7f1b74953b005c23c53dfbc533e4c1419e"
+    }
+  ]
+}

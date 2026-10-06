@@ -19,6 +19,7 @@ type Options = {
   getCustomRecording: (text: string, pronunciation: string) => Promise<CustomRecording | null>;
 };
 export type ClipOptions = {
+  url?: string;
   pronunciation?: string;
   playbackRate?: number;
   allowSynthesis?: boolean;
@@ -160,11 +161,11 @@ export function useAudioPlayer({
       };
       audioLoadTimeoutRef.current = window.setTimeout(failed, 15000);
       const isZhuyinPrompt = /^[\u3105-\u3129]+$/.test(text);
-      setPlayingSymbol(isZhuyinPrompt ? text : null);
+      setPlayingSymbol(isZhuyinPrompt || options.url ? text : null);
       const start = async () => {
         // A failed custom lookup must not quietly substitute the old unclear voice.
         const custom =
-          isZhuyinPrompt || options.pronunciation
+          !options.url && (isZhuyinPrompt || options.pronunciation)
             ? await getCustomRecording(text, options.pronunciation ?? text)
             : null;
         if (playbackToken !== playbackTokenRef.current) return;
@@ -173,7 +174,8 @@ export function useAudioPlayer({
         audio.preservesPitch = true;
         (audio as HTMLAudioElement & { webkitPreservesPitch?: boolean }).webkitPreservesPitch =
           true;
-        const url = view === "listen" ? dictationAudioUrl(text) : listeningAudioUrl(text);
+        const url =
+          options.url ?? (view === "listen" ? dictationAudioUrl(text) : listeningAudioUrl(text));
         audioPreloaderRef.current?.cancelWarmup(url);
         if (custom) {
           customUrlRef.current = URL.createObjectURL(custom.blob);
