@@ -80,7 +80,9 @@ export function PracticeList({ app }: { app: AppController }) {
         (filter === "fill" ? session.mode === "fill" : session.mode === "listening")),
   );
   return (
-    <section className="page-section practice-page practice-grouped-page">
+    <section
+      className={`page-section practice-page practice-grouped-page${tab === "sound" ? " is-sound-tab" : ""}`}
+    >
       <PageHeading title="練習" artwork="/course-art/happy-watercolor.webp" />
       <div className="practice-section-tabs" role="group" aria-label="練習功能">
         {(

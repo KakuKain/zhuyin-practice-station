@@ -2,7 +2,7 @@
 import { ShowMsg } from "../../components/ShowMsg";
 
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, Check, Headphones, SpeakerHigh } from "@phosphor-icons/react";
+import { ArrowLeft, ArrowRight, Check, SpeakerHigh } from "@phosphor-icons/react";
 import { SectionHeading } from "../../components/AppChrome";
 import { ZhuyinStack } from "../../components/Zhuyin";
 import type { AppController } from "../usePracticeApp";
@@ -25,6 +25,7 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => 
   const [firstTry, setFirstTry] = useState<boolean[]>([]);
   const [hadWrong, setHadWrong] = useState(false);
   const [playing, setPlaying] = useState(false);
+  const [selected, setSelected] = useState<number | null>(null);
   const generation = useRef(0);
   const titleRef = useRef<HTMLHeadingElement>(null);
   useEffect(
@@ -58,10 +59,14 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => 
       },
     });
   };
-  const playQuestion = (questions = round, questionIndex = index) => {
+  const playQuestion = (questions = round, questionIndex = index, preserveAnswer = false) => {
     if (!pair || !questions[questionIndex]) return;
     cancel();
     const token = generation.current;
+    if (!preserveAnswer) {
+      setFeedback(null);
+      setSelected(null);
+    }
     setCanChoose(false);
     setPlaying(true);
     audio.speak(pair.sounds[questions[questionIndex].target].audioText, {
@@ -160,7 +165,7 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => 
           <h2 ref={titleRef} tabIndex={-1}>
             先聽聽兩個音
           </h2>
-          <p>點注音聽聲音，可以多聽幾次。</p>
+          <p>先聽兩個音，再開始練習。</p>
           <div className="sound-choice-row" dir="rtl">
             {pair.sounds.map((sound, choice) => (
               <button
@@ -205,15 +210,15 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => 
             第 {index + 1} 題 / {round.length}
           </span>
           <h2 ref={titleRef} tabIndex={-1}>
-            你聽到哪個音？
+            聽一聽，選注音
           </h2>
           <button
             type="button"
             className="sound-replay"
-            onClick={() => playQuestion()}
-            disabled={feedback === "correct"}
+            onClick={() => playQuestion(round, index, feedback === "correct")}
+            disabled={audio.audioLoading || playing}
           >
-            <Headphones size={28} aria-hidden="true" />
+            <img src="/course-art/listening-play-button-watercolor-v1.webp" alt="" />
             {audio.audioLoading
               ? "聲音載入中…"
               : playing && !audio.audioError
@@ -226,41 +231,46 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => 
               return (
                 <button
                   type="button"
-                  className="sound-choice"
+                  className={`sound-choice${selected === choice ? (feedback === "correct" ? " is-correct" : " is-retry") : ""}`}
                   key={sound.label}
                   disabled={
                     !canChoose || audio.audioLoading || audio.audioError || feedback === "correct"
                   }
                   aria-label={`選 ${sound.label}`}
                   onClick={() => {
+                    setSelected(choice);
                     if (choice === round[index].target) {
                       setFeedback("correct");
                       setFirstTry((current) => [...current, !hadWrong]);
                     } else {
                       setHadWrong(true);
                       setFeedback("retry");
-                      setCanChoose(false);
                     }
                   }}
                 >
                   <ZhuyinStack text={sound.label} literalSymbol />
                   {sound.caption && <span>{sound.caption}</span>}
+                  {selected === choice && feedback === "correct" && (
+                    <span className="sound-choice-result">
+                      <Check size={18} />
+                      選對了
+                    </span>
+                  )}
                 </button>
               );
             })}
           </div>
-          {feedback ? (
-            <ShowMsg
-              key={`${index}-${feedback}`}
-              message={feedback === "correct" ? "聽出來了！" : "還不是這個音，再聽一次試試看。"}
-            />
-          ) : (
-            <p>聽完聲音，再選一個。</p>
-          )}
-          {feedback === "correct" && (
+          <p
+            className={`sound-inline-feedback${feedback === "correct" ? " is-correct" : ""}`}
+            role="status"
+          >
+            {feedback === "correct" ? "" : feedback === "retry" ? "再聽一次，試試另一個。" : ""}
+          </p>
+          {
             <button
               type="button"
               className="sound-primary"
+              disabled={feedback !== "correct"}
               onClick={() => {
                 cancel();
                 setFeedback(null);
@@ -272,8 +282,9 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => 
               }}
             >
               {index + 1 === round.length ? "完成這一組" : "下一題"}
+              <ArrowRight size={22} aria-hidden="true" />
             </button>
-          )}
+          }
         </div>
       )}
       {audio.audioLoading && <ShowMsg message={"正在載入聲音…"} />}

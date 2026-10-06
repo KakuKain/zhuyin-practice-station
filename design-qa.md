@@ -1,12 +1,13 @@
-# Practice collection design QA — 2026-10-04
+# Sound practice design QA — 2026-10-06
 
-Selected target: `/Users/kaoru/.codex/generated_images/01a0fbf5-48fc-7592-8416-00b533a6e8ce/exec-14ac910a-fc0a-4e67-96bf-30379e8e61d6.png`.
-Rendered evidence: `/Users/kaoru/Desktop/AppDev/kid/material-management-2026-10-02/practice-course-groups-mobile.png` (390 × 844).
+Target: second displayed concept, exec-c03449a4-d7e8-4752-a18c-e35d11935f5e.png.
+Viewport: 390 × 844 CSS pixels; browser screenshot at matching dimensions. Reference normalized from generated source to 390 × 844 solely for comparison.
+Evidence: ../sound-design-20261006/comparison.png and second-implemented.png.
 
-The selected image and rendered screenshot were opened in the same comparison tool result. The mobile implementation retains the watercolor heading, three mode filters, illustrated expandable course groups, flat question rows, independent gold favorite stars, one course retry action, recent records and slim sound-practice entry. Real saved data replaces illustrative mock data; the reference is taller at its generated resolution, so the live viewport scrolls to remaining history.
+Initial P2: heading occupied an extra row; playback and symbols were too small. Fixed by placing the heading beside the logo and increasing playback to 150px and choices to 160px. Removed duplicated success copy, reserved next-button space, and positioned choice feedback without increasing card height.
 
-Verified course expand/collapse, mode filters, course retry opening the intended saved question, history expansion from three to all four existing records, sound-practice entry and return, cancellation of a star without removing its pending question, and undo restoring the original star. Original stored records were preserved. Added tests cover mixed-mode course queues, filtering, empty courses, and excluding mastered favorites from pending work.
+Final comparison: compact header, underline tabs, watercolor replay button, two side-by-side upright symbols, mint successful choice, safe spacing above bottom navigation are present. Uses existing watercolor assets and existing shared fonts instead of generated glyph approximations. Minor P3: existing footer illustration and button texture differ from concept; retained established site assets.
 
-No P0/P1/P2 layout or interaction findings remain in the examined states. Existing original artwork is reused instead of substituting newly generated animals. The course illustration scale is intentionally compact for the real mobile viewport.
+Interaction: preview tested selection, both trial clips, start, repeated rounds, successful choice, next, and wrong choice followed immediately by correct choice without mandatory replay. Wrong-state choices remain enabled. Replay remains available after a correct answer. Typecheck, focused ESLint, build and six existing sound/position tests passed.
 
 final result: passed
