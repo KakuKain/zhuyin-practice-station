@@ -83,6 +83,18 @@
   font-feature-settings: "ss01" 1;
 }
 
+/* Literal symbols share the symbol chart's upright forms in every activity. */
+.zhuyin-glyph.is-symbol {
+  font-family: "PingFang TC", sans-serif;
+  transform: translate(-50%, -50%);
+}
+
+.zhuyin-glyph.is-symbol-combination {
+  font-family: "KidCombinedRhymes", sans-serif;
+  writing-mode: horizontal-tb;
+  letter-spacing: 0;
+}
+
 .syllable-cell.is-drop-hover {
   border: 2px solid var(--ref-green);
   background: #ddffe8;
