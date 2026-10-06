@@ -678,8 +678,8 @@
 }
 
 .answer-display .zhuyin-glyph.is-symbol-combination {
-  font-size: 30px;
-  writing-mode: vertical-rl;
-  text-orientation: upright;
-  letter-spacing: -4px;
+  font-family: "KidCombinedRhymes", sans-serif;
+  font-size: 48px;
+  writing-mode: horizontal-tb;
+  letter-spacing: 0;
 }

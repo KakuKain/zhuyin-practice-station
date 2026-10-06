@@ -1,5 +1,16 @@
 "use client";
 
+import { combinedRhymeGroups } from "../features/symbols/symbols-data";
+
+const combinedGlyphs = Object.fromEntries(
+  combinedRhymeGroups.flatMap((group, groupIndex) =>
+    group.cells.map((rhyme, index) => [
+      rhyme,
+      String.fromCodePoint(0xe100 + [0, 10, 18][groupIndex] + index),
+    ]),
+  ),
+);
+
 import { syllableGlyphs } from "../features/lesson/zhuyin-glyphs";
 
 export function ZhuyinStack({
@@ -31,7 +42,7 @@ export function ZhuyinStack({
             )}
           </span>
         ) : isSymbol ? (
-          text
+          (combinedGlyphs[text] ?? text)
         ) : (
           syllableGlyphs[text]
         )}
