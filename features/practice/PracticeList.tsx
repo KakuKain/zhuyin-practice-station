@@ -24,11 +24,10 @@ import type { AppController } from "../usePracticeApp";
 type Filter = "all" | "fill" | "listening";
 export function PracticeList({ app }: { app: AppController }) {
   const catalog = useCatalog();
-  const [tab, setTab] = useState("free");
+  const [tab, setTab] = useState<"free" | "records" | "sound">("free");
   const [filter, setFilter] = useState<Filter>("all");
   const [expanded, setExpanded] = useState<number | null | undefined>(undefined);
   const [showAllHistory, setShowAllHistory] = useState(false);
-  const [soundOpen, setSoundOpen] = useState(false);
   const entries = [
     ...app.fillFavorites.map((favorite) => ({
       key: `fill:${fillFavoriteKey(favorite)}`,
@@ -80,27 +79,34 @@ export function PracticeList({ app }: { app: AppController }) {
       (filter === "all" ||
         (filter === "fill" ? session.mode === "fill" : session.mode === "listening")),
   );
-  if (soundOpen) return <SoundPractice audio={app} onBack={() => setSoundOpen(false)} />;
   return (
     <section className="page-section practice-page practice-grouped-page">
       <PageHeading title="練習" artwork="/course-art/happy-watercolor.webp" />
       <div className="practice-section-tabs" role="group" aria-label="練習功能">
-        <button
-          type="button"
-          aria-pressed={tab === "free"}
-          onClick={() => {
-            app.stopPlayback();
-            setTab("free");
-          }}
-        >
-          自由聽寫
-        </button>
-        <button type="button" aria-pressed={tab === "records"} onClick={() => setTab("records")}>
-          練習紀錄
-        </button>
+        {(
+          [
+            ["free", "自由聽寫"],
+            ["records", "練習紀錄"],
+            ["sound", "辨音練習"],
+          ] as const
+        ).map(([value, label]) => (
+          <button
+            type="button"
+            key={value}
+            aria-pressed={tab === value}
+            onClick={() => {
+              app.stopPlayback();
+              setTab(value);
+            }}
+          >
+            {label}
+          </button>
+        ))}
       </div>
       {tab === "free" ? (
         <FreeDictation />
+      ) : tab === "sound" ? (
+        <SoundPractice audio={app} />
       ) : (
         <>
           <div className="practice-mode-tabs" role="group" aria-label="篩選練習類型">
@@ -309,20 +315,6 @@ export function PracticeList({ app }: { app: AppController }) {
               );
             })}
           </section>
-          <button
-            type="button"
-            className="practice-sound-link"
-            onClick={() => {
-              app.stopPlayback();
-              setSoundOpen(true);
-            }}
-          >
-            <span className="practice-recent-icon mode-listening">
-              <Headphones size={26} aria-hidden="true" />
-            </span>
-            <strong>辨音小練習</strong>
-            <ArrowRight size={22} aria-hidden="true" />
-          </button>
         </>
       )}
     </section>

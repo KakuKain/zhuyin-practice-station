@@ -14,7 +14,7 @@ import {
 } from "./sound-practice-data";
 
 type Audio = Pick<AppController, "speak" | "stopPlayback" | "audioLoading" | "audioError">;
-export function SoundPractice({ audio, onBack }: { audio: Audio; onBack: () => void }) {
+export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => void }) {
   const stopPlayback = audio.stopPlayback;
   const [pair, setPair] = useState<SoundPair | null>(null);
   const [heard, setHeard] = useState<number[]>([]);
@@ -91,16 +91,20 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack: () => v
     if (pair) reset();
     else {
       cancel();
-      onBack();
+      onBack?.();
     }
   };
   return (
     <section className="page-section sound-practice-page">
-      <button type="button" className="sound-back" onClick={back}>
-        <ArrowLeft size={18} aria-hidden="true" />
-        {pair ? "換一組聲音" : "回到練習紀錄"}
-      </button>
-      <SectionHeading title="辨音小練習" description="一次分辨兩個音，不用寫字、不計時。" />
+      {(pair || onBack) && (
+        <button type="button" className="sound-back" onClick={back}>
+          <ArrowLeft size={18} aria-hidden="true" />
+          {pair ? "換一組聲音" : "回到練習"}
+        </button>
+      )}
+      {onBack && (
+        <SectionHeading title="辨音小練習" description="一次分辨兩個音，不用寫字、不計時。" />
+      )}
       {!pair ? (
         <>
           <h2 ref={titleRef} tabIndex={-1}>
