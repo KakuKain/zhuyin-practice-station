@@ -164,8 +164,8 @@ export function useAudioPlayer({
       const start = async () => {
         // A failed custom lookup must not quietly substitute the old unclear voice.
         const custom =
-          !isZhuyinPrompt && options.pronunciation
-            ? await getCustomRecording(text, options.pronunciation)
+          isZhuyinPrompt || options.pronunciation
+            ? await getCustomRecording(text, options.pronunciation ?? text)
             : null;
         if (playbackToken !== playbackTokenRef.current) return;
         const policy = clipPolicy(!!custom, isZhuyinPrompt, options.playbackRate);

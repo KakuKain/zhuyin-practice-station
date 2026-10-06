@@ -20,6 +20,7 @@ import {
 import type { CustomAudioController } from "../../lib/audio/useCustomRecordings";
 import { audioDuration, createRecordingSession } from "../../lib/audio/recording-session";
 import type { ClipOptions } from "../../lib/audio/useAudioPlayer";
+import { combinedRhymeGroups } from "../symbols/symbols-data";
 import { priorityPrompts, type RecordingPrompt } from "./recording-data";
 
 import { useCatalog } from "../courses/MaterialContext";
@@ -49,12 +50,24 @@ export function CustomAudioPanel(props: Props) {
       key: recordingKey(seed.audioText, seed.answer),
     })),
   }));
+  const rhymePrompts = combinedRhymeGroups
+    .flatMap((group) => group.cells)
+    .map((text) => ({
+      text,
+      pronunciation: text,
+      category: "characters" as const,
+      key: recordingKey(text, text),
+    }));
   const [lessonIndex, setLessonIndex] = useState(-1);
   const [category, setCategory] = useState<"characters" | "words">("characters");
   const [selectedKey, setSelectedKey] = useState(priorityPrompts[0].key);
   const [busy, setBusy] = useState(false);
   const prompts = (
-    lessonIndex < 0 ? priorityPrompts : recordingLessons[lessonIndex].prompts
+    lessonIndex === -2
+      ? rhymePrompts
+      : lessonIndex < 0
+        ? priorityPrompts
+        : recordingLessons[lessonIndex].prompts
   ).filter((item) => item.category === category);
   const selected = prompts.find((item) => item.key === selectedKey) ?? prompts[0];
   return (
@@ -94,6 +107,7 @@ export function CustomAudioPanel(props: Props) {
               setSelectedKey("");
             }}
           >
+            <option value={-2}>結合韻（錄下完整音節）</option>
             <option value={-1}>優先修正的讀音</option>
             {recordingLessons.map((lesson, index) => (
               <option key={index} value={index}>
