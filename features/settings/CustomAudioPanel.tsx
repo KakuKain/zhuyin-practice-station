@@ -156,20 +156,7 @@ export function CustomAudioPanel(props: Props) {
                   dialog.current?.showModal();
                 }}
               >
-                {tab === "courses" ? (
-                  <>
-                    <strong>{item.text}</strong>
-                    <AnswerDisplay
-                      answer={item.pronunciation}
-                      literalSymbols={/^[\u3105-\u3129]+$/.test(item.text)}
-                    />
-                  </>
-                ) : (
-                  <AnswerDisplay
-                    answer={item.pronunciation}
-                    literalSymbols={/^[\u3105-\u3129]+$/.test(item.text)}
-                  />
-                )}
+                <RecordingReading prompt={item} />
                 <small>{recorded ? "已錄音" : "預設讀音"}</small>
               </button>
               <button
@@ -214,6 +201,27 @@ export function CustomAudioPanel(props: Props) {
         )}
       </dialog>
     </div>
+  );
+}
+
+function RecordingReading({ prompt }: { prompt: RecordingPrompt }) {
+  if (/^[\u3105-\u3129]+$/.test(prompt.text)) {
+    return <AnswerDisplay answer={prompt.pronunciation} literalSymbols />;
+  }
+  const characters = Array.from(prompt.text.replace(/\s/g, ""));
+  const syllables = prompt.pronunciation.split("|");
+  return (
+    <span
+      className="recording-reading-vertical"
+      aria-label={`${prompt.text} ${prompt.pronunciation.replaceAll("|", " ")}`}
+    >
+      {syllables.map((syllable, index) => (
+        <span className="recording-reading-pair" key={index}>
+          <strong>{characters[index] ?? ""}</strong>
+          <AnswerDisplay answer={syllable} />
+        </span>
+      ))}
+    </span>
   );
 }
 
@@ -403,15 +411,7 @@ function RecordingEditor({
         <span className={`custom-audio-badge ${info ? "is-recorded" : ""}`}>
           {audio.loading ? "讀取錄音中…" : info ? "已使用自訂錄音" : "目前使用預設讀音"}
         </span>
-        <div
-          className={`custom-audio-pronunciation ${prompt.category === "words" ? "is-word" : ""}`}
-        >
-          <strong>{prompt.text}</strong>
-          <AnswerDisplay
-            answer={prompt.pronunciation}
-            literalSymbols={/^[\u3105-\u3129]+$/.test(prompt.text)}
-          />
-        </div>
+        <RecordingReading prompt={prompt} />
         <p>
           只唸「{prompt.text}」，不要唸注音拼法、字義或例句。
           {prompt.category === "words"

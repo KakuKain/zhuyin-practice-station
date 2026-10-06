@@ -385,3 +385,30 @@
   outline: 3px solid #3478cf;
   outline-offset: -3px;
 }
+
+.recording-reading-vertical {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin: 8px auto;
+}
+.recording-reading-pair {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 64px;
+}
+.recording-reading-pair strong {
+  font-family: "PingFang TC", sans-serif;
+  font-size: 36px;
+  line-height: 1;
+  font-weight: 400;
+}
+.recording-reading-pair .answer-display {
+  margin: 0;
+}
+.recording-library-open > small {
+  margin-top: auto;
+}
