@@ -561,16 +561,6 @@
 }
 
 /* Watercolor playback: a compact, stable workspace for listening and choosing. */
-.is-sound-tab .page-heading {
-  min-height: 0;
-  padding-block: 8px;
-}
-.is-sound-tab .page-heading img {
-  display: none;
-}
-.is-sound-tab .practice-section-tabs {
-  margin-bottom: 12px;
-}
 .is-sound-tab .sound-practice-page {
   padding: 0;
 }
@@ -675,12 +665,6 @@
     min-height: 112px;
   }
 }
-.is-sound-tab .page-heading-art {
-  display: none;
-}
-.is-sound-tab .page-heading h1 {
-  font-size: 30px;
-}
 .is-sound-tab .sound-choice-result {
   position: absolute;
   bottom: 12px;
@@ -690,14 +674,6 @@
 }
 .is-sound-tab {
   position: relative;
-}
-.is-sound-tab .page-heading {
-  position: absolute;
-  top: -54px;
-  left: 8px;
-  z-index: 40;
-  margin: 0;
-  padding: 0;
 }
 .is-sound-tab .sound-replay img {
   width: 150px;
@@ -718,3 +694,245 @@
     min-height: 120px;
   }
 }
+
+/* Feedback floats above the workspace without moving the answer targets. */
+.sound-feedback-space {
+  height: 36px;
+  color: transparent;
+  user-select: none;
+}
+.is-sound-tab .sound-choice:disabled {
+  opacity: 1;
+}
+.sound-feedback-animation {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(252, 254, 255, 0.88);
+  border-radius: 24px;
+  pointer-events: none;
+  color: #36a77a;
+}
+.sound-feedback-animation svg {
+  filter: drop-shadow(0 6px 0 rgba(44, 128, 90, 0.12));
+  animation: sound-feedback-pop 420ms cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+}
+.sound-feedback-animation span {
+  font-size: 22px;
+  font-weight: 800;
+  animation: sound-feedback-pop 350ms ease-out both;
+}
+.sound-feedback-animation.is-retry {
+  color: #dc806d;
+}
+.sound-feedback-animation.is-retry svg {
+  animation: sound-feedback-wiggle 420ms ease-out both;
+}
+@keyframes sound-feedback-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.45) rotate(-12deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+@keyframes sound-feedback-wiggle {
+  0% {
+    opacity: 0;
+    transform: scale(0.65);
+  }
+  40% {
+    opacity: 1;
+    transform: translateX(-7px);
+  }
+  70% {
+    transform: translateX(7px);
+  }
+  100% {
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sound-feedback-animation svg,
+  .sound-feedback-animation span {
+    animation: none;
+  }
+}
+
+.is-sound-tab .sound-finished {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding-top: 20px;
+}
+.sound-complete-art {
+  width: 240px;
+  height: 240px;
+  object-fit: contain;
+}
+.is-sound-tab .sound-finished h2 {
+  font-size: clamp(26px, 5vw, 34px);
+  margin: 0;
+}
+.sound-complete-actions {
+  display: grid;
+  gap: 14px;
+  width: 100%;
+  max-width: 500px;
+  margin-top: 10px;
+}
+.sound-secondary {
+  min-height: 54px;
+  border: 1.5px solid #357bc8;
+  border-radius: 18px;
+  color: #357bc8;
+  background: white;
+  font-size: 1.15rem;
+  font-weight: 750;
+}
+@media (max-height: 740px) {
+  .sound-complete-art {
+    width: 180px;
+    height: 180px;
+  }
+  .is-sound-tab .sound-finished {
+    gap: 14px;
+    padding-top: 8px;
+  }
+}
+
+.sound-selection-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 116px;
+  margin-bottom: 12px;
+}
+.sound-selection-heading h2 {
+  font-size: clamp(22px, 3.4vw, 30px);
+  margin: 0 0 12px;
+}
+.sound-selection-heading p {
+  margin: 0;
+  color: #627b93;
+}
+.sound-selection-heading img {
+  width: 116px;
+  height: 116px;
+  object-fit: contain;
+}
+.is-sound-tab .sound-pair-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.is-sound-tab .sound-pair-list button {
+  position: relative;
+  min-height: 112px;
+  padding: 18px 12px 42px;
+  border: 0;
+  border-radius: 24px;
+  background-color: #e4f2fd;
+  background-image: url("/course-art/course-card-paper-v1.webp");
+  background-size: cover;
+  background-blend-mode: multiply;
+  color: #18375d;
+}
+.is-sound-tab .sound-pair-list button:nth-child(3n + 2) {
+  background-color: #e1f4e9;
+}
+.is-sound-tab .sound-pair-list button:nth-child(3n) {
+  background-color: #fff3cf;
+}
+.is-sound-tab .sound-pair-list button > span:first-child {
+  font-size: clamp(24px, 4vw, 34px);
+  white-space: nowrap;
+}
+.is-sound-tab .sound-pair-list button:last-child > span:first-child {
+  font-size: clamp(20px, 3.3vw, 28px);
+}
+.is-sound-tab .sound-pair-list .sound-pair-arrow {
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #fff;
+  color: #286bbb;
+}
+.is-sound-tab .sound-pair-list button:focus-visible {
+  outline: 3px solid #286bbb;
+  outline-offset: 3px;
+}
+.is-sound-tab .sound-pair-list button:hover {
+  box-shadow: 0 0 0 2px #75a7d7;
+}
+@media (max-height: 740px) {
+  .sound-selection-heading {
+    min-height: 86px;
+    margin-bottom: 8px;
+  }
+  .sound-selection-heading img {
+    width: 86px;
+    height: 86px;
+  }
+  .is-sound-tab .sound-pair-list button {
+    min-height: 86px;
+    padding-top: 12px;
+    padding-bottom: 34px;
+  }
+  .is-sound-tab .sound-pair-list {
+    gap: 8px;
+  }
+}
+.is-sound-tab .sound-pair-list button {
+  background-blend-mode: soft-light;
+}
+.is-sound-tab .sound-pair-list button > span:first-child {
+  font-size: 32px;
+}
+.is-sound-tab .sound-pair-list button:last-child > span:first-child {
+  font-size: 24px;
+}
+.sound-selection-heading h2 {
+  font-weight: 800;
+}
+@media (max-width: 360px) {
+  .is-sound-tab .sound-pair-list button > span:first-child {
+    font-size: 28px;
+  }
+  .is-sound-tab .sound-pair-list button:last-child > span:first-child {
+    font-size: 21px;
+  }
+  .sound-selection-heading img {
+    width: 88px;
+    height: 88px;
+  }
+}
+/* Preserve the shared heading while keeping all seven pairs visible on phones. */
+@media (max-width: 600px) {
+  .is-sound-tab .sound-selection-heading { min-height: 100px; margin-bottom: 8px; }
+  .is-sound-tab .sound-selection-heading img { width:100px; height:100px; }
+  .is-sound-tab .sound-pair-list { gap:10px; }
+  .is-sound-tab .sound-pair-list button { min-height:82px; padding:10px 12px 32px; }
+  .is-sound-tab .sound-pair-list .sound-pair-arrow { width:26px; height:26px; bottom:7px; }
+}
+/* Visible watercolor pigment and foliage, with a pale center for readable glyphs. */
+.is-sound-tab .sound-pair-list button {
+  background-image:url('/course-art/sound-pair-watercolor.webp');
+  background-blend-mode:luminosity;
+  background-color:#e0f1fc;
+}
+.is-sound-tab .sound-pair-list button:nth-child(3n+2) { background-color:#def2e5; }
+.is-sound-tab .sound-pair-list button:nth-child(3n) { background-color:#fff0c5; }

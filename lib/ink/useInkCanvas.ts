@@ -151,6 +151,21 @@ export function useInkCanvas({
     [],
   );
 
+  const interruptInk = useEffectEvent(() => cancelGesture());
+  useEffect(() => {
+    const interrupt = () => interruptInk();
+    const visibility = () => {
+      if (document.hidden) interrupt();
+    };
+    window.addEventListener("blur", interrupt);
+    document.addEventListener("visibilitychange", visibility);
+    return () => {
+      window.removeEventListener("blur", interrupt);
+      document.removeEventListener("visibilitychange", visibility);
+      interrupt();
+    };
+  }, []);
+
   const begin = (event: PointerEvent<HTMLCanvasElement>) => {
     if (!enabled || gestureRef.current || (event.pointerType === "mouse" && event.button !== 0))
       return;

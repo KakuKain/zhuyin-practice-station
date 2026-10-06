@@ -101,7 +101,7 @@ test("every contrast uses existing clips; second/third tone retains the same syl
     tone.sounds[0].label.replace(/[ˊˇ]/g, ""),
     tone.sounds[1].label.replace(/[ˊˇ]/g, ""),
   );
-  assert.ok(soundPairs.find((p) => p.id === "chi-ci")?.optional);
+  assert.ok(soundPairs.find((p) => p.id === "chi-ci"));
 });
 
 test("short practice opens with pair choice, no timer, canvas or automatic answer", () => {

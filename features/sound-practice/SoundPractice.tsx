@@ -2,7 +2,14 @@
 import { ShowMsg } from "../../components/ShowMsg";
 
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, Check, SpeakerHigh } from "@phosphor-icons/react";
+import {
+  ArrowLeft,
+  CaretRight,
+  Check,
+  CheckCircle,
+  XCircle,
+  SpeakerHigh,
+} from "@phosphor-icons/react";
 import { SectionHeading } from "../../components/AppChrome";
 import { ZhuyinStack } from "../../components/Zhuyin";
 import type { AppController } from "../usePracticeApp";
@@ -22,15 +29,15 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => 
   const [index, setIndex] = useState(0);
   const [canChoose, setCanChoose] = useState(false);
   const [feedback, setFeedback] = useState<"correct" | "retry" | null>(null);
-  const [firstTry, setFirstTry] = useState<boolean[]>([]);
-  const [hadWrong, setHadWrong] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [selected, setSelected] = useState<number | null>(null);
   const generation = useRef(0);
+  const feedbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   useEffect(
     () => () => {
       generation.current += 1;
+      if (feedbackTimer.current) clearTimeout(feedbackTimer.current);
       stopPlayback();
     },
     [stopPlayback],
@@ -39,6 +46,8 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => 
     titleRef.current?.focus({ preventScroll: true });
   }, [pair, round.length, index]);
   const cancel = () => {
+    if (feedbackTimer.current) clearTimeout(feedbackTimer.current);
+    feedbackTimer.current = null;
     generation.current += 1;
     audio.stopPlayback();
     setPlaying(false);
@@ -87,8 +96,6 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => 
     setRound([]);
     setIndex(0);
     setFeedback(null);
-    setFirstTry([]);
-    setHadWrong(false);
     setCanChoose(false);
   };
   const finished = round.length > 0 && index === round.length;
@@ -101,7 +108,7 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => 
   };
   return (
     <section className="page-section sound-practice-page">
-      {(pair || onBack) && (
+      {((pair && !finished) || onBack) && (
         <button type="button" className="sound-back" onClick={back}>
           <ArrowLeft size={18} aria-hidden="true" />
           {pair ? "換一組聲音" : "回到練習"}
@@ -112,9 +119,15 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => 
       )}
       {!pair ? (
         <>
-          <h2 ref={titleRef} tabIndex={-1}>
-            今天先練哪一組？
-          </h2>
+          <div className="sound-selection-heading">
+            <div>
+              <h2 ref={titleRef} tabIndex={-1}>
+                今天想練哪一組？
+              </h2>
+              <p>每組 6 題</p>
+            </div>
+            <img src="/course-art/sound-headphone-cat.webp" alt="" />
+          </div>
           <div className="sound-pair-list">
             {soundPairs.map((item) => (
               <button
@@ -126,39 +139,39 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => 
                 }}
               >
                 <span>{item.title}</span>
-                <small>{item.optional ? "之後學到再練" : "6 題短練習"}</small>
+                <span className="sound-pair-arrow">
+                  <CaretRight size={22} weight="bold" aria-hidden="true" />
+                </span>
               </button>
             ))}
           </div>
         </>
       ) : finished ? (
         <div className="sound-practice-card sound-finished">
-          <Check size={40} aria-hidden="true" />
+          <img className="sound-complete-art" src="/course-art/sound-complete-cat.webp" alt="" />
           <h2 ref={titleRef} tabIndex={-1}>
-            這一組練完了
+            這一組練完了！
           </h2>
-          <p>
-            第一下就選對 {firstTry.filter(Boolean).length} / {round.length} 題
-          </p>
-          <p className="sound-parent-note">
-            重聽後答對不算第一下選對；幾題的結果還不能判斷是否熟練。
-          </p>
-          <button
-            type="button"
-            className="sound-primary"
-            onClick={() => {
-              cancel();
-              setRound([]);
-              setHeard([]);
-              setIndex(0);
-              setFeedback(null);
-              setFirstTry([]);
-              setHadWrong(false);
-              setCanChoose(false);
-            }}
-          >
-            再聽這兩個音
-          </button>
+          <div className="sound-complete-actions">
+            <button
+              type="button"
+              className="sound-primary"
+              onClick={() => {
+                cancel();
+                const questions = makeSoundRound();
+                setSelected(null);
+                setFeedback(null);
+                setRound(questions);
+                setIndex(0);
+                playQuestion(questions, 0);
+              }}
+            >
+              再練一次
+            </button>
+            <button type="button" className="sound-secondary" onClick={reset}>
+              換一組聲音
+            </button>
+          </div>
         </div>
       ) : !round.length ? (
         <div className="sound-practice-card">
@@ -216,7 +229,7 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => 
             type="button"
             className="sound-replay"
             onClick={() => playQuestion(round, index, feedback === "correct")}
-            disabled={audio.audioLoading || playing}
+            disabled={audio.audioLoading || playing || feedback !== null}
           >
             <img src="/course-art/listening-play-button-watercolor-v1.webp" alt="" />
             {audio.audioLoading
@@ -234,57 +247,57 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => 
                   className={`sound-choice${selected === choice ? (feedback === "correct" ? " is-correct" : " is-retry") : ""}`}
                   key={sound.label}
                   disabled={
-                    !canChoose || audio.audioLoading || audio.audioError || feedback === "correct"
+                    !canChoose || audio.audioLoading || audio.audioError || feedback !== null
                   }
                   aria-label={`選 ${sound.label}`}
                   onClick={() => {
                     setSelected(choice);
                     if (choice === round[index].target) {
                       setFeedback("correct");
-                      setFirstTry((current) => [...current, !hadWrong]);
+                      const token = generation.current;
+                      feedbackTimer.current = setTimeout(() => {
+                        if (token !== generation.current) return;
+                        feedbackTimer.current = null;
+                        setFeedback(null);
+                        setSelected(null);
+                        setCanChoose(false);
+                        const next = index + 1;
+                        setIndex(next);
+                        if (next < round.length) playQuestion(round, next);
+                      }, 1200);
                     } else {
-                      setHadWrong(true);
                       setFeedback("retry");
+                      const token = generation.current;
+                      feedbackTimer.current = setTimeout(() => {
+                        if (token !== generation.current) return;
+                        feedbackTimer.current = null;
+                        setFeedback(null);
+                        setSelected(null);
+                      }, 650);
                     }
                   }}
                 >
                   <ZhuyinStack text={sound.label} literalSymbol />
                   {sound.caption && <span>{sound.caption}</span>}
-                  {selected === choice && feedback === "correct" && (
-                    <span className="sound-choice-result">
-                      <Check size={18} />
-                      選對了
-                    </span>
-                  )}
                 </button>
               );
             })}
           </div>
-          <p
-            className={`sound-inline-feedback${feedback === "correct" ? " is-correct" : ""}`}
-            role="status"
-          >
-            {feedback === "correct" ? "" : feedback === "retry" ? "再聽一次，試試另一個。" : ""}
-          </p>
-          {
-            <button
-              type="button"
-              className="sound-primary"
-              disabled={feedback !== "correct"}
-              onClick={() => {
-                cancel();
-                setFeedback(null);
-                setHadWrong(false);
-                setCanChoose(false);
-                const next = index + 1;
-                setIndex(next);
-                if (next < round.length) playQuestion(round, next);
-              }}
+          <div className="sound-feedback-space" aria-hidden="true" />
+          {feedback && (
+            <div
+              className={`sound-feedback-animation is-${feedback}`}
+              role="status"
+              key={`${index}-${selected}`}
             >
-              {index + 1 === round.length ? "完成這一組" : "下一題"}
-              <ArrowRight size={22} aria-hidden="true" />
-            </button>
-          }
+              {feedback === "correct" ? (
+                <CheckCircle size={132} weight="fill" aria-hidden="true" />
+              ) : (
+                <XCircle size={112} weight="fill" aria-hidden="true" />
+              )}
+              <span>{feedback === "correct" ? "答對了！" : "再試一次"}</span>
+            </div>
+          )}
         </div>
       )}
       {audio.audioLoading && <ShowMsg message={"正在載入聲音…"} />}

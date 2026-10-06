@@ -118,6 +118,7 @@ export function FillPractice({
               onPointerMove={moveFillDrawing}
               onPointerUp={endFillDrawing}
               onPointerCancel={endFillDrawing}
+              onLostPointerCapture={endFillDrawing}
               aria-label={`${favorite.character}注音手寫區`}
             />
           </div>

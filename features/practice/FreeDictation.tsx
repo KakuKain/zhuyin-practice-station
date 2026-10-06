@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import {
   PencilSimple,
   Eraser,
@@ -20,6 +20,7 @@ export function FreeDictation() {
   const strokes = useRef<Stroke[]>([]);
   const redo = useRef<Stroke[]>([]);
   const active = useRef<Stroke | null>(null);
+  const activePointer = useRef<number | null>(null);
   const [tool, setTool] = useState("pen");
   const [paper, setPaper] = useState("grid");
   const paperRef = useRef("grid");
@@ -84,17 +85,45 @@ export function FreeDictation() {
       ((event.clientY - rect.top) * 2400) / rect.height,
     ];
   };
-  const finish = (event: PointerEvent<HTMLCanvasElement>) => {
-    if (!active.current) return;
-    strokes.current.push(active.current);
+  const stopStroke = (completed = false) => {
+    const stroke = active.current;
+    const pointerId = activePointer.current;
     active.current = null;
-    redo.current = [];
-    if (event.currentTarget.hasPointerCapture(event.pointerId))
-      event.currentTarget.releasePointerCapture(event.pointerId);
-    save();
-    paint();
+    activePointer.current = null;
+    // Preserve interrupted writing; an interrupted eraser must not remove ink.
+    if (stroke && (!stroke.erase || completed)) {
+      strokes.current.push(stroke);
+      redo.current = [];
+    }
+    const el = canvas.current;
+    if (el && pointerId !== null && el.hasPointerCapture(pointerId))
+      el.releasePointerCapture(pointerId);
+    if (stroke) {
+      save();
+      paint();
+    }
   };
+  const finish = (event: PointerEvent<HTMLCanvasElement>) => {
+    if (activePointer.current !== event.pointerId) return;
+    if (event.type === "pointerup" && active.current) active.current.points.push(point(event));
+    stopStroke(event.type === "pointerup");
+  };
+  const interruptStroke = useEffectEvent(() => stopStroke());
+  useEffect(() => {
+    const interrupt = () => interruptStroke();
+    const visibility = () => {
+      if (document.hidden) interrupt();
+    };
+    window.addEventListener("blur", interrupt);
+    document.addEventListener("visibilitychange", visibility);
+    return () => {
+      interrupt();
+      window.removeEventListener("blur", interrupt);
+      document.removeEventListener("visibilitychange", visibility);
+    };
+  }, []);
   const download = () => {
+    stopStroke();
     const output = document.createElement("canvas");
     output.width = 720;
     output.height =
@@ -153,7 +182,10 @@ export function FreeDictation() {
             title={label}
             className={value === "red" ? "is-red-pen" : undefined}
             aria-pressed={tool === value}
-            onClick={() => setTool(value)}
+            onClick={() => {
+              stopStroke();
+              setTool(value);
+            }}
           >
             <Icon size={22} aria-hidden="true" />
           </button>
@@ -164,6 +196,7 @@ export function FreeDictation() {
           title={paper === "grid" ? "田字格（點一下切換空白）" : "空白（點一下切換田字格）"}
           aria-pressed={paper === "grid"}
           onClick={() => {
+            stopStroke();
             const next = paper === "grid" ? "blank" : "grid";
             setPaper(next);
             paperRef.current = next;
@@ -182,6 +215,7 @@ export function FreeDictation() {
           type="button"
           disabled={!counts.ink}
           onClick={() => {
+            stopStroke();
             redo.current.push(strokes.current.pop()!);
             save();
             paint();
@@ -195,6 +229,8 @@ export function FreeDictation() {
           type="button"
           disabled={!counts.redo}
           onClick={() => {
+            stopStroke();
+            if (!redo.current.length) return;
             strokes.current.push(redo.current.pop()!);
             save();
             paint();
@@ -208,6 +244,7 @@ export function FreeDictation() {
           type="button"
           onClick={() => {
             if (window.confirm("清空整張畫板？")) {
+              stopStroke();
               strokes.current = [];
               redo.current = [];
               save();
@@ -230,7 +267,14 @@ export function FreeDictation() {
           aria-label="自由聽寫作答畫板"
           style={{ touchAction: tool === "scroll" ? "pan-y" : "none" }}
           onPointerDown={(event) => {
-            if (tool === "scroll" || event.button !== 0 || active.current) return;
+            if (
+              tool === "scroll" ||
+              (event.pointerType === "mouse" && event.button !== 0) ||
+              activePointer.current !== null
+            )
+              return;
+            event.preventDefault();
+            activePointer.current = event.pointerId;
             event.currentTarget.setPointerCapture(event.pointerId);
             active.current = {
               color: tool === "red" ? "#d43838" : "#193458",
@@ -240,12 +284,14 @@ export function FreeDictation() {
             paint();
           }}
           onPointerMove={(event) => {
-            if (!active.current || !event.currentTarget.hasPointerCapture(event.pointerId)) return;
+            if (!active.current || activePointer.current !== event.pointerId) return;
+            event.preventDefault();
             active.current.points.push(point(event));
             paint();
           }}
           onPointerUp={finish}
           onPointerCancel={finish}
+          onLostPointerCapture={finish}
         />
       </div>
       <p className="free-board-note">畫作自動保存在這個瀏覽器。往下寫時，請切換「捲動」。</p>

@@ -145,6 +145,7 @@ export function FillWriting({
               onPointerMove={moveFillDrawing}
               onPointerUp={endFillDrawing}
               onPointerCancel={endFillDrawing}
+              onLostPointerCapture={endFillDrawing}
 
               aria-label={`${!catalogLesson.custom && lineIndex === 0 ? "標題" : `第 ${lineIndex + (catalogLesson.custom ? 1 : 0)} 行`}第 ${position} 格手寫區`}
             />

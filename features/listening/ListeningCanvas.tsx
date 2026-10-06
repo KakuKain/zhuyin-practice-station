@@ -107,6 +107,7 @@ export function ListeningCanvas({
                     onPointerMove={draw}
                     onPointerUp={endDrawing}
                     onPointerCancel={endDrawing}
+                    onLostPointerCapture={endDrawing}
                     aria-label={`語詞第 ${index + 1} 字田字格手寫區`}
                   />
                 </div>
@@ -122,6 +123,7 @@ export function ListeningCanvas({
               onPointerMove={draw}
               onPointerUp={endDrawing}
               onPointerCancel={endDrawing}
+              onLostPointerCapture={endDrawing}
               aria-label="田字格手寫區"
             />
           </div>
