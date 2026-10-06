@@ -283,3 +283,105 @@
     flex-wrap: wrap;
   }
 }
+
+.recording-library-tabs {
+  display: flex;
+  gap: 12px;
+  border-bottom: 1px solid #d8e6ef;
+  margin: 20px 0;
+}
+.recording-library-tabs button {
+  flex: 1;
+  background: none;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  padding: 14px 4px;
+  color: #64758b;
+  font: inherit;
+  font-weight: 700;
+}
+.recording-library-tabs button[aria-selected="true"] {
+  color: #3478cf;
+  border-bottom-color: #3478cf;
+}
+.custom-audio-picker input[type="search"] {
+  width: 100%;
+  border: 1px solid #bed8ee;
+  border-radius: 12px;
+  padding: 12px;
+  font: inherit;
+  background: white;
+}
+.recording-library-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(125px, 1fr));
+  gap: 12px;
+  margin: 20px 0;
+}
+.recording-library-card {
+  position: relative;
+  border: 1px solid #d5e5ee;
+  border-radius: 18px;
+  background: #f6fbff;
+  overflow: hidden;
+}
+.recording-library-open {
+  width: 100%;
+  min-height: 150px;
+  padding: 16px 8px 42px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  background: none;
+  color: #193658;
+  font: inherit;
+}
+.recording-library-open small {
+  font-size: 13px;
+  color: #5a7686;
+}
+.recording-library-play {
+  position: absolute;
+  bottom: 4px;
+  right: 8px;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #3478cf;
+}
+.recording-library-dialog {
+  width: min(580px, calc(100% - 24px));
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  padding: 52px 16px 20px;
+  border: 0;
+  border-radius: 24px;
+  color: #193658;
+}
+.recording-library-dialog::backdrop {
+  background: rgb(20 45 70 / 45%);
+}
+.recording-library-close {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  background: #f0f7fb;
+  border: 0;
+  border-radius: 50%;
+  color: #193658;
+}
+.recording-library-dialog .custom-audio-editor {
+  margin: 0;
+}
+.recording-library-card button:focus-visible {
+  outline: 3px solid #3478cf;
+  outline-offset: -3px;
+}

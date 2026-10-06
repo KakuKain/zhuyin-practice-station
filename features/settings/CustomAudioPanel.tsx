@@ -3,6 +3,7 @@ import { ShowMsg } from "../../components/ShowMsg";
 import { useEffect, useRef, useState } from "react";
 import {
   Check,
+  X,
   DownloadSimple,
   Microphone,
   SpeakerHigh,
@@ -18,9 +19,13 @@ import {
   type CustomRecording,
 } from "../../lib/audio/custom-audio";
 import type { CustomAudioController } from "../../lib/audio/useCustomRecordings";
-import { audioDuration, createRecordingSession } from "../../lib/audio/recording-session";
+import {
+  audioDuration,
+  createRecordingSession,
+  trimRecordingSilence,
+} from "../../lib/audio/recording-session";
 import type { ClipOptions } from "../../lib/audio/useAudioPlayer";
-import { combinedRhymeGroups } from "../symbols/symbols-data";
+import { allSymbols, combinedRhymeGroups } from "../symbols/symbols-data";
 import { priorityPrompts, type RecordingPrompt } from "./recording-data";
 
 import { useCatalog } from "../courses/MaterialContext";
@@ -58,111 +63,150 @@ export function CustomAudioPanel(props: Props) {
       category: "characters" as const,
       key: recordingKey(text, text),
     }));
+  const [tab, setTab] = useState("symbols");
   const [lessonIndex, setLessonIndex] = useState(-1);
-  const [category, setCategory] = useState<"characters" | "words">("characters");
-  const [selectedKey, setSelectedKey] = useState(priorityPrompts[0].key);
+  const [search, setSearch] = useState("");
+  const [selected, setSelected] = useState<RecordingPrompt | null>(null);
   const [busy, setBusy] = useState(false);
-  const prompts = (
-    lessonIndex === -2
-      ? rhymePrompts
-      : lessonIndex < 0
-        ? priorityPrompts
-        : recordingLessons[lessonIndex].prompts
-  ).filter((item) => item.category === category);
-  const selected = prompts.find((item) => item.key === selectedKey) ?? prompts[0];
+  const dialog = useRef<HTMLDialogElement>(null);
+  const symbols = allSymbols.map((text) => ({
+    text,
+    pronunciation: text,
+    category: "characters" as const,
+    key: recordingKey(text, text),
+  }));
+  const coursePrompts =
+    lessonIndex < 0
+      ? [...priorityPrompts, ...recordingLessons.flatMap((lesson) => lesson.prompts)]
+      : recordingLessons[lessonIndex].prompts;
+  const prompts = Array.from(
+    new Map(
+      (tab === "symbols" ? symbols : tab === "rhymes" ? rhymePrompts : coursePrompts).map(
+        (item) => [item.key, item],
+      ),
+    ).values(),
+  ).filter((item) => !search || `${item.text}${item.pronunciation}`.includes(search));
+  const close = () => {
+    if (busy) return;
+    dialog.current?.close();
+    setSelected(null);
+    props.stopPlayback();
+  };
   return (
     <div className="more-detail-content custom-audio-panel">
       <h1>自訂讀音</h1>
-      <p className="more-detail-intro">
-        把不清楚的生字、語詞換成家長或老師的錄音。試聽確認後，聽寫與短練習會使用這段讀音。
-      </p>
-      <div className="custom-audio-local-note">
-        <strong>只存在這台裝置，不會上傳</strong>
-        <p>限目前瀏覽器與這個網站；換裝置、清除網站資料或結束無痕模式會失去錄音。請下載備份。</p>
-      </div>
-      {props.audio.error && (
-        <ShowMsg error message={props.audio.error}>
-          <button type="button" onClick={() => void props.audio.reload()}>
-            重新讀取
-          </button>
-        </ShowMsg>
-      )}
-      <div className="custom-audio-picker">
-        <label>
-          選擇課程
-          <select
-            disabled={busy}
-            value={lessonIndex}
-            onChange={(event) => {
-              const nextLessonIndex = Number(event.target.value);
-              setLessonIndex(nextLessonIndex);
-              setCategory(
-                nextLessonIndex >= 0 &&
-                  !recordingLessons[nextLessonIndex].prompts.some(
-                    (prompt) => prompt.category === "characters",
-                  )
-                  ? "words"
-                  : "characters",
-              );
-              setSelectedKey("");
+      <p className="more-detail-intro">點選讀音，即可試聽或重新錄製。</p>
+      <div className="recording-library-tabs" role="tablist" aria-label="讀音分類">
+        {[
+          ["symbols", "注音符號"],
+          ["rhymes", "結合韻"],
+          ["courses", "生字與語詞"],
+        ].map(([id, label]) => (
+          <button
+            key={id}
+            type="button"
+            role="tab"
+            aria-selected={tab === id}
+            onClick={() => {
+              setTab(id);
+              setSearch("");
             }}
           >
-            <option value={-2}>結合韻（錄下完整音節）</option>
-            <option value={-1}>優先修正的讀音</option>
-            {recordingLessons.map((lesson, index) => (
-              <option key={index} value={index}>
-                {lesson.label}
-              </option>
-            ))}
-          </select>
-        </label>
-        {lessonIndex >= 0 && (
-          <fieldset>
-            <legend>錄音類別</legend>
-            <div className="settings-options">
-              {(["characters", "words"] as const).map((item) => (
-                <button
-                  key={item}
-                  type="button"
-                  disabled={
-                    busy ||
-                    !recordingLessons[lessonIndex].prompts.some(
-                      (prompt) => prompt.category === item,
-                    )
-                  }
-                  aria-pressed={category === item}
-                  onClick={() => {
-                    setCategory(item);
-                    setSelectedKey("");
-                  }}
-                >
-                  {item === "characters" ? "生字" : "語詞"}
-                </button>
-              ))}
-            </div>
-          </fieldset>
-        )}
-        <label>
-          選擇{category === "words" ? "語詞" : "生字"}
-          <select
-            disabled={busy || !selected}
-            value={selected?.key ?? ""}
-            onChange={(event) => setSelectedKey(event.target.value)}
-          >
-            {prompts.map((item) => (
-              <option key={item.key} value={item.key}>
-                {item.text} · {item.pronunciation.replaceAll("|", "　")}
-              </option>
-            ))}
-          </select>
-        </label>
+            {label}
+          </button>
+        ))}
       </div>
-      {selected && (
-        <RecordingEditor key={selected.key} {...props} prompt={selected} onBusy={setBusy} />
-      )}
-      <p className="more-detail-footnote">
-        請只錄自己的聲音，或匯入已取得使用許可的音檔。37 個單獨注音符號仍使用原本的教育部錄音。
-      </p>
+      <div className="custom-audio-picker">
+        <label>
+          搜尋讀音
+          <input
+            type="search"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="輸入字詞或注音"
+          />
+        </label>
+        {tab === "courses" && (
+          <label>
+            課程
+            <select
+              value={lessonIndex}
+              onChange={(event) => setLessonIndex(Number(event.target.value))}
+            >
+              <option value={-1}>所有課程</option>
+              {recordingLessons.map((lesson, index) => (
+                <option key={index} value={index}>
+                  {lesson.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
+      </div>
+      <div className="recording-library-grid">
+        {prompts.map((item) => {
+          const recorded = props.audio.recordings.some((recording) => recording.key === item.key);
+          return (
+            <div className="recording-library-card" key={item.key}>
+              <button
+                type="button"
+                className="recording-library-open"
+                onClick={() => {
+                  setSelected(item);
+                  dialog.current?.showModal();
+                }}
+              >
+                {tab === "courses" ? (
+                  <>
+                    <strong>{item.text}</strong>
+                    <AnswerDisplay answer={item.pronunciation} />
+                  </>
+                ) : (
+                  <AnswerDisplay answer={item.pronunciation} />
+                )}
+                <small>{recorded ? "已錄音" : "預設讀音"}</small>
+              </button>
+              <button
+                type="button"
+                className="recording-library-play"
+                aria-label={`試聽 ${item.text}`}
+                onClick={() =>
+                  props.speak(item.text, {
+                    pronunciation: item.pronunciation,
+                    allowSynthesis: false,
+                  })
+                }
+              >
+                <SpeakerHigh size={22} />
+              </button>
+            </div>
+          );
+        })}
+      </div>
+      {!prompts.length && <p>沒有符合的讀音。</p>}
+      <p className="more-detail-footnote">錄音儲存在目前瀏覽器。換裝置前，請下載錄音備份。</p>
+      {props.audio.error && <ShowMsg error message={props.audio.error} />}
+      <dialog
+        ref={dialog}
+        className="recording-library-dialog"
+        onCancel={(event) => {
+          event.preventDefault();
+          close();
+        }}
+      >
+        <button
+          type="button"
+          className="recording-library-close"
+          disabled={busy}
+          onClick={close}
+          aria-label="關閉錄音"
+        >
+          <X size={24} />
+        </button>
+        {selected && (
+          <RecordingEditor key={selected.key} {...props} prompt={selected} onBusy={setBusy} />
+        )}
+      </dialog>
     </div>
   );
 }
@@ -184,6 +228,7 @@ function RecordingEditor({
   );
   const [seconds, setSeconds] = useState(0);
   const [candidate, setCandidate] = useState<PreviewRecording | null>(null);
+  const [original, setOriginal] = useState<Blob | null>(null);
   const [saved, setSaved] = useState<PreviewRecording | null>(null);
   const [heard, setHeard] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
@@ -250,7 +295,8 @@ function RecordingEditor({
     };
   }, [info, getRecording, prompt.text, prompt.pronunciation]);
 
-  const prepare = async (blob: Blob) => {
+  const prepare = async (source: Blob, trim = true) => {
+    let blob = source;
     const token = ++importGeneration.current;
     setStatus("processing");
     setError("");
@@ -259,6 +305,10 @@ function RecordingEditor({
     setConfirmed(false);
     try {
       if (blob.size > maxRecordingBytes) throw new Error("音檔太大，請使用 2 MB 以下的檔案。");
+      if (trim) {
+        setOriginal(source);
+        blob = await trimRecordingSilence(source);
+      }
       const duration = await audioDuration(blob);
       validateAudio(blob, duration);
       if (!alive.current || token !== importGeneration.current) return;
@@ -345,7 +395,7 @@ function RecordingEditor({
     <section className="custom-audio-editor" aria-label={`${prompt.text}讀音設定`}>
       <div className="custom-audio-target">
         <span className={`custom-audio-badge ${info ? "is-recorded" : ""}`}>
-          {audio.loading ? "讀取錄音中…" : info ? "已使用自訂錄音" : "目前使用合成音"}
+          {audio.loading ? "讀取錄音中…" : info ? "已使用自訂錄音" : "目前使用預設讀音"}
         </span>
         <div
           className={`custom-audio-pronunciation ${prompt.category === "words" ? "is-word" : ""}`}
@@ -446,7 +496,20 @@ function RecordingEditor({
       {candidate && (
         <div className="custom-audio-candidate">
           <h2>確認新讀音</h2>
-          <p>{candidate.duration.toFixed(1)} 秒 · 尚未替換原本讀音</p>
+          <p>{candidate.duration.toFixed(1)} 秒 · 只修剪首尾空白，保留尾音與中間停頓。</p>
+          {original && (
+            <button
+              type="button"
+              className="custom-audio-secondary"
+              disabled={busy}
+              onClick={() => {
+                candidateAudio.current?.pause();
+                void prepare(original, false);
+              }}
+            >
+              使用原始錄音
+            </button>
+          )}
           <audio
             ref={candidateAudio}
             controls

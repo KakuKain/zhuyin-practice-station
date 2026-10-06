@@ -113,3 +113,75 @@ export async function audioDuration(blob: Blob): Promise<number> {
     await context.close();
   }
 }
+
+/** Conservative edge-only trim: quiet speech is retained, interior pauses untouched. */
+export function silenceBounds(samples: Float32Array, sampleRate: number): [number, number] {
+  const frame = Math.max(1, Math.floor(sampleRate * 0.02));
+  const levels: number[] = [];
+  for (let offset = 0; offset < samples.length; offset += frame) {
+    let sum = 0;
+    const end = Math.min(samples.length, offset + frame);
+    for (let index = offset; index < end; index++) sum += samples[index] ** 2;
+    levels.push(Math.sqrt(sum / (end - offset)));
+  }
+  const peak = levels.reduce((max, level) => Math.max(max, level), 0);
+  if (peak < 0.008) return [0, samples.length];
+  const threshold = Math.max(0.001, peak * 0.015);
+  const first = levels.findIndex((level) => level > threshold);
+  let last = levels.length - 1;
+  while (last > first && levels[last] <= threshold) last--;
+  const padding = Math.floor(sampleRate * 0.3);
+  return [
+    Math.max(0, first * frame - padding),
+    Math.min(samples.length, (last + 1) * frame + padding),
+  ];
+}
+
+export async function trimRecordingSilence(blob: Blob): Promise<Blob> {
+  const context = new AudioContext();
+  try {
+    const buffer = await context.decodeAudioData(await blob.arrayBuffer());
+    const mono = new Float32Array(buffer.length);
+    for (let channel = 0; channel < buffer.numberOfChannels; channel++) {
+      const samples = buffer.getChannelData(channel);
+      for (let index = 0; index < mono.length; index++)
+        mono[index] += samples[index] / buffer.numberOfChannels;
+    }
+    const [start, end] = silenceBounds(mono, buffer.sampleRate);
+    if ((end - start) / buffer.sampleRate < 0.5 || (start === 0 && end === mono.length))
+      return blob;
+    const bytes = new ArrayBuffer(44 + (end - start) * 2);
+    const view = new DataView(bytes);
+    const label = (offset: number, text: string) => {
+      for (let index = 0; index < text.length; index++)
+        view.setUint8(offset + index, text.charCodeAt(index));
+    };
+    label(0, "RIFF");
+    view.setUint32(4, bytes.byteLength - 8, true);
+    label(8, "WAVE");
+    label(12, "fmt ");
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true);
+    view.setUint16(22, 1, true);
+    view.setUint32(24, buffer.sampleRate, true);
+    view.setUint32(28, buffer.sampleRate * 2, true);
+    view.setUint16(32, 2, true);
+    view.setUint16(34, 16, true);
+    label(36, "data");
+    view.setUint32(40, bytes.byteLength - 44, true);
+    for (let index = start; index < end; index++) {
+      const sample = Math.max(-1, Math.min(1, mono[index]));
+      view.setInt16(
+        44 + (index - start) * 2,
+        Math.round(sample * (sample < 0 ? 32768 : 32767)),
+        true,
+      );
+    }
+    return new Blob([bytes], { type: "audio/wav" });
+  } catch {
+    // Unsupported decoding must never discard the original take.
+    return blob;
+  } finally {
+    await context.close();
+  }
+}
