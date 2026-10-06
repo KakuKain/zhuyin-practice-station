@@ -93,7 +93,7 @@ export function questionId(question: ListeningSeed): string {
 
 export function listeningAudioUrl(text: string): string {
   const example = combinedRhymeExample(text);
-  if (example) return example.audioUrl;
+  if (example) return dictationAudioUrl(text);
   return dictationAudioUrl(text);
 }
 
@@ -102,6 +102,7 @@ export const naturalReadingPrompts = new Set(["包", "皮包", "包子", "毛", 
 
 export function dictationAudioUrl(text: string): string {
   const filename = [...text].map((character) => character.codePointAt(0)!.toString(16)).join("-");
+  if (combinedRhymeExample(text)) return `/listening-audio/ai-rhymes/${filename}.m4a?v=70`;
   // These 37 clips changed source in v44; the query bypasses older browser caches.
   return `/listening-audio/${filename}.m4a${naturalReadingPrompts.has(text) ? "?v=57" : /^[\u3105-\u3129]$/.test(text) ? "?v=44" : ""}`;
 }

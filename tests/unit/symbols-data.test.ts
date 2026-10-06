@@ -72,7 +72,12 @@ test("combined-rhyme playback uses intact official example recordings with expli
   assert.equal(combinedRhymeExamples.length, 22);
   assert.equal(manifest.clips.length, 22);
   for (const example of combinedRhymeExamples) {
-    assert.equal(listeningAudioUrl(example.rhyme), example.audioUrl);
+    assert.ok(listeningAudioUrl(example.rhyme).startsWith("/listening-audio/ai-rhymes/"));
+    assert.ok(
+      existsSync(
+        new URL(`../../public${listeningAudioUrl(example.rhyme).split("?")[0]}`, import.meta.url),
+      ),
+    );
     assert.equal(example.zhuyin, example.rhyme + (example.rhyme === "ㄧㄞ" ? "ˊ" : ""));
     assert.equal(example.tone, example.rhyme === "ㄧㄞ" ? "第二聲" : "第一聲");
     assert.ok(example.sourceUrl.startsWith("https://dict.concised.moe.edu.tw/sound/word/"));
