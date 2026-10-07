@@ -68,3 +68,18 @@ test("writing completion and eraser state still follow the current ink", () => {
   assert.doesNotMatch(html, /圈住想擦掉的地方/);
   assert.doesNotMatch(html, /disabled=""/);
 });
+
+test("writing tool feedback stays in a reserved status line outside the canvas", () => {
+  const notice = "已清空這格；可按復原。";
+  const html = renderToStaticMarkup(
+    createElement(FillWriting, { app: { ...writingApp(), fillInkNotice: notice } }),
+  );
+  assert.match(
+    html,
+    /<p class="ink-status" role="status" aria-atomic="true">已清空這格；可按復原。<\/p>/,
+  );
+  assert.ok(html.indexOf("ink-status") > html.indexOf("</canvas>"));
+  assert.doesNotMatch(html, /關閉提示/);
+  const idle = renderToStaticMarkup(createElement(FillWriting, { app: writingApp() }));
+  assert.match(idle, /<p class="ink-status" role="status" aria-atomic="true"><\/p>/);
+});

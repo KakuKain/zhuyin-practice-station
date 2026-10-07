@@ -11,7 +11,7 @@ export function PageHeading({
   return (
     <div className="page-heading">
       <div className="page-heading-copy">
-        <h1>{title}</h1>
+        <h1 tabIndex={-1}>{title}</h1>
         {description && <p>{description}</p>}
       </div>
       {artwork && (

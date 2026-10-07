@@ -1,9 +1,9 @@
 "use client";
 
 import { PageHeading } from "../../components/PageHeading";
+import { ProgressiveImage } from "../../components/ProgressiveImage";
 import { SpeakerHigh } from "@phosphor-icons/react";
 import { ShowMsg } from "../../components/ShowMsg";
-import { AnnotatedText } from "../../components/AnnotatedText";
 import type { AppController } from "../usePracticeApp";
 import { symbolGroups, combinedRhymeGroups } from "./symbols-data";
 
@@ -24,7 +24,13 @@ export function SymbolChart({
 
   return (
     <section className="page-section symbol-page">
-      <PageHeading title="全部注音" description="一起認識 37 個基本符號與 22 個結合韻" />
+      <ProgressiveImage
+        className="symbol-page-watercolor"
+        src="/course-art/symbol-chart-watercolor.webp"
+        alt=""
+        aria-hidden="true"
+      />
+      <PageHeading title="全部注音" description="37 個基本符號・22 個結合韻" />
       {playingSymbol || audioError ? (
         <ShowMsg
           key={`${playingSymbol}-${audioLoading}-${audioError}`}
@@ -39,10 +45,8 @@ export function SymbolChart({
           aria-labelledby={`symbol-heading-${group.id}`}
         >
           <div className="symbol-group-heading">
-            <h2 id={`symbol-heading-${group.id}`}>
-              <AnnotatedText text={group.title} />
-            </h2>
-            <span>{group.count} 個符號</span>
+            <h2 id={`symbol-heading-${group.id}`}>{group.title}</h2>
+            <span>{group.count} 個</span>
           </div>
           <div
             className="symbol-chart-grid"

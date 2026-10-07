@@ -225,6 +225,24 @@
 .ink-notice.is-erasing {
   color: #895511;
 }
+.ink-status {
+  width: 100%;
+  max-width: 440px;
+  height: 22px;
+  margin: 4px auto 0;
+  color: #65807e;
+  font-size: 13px;
+  line-height: 22px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+.ink-notice {
+  min-height: 44px;
+  pointer-events: none;
+}
 canvas.is-erasing {
   cursor: crosshair;
   outline: 3px solid rgba(235, 183, 80, 0.5);

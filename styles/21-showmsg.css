@@ -21,7 +21,7 @@
   border: 1px solid #b8cbb0;
   border-radius: 16px;
   box-shadow: 0 6px 24px #304c3826;
-  pointer-events: auto;
+  pointer-events: none;
 }
 .showmsg.is-error {
   background: #fff4ef;
@@ -41,6 +41,7 @@
   min-width: 44px;
   min-height: 44px;
   border-radius: 10px;
+  pointer-events: auto;
 }
 .showmsg > button {
   flex-shrink: 0;

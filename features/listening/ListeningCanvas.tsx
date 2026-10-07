@@ -2,9 +2,8 @@
 
 import type { CSSProperties } from "react";
 import type { AppController } from "../usePracticeApp";
-import { ShowMsg } from "../../components/ShowMsg";
 import { Play } from "@phosphor-icons/react";
-import { InkTools } from "../../components/InkTools";
+import { InkStatus, InkTools } from "../../components/InkTools";
 
 export function ListeningCanvas({
   app,
@@ -152,7 +151,7 @@ export function ListeningCanvas({
       </div>
       <div className="canvas-toolbar">
         {(listenPhase === "active" || listenPhase === "retry") && (
-          <ShowMsg message={listeningInkNotice} />
+          <InkStatus message={listeningInkNotice} />
         )}
       </div>
     </div>

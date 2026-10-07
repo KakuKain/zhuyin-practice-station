@@ -2,10 +2,9 @@
 
 import type { AppController } from "../usePracticeApp";
 import { LoadingOverlay, ResourceNotice } from "../../components/AppChrome";
-import { InkTools } from "../../components/InkTools";
+import { InkStatus, InkTools } from "../../components/InkTools";
 import { FocusHeader } from "../../components/FocusHeader";
 import { Check } from "@phosphor-icons/react";
-import { ShowMsg } from "../../components/ShowMsg";
 import { useCatalogLesson } from "../courses/MaterialContext";
 import { FillPositionPeek } from "./FillPositionPeek";
 
@@ -151,7 +150,7 @@ export function FillWriting({
             />
           </div>
         </section>
-        <ShowMsg message={fillInkNotice} />
+        <InkStatus message={fillInkNotice} />
         <div className="fill-writing-actions">
           <button
             type="button"

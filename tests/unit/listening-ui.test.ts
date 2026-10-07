@@ -34,7 +34,7 @@ test("two to five character canvases retain sequential labels and per-character 
       clearListeningCell() {},
       listeningEraserCell: null,
       listeningUndoAvailable: Array(wordLength).fill(true),
-      listeningInkNotice: "",
+      listeningInkNotice: "已復原，可以繼續寫。",
       toggleListeningEraser() {},
       undoListeningInk() {},
       draw() {},
@@ -52,6 +52,12 @@ test("two to five character canvases retain sequential labels and per-character 
     assert.doesNotMatch(html, /tabindex="0"/);
     assert.ok(html.includes(`style="--word-count:${wordLength}"`));
     assert.equal((html.match(/<canvas /g) ?? []).length, wordLength);
+    assert.match(
+      html,
+      /<p class="ink-status" role="status" aria-atomic="true">已復原，可以繼續寫。<\/p>/,
+    );
+    assert.ok(html.indexOf("ink-status") > html.lastIndexOf("</canvas>"));
+    assert.doesNotMatch(html, /關閉提示/);
     const indices = Array.from(html.matchAll(/data-word-index="(\d)"/g), (match) =>
       Number(match[1]),
     );
