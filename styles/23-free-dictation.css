@@ -14,7 +14,7 @@
 .free-board-tools button,
 .free-board-tools select {
   padding: 10px 12px;
-  min-height: 44px;
+  min-height: var(--tap-size);
   border: 1px solid #c8dce9;
   border-radius: 10px;
   background: white;
@@ -34,10 +34,9 @@
   overflow: hidden;
 }
 .free-board-paper.has-grid {
-  width: round(down, 100%, 152px);
   border: 0;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='152' height='152'%3E%3Crect x='1' y='1' width='138' height='138' fill='white' stroke='%2397b3c2' stroke-width='2'/%3E%3Cpath d='M70 2V138M2 70H138' fill='none' stroke='%23ccdbe4' stroke-dasharray='5 5'/%3E%3C/svg%3E");
-  background-size: 152px 152px;
+  background-size: var(--board-step) var(--board-step);
 }
 .free-board-paper canvas {
   display: block;
@@ -87,10 +86,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: var(--tap-size);
+  height: var(--tap-size);
   padding: 0;
-  flex: 0 0 44px;
+  flex: 0 0 var(--tap-size);
 }
 .free-board-tools .is-red-pen {
   color: #d43838;
@@ -101,4 +100,9 @@
 
 .free-board-paper.has-grid canvas {
   height: 1812px;
+}
+
+.free-board-viewport {
+  overflow: auto;
+  max-width: 100%;
 }

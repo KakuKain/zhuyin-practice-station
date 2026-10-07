@@ -36,7 +36,6 @@
 
 .canvas-zone.is-word {
   width: min(100%, 260px, max(150px, calc((100dvh - 250px) / var(--word-count, 2))));
-  margin-inline: auto;
 }
 
 .word-canvas-stack {
@@ -152,7 +151,7 @@
 }
 
 .answer-display .zhuyin-glyph.is-symbol {
-  font-family: "PingFang TC", sans-serif;
+  font-family: var(--font-symbol);
   font-size: 34px;
   transform: translate(-50%, -50%);
 }
@@ -200,7 +199,6 @@
 .listen-ready-card p {
   color: #607895;
   font-size: 15px;
-  line-height: 1.5;
 }
 
 .listen-ready-summary {
@@ -678,7 +676,7 @@
 }
 
 .answer-display .zhuyin-glyph.is-symbol-combination {
-  font-family: "KidCombinedRhymes", sans-serif;
+  font-family: var(--font-rhyme);
   font-size: 48px;
   writing-mode: horizontal-tb;
   letter-spacing: 0;

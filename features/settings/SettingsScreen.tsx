@@ -4,9 +4,10 @@ import { HeaderBack } from "../../components/AppChrome";
 
 import { PageHeading } from "../../components/PageHeading";
 import type { AppController } from "../usePracticeApp";
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import type { ListeningSettings } from "../types";
 import {
+  DownloadSimple,
   BookOpenText,
   ArrowRight,
   Info,
@@ -15,9 +16,17 @@ import {
   Question,
 } from "@phosphor-icons/react";
 import { siteReleaseNotes } from "../courses/course-data";
-import { MaterialsPanel } from "./MaterialsPanel";
+const MaterialsPanel = lazy(() =>
+  import("./MaterialsPanel").then((module) => ({ default: module.MaterialsPanel })),
+);
 import { builtinMaterialName } from "../courses/materials";
-import { CustomAudioPanel } from "./CustomAudioPanel";
+const CustomAudioPanel = lazy(() =>
+  import("./CustomAudioPanel").then((module) => ({ default: module.CustomAudioPanel })),
+);
+
+const DeviceBackupPanel = lazy(() =>
+  import("./DeviceBackupPanel").then((module) => ({ default: module.DeviceBackupPanel })),
+);
 
 export function SettingsScreen({
   app,
@@ -111,6 +120,18 @@ export function SettingsScreen({
         <div className="more-group">
           <h2>資訊與協助</h2>
           <div className="more-settings-list">
+            <button type="button" onClick={() => setMorePanel("backup")}>
+              <span className="more-row-icon green">
+                <DownloadSimple size={21} aria-hidden="true" />
+              </span>
+              <span>
+                <strong>裝置備份</strong>
+                <small>保存教材、練習與錄音</small>
+              </span>
+              <span className="more-arrow" aria-hidden="true">
+                <ArrowRight size={21} weight="bold" />
+              </span>
+            </button>
             <button type="button" onClick={() => setMorePanel("help")}>
               <span className="more-row-icon green">
                 <Question size={21} aria-hidden="true" />
@@ -152,15 +173,24 @@ export function SettingsScreen({
           }}
         />
       )}
-      {morePanel === "materials" && <MaterialsPanel app={app} />}
+      <Suspense fallback={<p role="status">正在準備教材…</p>}>
+        {morePanel === "materials" && <MaterialsPanel app={app} />}
+      </Suspense>
       {morePanel === "audio" && (
-        <CustomAudioPanel
-          audio={app.customAudio}
-          speak={app.speak}
-          stopPlayback={app.stopPlayback}
-          audioLoading={app.audioLoading}
-          audioError={app.audioError}
-        />
+        <Suspense fallback={<p role="status">正在準備讀音…</p>}>
+          <CustomAudioPanel
+            audio={app.customAudio}
+            speak={app.speak}
+            stopPlayback={app.stopPlayback}
+            audioLoading={app.audioLoading}
+            audioError={app.audioError}
+          />
+        </Suspense>
+      )}
+      {morePanel === "backup" && (
+        <Suspense fallback={<p role="status">正在準備備份…</p>}>
+          <DeviceBackupPanel />
+        </Suspense>
       )}
       {morePanel === "listening" && (
         <div id="listening-settings" className="more-detail-content">

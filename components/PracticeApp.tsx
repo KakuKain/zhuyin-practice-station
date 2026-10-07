@@ -1,7 +1,7 @@
 "use client";
 
 import { ShowMsgProvider } from "./ShowMsg";
-import { useSyncExternalStore } from "react";
+import { lazy, Suspense, useSyncExternalStore } from "react";
 import { usePracticeApp } from "../features/usePracticeApp";
 import { AppHeader, BottomNav, LoadingOverlay, ResourceNotice } from "./AppChrome";
 import { FillDialogs } from "../features/fill/FillDialogs";
@@ -12,11 +12,19 @@ import { FillBlank } from "../features/fill/FillBlank";
 import { FillWriting } from "../features/fill/FillWriting";
 import { FillReview } from "../features/fill/FillReview";
 import { FillPractice } from "../features/fill/FillPractice";
-import { PracticeList } from "../features/practice/PracticeList";
-import { SettingsScreen } from "../features/settings/SettingsScreen";
+const PracticeList = lazy(() =>
+  import("../features/practice/PracticeList").then((module) => ({ default: module.PracticeList })),
+);
+const SettingsScreen = lazy(() =>
+  import("../features/settings/SettingsScreen").then((module) => ({
+    default: module.SettingsScreen,
+  })),
+);
 import { ListeningResult } from "../features/listening/ListeningResult";
 import { ListeningScreen } from "../features/listening/ListeningScreen";
-import { SymbolChart } from "../features/symbols/SymbolChart";
+const SymbolChart = lazy(() =>
+  import("../features/symbols/SymbolChart").then((module) => ({ default: module.SymbolChart })),
+);
 
 import { MaterialContext } from "../features/courses/MaterialContext";
 
@@ -109,7 +117,15 @@ function PracticeContent({
       />
       <main className="main-content">
         <ResourceNotice failed={resourceError} />
-        {renderMain()}
+        <Suspense
+          fallback={
+            <p className="feature-loading" role="status">
+              正在準備練習…
+            </p>
+          }
+        >
+          {renderMain()}
+        </Suspense>
       </main>
       <BottomNav
         active={view === "lesson" || view === "fill" || view === "result" ? "courses" : view}

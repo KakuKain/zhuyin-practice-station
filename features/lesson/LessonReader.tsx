@@ -7,6 +7,7 @@ import { previewPronunciationVariants } from "../courses/course-data";
 import { AnnotatedText } from "../../components/AnnotatedText";
 import { ZhuyinStack } from "../../components/Zhuyin";
 import { LessonTitle } from "../../components/LessonTitle";
+import { registeredLessonAudioUrl } from "../../lib/audio/audio-registry";
 import { useReaderPosition } from "./useReaderPosition";
 import {
   ArrowLeft,
@@ -138,7 +139,7 @@ export function LessonReader({
                 reading
                   ? app.stopPlayback()
                   : app.speak(readingKey, {
-                      url: `/listening-audio/gemini/lessons/${String(selectedLesson + 1).padStart(2, "0")}.m4a`,
+                      url: registeredLessonAudioUrl(selectedLesson) ?? undefined,
                       playbackRate: 1,
                       allowSynthesis: false,
                     })

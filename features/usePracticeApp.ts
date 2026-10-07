@@ -1,6 +1,6 @@
 "use client";
 import { courseReviewQueue, type CourseReviewItem } from "./practice/course-review";
-import { isListeningAnswerComplete } from "./listening/listening-policy";
+import { useListeningRound } from "./listening/useListeningRound";
 
 import { usePersistentState } from "../lib/storage/usePersistentState";
 import { useAudioPlayer } from "../lib/audio/useAudioPlayer";
@@ -17,17 +17,11 @@ import { usePracticeCollection } from "./practice/usePracticeCollection";
 import { useFillCollection } from "./practice/useFillCollection";
 import { useLessonPreview } from "./lesson/useLessonPreview";
 import { listeningDuration } from "./settings/listening-settings";
-import { useRef, useState } from "react";
-import type {
-  FillDraft,
-  FillFavorite,
-  InkStroke,
-  ListenPhase,
-  ListeningQuestion,
-  MorePanel,
-  ParentResult,
-  View,
-} from "./types";
+import { useFillSession } from "./fill/useFillSession";
+import { useListeningSession } from "./listening/useListeningSession";
+import { useNavigationSession } from "./navigation/useNavigationSession";
+import { useRef } from "react";
+import type { FillFavorite, InkStroke, ParentResult } from "./types";
 import {
   buildListeningSession,
   defaultListeningSettings,
@@ -49,70 +43,74 @@ import { useFillProgress } from "./fill/fill-progress";
 export function usePracticeApp() {
   const materials = useMaterials();
   const { catalog } = materials;
-  const [view, setView] = useState<View>("courses");
-
-  const [selectedLesson, setSelectedLesson] = useState(0);
-
-  const [fillStrokes, setFillStrokes] = useState<Record<number, InkStroke[]>>({});
-
-  const [fillPendingCells, setFillPendingCells] = useState<Record<number, InkStroke[]>>({});
-
-  const [fillDraftReady, setFillDraftReady] = useState(false);
-
-  const [fillResumeDraft, setFillResumeDraft] = useState<FillDraft | null>(null);
-
-  const [fillExitTarget, setFillExitTarget] = useState<View | null>(null);
-
-  const [activeFillCell, setActiveFillCell] = useState<number | null>(null);
-
-  const [fillReviewOpen, setFillReviewOpen] = useState(false);
-
-  const [fillNeedsRetry, setFillNeedsRetry] = useState<number[]>([]);
-
-  const [fillParentChecked, setFillParentChecked] = useState(false);
-
-  const [fillPracticeTarget, setFillPracticeTarget] = useState<FillFavorite | null>(null);
-
-  const [fillPracticePhase, setFillPracticePhase] = useState<"writing" | "review">("writing");
-
-  const [fillPracticeStrokes, setFillPracticeStrokes] = useState<InkStroke[]>([]);
-
-  const [listenIndex, setListenIndex] = useState(0);
-
-  const [sessionQuestions, setSessionQuestions] = useState<ListeningQuestion[]>([]);
-
-  const [listenPhase, setListenPhase] = useState<ListenPhase>("ready");
-
-  const [listenExitOpen, setListenExitOpen] = useState(false);
-
-  const [fillPracticeExitOpen, setFillPracticeExitOpen] = useState(false);
-
-  const [secondsLeft, setSecondsLeft] = useState(30);
-
-  const [playCount, setPlayCount] = useState(0);
-
-  const [listenMessage, setListenMessage] = useState("");
+  const { view, setView, selectedLesson, setSelectedLesson, morePanel, setMorePanel } =
+    useNavigationSession();
+  const listeningSession = useListeningSession();
+  const {
+    listenIndex,
+    setListenIndex,
+    sessionQuestions,
+    setSessionQuestions,
+    listenPhase,
+    setListenPhase,
+    listenExitOpen,
+    setListenExitOpen,
+    secondsLeft,
+    setSecondsLeft,
+    playCount,
+    setPlayCount,
+    listenMessage,
+    setListenMessage,
+    retryMessage,
+    setRetryMessage,
+    sessionScore,
+    setSessionScore,
+    listeningDrafts,
+    setListeningDrafts,
+    batchNeedsReview,
+    setBatchNeedsReview,
+    reviewedIndexes,
+    setReviewedIndexes,
+    singleQuestionPractice,
+    setSingleQuestionPractice,
+  } = listeningSession;
+  const {
+    fillStrokes,
+    setFillStrokes,
+    fillPendingCells,
+    setFillPendingCells,
+    fillDraftReady,
+    setFillDraftReady,
+    fillResumeDraft,
+    setFillResumeDraft,
+    fillExitTarget,
+    setFillExitTarget,
+    activeFillCell,
+    setActiveFillCell,
+    fillReviewOpen,
+    setFillReviewOpen,
+    fillNeedsRetry,
+    setFillNeedsRetry,
+    fillParentChecked,
+    setFillParentChecked,
+    fillPracticeTarget,
+    setFillPracticeTarget,
+    fillPracticePhase,
+    setFillPracticePhase,
+    fillPracticeStrokes,
+    setFillPracticeStrokes,
+    fillPracticeExitOpen,
+    setFillPracticeExitOpen,
+    draftStorageError,
+    setStorageError,
+    completedFillLessons,
+    setCompletedFillLessons,
+  } = useFillSession();
 
   const { loadingMessage, resourceError, showLoading } = usePageResources(view);
 
-  const [retryMessage, setRetryMessage] = useState("");
-
-  const [sessionScore, setSessionScore] = useState({ listeningCorrect: 0 });
-
   const reviewQueueRef = useRef<CourseReviewItem[]>([]);
   const listeningDraftsRef = useRef<Record<number, InkStroke[][]>>({});
-  const [listeningDrafts, setListeningDrafts] = useState<Record<number, InkStroke[][]>>({});
-  const [batchNeedsReview, setBatchNeedsReview] = useState<number[]>([]);
-
-  const [reviewedIndexes, setReviewedIndexes] = useState<number[]>([]);
-
-  const [morePanel, setMorePanel] = useState<MorePanel>("home");
-
-  const [draftStorageError, setStorageError] = useState(false);
-
-  const [singleQuestionPractice, setSingleQuestionPractice] = useState(false);
-
-  const [completedFillLessons, setCompletedFillLessons] = useState<number[]>([]);
 
   const persistFillRef = useRef<() => void>(() => {});
 
@@ -611,65 +609,31 @@ export function usePracticeApp() {
     setListenPhase("ready");
   };
 
-  const captureListeningAnswer = () => {
-    const next = { ...listeningDraftsRef.current, [listenIndex]: readListeningInk() };
-    listeningDraftsRef.current = next;
-    setListeningDrafts(next);
-    return next;
-  };
-  const goToListeningQuestion = (index: number) => {
-    if (listenPhase !== "batch_review") captureListeningAnswer();
-    clearListenTimers();
-    stopPlayback();
-    setListenIndex(index);
-    setListenPhase("active");
-    setPlayCount(1);
-    resumeListening();
-    const question = listeningQuestions[index];
-    speak(question.audioText, { pronunciation: question.answer });
-  };
-  const openBatchReview = () => {
-    captureListeningAnswer();
-    clearListenTimers();
-    stopPlayback();
-    setListenPhase("batch_review");
-  };
-  const nextListeningAnswer = () => {
-    if (listenIndex === listeningQuestions.length - 1) openBatchReview();
-    else goToListeningQuestion(listenIndex + 1);
-  };
-  const toggleBatchNeedsReview = (index: number) =>
-    setBatchNeedsReview((current) =>
-      current.includes(index) ? current.filter((item) => item !== index) : [...current, index],
-    );
-  const finishBatchReview = () => {
-    let correctUnits = 0;
-    let pending = 0;
-    listeningQuestions.forEach((question, index) => {
-      const units = question.answer.split("|").length;
-      const cells = listeningDraftsRef.current[index] ?? [];
-      const complete = isListeningAnswerComplete(question.answer, cells);
-      if (complete && !batchNeedsReview.includes(index)) {
-        correctUnits += units;
-        markQuestionPracticed(selectedLesson, question.id);
-      } else {
-        pending++;
-        saveQuestion(selectedLesson, question.id, true);
-      }
-    });
-    setReviewedIndexes(listeningQuestions.map((_, index) => index));
-    setSessionScore({ listeningCorrect: correctUnits });
-    recordSession("listening", sessionWritingUnits, correctUnits, pending);
-    setView("result");
-  };
-  const toggleBatchFavorite = (questionId: string) => {
-    const favorite = practiceState.savedQuestions.some(
-      (item) =>
-        item.lessonIndex === selectedLesson && item.questionId === questionId && item.isFavorite,
-    );
-    if (favorite) removeQuestion(selectedLesson, questionId);
-    else saveQuestion(selectedLesson, questionId);
-  };
+  const {
+    goToListeningQuestion,
+    openBatchReview,
+    nextListeningAnswer,
+    toggleBatchNeedsReview,
+    finishBatchReview,
+    toggleBatchFavorite,
+  } = useListeningRound({
+    session: listeningSession,
+    listeningDraftsRef,
+    readListeningInk,
+    clearListenTimers,
+    stopPlayback,
+    resumeListening,
+    listeningQuestions,
+    speak,
+    markQuestionPracticed,
+    selectedLesson,
+    saveQuestion,
+    recordSession,
+    sessionWritingUnits,
+    setView,
+    practiceState,
+    removeQuestion,
+  });
 
   const goToNextQuestion = (
     correctUnits = sessionScore.listeningCorrect,

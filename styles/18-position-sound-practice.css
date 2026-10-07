@@ -670,7 +670,7 @@
   bottom: 12px;
 }
 .is-sound-tab .sound-pair-list button > span {
-  font-family: "PingFang TC", sans-serif;
+  font-family: var(--font-symbol);
 }
 .is-sound-tab {
   position: relative;
@@ -922,17 +922,36 @@
 }
 /* Preserve the shared heading while keeping all seven pairs visible on phones. */
 @media (max-width: 600px) {
-  .is-sound-tab .sound-selection-heading { min-height: 100px; margin-bottom: 8px; }
-  .is-sound-tab .sound-selection-heading img { width:100px; height:100px; }
-  .is-sound-tab .sound-pair-list { gap:10px; }
-  .is-sound-tab .sound-pair-list button { min-height:82px; padding:10px 12px 32px; }
-  .is-sound-tab .sound-pair-list .sound-pair-arrow { width:26px; height:26px; bottom:7px; }
+  .is-sound-tab .sound-selection-heading {
+    min-height: 100px;
+    margin-bottom: 8px;
+  }
+  .is-sound-tab .sound-selection-heading img {
+    width: 100px;
+    height: 100px;
+  }
+  .is-sound-tab .sound-pair-list {
+    gap: 10px;
+  }
+  .is-sound-tab .sound-pair-list button {
+    min-height: 82px;
+    padding: 10px 12px 32px;
+  }
+  .is-sound-tab .sound-pair-list .sound-pair-arrow {
+    width: 26px;
+    height: 26px;
+    bottom: 7px;
+  }
 }
 /* Visible watercolor pigment and foliage, with a pale center for readable glyphs. */
 .is-sound-tab .sound-pair-list button {
-  background-image:url('/course-art/sound-pair-watercolor.webp');
-  background-blend-mode:luminosity;
-  background-color:#e0f1fc;
+  background-image: url("/course-art/sound-pair-watercolor.webp");
+  background-blend-mode: luminosity;
+  background-color: #e0f1fc;
 }
-.is-sound-tab .sound-pair-list button:nth-child(3n+2) { background-color:#def2e5; }
-.is-sound-tab .sound-pair-list button:nth-child(3n) { background-color:#fff0c5; }
+.is-sound-tab .sound-pair-list button:nth-child(3n + 2) {
+  background-color: #def2e5;
+}
+.is-sound-tab .sound-pair-list button:nth-child(3n) {
+  background-color: #fff0c5;
+}

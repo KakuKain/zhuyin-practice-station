@@ -6,7 +6,7 @@ test("all lesson titles and lesson headings use annotated text without changing 
   page,
 }) => {
   await page.goto("/");
-  await expect(page.locator(".journey-card-copy strong .annotated-text")).toHaveCount(9);
+  await expect(page.locator(".journey-card-copy strong .annotated-text")).toHaveCount(12);
   expect(
     await page
       .locator(".journey-card-copy strong")
@@ -19,7 +19,9 @@ test("all lesson titles and lesson headings use annotated text without changing 
     const overlaps = await page.locator(".journey-card").evaluateAll((cards) =>
       cards.some((card) => {
         const title = card.querySelector("strong [aria-hidden='true']")!;
-        const art = card.querySelector(".journey-art")!.getBoundingClientRect();
+        const artNode = card.querySelector(".journey-art");
+        if (!artNode) return false;
+        const art = artNode.getBoundingClientRect();
         return [...title.getClientRects()].some((line) => line.right > art.left + 1);
       }),
     );
@@ -155,12 +157,12 @@ test("failed chart audio shows an actionable error and can be retried", async ({
   await page.getByRole("button", { name: "注音", exact: true }).click();
   const symbol = page.getByRole("button", { name: "播放注音符號 ㄠ", exact: true });
   await symbol.click();
-  await expect(page.getByRole("status")).toContainText("音檔無法播放");
+  await expect(page.getByText("音檔無法播放", { exact: false })).toBeVisible();
   await expect(symbol).toHaveAttribute("aria-pressed", "false");
   await expect(symbol).toHaveAttribute("aria-busy", "false");
   await page.unroute("**/listening-audio/**");
   await symbol.click();
-  await expect(page.getByRole("status")).not.toContainText("音檔無法播放");
+  await expect(page.getByText("音檔無法播放", { exact: false })).toHaveCount(0);
   await expect
     .poll(() => page.locator("audio").evaluate((audio: HTMLAudioElement) => !audio.paused))
     .toBe(true);

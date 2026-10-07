@@ -12,15 +12,27 @@ import {
   Square,
 } from "@phosphor-icons/react";
 import type { PointerEvent } from "react";
+import { PointerLease, appendSample, createPaintScheduler } from "../../lib/ink/gesture";
+import {
+  freeBoardKey,
+  boardStep,
+  boardHeight,
+  readBoardDraft,
+  paintBoard,
+  type BoardStroke,
+} from "../../lib/ink/free-board";
 
-type Stroke = { color: string; erase: boolean; points: [number, number][] };
-const KEY = "kid-free-dictation-v1";
 export function FreeDictation() {
   const canvas = useRef<HTMLCanvasElement>(null);
-  const strokes = useRef<Stroke[]>([]);
-  const redo = useRef<Stroke[]>([]);
-  const active = useRef<Stroke | null>(null);
-  const activePointer = useRef<number | null>(null);
+  const strokes = useRef<BoardStroke[]>([]);
+  const redo = useRef<BoardStroke[]>([]);
+  const active = useRef<BoardStroke | null>(null);
+  const pointerLease = useRef(new PointerLease());
+  const viewport = useRef<HTMLDivElement>(null);
+  const size = useRef({ width: 304, height: boardHeight });
+  const [boardSize, setBoardSize] = useState({ width: 304, height: boardHeight });
+  const [protectedDraft, setProtectedDraft] = useState(false);
+  const protectedRef = useRef(false);
   const [tool, setTool] = useState("pen");
   const [paper, setPaper] = useState("grid");
   const paperRef = useRef("grid");
@@ -30,66 +42,84 @@ export function FreeDictation() {
     const el = canvas.current;
     const ctx = el?.getContext("2d");
     if (!el || !ctx) return;
-    ctx.clearRect(0, 0, 720, 2400);
-    for (const stroke of [...strokes.current, ...(active.current ? [active.current] : [])]) {
-      ctx.globalCompositeOperation = stroke.erase ? "destination-out" : "source-over";
-      ctx.strokeStyle = stroke.color;
-      ctx.lineWidth = stroke.erase ? 28 : 5;
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
-      ctx.beginPath();
-      stroke.points.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
-      if (stroke.points.length === 1) ctx.lineTo(stroke.points[0][0] + 0.1, stroke.points[0][1]);
-      ctx.stroke();
-    }
-    ctx.globalCompositeOperation = "source-over";
+    const ratio = Math.min(devicePixelRatio || 1, 2);
+    el.width = Math.round(size.current.width * ratio);
+    el.height = Math.round(size.current.height * ratio);
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    paintBoard(ctx, [...strokes.current, ...(active.current ? [active.current] : [])]);
   };
+  const [scheduler] = useState(() => createPaintScheduler());
   const save = () => {
-    try {
-      localStorage.setItem(
-        KEY,
-        JSON.stringify({ paper: paperRef.current, strokes: strokes.current }),
-      );
-    } catch {
-      setNotice("無法自動保存，請先儲存圖片。");
-    }
+    if (!protectedRef.current)
+      try {
+        localStorage.setItem(
+          freeBoardKey,
+          JSON.stringify({
+            version: 2,
+            ...size.current,
+            paper: paperRef.current,
+            strokes: strokes.current,
+          }),
+        );
+      } catch {
+        setNotice("無法自動保存，請先儲存圖片。");
+      }
     setCounts({ ink: strokes.current.length, redo: redo.current.length });
   };
+  const paintLatest = useEffectEvent(() => paint());
   useEffect(() => {
+    const width = Math.max(
+      boardStep,
+      Math.floor((viewport.current?.clientWidth ?? 304) / boardStep) * boardStep,
+    );
+    size.current = { width, height: boardHeight };
     try {
-      const data = JSON.parse(localStorage.getItem(KEY) ?? "null");
-      if (
-        data &&
-        Array.isArray(data.strokes) &&
-        data.strokes.every(
-          (s: Stroke) =>
-            typeof s.color === "string" &&
-            Array.isArray(s.points) &&
-            s.points.every((p) => Array.isArray(p) && p.length === 2 && p.every(Number.isFinite)),
-        )
-      ) {
+      const raw = localStorage.getItem(freeBoardKey);
+      if (raw) {
+        const data = readBoardDraft(JSON.parse(raw), width);
+        if (!data) throw new Error("invalid draft");
         strokes.current = data.strokes;
-        paperRef.current = data.paper === "blank" ? "blank" : "grid";
-        setPaper(paperRef.current);
+        size.current = { width: data.width, height: data.height };
+        paperRef.current = data.paper;
+        setPaper(data.paper);
       }
     } catch {
-      /* A damaged draft should not prevent opening the board. */
+      protectedRef.current = true;
+      setProtectedDraft(true);
+      setNotice("舊畫作無法讀取，已保留原始資料。可到「更多 → 裝置備份」先下載備份。");
     }
+    setBoardSize(size.current);
     setCounts({ ink: strokes.current.length, redo: 0 });
-    paint();
-  }, []);
+    paintLatest();
+    const observer = new ResizeObserver(() => paintLatest());
+    if (viewport.current) observer.observe(viewport.current);
+    if (canvas.current) observer.observe(canvas.current);
+    return () => {
+      observer.disconnect();
+      scheduler.cancel();
+    };
+  }, [scheduler]);
   const point = (event: PointerEvent<HTMLCanvasElement>): [number, number] => {
     const rect = event.currentTarget.getBoundingClientRect();
     return [
-      ((event.clientX - rect.left) * 720) / rect.width,
-      ((event.clientY - rect.top) * 2400) / rect.height,
+      Math.max(0, Math.min(size.current.width, event.clientX - rect.left)),
+      Math.max(0, Math.min(size.current.height, event.clientY - rect.top)),
     ];
+  };
+  const sample = (event: PointerEvent<HTMLCanvasElement>) => {
+    if (active.current)
+      appendSample(
+        active.current.points,
+        point(event),
+        (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]),
+        0.5,
+      );
   };
   const stopStroke = (completed = false) => {
     const stroke = active.current;
-    const pointerId = activePointer.current;
+    const pointerId = pointerLease.current.release();
     active.current = null;
-    activePointer.current = null;
+    scheduler.cancel();
     // Preserve interrupted writing; an interrupted eraser must not remove ink.
     if (stroke && (!stroke.erase || completed)) {
       strokes.current.push(stroke);
@@ -104,8 +134,8 @@ export function FreeDictation() {
     }
   };
   const finish = (event: PointerEvent<HTMLCanvasElement>) => {
-    if (activePointer.current !== event.pointerId) return;
-    if (event.type === "pointerup" && active.current) active.current.points.push(point(event));
+    if (!pointerLease.current.owns(event.pointerId)) return;
+    if (event.type === "pointerup" && active.current) sample(event);
     stopStroke(event.type === "pointerup");
   };
   const interruptStroke = useEffectEvent(() => stopStroke());
@@ -125,34 +155,33 @@ export function FreeDictation() {
   const download = () => {
     stopStroke();
     const output = document.createElement("canvas");
-    output.width = 720;
-    output.height =
-      paper === "grid" ? Math.round((1812 * 720) / (canvas.current?.clientWidth ?? 304)) : 2400;
+    const ratio = 2;
+    output.width = size.current.width * ratio;
+    output.height = size.current.height * ratio;
     const ctx = output.getContext("2d")!;
+    ctx.scale(ratio, ratio);
     ctx.fillStyle = "white";
-    ctx.fillRect(0, 0, 720, output.height);
+    ctx.fillRect(0, 0, size.current.width, size.current.height);
     if (paper === "grid") {
-      const scale = 720 / (canvas.current?.clientWidth ?? 304);
-      const step = 152 * scale;
-      const size = 138 * scale;
-      for (let x = 0; x < 720; x += step)
-        for (let y = 0; y < output.height; y += step) {
+      for (let x = 0; x < size.current.width; x += boardStep)
+        for (let y = 0; y < size.current.height; y += boardStep) {
           ctx.setLineDash([]);
           ctx.strokeStyle = "#97b3c2";
-          ctx.lineWidth = 2 * scale;
-          ctx.strokeRect(x + scale, y + scale, size, size);
+          ctx.lineWidth = 2;
+          ctx.strokeRect(x + 1, y + 1, 138, 138);
           ctx.strokeStyle = "#ccdbe4";
-          ctx.lineWidth = scale;
-          ctx.setLineDash([5 * scale, 5 * scale]);
+          ctx.lineWidth = 1;
+          ctx.setLineDash([5, 5]);
           ctx.beginPath();
-          ctx.moveTo(x + 70 * scale, y + 2 * scale);
-          ctx.lineTo(x + 70 * scale, y + 138 * scale);
-          ctx.moveTo(x + 2 * scale, y + 70 * scale);
-          ctx.lineTo(x + 138 * scale, y + 70 * scale);
+          ctx.moveTo(x + 70, y + 2);
+          ctx.lineTo(x + 70, y + 138);
+          ctx.moveTo(x + 2, y + 70);
+          ctx.lineTo(x + 138, y + 70);
           ctx.stroke();
         }
     }
-    ctx.drawImage(canvas.current!, 0, 0, output.width, output.height);
+    ctx.setLineDash([]);
+    ctx.drawImage(canvas.current!, 0, 0, size.current.width, size.current.height);
     output.toBlob((blob) => {
       if (!blob) return;
       const url = URL.createObjectURL(blob);
@@ -243,7 +272,7 @@ export function FreeDictation() {
           title="清空"
           type="button"
           onClick={() => {
-            if (window.confirm("清空整張畫板？")) {
+            if (!protectedDraft && window.confirm("清空整張畫板？")) {
               stopStroke();
               strokes.current = [];
               redo.current = [];
@@ -259,40 +288,50 @@ export function FreeDictation() {
         </button>
       </div>
       {notice && <p role="status">{notice}</p>}
-      <div className={`free-board-paper ${paper === "grid" ? "has-grid" : ""}`}>
-        <canvas
-          ref={canvas}
-          width={720}
-          height={2400}
-          aria-label="自由聽寫作答畫板"
-          style={{ touchAction: tool === "scroll" ? "pan-y" : "none" }}
-          onPointerDown={(event) => {
-            if (
-              tool === "scroll" ||
-              (event.pointerType === "mouse" && event.button !== 0) ||
-              activePointer.current !== null
-            )
-              return;
-            event.preventDefault();
-            activePointer.current = event.pointerId;
-            event.currentTarget.setPointerCapture(event.pointerId);
-            active.current = {
-              color: tool === "red" ? "#d43838" : "#193458",
-              erase: tool === "erase",
-              points: [point(event)],
-            };
-            paint();
-          }}
-          onPointerMove={(event) => {
-            if (!active.current || activePointer.current !== event.pointerId) return;
-            event.preventDefault();
-            active.current.points.push(point(event));
-            paint();
-          }}
-          onPointerUp={finish}
-          onPointerCancel={finish}
-          onLostPointerCapture={finish}
-        />
+      <div ref={viewport} className="free-board-viewport">
+        <div
+          style={{ width: boardSize.width }}
+          className={`free-board-paper ${paper === "grid" ? "has-grid" : ""}`}
+        >
+          <canvas
+            ref={canvas}
+            width={boardSize.width}
+            height={boardSize.height}
+            aria-label="自由聽寫作答畫板"
+            style={{
+              width: boardSize.width,
+              height: boardSize.height,
+              touchAction: tool === "scroll" ? "auto" : "none",
+            }}
+            onPointerDown={(event) => {
+              if (
+                protectedDraft ||
+                tool === "scroll" ||
+                (event.pointerType === "mouse" && event.button !== 0) ||
+                strokes.current.length >= 2000
+              )
+                return;
+              event.preventDefault();
+              if (!pointerLease.current.acquire(event.pointerId)) return;
+              event.currentTarget.setPointerCapture(event.pointerId);
+              active.current = {
+                color: tool === "red" ? "#d43838" : "#193458",
+                erase: tool === "erase",
+                points: [point(event)],
+              };
+              paint();
+            }}
+            onPointerMove={(event) => {
+              if (!active.current || !pointerLease.current.owns(event.pointerId)) return;
+              event.preventDefault();
+              sample(event);
+              scheduler.schedule(paint);
+            }}
+            onPointerUp={finish}
+            onPointerCancel={finish}
+            onLostPointerCapture={finish}
+          />
+        </div>
       </div>
       <p className="free-board-note">畫作自動保存在這個瀏覽器。往下寫時，請切換「捲動」。</p>
     </section>

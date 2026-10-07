@@ -3,6 +3,7 @@ import { exercises, firstListeningQuestions } from "../courses/course-data";
 import { legacyCircledVocabulary } from "../courses/legacy-circled-vocabulary";
 import type { CircledTerm } from "../courses/circled-vocabulary";
 import { builtinCatalog, type CatalogLesson } from "../courses/materials";
+import { registeredAudioUrl } from "../../lib/audio/audio-registry";
 import { combinedRhymeExample } from "../symbols/combined-rhyme-audio";
 
 export const listeningSettingsStorageKey = "zhuyin-listening-settings-v1";
@@ -101,6 +102,8 @@ export function listeningAudioUrl(text: string): string {
 export const naturalReadingPrompts = new Set(["包", "皮包", "包子", "毛", "衣", "毛衣"]);
 
 export function dictationAudioUrl(text: string): string {
+  const registered = registeredAudioUrl(text);
+  if (registered) return registered;
   const filename = [...text].map((character) => character.codePointAt(0)!.toString(16)).join("-");
   if (combinedRhymeExample(text)) return `/listening-audio/gemini/rhymes/${filename}.m4a`;
   // These 37 clips changed source in v44; the query bypasses older browser caches.

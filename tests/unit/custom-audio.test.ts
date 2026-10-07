@@ -174,6 +174,7 @@ test("recorder errors release the microphone and report failure", async () => {
 
 test("IndexedDB save waits for commit and rejects a late quota abort", async (t) => {
   const descriptor = Object.getOwnPropertyDescriptor(globalThis, "indexedDB");
+  let stored: { blob: ArrayBuffer } | undefined;
   let tx!: {
     oncomplete: (() => void) | null;
     onabort: (() => void) | null;
@@ -189,7 +190,13 @@ test("IndexedDB save waits for commit and rejects a late quota abort", async (t)
         result: {
           transaction() {
             tx = { oncomplete: null, onabort: null, onerror: null, error: null };
-            return Object.assign(tx, { objectStore: () => ({ put() {} }) });
+            return Object.assign(tx, {
+              objectStore: () => ({
+                put(value: { blob: ArrayBuffer }) {
+                  stored = value;
+                },
+              }),
+            });
           },
           close() {},
         },
@@ -218,6 +225,8 @@ test("IndexedDB save waits for commit and rejects a late quota abort", async (t)
   });
   await new Promise((resolve) => setImmediate(resolve));
   assert.equal(committed, false);
+  assert.ok(stored?.blob instanceof ArrayBuffer);
+  assert.equal(new TextDecoder().decode(stored.blob), "voice");
   tx.oncomplete?.();
   await save;
   assert.equal(committed, true);
@@ -227,4 +236,70 @@ test("IndexedDB save waits for commit and rejects a late quota abort", async (t)
   tx.error = new Error("quota exceeded");
   tx.onabort?.();
   await rejected;
+});
+
+test("legacy Blob and byte recordings hydrate with their original bytes and MIME", async (t) => {
+  const descriptor = Object.getOwnPropertyDescriptor(globalThis, "indexedDB");
+  const entries = [
+    { text: "教", pronunciation: "ㄐㄧㄠ", blob: new Blob(["old voice"], { type: "audio/mp4" }) },
+    { text: "包", pronunciation: "ㄅㄠ", blob: new TextEncoder().encode("new voice").buffer },
+  ].map((entry) => ({
+    ...entry,
+    key: recordingKey(entry.text, entry.pronunciation),
+    mimeType: "audio/mp4",
+    duration: 1,
+    updatedAt: 1,
+  }));
+  Object.defineProperty(globalThis, "indexedDB", {
+    configurable: true,
+    value: {
+      open() {
+        const request = {
+          onsuccess: null as (() => void) | null,
+          result: {
+            close() {},
+            transaction() {
+              const tx = {
+                oncomplete: null as (() => void) | null,
+                onabort: null,
+                onerror: null,
+                objectStore() {
+                  const read = (result: unknown) => {
+                    const record = { result, onsuccess: null as (() => void) | null };
+                    queueMicrotask(() => {
+                      record.onsuccess?.();
+                      tx.oncomplete?.();
+                    });
+                    return record;
+                  };
+                  return {
+                    get: (key: string) => read(entries.find((entry) => entry.key === key)),
+                    getAll: () => read(entries),
+                  };
+                },
+              };
+              return tx;
+            },
+          },
+        };
+        queueMicrotask(() => request.onsuccess?.());
+        return request;
+      },
+    },
+  });
+  t.after(() => {
+    if (descriptor) Object.defineProperty(globalThis, "indexedDB", descriptor);
+    else Reflect.deleteProperty(globalThis, "indexedDB");
+  });
+  const all = await customAudioStorage.all();
+  assert.deepEqual(await Promise.all(all.map((clip) => clip.blob.text())), [
+    "old voice",
+    "new voice",
+  ]);
+  for (const entry of entries) {
+    const clip = (await customAudioStorage.get(entry.text, entry.pronunciation))!;
+    assert.ok(clip.blob instanceof Blob);
+    assert.equal(clip.blob.type, "audio/mp4");
+    assert.equal(clip.key, entry.key);
+  }
 });

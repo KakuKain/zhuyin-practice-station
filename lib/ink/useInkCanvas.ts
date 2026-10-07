@@ -4,6 +4,7 @@ import { useEffect, useEffectEvent, useRef, useState } from "react";
 import type { PointerEvent } from "react";
 import type { InkStroke } from "../../features/types";
 import { cloneInk, eraseInsideLasso, InkHistory, isUsableLasso } from "./ink-path";
+import { PointerLease, appendSample, createPaintScheduler } from "./gesture";
 import { pointerPoint, renderInk } from "./ink-render";
 
 type Options = {
@@ -40,7 +41,8 @@ export function useInkCanvas({
     canvas: HTMLCanvasElement;
     erase: boolean;
   } | null>(null);
-  const frameRef = useRef<number | null>(null);
+  const pointerLease = useRef(new PointerLease());
+
   const readInitialEvent = useEffectEvent((index: number) => readInitial?.(index) ?? []);
   const getCanvasEvent = useEffectEvent((index: number) => getCanvas(index));
 
@@ -59,13 +61,14 @@ export function useInkCanvas({
       active && gesture?.erase ? active : undefined,
     );
   };
+  const [scheduler] = useState(() => createPaintScheduler());
   const stopGesture = () => {
     const gesture = gestureRef.current;
     gestureRef.current = null;
+    pointerLease.current.release();
     activeStrokeRef.current = null;
     gestureStrokeRef.current = null;
-    if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);
-    frameRef.current = null;
+    scheduler.cancel();
     if (gesture && gesture.canvas.hasPointerCapture(gesture.pointerId))
       gesture.canvas.releasePointerCapture(gesture.pointerId);
   };
@@ -146,9 +149,9 @@ export function useInkCanvas({
   }, [enabled]);
   useEffect(
     () => () => {
-      if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);
+      scheduler.cancel();
     },
-    [],
+    [scheduler],
   );
 
   const interruptInk = useEffectEvent(() => cancelGesture());
@@ -173,6 +176,7 @@ export function useInkCanvas({
     const canvas = event.currentTarget;
     const index = Number(canvas.dataset.wordIndex ?? 0);
     if (!historiesRef.current[index]) return;
+    if (!pointerLease.current.acquire(event.pointerId)) return;
     canvas.setPointerCapture(event.pointerId);
     gestureRef.current = {
       index,
@@ -189,31 +193,21 @@ export function useInkCanvas({
     const stroke = gestureStrokeRef.current;
     if (!stroke?.length) return;
     const point = pointerPoint(event.currentTarget, event.clientX, event.clientY);
-    const last = stroke[stroke.length - 1];
-    if (Math.hypot(point.x - last.x, point.y - last.y) < 0.12) return;
-    stroke.push(point);
-    // Bound long scribbles while preserving endpoints and the path, not a bitmap.
-    if (stroke.length > 1900) {
-      gestureStrokeRef.current = stroke.filter(
-        (_, index) => index === 0 || index % 2 === 1 || index === stroke.length - 1,
-      );
-      if (!gestureRef.current?.erase) activeStrokeRef.current = gestureStrokeRef.current;
-    }
+    appendSample(stroke, point, (a, b) => Math.hypot(a.x - b.x, a.y - b.y), 0.12);
   };
   const move = (event: PointerEvent<HTMLCanvasElement>) => {
     const gesture = gestureRef.current;
-    if (!gesture || gesture.pointerId !== event.pointerId) return;
+    if (!gesture || !pointerLease.current.owns(event.pointerId)) return;
     event.preventDefault();
     append(event);
-    if (frameRef.current === null)
-      frameRef.current = requestAnimationFrame(() => {
-        frameRef.current = null;
-        if (gestureRef.current === gesture) paint(gesture.index, gesture.canvas);
-      });
+    scheduler.schedule(() => {
+      const current = gestureRef.current;
+      if (current) paint(current.index, current.canvas);
+    });
   };
   const end = (event: PointerEvent<HTMLCanvasElement>) => {
     const gesture = gestureRef.current;
-    if (!gesture || gesture.pointerId !== event.pointerId) return;
+    if (!gesture || !pointerLease.current.owns(event.pointerId)) return;
     if (event.type === "pointerup") append(event);
     const stroke = gestureStrokeRef.current;
     if (stroke?.length) {

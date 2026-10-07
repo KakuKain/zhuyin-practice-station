@@ -7,6 +7,32 @@ import {
 
 const databaseName = "zhuyin-custom-audio-v1";
 const storeName = "recordings";
+type StoredRecording = Omit<CustomRecording, "blob"> & { blob: Blob | ArrayBuffer };
+function hydrateRecording(value: StoredRecording): CustomRecording {
+  const recording = {
+    ...value,
+    blob:
+      value.blob instanceof ArrayBuffer
+        ? new Blob([value.blob], { type: value.mimeType })
+        : value.blob,
+  };
+  validateRecording(recording);
+  return recording;
+}
+async function serializeRecording(recording: CustomRecording): Promise<StoredRecording> {
+  validateRecording(recording);
+  const { key, text, pronunciation, mimeType, duration, updatedAt } = recording;
+  // Byte storage avoids WebKit's Blob/File preparation failure. Old Blob records remain readable.
+  return {
+    key,
+    text,
+    pronunciation,
+    mimeType,
+    duration,
+    updatedAt,
+    blob: await recording.blob.arrayBuffer(),
+  };
+}
 
 /** Resolve on transaction completion: a successful request can still fail to commit. */
 async function transaction<T>(
@@ -63,14 +89,31 @@ async function transaction<T>(
 }
 
 export const customAudioStorage = {
+  all(): Promise<CustomRecording[]> {
+    return transaction<StoredRecording[]>("readonly", (store, result) => {
+      const request = store.getAll();
+      request.onsuccess = () => {
+        const recordings = request.result as StoredRecording[];
+        result(recordings);
+      };
+    }).then((recordings) => recordings.map(hydrateRecording));
+  },
+  /** Clear and insert in one transaction: an aborted import keeps all old recordings. */
+  async replaceAll(recordings: CustomRecording[]): Promise<void> {
+    const stored = await Promise.all(recordings.map(serializeRecording));
+    return transaction("readwrite", (store, result) => {
+      store.clear();
+      stored.forEach((recording) => store.put(recording));
+      result(undefined);
+    });
+  },
   async get(text: string, pronunciation: string): Promise<CustomRecording | null> {
-    const value = await transaction<CustomRecording | undefined>("readonly", (store, result) => {
+    const value = await transaction<StoredRecording | undefined>("readonly", (store, result) => {
       const request = store.get(recordingKey(text, pronunciation));
       request.onsuccess = () => result(request.result);
     });
     if (!value) return null;
-    validateRecording(value);
-    return value;
+    return hydrateRecording(value);
   },
   list(): Promise<RecordingInfo[]> {
     return transaction("readonly", (store, result) => {
@@ -95,12 +138,11 @@ export const customAudioStorage = {
       };
     });
   },
-  put(recording: CustomRecording): Promise<void> {
-    validateRecording(recording);
-    const { key, text, pronunciation, blob, mimeType, duration, updatedAt } = recording;
+  async put(recording: CustomRecording): Promise<void> {
+    const stored = await serializeRecording(recording);
     return transaction("readwrite", (store, result) => {
       // Do not persist UI-only object URLs or other incidental fields.
-      store.put({ key, text, pronunciation, blob, mimeType, duration, updatedAt });
+      store.put(stored);
       result(undefined);
     });
   },

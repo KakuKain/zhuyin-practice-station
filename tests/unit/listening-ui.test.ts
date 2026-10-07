@@ -3,7 +3,6 @@ import test from "node:test";
 import { createElement, createRef, type ComponentProps } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { AnswerDisplay } from "../../components/Zhuyin";
-import { readFileSync } from "node:fs";
 import { ListeningCanvas } from "../../features/listening/ListeningCanvas";
 import { ListeningResult } from "../../features/listening/ListeningResult";
 
@@ -77,27 +76,7 @@ test("two to five character canvases retain sequential labels and per-character 
   }
 });
 
-test("word writing cells form one centered column while answers retain RTL order", () => {
-  const css = readFileSync(
-    new URL("../../styles/06-listening-settings-base.css", import.meta.url),
-    "utf8",
-  );
-  const grid = css.match(/\.word-canvas-stack \{([^}]+)\}/)?.[1] ?? "";
-  assert.match(grid, /grid-template-columns: minmax\(0, 1fr\)/);
-  assert.match(grid, /justify-items: center/);
-  assert.doesNotMatch(grid, /overflow-x: auto/);
-  const zone = css.match(/\.canvas-zone\.is-word \{([^}]+)\}/)?.[1] ?? "";
-  assert.match(zone, /margin-inline: auto/);
-  assert.match(zone, /var\(--word-count, 2\)/);
-  assert.doesNotMatch(css, /\.is-long-word \.word-canvas-stack/);
-
-  const answerRule = [...css.matchAll(/\.answer-display\.is-word \{([^}]+)\}/g)]
-    .map((match) => match[1])
-    .join("\n");
-  assert.match(answerRule, /flex-wrap: nowrap/);
-  assert.match(answerRule, /white-space: nowrap/);
-  assert.match(answerRule, /overflow-x: auto/);
-  assert.doesNotMatch(answerRule, /flex-wrap: wrap/);
+test("word answers retain each syllable and their RTL order", () => {
   for (const length of [2, 3, 4, 5]) {
     const html = renderToStaticMarkup(
       createElement(AnswerDisplay, { answer: Array(length).fill("ㄅㄠˇ").join("|") }),

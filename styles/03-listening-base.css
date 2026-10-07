@@ -351,7 +351,7 @@
 
 .lesson-text-line {
   direction: ltr;
-  font-family: "KidLessonYoSans", "BpmfZihiSans", "PingFang TC", sans-serif;
+  font-family: var(--font-annotated);
   font-size: 29px;
   font-weight: 400;
   letter-spacing: 0;
@@ -359,7 +359,7 @@
 }
 
 .lesson-text-lines.is-zhuyin-only .lesson-text-line {
-  font-family: "KidLessonYoOnly", "BpmfZihiOnly", "PingFang TC", sans-serif;
+  font-family: var(--font-syllable);
   font-size: clamp(37px, 10vw, 48px);
   line-height: 1.05;
 }

@@ -1,9 +1,11 @@
 "use client";
 
-import { FreeDictation } from "./FreeDictation";
+const FreeDictation = lazy(() =>
+  import("./FreeDictation").then((module) => ({ default: module.FreeDictation })),
+);
 import { ProgressiveImage } from "../../components/ProgressiveImage";
 
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import {
   ArrowRight,
   CaretDown,
@@ -15,7 +17,9 @@ import {
 import { ShowMsg } from "../../components/ShowMsg";
 import { FavoriteButton } from "../../components/ReviewActions";
 import { PageHeading } from "../../components/PageHeading";
-import { SoundPractice } from "../sound-practice/SoundPractice";
+const SoundPractice = lazy(() =>
+  import("../sound-practice/SoundPractice").then((module) => ({ default: module.SoundPractice })),
+);
 import { useCatalog } from "../courses/MaterialContext";
 import { findQuestionSeed } from "../listening/listening-data";
 import { fillFavoriteKey } from "./practice-storage";
@@ -106,9 +110,13 @@ export function PracticeList({ app }: { app: AppController }) {
         ))}
       </div>
       {tab === "free" ? (
-        <FreeDictation />
+        <Suspense fallback={<p role="status">正在準備畫板…</p>}>
+          <FreeDictation />
+        </Suspense>
       ) : tab === "sound" ? (
-        <SoundPractice audio={app} />
+        <Suspense fallback={<p role="status">正在準備辨音…</p>}>
+          <SoundPractice audio={app} />
+        </Suspense>
       ) : (
         <>
           <div className="practice-mode-tabs" role="group" aria-label="篩選練習類型">

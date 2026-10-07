@@ -95,6 +95,7 @@ export type ListeningSettings = {
   answerTime: "standard" | "relaxed";
 };
 
-export type MorePanel = "home" | "help" | "listening" | "audio" | "versions" | "materials";
+export type MorePanel =
+  "home" | "help" | "listening" | "audio" | "versions" | "materials" | "backup";
 
 export type StateSetter<T> = import("react").Dispatch<import("react").SetStateAction<T>>;

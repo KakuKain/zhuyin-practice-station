@@ -2,9 +2,6 @@
 .phase-ready {
   display: flex;
   flex-direction: column;
-  height: 100dvh;
-  min-height: 0;
-  aspect-ratio: auto;
   background: #d9f2ff url("/course-art/listening-ready-background-v1.webp?v=3") center / 100% 100%
     no-repeat;
 }

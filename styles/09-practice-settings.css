@@ -364,3 +364,59 @@
 .app-header .brand-button {
   margin-left: auto;
 }
+
+.backup-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-block: 24px;
+}
+.backup-actions > * {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--tap-size);
+  flex: 1 1 220px;
+}
+.backup-actions label {
+  position: relative;
+  cursor: pointer;
+}
+.backup-actions input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+.backup-actions label:focus-within {
+  outline: 3px solid #78a4dc;
+  outline-offset: 3px;
+}
+.backup-preview {
+  padding: 20px;
+  border: 1px solid #c8dce9;
+  border-radius: 20px;
+  background: #f5faff;
+}
+.backup-preview dl {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.backup-preview dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.backup-preview dd {
+  margin: 0;
+  font-weight: 700;
+}
+.feature-loading {
+  min-height: 200px;
+  display: grid;
+  place-items: center;
+  color: #526b7f;
+}

@@ -34,7 +34,7 @@
 .symbol-status-glyph {
   display: inline-block;
   margin-right: 8px;
-  font-family: "KidLessonYoOnly", "BpmfZihiOnly", sans-serif;
+  font-family: var(--font-syllable);
   font-size: 25px;
   line-height: 1;
   vertical-align: middle;
@@ -144,7 +144,7 @@
 }
 
 .symbol-chart-glyph {
-  font-family: "KidLessonYoOnly", "BpmfZihiOnly", "PingFang TC", sans-serif;
+  font-family: var(--font-syllable);
   font-size: clamp(36px, 10vw, 48px);
   font-weight: 400;
   line-height: 1;
@@ -152,7 +152,7 @@
 
 .combined-rhyme-example {
   color: #607678;
-  font-family: "PingFang TC", sans-serif;
+  font-family: var(--font-symbol);
   font-size: 12px;
   line-height: 1.5;
   white-space: nowrap;

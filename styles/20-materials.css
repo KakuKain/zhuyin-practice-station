@@ -247,7 +247,7 @@ button.material-primary {
   justify-content: center;
   width: 1em;
   height: 1em;
-  font-family: "PingFang TC", sans-serif;
+  font-family: var(--font-symbol);
 }
 .literal-letters {
   display: flex;

@@ -17,7 +17,8 @@ test("all nine lesson readings and 22 complete rhyme clips are shipped", () => {
 
 test("every combined rhyme uses its new Gemini clip, without dictionary narration", () => {
   for (const clip of manifest.rhymes) {
-    assert.equal(dictationAudioUrl(clip.text), clip.path);
+    assert.equal(new URL(dictationAudioUrl(clip.text), "http://test").pathname, clip.path);
+    assert.match(dictationAudioUrl(clip.text), /[?]v=[a-f0-9]{12}$/);
     assert.ok(clip.voicedDuration >= 0.7);
     assert.ok(clip.duration - clip.voicedDuration >= 0.5);
   }

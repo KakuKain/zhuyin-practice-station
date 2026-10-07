@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { RefObject } from "react";
 import type { ListeningQuestion, StateSetter, View } from "../../features/types";
+import { registeredAudioUrl } from "./audio-registry";
 import { createAudioPreloader } from "./audio-preload";
 import { clipPolicy, type CustomRecording } from "./custom-audio";
 import {
@@ -175,22 +176,34 @@ export function useAudioPlayer({
         (audio as HTMLAudioElement & { webkitPreservesPitch?: boolean }).webkitPreservesPitch =
           true;
         const url =
-          options.url ?? (view === "listen" ? dictationAudioUrl(text) : listeningAudioUrl(text));
-        audioPreloaderRef.current?.cancelWarmup(url);
+          options.url ??
+          registeredAudioUrl(text, options.pronunciation) ??
+          (registeredAudioUrl(text) ? null : dictationAudioUrl(text));
+        if (!custom && !url) {
+          failed();
+          return;
+        }
+        const playbackUrl = url ?? "";
+        audio.dataset.clipText = text;
+        audioPreloaderRef.current?.cancelWarmup(playbackUrl);
         if (custom) {
           customUrlRef.current = URL.createObjectURL(custom.blob);
           audio.src = customUrlRef.current;
-        } else audio.src = audioPreloaderRef.current?.playbackUrl(url) ?? url;
+        } else audio.src = audioPreloaderRef.current?.playbackUrl(playbackUrl) ?? playbackUrl;
         await audio
           .play()
           .then(() => {
             loaded();
             // Retain downloaded official clips for subsequent taps and replay.
-            if (!custom) audioPreloaderRef.current?.warm([url]);
+            if (!custom) audioPreloaderRef.current?.warm([playbackUrl]);
           })
           .catch(() => {
             if (playbackToken !== playbackTokenRef.current) return;
-            if (!policy.allowSynthesis || options.allowSynthesis === false) {
+            if (
+              !policy.allowSynthesis ||
+              options.allowSynthesis === false ||
+              registeredAudioUrl(text) !== null
+            ) {
               loaded();
               setPlayingSymbol(null);
               setAudioLoading(false);

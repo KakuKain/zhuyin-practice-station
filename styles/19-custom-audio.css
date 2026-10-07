@@ -401,7 +401,7 @@
   min-height: 64px;
 }
 .recording-reading-pair strong {
-  font-family: "PingFang TC", sans-serif;
+  font-family: var(--font-symbol);
   font-size: 36px;
   line-height: 1;
   font-weight: 400;

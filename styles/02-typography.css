@@ -31,7 +31,7 @@
 }
 
 .annotated-text {
-  font-family: "KidLessonYoSans", "BpmfZihiSans", "PingFang TC", sans-serif;
+  font-family: var(--font-annotated);
   font-weight: 400;
   font-synthesis: none;
 }
@@ -54,7 +54,7 @@
 
 .zhuyin-stack,
 .logo-mark span {
-  font-family: "KidLessonYoOnly", "BpmfZihiOnly", "PingFang TC", sans-serif;
+  font-family: var(--font-syllable);
   font-weight: 400;
 }
 
@@ -85,12 +85,12 @@
 
 /* Literal symbols share the symbol chart's upright forms in every activity. */
 .zhuyin-glyph.is-symbol {
-  font-family: "PingFang TC", sans-serif;
+  font-family: var(--font-symbol);
   transform: translate(-50%, -50%);
 }
 
 .zhuyin-glyph.is-symbol-combination {
-  font-family: "KidCombinedRhymes", sans-serif;
+  font-family: var(--font-rhyme);
   writing-mode: horizontal-tb;
   letter-spacing: 0;
 }

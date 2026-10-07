@@ -1,4 +1,12 @@
 :root {
+  --font-ui: ui-rounded, "SF Pro Rounded", "Noto Sans TC", "PingFang TC", system-ui, sans-serif;
+  --font-annotated: "KidLessonYoSans", "BpmfZihiSans", "PingFang TC", sans-serif;
+  --font-syllable: "KidLessonYoOnly", "BpmfZihiOnly", "PingFang TC", sans-serif;
+  --font-symbol: "PingFang TC", "Noto Sans TC", sans-serif;
+  --font-rhyme: "KidCombinedRhymes", sans-serif;
+  --tap-size: 44px;
+  --board-cell: 138px;
+  --board-step: 152px;
   --ink: #173b35;
   --ink-soft: #59736b;
   --muted: #8ea19a;
@@ -34,7 +42,7 @@ body {
   background:
     radial-gradient(circle at 88% 7%, #fff0d7 0, rgba(255, 240, 215, 0) 22rem),
     radial-gradient(circle at 4% 48%, #e9f5ee 0, rgba(233, 245, 238, 0) 19rem), var(--paper);
-  font-family: ui-rounded, "SF Pro Rounded", "Noto Sans TC", "PingFang TC", system-ui, sans-serif;
+  font-family: var(--font-ui);
   text-wrap: pretty;
 }
 
@@ -1174,7 +1182,6 @@ h1 em {
   left: 0;
   z-index: 30;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
   width: min(480px, 100%);
   height: var(--nav-height);
   margin: 0 auto;
