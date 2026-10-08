@@ -1,7 +1,7 @@
 # 架構與維護界線
 
 ```text
-app/                       路由、metadata、樣式入口
+app/                       入口 main.tsx、全域樣式匯入順序
 components/                品牌標頭、頁面標題、注音、檢查控制與筆跡縮圖
 features/
   courses/                 九課、三組複習、教材 identity／匯入／封存
@@ -20,8 +20,7 @@ lib/audio/                 靜態語音清單、可取消預載／播放、自�
 lib/storage/               本機 external store、完整備份驗證與還原
 lib/loading/               字型就緒、圖片漸進顯示（圖片不阻塞作答）
 styles/                    保留 cascade 順序的分檔樣式、共用字型與尺寸 token
-worker/                    Cloudflare adapter；無 DB／登入
-tooling/build/             Sites metadata 建置插件
+scripts/                   素材／語音產生器、建置後檢查（check-build.mjs）
 tests/unit/                資料、遷移、圈選、快取、備份／失敗保護
 tests/e2e/                 Chromium／WebKit 操作與小螢幕回歸
 assets/                    可重建的原始素材（不公開部署）
@@ -30,9 +29,9 @@ public/                    靜態部署素材與完整語音 registry
 
 ## 狀態與功能界線
 
-`app/page.tsx` 不持有練習狀態。`useFillSession`、`useListeningSession`、`useNavigationSession` 各自管理狀態；`useListeningRound` 管理整輪草稿、前後題與批次檢查，`useListeningPlayback` 管理重播／計時，`useFillProgress` 管理默寫保存與退出。`usePracticeApp` 保留既有元件的 controller 介面，協調跨模式重練及收藏。
+`app/main.tsx` 只掛載 `PracticeApp`，不持有練習狀態。`useFillSession`、`useListeningSession`、`useNavigationSession` 各自管理狀態；`useListeningRound` 管理整輪草稿、前後題與批次檢查，`useListeningPlayback` 管理重播／計時，`useFillProgress` 管理默寫保存與退出。`usePracticeApp` 保留既有元件的 controller 介面，協調跨模式重練及收藏。
 
-課程列表維持 server render。練習頁、注音表、設定頁分成下載區塊，教材管理、自訂讀音、自由畫板、辨音和裝置備份再按需載入。沒有為了重構更換路由框架或全域狀態套件。
+整站是單一 Vite 靜態建置（GitHub Pages 子路徑 `/zhuyin-practice-station/`），沒有伺服器渲染；開發、測試與正式站使用同一份設定。`public/` 檔案以相對路徑引用（`course-art/…`），由瀏覽器依頁面網址解析，建置檢查會拒絕 `/course-art/…` 這類根目錄路徑。練習頁、注音表、設定頁分成下載區塊，教材管理、自訂讀音、自由畫板、辨音和裝置備份再按需載入。沒有為了重構更換路由框架或全域狀態套件。
 
 `PageHeading` 統一四個主頁的標題與黃色底線；練習子分頁不替換主標題。瀏覽標頭保留品牌與返回／教材選擇，作答標頭保留目前位置與重聽。`ShowMsg` 統一可關閉提示，`ReviewActions` 與 `FavoriteButton` 分開操作。
 
@@ -82,6 +81,6 @@ Loading 等待當頁必要字型，圖片獨立透過小圖預覽漸進清晰。
 
 CSS 維持原匯入順序，只清除同條件、同 selector 的完全相同宣告，保留不同值及瀏覽器 fallback。`00-foundation.css` 集中 UI／旁注音／音節／基本符號／結合韻字型與點擊尺寸。功能樣式在對應檔案修改，避免另建一套字型或任意覆寫根樣式。
 
-發布須通過 `npm run check`、build、Worker HTML 渲染測試及 Playwright 三專案。檢查 320／390／1280px、標題續寫、整輪往返／重聽／批次檢查、垂直語詞、辨音動畫、自訂資料備份及失敗重試。更新證據記在 `structure-improvements.md`；模擬 pointer 不能宣稱紅米真機／普通電容筆已驗證。發布後核對成功狀態與 source commit。
+發布須通過 `npm run check`、`npm run format:check`、`npm run build`（含素材與子路徑檢查）及 Playwright 五個專案（Android 平板直／橫、iPad、Android 手機、桌面）。主要裝置是 Android 平板＋電容筆，先檢查 800／1280px 平板，再看 320／390px。檢查標題續寫、整輪往返／重聽／批次檢查、垂直語詞、辨音動畫、自訂資料備份及失敗重試。更新證據記在 `structure-improvements.md`；模擬 pointer 不能宣稱紅米真機／普通電容筆已驗證。發布後核對成功狀態與 source commit。
 
 維持免登入、無 DB／雲端同步／PWA，不變更教師課文範圍。依賴維護見 `security-maintenance.md`。

@@ -98,8 +98,7 @@ test("older shapes, corrected readings and unreadable values restore exactly as 
   assert.equal(prepared.summary.unreadable, 2);
   const storage = memory({ unrelated: "keep" });
   await restoreDeviceBackup(prepared, storage, async () => {});
-  for (const [key, text] of Object.entries(value.storage))
-    assert.equal(storage.getItem(key), text);
+  for (const [key, text] of Object.entries(value.storage)) assert.equal(storage.getItem(key), text);
   assert.equal(storage.getItem("unrelated"), "keep");
 });
 

@@ -17,8 +17,9 @@ test("audio metadata points to shipped bytes and hash versions match", () => {
     const lesson = /gemini\/lessons\/(\d+)\.m4a$/.exec(clip.url);
     if (lesson)
       assert.equal(
+        // Registry paths are rooted at public/; the app requests them page-relative.
         registeredLessonAudioUrl(Number(lesson[1]) - 1),
-        `${clip.url}?v=${clip.version}`,
+        `${clip.url.slice(1)}?v=${clip.version}`,
       );
   }
 });

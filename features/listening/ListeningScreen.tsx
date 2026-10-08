@@ -90,7 +90,7 @@ export function ListeningScreen({ app }: { app: AppController }) {
       )}
       <div className="focus-content">
         <ResourceNotice failed={resourceError} />
-        <p className="sr-only" aria-live="polite">
+        <p className="visually-hidden" aria-live="polite">
           {listenMessage}
         </p>
         {listenPhase === "ready" ? (
@@ -125,7 +125,7 @@ export function ListeningScreen({ app }: { app: AppController }) {
                 >
                   <ProgressiveImage
                     className="listen-start-art"
-                    src="/course-art/listening-play-button-watercolor-v1.webp"
+                    src="course-art/listening-play-button-watercolor-v1.webp"
                     width={640}
                     height={640}
                     alt=""
@@ -138,12 +138,12 @@ export function ListeningScreen({ app }: { app: AppController }) {
                     className="listen-ready-art"
                     src={
                       catalogLesson.listeningOnly
-                        ? "/course-art/review-sleeping-cat-watercolor-v2.webp"
+                        ? "course-art/review-sleeping-cat-watercolor-v2.webp"
                         : app.selectedLesson === 7
-                          ? "/course-art/radish-story.webp"
+                          ? "course-art/radish-story.webp"
                           : catalogLesson.artwork
-                            ? `/course-art/${catalogLesson.artwork}-watercolor.webp`
-                            : "/course-art/lesson-watercolor-paper.webp"
+                            ? `course-art/${catalogLesson.artwork}-watercolor.webp`
+                            : "course-art/lesson-watercolor-paper.webp"
                     }
                     alt=""
                   />

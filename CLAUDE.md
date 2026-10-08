@@ -14,13 +14,13 @@ Node 24 (CI version; minimum 22.13) with npm.
 
 ```sh
 npm ci
-npm run dev                    # vinext dev server (Next App Router on Vite + Cloudflare plugin)
-npm run check                  # eslint --max-warnings 0, tsc --noEmit, unit tests (the CI gate)
-npm test                       # unit tests + vinext build + Worker SSR render test
-npm run test:e2e               # vinext build, then Playwright (android-chromium, iphone-webkit, desktop-chromium)
-npm run build:pages            # production GitHub Pages build -> dist-pages/, then scripts/check-pages-build.mjs
-npm run preview:pages          # serves /zhuyin-practice-station/
-npm run format                 # prettier (printWidth 100)
+npm run dev                    # Vite dev server at http://localhost:5173/zhuyin-practice-station/
+npm run check                  # eslint --max-warnings 0, tsc --noEmit, unit tests
+npm run format:check           # prettier (printWidth 100); CI runs it too
+npm run build                  # production build -> dist-pages/, then scripts/check-build.mjs
+npm run preview                # serves the build at /zhuyin-practice-station/
+npm test                       # check + build
+npm run test:e2e               # build, then Playwright against the preview server
 ```
 
 Single tests:
@@ -28,39 +28,34 @@ Single tests:
 ```sh
 npx tsx --test tests/unit/materials.test.ts
 npx tsx --test --test-name-pattern "lesson pages" tests/unit/audit-regressions.test.ts
-npx playwright test tests/e2e/symbols.spec.ts --project=desktop-chromium -g "<title regex>"
+npx playwright test tests/e2e/symbols.spec.ts --project=android-tablet -g "<title regex>"
 ```
 
-Playwright's default web server is `npm run start` on port 4173, which serves `dist/`, so run `npm run build` first. Locally it reuses any server already running on that port. `PLAYWRIGHT_BASE_URL` and `PLAYWRIGHT_WEB_SERVER_COMMAND` override this; the Pages workflow uses them to test the `preview:pages` build on port 4185.
+Playwright always starts a fresh `npm run preview` on port 4176 (`PLAYWRIGHT_PORT` overrides it) and never reuses a running server, so run `npm run build` first. Projects: `android-tablet` and `android-tablet-landscape` (the primary device), `ipad-webkit`, `android-phone`, `desktop-chromium`.
 
 Asset pipelines:
 
 - After adding or replacing any audio file, run `npm run assets:audio-registry`. It rewrites `public/listening-audio/registry.json` and `lib/audio/audio-index.json` with hashes, durations, and cache-busting URLs.
-- `npm run assets:artwork` generates lossless WebP files in `public/course-art/` from the PNG originals in `assets/artwork/`.
+- `npm run assets:artwork` generates lossless WebP files in `public/course-art/` from the PNG originals in `assets/artwork/`; `npm run assets:progressive` regenerates the blur-up previews in `components/artwork-previews.json`.
 - `python3 scripts/build-yo-fonts.py` rebuilds the lesson font subsets after you add characters or IVS glyphs. `scripts/build-fonts.py` rebuilds the full fonts. Both need fontTools and brotli.
 
-## Two build targets for the same app
+## Build and deploy
 
-Both targets render the same `components/PracticeApp.tsx` client component:
+There is one build: a static Vite SPA. `index.html` → `app/main.tsx` → `createRoot(...).render(<PracticeApp />)`. Dev, tests and production all use `vite.config.ts` with the GitHub Pages base path `/zhuyin-practice-station/` (`PAGES_BASE_PATH=/` builds for a root or custom domain).
 
-1. **GitHub Pages (production).** `index.html` → `tooling/pages/main.tsx` → `createRoot(...).render(<PracticeApp />)`. This is a plain Vite SPA built with `vite.pages.config.ts`. A pre-transform (`tooling/pages/public-assets.ts`) rewrites string literals that start with `/course-art/`, `/fonts/`, or `/listening-audio/` in `.ts`, `.tsx`, and `.json` sources so they carry the Pages base path. `check-pages-build.mjs` fails the build if any unprefixed URL survives or if a `public/` file is missing from `dist-pages/`.
-   - Reference public assets as literal absolute paths under those three folders.
-   - If you add a new top-level `public/` folder, add it to the regex in both files.
-   - `PAGES_BASE_PATH=/` builds for a root or custom domain.
-   - A push to `main` deploys through `.github/workflows/pages.yml`, but only after check, the Pages build, and Playwright all pass.
-2. **Legacy Sites/Cloudflare build.** `npm run build` uses vinext with `app/` (App Router), `worker/index.ts`, and `tooling/build/sites-vite-plugin.ts` (packages `.openai/hosting.json`). It is kept for compatibility. `tests/rendered-html.test.mjs` imports `dist/server/index.js` and asserts on the server-rendered HTML of the course list, so text changes on the home page can break that test.
-
-`examples/` (inactive D1/auth samples) is excluded from lint, typecheck, and both builds.
+- **Reference `public/` files with page-relative paths** (`"course-art/cat.webp"`, `` `listening-audio/${name}.m4a` ``), never root-absolute ones (`"/course-art/…"`), which would skip the base path and 404 on Pages. `scripts/check-build.mjs` fails the build on a root-absolute literal, a CSS `url()` outside the base, or any `public/` file missing from `dist-pages/`. CSS may keep `url(/fonts/…)`; Vite adds the base there.
+- A push to `main` deploys through `.github/workflows/pages.yml` only after check, format check, the build and all Playwright projects pass. Pull requests run the same gate in `.github/workflows/ci.yml`.
+- The old Next/vinext/Cloudflare Worker build was removed; its last version is the git tag `legacy-sites-build`.
 
 ## Architecture
 
-**There are no routes; this is a single-page state machine.** `app/page.tsx` and the Pages entry both render only `<PracticeApp />`. The screen is selected by the `View` union in `features/types.ts`. `features/usePracticeApp.ts` is the cross-feature coordinator and keeps a legacy controller interface for components. Each flow owns its own state:
+**There are no routes; this is a single-page state machine.** The entry renders only `<PracticeApp />`. The screen is selected by the `View` union in `features/types.ts`. `features/usePracticeApp.ts` is the cross-feature coordinator and keeps a legacy controller interface for components. Each flow owns its own state:
 
 - `useFillSession`: handwriting dictation (默寫)
 - `useListeningSession`, `useListeningRound`, `useListeningPlayback`: listening dictation (聽寫), covering full-round drafting, batch review, replay, and timers
 - `useNavigationSession`: navigation, leave guards, focus, and scroll
 
-`PracticeList`, `SettingsScreen`, `SymbolChart`, and their heavy sub-panels are `React.lazy` chunks. Keep them out of the initial bundle. `PracticeApp` uses a `useSyncExternalStore` hydration flag so SSR and the first client render match.
+`PracticeList`, `SettingsScreen`, `SymbolChart`, and their heavy sub-panels are `React.lazy` chunks. Keep them out of the initial bundle.
 
 Layout: `features/<feature>/` holds feature UI and logic, `components/` holds shared UI (`PageHeading`, `ShowMsg`, `ReviewActions`, `Zhuyin`, `InkTools`), and `lib/` holds infrastructure (ink, audio, storage, loading).
 
@@ -96,11 +91,11 @@ Layout: `features/<feature>/` holds feature UI and logic, `components/` holds sh
 
 ### Styles
 
-`app/globals.css` imports `styles/00-…css` through `styles/23-…css` in a fixed cascade order, and Tailwind v4 comes first. Order matters. Put new rules in the matching feature file. Shared fonts, size tokens, and tap-target sizes live in `00-foundation.css`. Don't add a parallel font system or override root styles ad hoc.
+`app/globals.css` imports `styles/00-…css` through `styles/23-…css` in a fixed cascade order. `00-reset.css` is the former Tailwind preflight, kept in cascade layers so every unlayered rule wins; there is no Tailwind and no utility classes. Order matters. Put new rules in the matching feature file. Shared fonts, size tokens, and tap-target sizes live in `00-foundation.css`. Don't add a parallel font system or override root styles ad hoc.
 
 ## Verification conventions
 
-- Release bar: `npm run check`, build, the SSR render test, and all three Playwright projects. For UI changes, also check 320px, 390px, and 1280px widths for horizontal overflow and page errors.
+- Release bar: `npm run check`, `npm run format:check`, `npm run build`, and all Playwright projects. The primary device is an Android tablet with a capacitive stylus (reported as `pointerType: "touch"`), so check tablet portrait (800px) and landscape (1280px) first, then 320px and 390px, for horizontal overflow and page errors.
 - QA screenshots and measurements go in the git-ignored `outputs/`.
 - Record structural-change evidence in `docs/structure-improvements.md`. Visual design QA write-ups follow the format of `design-qa.md`.
 - Simulated pointers do not count as validation on real hardware (Redmi tablet with a capacitive stylus). Don't claim they do.

@@ -93,7 +93,7 @@ test("every contrast uses existing clips; second/third tone retains the same syl
   for (const pair of soundPairs) {
     for (const sound of pair.sounds) {
       const path = listeningAudioUrl(sound.audioText).split("?")[0];
-      assert.ok(existsSync(new URL(`../../public${path}`, import.meta.url)), path);
+      assert.ok(existsSync(new URL(`../../public/${path}`, import.meta.url)), path);
     }
   }
   const tone = soundPairs.find((p) => p.id === "tone-2-3")!;

@@ -22,7 +22,7 @@ for (const name of (await readdir(dir)).filter((name) => name.endsWith(".webp"))
     .toBuffer();
   const result = optimized.length < original.length ? optimized : original;
   await writeFile(path, result);
-  previews[`/course-art/${name}`] = {
+  previews[`course-art/${name}`] = {
     src: `data:image/webp;base64,${(await sharp(original).resize({ width: 24, withoutEnlargement: true }).webp({ quality: 40 }).toBuffer()).toString("base64")}`,
     width: metadata.width,
     height: metadata.height,

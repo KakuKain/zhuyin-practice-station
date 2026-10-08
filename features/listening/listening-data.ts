@@ -101,9 +101,9 @@ export function dictationAudioUrl(text: string): string {
   const registered = registeredAudioUrl(text);
   if (registered) return registered;
   const filename = [...text].map((character) => character.codePointAt(0)!.toString(16)).join("-");
-  if (combinedRhymeExample(text)) return `/listening-audio/gemini/rhymes/${filename}.m4a`;
+  if (combinedRhymeExample(text)) return `listening-audio/gemini/rhymes/${filename}.m4a`;
   // These 37 clips changed source in v44; the query bypasses older browser caches.
-  return `/listening-audio/${filename}.m4a${naturalReadingPrompts.has(text) ? "?v=57" : /^[\u3105-\u3129]$/.test(text) ? "?v=44" : ""}`;
+  return `listening-audio/${filename}.m4a${naturalReadingPrompts.has(text) ? "?v=57" : /^[\u3105-\u3129]$/.test(text) ? "?v=44" : ""}`;
 }
 
 export function questionSeedsForLesson(

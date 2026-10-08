@@ -178,7 +178,7 @@ export function PracticeList({ app }: { app: AppController }) {
                   >
                     {lesson.artwork && (
                       <ProgressiveImage
-                        src={`/course-art/${lesson.artwork}-watercolor.webp`}
+                        src={`course-art/${lesson.artwork}-watercolor.webp`}
                         alt=""
                       />
                     )}

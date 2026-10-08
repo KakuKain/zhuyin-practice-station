@@ -23,29 +23,30 @@
 
 ```sh
 npm ci
-npm run dev
+npm run dev                   # http://localhost:5173/zhuyin-practice-station/
 npm run check                 # 零警告 lint、TypeScript、單元測試
-npm test                      # 單元測試、正式建置、Worker HTML 渲染測試
+npm run format:check          # Prettier 格式檢查
+npm test                      # check ＋ 正式建置（含素材完整性與子路徑檢查）
 npx playwright install chromium webkit
-npm run test:e2e              # Android Chrome、iPhone WebKit、桌面 Chrome
+npm run test:e2e              # 正式建置後，以 Android 平板（直／橫）、iPad、Android 手機、桌面 Chrome 測試
 ```
 
-瀏覽器測試自行使用 4173 埠，不會關閉既有的 3001 預覽。涵蓋手寫／縮放後筆跡、續寫、家長檢查、收藏、正常速度符號、語詞大格垂直排列、整輪往返／重聽／批次檢查、辨音自動換題、完整備份、九課標題旁注音、37 符號分組／發音／中斷／重試，以及慢網路／儲存失敗提示。GitHub Actions 執行相同檢查，失敗時保存 trace 與截圖。
+主要使用情境是 Android 平板＋電容筆（瀏覽器回報為 touch）。開發、測試與正式站都是同一個 Vite 靜態建置及 `/zhuyin-practice-station/` 子路徑。瀏覽器測試每次在 4176 埠啟動剛建好的版本，不沿用其他已開啟的伺服器。涵蓋手寫／縮放後筆跡、續寫、已完成格重看、家長檢查、收藏、正常速度符號、語詞大格垂直排列、整輪往返／重聽／批次檢查、辨音自動換題、完整備份、九課標題旁注音、37 符號分組／發音／中斷／重試、錄音資料庫無法使用時的官方音檔，以及慢網路提示。PR 由 `.github/workflows/ci.yml` 執行相同檢查，失敗時保存 trace 與截圖。
 
 ## 目錄與部署
 
-`app/` 只放路由、layout 和樣式入口；`features/` 按功能分組；`components/` 放共用 UI；`lib/` 放音訊及儲存基礎設施。詳見 [架構說明](docs/architecture.md)。
+`app/` 只放入口（`main.tsx`）與全域樣式；`features/` 按功能分組；`components/` 放共用 UI；`lib/` 放音訊及儲存基礎設施。詳見 [架構說明](docs/architecture.md)。
 
-`public/` 只放部署用素材，原始字體／插圖留在 `assets/`，視覺參考在 `docs/visual-qa/`。未啟用的 D1／登入範例在 `examples/`，不參與 app 的 lint／型別檢查／建置；沒有安裝資料庫套件。
+`public/` 只放部署用素材，原始字體／插圖留在 `assets/`，視覺參考在 `docs/visual-qa/`。程式以相對路徑（例如 `course-art/…`）引用 `public/` 檔案，不要寫成 `/course-art/…`，否則在子路徑會找不到；建置檢查會攔下這種寫法。
 
 正式站改用 KakuKain 儲存庫的 GitHub Pages。推送 `main` 會由 `.github/workflows/pages.yml` 執行檢查、靜態建置與部署；只有檢查通過才發布。網站沿用原本的 React 元件與靜態音檔，沒有伺服器 API。
 
 ```sh
-npm run build:pages            # 產生 dist-pages/，檢查素材完整性與子路徑
-npm run preview:pages          # 開啟 /zhuyin-practice-station/ 預覽
+npm run build                  # 產生 dist-pages/，檢查素材完整性與子路徑
+npm run preview                # 開啟 /zhuyin-practice-station/ 預覽
 ```
 
-`vite.pages.config.ts` 處理專案子路徑；需要根目錄或自訂網域時可設定 `PAGES_BASE_PATH=/`。原 Sites 的 `.openai/hosting.json` 與 `npm run build` 保留作為舊站的相容建置。不要把 token 或其他密鑰寫進版本控制。
+`vite.config.ts` 處理專案子路徑；需要根目錄或自訂網域時可設定 `PAGES_BASE_PATH=/`。舊 Sites／Cloudflare 版本（Next／vinext／Worker）已移除，最後一版保留在 git tag `legacy-sites-build`，需要重建舊站時從該 tag 取出。不要把 token 或其他密鑰寫進版本控制。
 
 網站來源改變後，瀏覽器不會自動移轉舊站的紀錄。先在[舊站](https://zhuyin-practice-station.ihealdev.chatgpt.site/)「更多 → 裝置備份」匯出，再於新站匯入；音檔和教材隨網站一起發布，不需要另行移轉。
 

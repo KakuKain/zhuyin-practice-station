@@ -81,10 +81,10 @@ export function LessonReader({
             className="lesson-heading-art"
             src={
               selectedLesson === 7
-                ? "/course-art/radish-story.webp"
+                ? "course-art/radish-story.webp"
                 : lesson.artwork
-                  ? `/course-art/${lesson.artwork}-watercolor.webp`
-                  : "/course-art/lesson-watercolor-paper.webp"
+                  ? `course-art/${lesson.artwork}-watercolor.webp`
+                  : "course-art/lesson-watercolor-paper.webp"
             }
             alt=""
           />

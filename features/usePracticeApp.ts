@@ -574,7 +574,8 @@ export function usePracticeApp() {
       practiceState.savedQuestions,
     ).filter(
       (item) =>
-        item.mode === "fill" || Boolean(findQuestionSeed(item.lessonIndex, item.questionId, catalog)),
+        item.mode === "fill" ||
+        Boolean(findQuestionSeed(item.lessonIndex, item.questionId, catalog)),
     );
     advanceReviewQueue();
   };

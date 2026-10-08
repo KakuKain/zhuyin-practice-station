@@ -74,7 +74,7 @@ test("every current and legacy prompt has a local playable audio file", async ()
     }
   });
   for (const text of texts) {
-    const file = new URL(`../../public${listeningAudioUrl(text).split("?")[0]}`, import.meta.url);
+    const file = new URL(`../../public/${listeningAudioUrl(text).split("?")[0]}`, import.meta.url);
     assert.ok((await stat(file)).size > 1024, text);
     const bytes = await readFile(file);
     if (file.pathname.endsWith(".mp3")) {

@@ -51,7 +51,7 @@ export function SymbolChart({
     <section className="page-section symbol-page" ref={pageRef}>
       <ProgressiveImage
         className="symbol-page-watercolor"
-        src="/course-art/symbol-chart-watercolor.webp"
+        src="course-art/symbol-chart-watercolor.webp"
         alt=""
         aria-hidden="true"
       />

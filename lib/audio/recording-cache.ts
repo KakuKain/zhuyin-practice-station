@@ -23,7 +23,12 @@ const info = ({ key, text, pronunciation, mimeType, duration, updatedAt }: Recor
  * still rejects so the recording manager can explain the problem. A recording that is
  * known to exist but fails to load is still an error: it must not be replaced silently.
  */
-export function createRecordingCache(storage: Storage, limit = 12, retryMs = 30000, now = Date.now) {
+export function createRecordingCache(
+  storage: Storage,
+  limit = 12,
+  retryMs = 30000,
+  now = Date.now,
+) {
   let metadata: Map<string, RecordingInfo> | null = null;
   let pending: Promise<RecordingInfo[]> | null = null;
   let unavailableUntil = 0;

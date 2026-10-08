@@ -4,6 +4,16 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import previews from "../../components/artwork-previews.json";
 import type { View } from "../../features/types";
 
+// Preview keys are relative to the page, so they match under any deployment base path.
+let previewsByHref: Map<string, { src: string }> | null = null;
+const previewByHref = () =>
+  (previewsByHref ??= new Map(
+    Object.entries(previews as Record<string, { src: string }>).map(([path, preview]) => [
+      new URL(path, document.baseURI).href,
+      preview,
+    ]),
+  ));
+
 export function imageReady(image: HTMLImageElement): Promise<void> {
   if (image.complete)
     return image.naturalWidth ? Promise.resolve() : Promise.reject(new Error("image"));
@@ -58,8 +68,7 @@ export function usePageResources(view: View) {
       let placeholder = background;
       const images: Promise<void>[] = [];
       for (const match of background.matchAll(/url\(["']?([^"')]+)["']?\)/g)) {
-        const pathname = new URL(match[1], location.href).pathname;
-        const preview = (previews as Record<string, { src: string }>)[pathname];
+        const preview = previewByHref().get(new URL(match[1], document.baseURI).href);
         if (!preview) continue;
         placeholder = placeholder.replace(match[0], `url("${preview.src}")`);
         const image = new Image();
