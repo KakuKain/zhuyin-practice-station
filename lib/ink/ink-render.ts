@@ -5,10 +5,16 @@ export function pointerPoint(
   clientX: number,
   clientY: number,
 ): InkPoint {
-  const rect = canvas.getBoundingClientRect();
+  return pointInRect(canvas.getBoundingClientRect(), clientX, clientY);
+}
+
+/** 0–100 coordinates to 0.01, finer than a device pixel on any writing cell. */
+const round = (value: number) => Math.round(value * 100) / 100;
+
+export function pointInRect(rect: DOMRect, clientX: number, clientY: number): InkPoint {
   return {
-    x: Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100)),
-    y: Math.max(0, Math.min(100, ((clientY - rect.top) / rect.height) * 100)),
+    x: round(Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100))),
+    y: round(Math.max(0, Math.min(100, ((clientY - rect.top) / rect.height) * 100))),
   };
 }
 

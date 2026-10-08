@@ -1,4 +1,3 @@
-"use client";
 import { useState } from "react";
 import type { InkStroke, ListenPhase, ListeningQuestion } from "../types";
 

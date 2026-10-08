@@ -115,6 +115,13 @@ export const customAudioStorage = {
     if (!value) return null;
     return hydrateRecording(value);
   },
+  /** Identities only: playback needs to know what exists without reading any audio. */
+  keys(): Promise<string[]> {
+    return transaction("readonly", (store, result) => {
+      const request = store.getAllKeys();
+      request.onsuccess = () => result(request.result.map(String));
+    });
+  },
   list(): Promise<RecordingInfo[]> {
     return transaction("readonly", (store, result) => {
       const entries: RecordingInfo[] = [];

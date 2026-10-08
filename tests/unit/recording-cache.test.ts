@@ -16,9 +16,12 @@ test("missing recordings skip individual reads and concurrent reads share one lo
     updatedAt: 1,
   };
   const cache = createRecordingCache({
-    list: async () => {
+    keys: async () => {
       lists++;
-      return [clip];
+      return [clip.key];
+    },
+    list: async () => {
+      throw new Error("playback must not read the full list");
     },
     get: async () => {
       gets++;
@@ -56,10 +59,13 @@ test("an unavailable database leaves official clips playable and is retried afte
   };
   const cache = createRecordingCache(
     {
-      list: async () => {
+      keys: async () => {
         lists++;
         if (failed) throw new Error("blocked");
-        return [clip];
+        return [clip.key];
+      },
+      list: async () => {
+        throw new Error("blocked");
       },
       get: async () => clip,
     },
@@ -71,27 +77,19 @@ test("an unavailable database leaves official clips playable and is retried afte
   await assert.rejects(cache.list(), /blocked/);
   assert.equal(await cache.get("ㄅ", "ㄅ"), null);
   assert.equal(await cache.get("半", "ㄅㄢˋ"), null);
-  assert.equal(lists, 2);
+  assert.equal(lists, 1);
   failed = false;
   time = 500;
   assert.equal(await cache.get("半", "ㄅㄢˋ"), null);
-  assert.equal(lists, 2, "no repeated slow database opens during the pause");
+  assert.equal(lists, 1, "no repeated slow database opens during the pause");
   time = 1500;
   assert.equal(await cache.get("半", "ㄅㄢˋ"), clip);
 });
 
 test("a known recording that fails to load is still an error", async () => {
   const cache = createRecordingCache({
-    list: async () => [
-      {
-        key: recordingKey("半", "ㄅㄢˋ"),
-        text: "半",
-        pronunciation: "ㄅㄢˋ",
-        mimeType: "audio/wav",
-        duration: 1,
-        updatedAt: 1,
-      },
-    ],
+    keys: async () => [recordingKey("半", "ㄅㄢˋ")],
+    list: async () => [],
     get: async () => {
       throw new Error("read failed");
     },
@@ -100,7 +98,11 @@ test("a known recording that fails to load is still an error", async () => {
 });
 
 test("saved recordings keep only metadata in the lookup map", async () => {
-  const cache = createRecordingCache({ list: async () => [], get: async () => null });
+  const cache = createRecordingCache({
+    keys: async () => [],
+    list: async () => [],
+    get: async () => null,
+  });
   await cache.list();
   cache.saved({
     key: recordingKey("狸", "ㄌㄧˊ"),

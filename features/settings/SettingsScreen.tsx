@@ -1,4 +1,3 @@
-"use client";
 import { ShowMsg } from "../../components/ShowMsg";
 import { HeaderBack } from "../../components/AppChrome";
 

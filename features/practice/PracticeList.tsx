@@ -1,5 +1,3 @@
-"use client";
-
 const FreeDictation = lazy(() =>
   import("./FreeDictation").then((module) => ({ default: module.FreeDictation })),
 );

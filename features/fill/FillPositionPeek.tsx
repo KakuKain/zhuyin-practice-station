@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useRef, useState } from "react";
 import { MapPin } from "@phosphor-icons/react";
 import { InkPreview } from "../../components/AppChrome";

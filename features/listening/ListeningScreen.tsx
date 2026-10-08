@@ -1,5 +1,3 @@
-"use client";
-
 import { ProgressiveImage } from "../../components/ProgressiveImage";
 
 import { ShowMsg } from "../../components/ShowMsg";
@@ -23,7 +21,6 @@ export function ListeningScreen({ app }: { app: AppController }) {
     currentQuestionSaved,
     deferRemediation,
     finishListening,
-    finishPlayback,
     handleParentDecision,
     hasCompleteInk,
     isWordQuestion,
@@ -34,7 +31,6 @@ export function ListeningScreen({ app }: { app: AppController }) {
     listeningSettings,
     loadingMessage,
     resourceError,
-    playbackRef,
     replayQuestion,
     retryMessage,
     secondsLeft,
@@ -56,7 +52,6 @@ export function ListeningScreen({ app }: { app: AppController }) {
   const catalogLesson = useCatalogLesson(app.selectedLesson);
   return (
     <main className={`focus-shell phase-${listenPhase}`}>
-      <audio ref={playbackRef} onEnded={finishPlayback} preload="none" hidden aria-hidden="true" />
       {listenPhase === "ready" || listenPhase === "batch_review" ? (
         <AppHeader onCourses={leaveFocus} onBack={leaveFocus} backLabel="返回" />
       ) : (

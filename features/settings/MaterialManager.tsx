@@ -1,4 +1,3 @@
-"use client";
 import type { CustomLesson, Material, MaterialsState } from "../courses/materials";
 import {
   archiveLesson,

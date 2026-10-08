@@ -1,7 +1,5 @@
-"use client";
-
 import { ShowMsgProvider } from "./ShowMsg";
-import { lazy, Suspense, useSyncExternalStore } from "react";
+import { lazy, Suspense } from "react";
 import { usePracticeApp } from "../features/usePracticeApp";
 import { AppHeader, BottomNav, LoadingOverlay, ResourceNotice } from "./AppChrome";
 import { FillDialogs } from "../features/fill/FillDialogs";
@@ -28,36 +26,32 @@ const SymbolChart = lazy(() =>
 
 import { MaterialContext } from "../features/courses/MaterialContext";
 
-const subscribeToHydration = () => () => {};
-const clientReady = () => true;
-const serverReady = () => false;
-
 export function PracticeApp() {
-  const hydrated = useSyncExternalStore(subscribeToHydration, clientReady, serverReady);
   const app = usePracticeApp();
+  const { catalog, playbackRef, finishPlayback } = app;
   return (
     <ShowMsgProvider>
-      <MaterialContext.Provider value={app.catalog}>
-        <PracticeContent app={app} hydrated={hydrated} />
+      <MaterialContext.Provider value={catalog}>
+        {/* One element for every screen: iOS keeps the playback a tap has unlocked. */}
+        <audio
+          ref={playbackRef}
+          onEnded={finishPlayback}
+          preload="none"
+          hidden
+          aria-hidden="true"
+        />
+        <PracticeContent app={app} />
       </MaterialContext.Provider>
     </ShowMsgProvider>
   );
 }
 
-function PracticeContent({
-  app,
-  hydrated,
-}: {
-  app: ReturnType<typeof usePracticeApp>;
-  hydrated: boolean;
-}) {
+function PracticeContent({ app }: { app: ReturnType<typeof usePracticeApp> }) {
   const {
     view,
     isFocusMode,
     activeFillCell,
     fillReviewOpen,
-    playbackRef,
-    finishPlayback,
     navigate,
     loadingMessage,
     resourceError,
@@ -101,8 +95,7 @@ function PracticeContent({
     );
 
   return (
-    <div className={`app-shell is-${view}`} aria-busy={!hydrated}>
-      <audio ref={playbackRef} onEnded={finishPlayback} preload="none" hidden aria-hidden="true" />
+    <div className={`app-shell is-${view}`}>
       <AppHeader
         title={view === "practice" ? "練習" : undefined}
         materialSelector={view === "courses" ? <MaterialSelector app={app} /> : undefined}
@@ -133,9 +126,7 @@ function PracticeContent({
         onNavigate={navigate}
       />
       {view === "fill" && <FillDialogs app={app} />}
-      {(!hydrated || loadingMessage) && (
-        <LoadingOverlay label={loadingMessage ?? "正在準備練習…"} />
-      )}
+      {loadingMessage && <LoadingOverlay label={loadingMessage} />}
     </div>
   );
 }

@@ -1,5 +1,3 @@
-"use client";
-
 import type { AppController } from "../usePracticeApp";
 import { isFillCellComplete } from "./fill-draft-policy";
 

@@ -1,4 +1,3 @@
-"use client";
 import { ShowMsg } from "../../components/ShowMsg";
 
 import { useEffect, useRef, useState } from "react";

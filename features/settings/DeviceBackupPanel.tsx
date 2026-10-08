@@ -1,4 +1,3 @@
-"use client";
 import { useState } from "react";
 import { DownloadSimple, UploadSimple } from "@phosphor-icons/react";
 import { ShowMsg } from "../../components/ShowMsg";

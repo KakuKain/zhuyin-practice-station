@@ -190,6 +190,10 @@ test("a second pointer never joins the active stroke on the free board", async (
     emit("pointerup", 1, 40, 40);
   });
   expect(await inkPixels(canvas)).toBeGreaterThan(20);
+  // The board is written once the hand rests, not on every lift.
+  await expect
+    .poll(() => page.evaluate(() => localStorage.getItem("kid-free-dictation-v1")))
+    .not.toBeNull();
   const stored = await page.evaluate(() =>
     JSON.parse(localStorage.getItem("kid-free-dictation-v1")!),
   );
@@ -201,6 +205,61 @@ test("a second pointer never joins the active stroke on the free board", async (
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
 
+test("a resting palm never writes on the free board", async ({ page }) => {
+  await page.goto("./");
+  await page.getByRole("button", { name: "練習", exact: true }).click();
+  const canvas = page.getByLabel("自由聽寫作答畫板", { exact: true });
+  await expect(canvas).toBeVisible();
+  await canvas.evaluate((el) => {
+    const box = el.getBoundingClientRect();
+    const emit = (type: string, id: number, x: number, y: number, size: number) =>
+      el.dispatchEvent(
+        new PointerEvent(type, {
+          pointerId: id,
+          pointerType: "touch",
+          clientX: box.x + x,
+          clientY: box.y + y,
+          width: size,
+          height: size,
+          bubbles: true,
+        }),
+      );
+    el.setPointerCapture = () => {};
+    el.hasPointerCapture = () => false;
+    // A palm-sized contact is ignored from the start.
+    emit("pointerdown", 1, 60, 60, 160);
+    emit("pointermove", 1, 90, 90, 160);
+    emit("pointerup", 1, 90, 90, 160);
+    // A touch that starts small and spreads into a palm is dropped.
+    emit("pointerdown", 2, 30, 30, 20);
+    emit("pointermove", 2, 50, 50, 24);
+    emit("pointermove", 2, 70, 70, 150);
+    emit("pointerup", 2, 70, 70, 150);
+  });
+  expect(await inkPixels(canvas)).toBe(0);
+  // A stylus-sized touch still writes.
+  await canvas.evaluate((el) => {
+    const box = el.getBoundingClientRect();
+    for (const [type, x] of [
+      ["pointerdown", 20],
+      ["pointermove", 60],
+      ["pointerup", 60],
+    ] as const)
+      el.dispatchEvent(
+        new PointerEvent(type, {
+          pointerId: 3,
+          pointerType: "touch",
+          clientX: box.x + x,
+          clientY: box.y + x,
+          width: 30,
+          height: 30,
+          bubbles: true,
+        }),
+      );
+  });
+  await expect.poll(() => inkPixels(canvas)).toBeGreaterThan(20);
+});
+
 test("device backup previews, restores and preserves unrelated browser storage", async ({
   page,
 }) => {
@@ -209,6 +268,9 @@ test("device backup previews, restores and preserves unrelated browser storage",
   await page.evaluate(async () => {
     await new Promise<void>((resolve, reject) => {
       const request = indexedDB.open("zhuyin-custom-audio-v1", 1);
+      // The app opens the recording database only when it is first needed.
+      request.onupgradeneeded = () =>
+        request.result.createObjectStore("recordings", { keyPath: "key" });
       request.onsuccess = () => {
         const db = request.result;
         const tx = db.transaction("recordings", "readwrite");

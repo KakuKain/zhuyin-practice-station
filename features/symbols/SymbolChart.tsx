@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useRef } from "react";
 import { PageHeading } from "../../components/PageHeading";
 import { ProgressiveImage } from "../../components/ProgressiveImage";

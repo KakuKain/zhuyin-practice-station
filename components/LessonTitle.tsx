@@ -1,4 +1,3 @@
-"use client";
 import { AnnotatedText } from "./AnnotatedText";
 import { useCatalogLesson } from "../features/courses/MaterialContext";
 import { lessonTitleGroups, lessonTitleVariants } from "../features/lesson/annotated-text";

@@ -1,4 +1,3 @@
-"use client";
 import { useState } from "react";
 import type { FillDraft, FillFavorite, InkStroke, View } from "../types";
 

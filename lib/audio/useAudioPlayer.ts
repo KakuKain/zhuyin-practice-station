@@ -1,4 +1,3 @@
-"use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { RefObject } from "react";
 import type { ListeningQuestion, StateSetter, View } from "../../features/types";

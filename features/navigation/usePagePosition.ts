@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useLayoutEffect, useRef } from "react";
 import type { View } from "../types";
 

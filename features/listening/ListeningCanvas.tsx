@@ -1,5 +1,3 @@
-"use client";
-
 import type { CSSProperties } from "react";
 import type { AppController } from "../usePracticeApp";
 import { Play } from "@phosphor-icons/react";

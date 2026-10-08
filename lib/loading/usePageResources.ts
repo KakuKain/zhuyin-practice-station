@@ -1,5 +1,3 @@
-"use client";
-
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import previews from "../../components/artwork-previews.json";
 import type { View } from "../../features/types";

@@ -1,4 +1,3 @@
-"use client";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 import {
   PencilSimple,
@@ -12,7 +11,13 @@ import {
   Square,
 } from "@phosphor-icons/react";
 import type { PointerEvent } from "react";
-import { PointerLease, appendSample, createPaintScheduler } from "../../lib/ink/gesture";
+import {
+  PointerLease,
+  appendSample,
+  createPaintScheduler,
+  isPalmContact,
+  pointerSamples,
+} from "../../lib/ink/gesture";
 import {
   freeBoardKey,
   boardStep,
@@ -38,33 +43,59 @@ export function FreeDictation() {
   const paperRef = useRef("grid");
   const [notice, setNotice] = useState("");
   const [counts, setCounts] = useState({ ink: 0, redo: 0 });
+  // Points of the active stroke already on the canvas; the rest are drawn on the next frame.
+  const drawnPoints = useRef(0);
+  /** Full redraw: on load, resize, undo/redo/clear and once when a stroke ends. */
   const paint = () => {
     const el = canvas.current;
     const ctx = el?.getContext("2d");
     if (!el || !ctx) return;
     const ratio = Math.min(devicePixelRatio || 1, 2);
-    el.width = Math.round(size.current.width * ratio);
-    el.height = Math.round(size.current.height * ratio);
+    const width = Math.round(size.current.width * ratio);
+    const height = Math.round(size.current.height * ratio);
+    // Assigning a size reallocates the bitmap, so only do it when the size changes.
+    if (el.width !== width) el.width = width;
+    if (el.height !== height) el.height = height;
     ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    ctx.clearRect(0, 0, size.current.width, size.current.height);
     paintBoard(ctx, [...strokes.current, ...(active.current ? [active.current] : [])]);
+    drawnPoints.current = active.current?.points.length ?? 0;
+  };
+  /** While writing, draw only the new segments instead of repainting a full page of ink. */
+  const paintActive = () => {
+    const stroke = active.current;
+    const ctx = canvas.current?.getContext("2d");
+    if (!stroke || !ctx) return;
+    const from = Math.max(0, drawnPoints.current - 1);
+    if (from + 1 >= stroke.points.length && drawnPoints.current) return;
+    paintBoard(ctx, [{ ...stroke, points: stroke.points.slice(from) }]);
+    drawnPoints.current = stroke.points.length;
   };
   const [scheduler] = useState(() => createPaintScheduler());
+  const pendingSave = useRef<number | null>(null);
+  const writeBoard = () => {
+    if (pendingSave.current !== null) window.clearTimeout(pendingSave.current);
+    pendingSave.current = null;
+    if (protectedRef.current) return;
+    try {
+      localStorage.setItem(
+        freeBoardKey,
+        JSON.stringify({
+          version: 2,
+          ...size.current,
+          paper: paperRef.current,
+          strokes: strokes.current,
+        }),
+      );
+    } catch {
+      setNotice("無法自動保存，請先儲存圖片。");
+    }
+  };
+  /** Serializing a full page on every lift stalls the next stroke; write once the hand rests. */
   const save = () => {
-    if (!protectedRef.current)
-      try {
-        localStorage.setItem(
-          freeBoardKey,
-          JSON.stringify({
-            version: 2,
-            ...size.current,
-            paper: paperRef.current,
-            strokes: strokes.current,
-          }),
-        );
-      } catch {
-        setNotice("無法自動保存，請先儲存圖片。");
-      }
     setCounts({ ink: strokes.current.length, redo: redo.current.length });
+    if (pendingSave.current !== null) window.clearTimeout(pendingSave.current);
+    pendingSave.current = window.setTimeout(writeBoard, 600);
   };
   const paintLatest = useEffectEvent(() => paint());
   useEffect(() => {
@@ -99,20 +130,21 @@ export function FreeDictation() {
       scheduler.cancel();
     };
   }, [scheduler]);
-  const point = (event: PointerEvent<HTMLCanvasElement>): [number, number] => {
-    const rect = event.currentTarget.getBoundingClientRect();
-    return [
-      Math.max(0, Math.min(size.current.width, event.clientX - rect.left)),
-      Math.max(0, Math.min(size.current.height, event.clientY - rect.top)),
-    ];
-  };
+  // 0.1 px keeps the stroke exact while halving the stored size of a full page.
+  const round = (value: number) => Math.round(value * 10) / 10;
+  const point = (rect: DOMRect, clientX: number, clientY: number): [number, number] => [
+    round(Math.max(0, Math.min(size.current.width, clientX - rect.left))),
+    round(Math.max(0, Math.min(size.current.height, clientY - rect.top))),
+  ];
   const sample = (event: PointerEvent<HTMLCanvasElement>) => {
-    if (active.current)
+    if (!active.current) return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    for (const item of pointerSamples(event.nativeEvent))
       appendSample(
         active.current.points,
-        point(event),
+        point(rect, item.clientX, item.clientY),
         (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]),
-        0.5,
+        1,
       );
   };
   const stopStroke = (completed = false) => {
@@ -139,16 +171,25 @@ export function FreeDictation() {
     stopStroke(event.type === "pointerup");
   };
   const interruptStroke = useEffectEvent(() => stopStroke());
+  const flushSave = useEffectEvent(() => {
+    if (pendingSave.current !== null) writeBoard();
+  });
   useEffect(() => {
     const interrupt = () => interruptStroke();
     const visibility = () => {
-      if (document.hidden) interrupt();
+      if (!document.hidden) return;
+      interrupt();
+      flushSave();
     };
+    const leave = () => flushSave();
     window.addEventListener("blur", interrupt);
+    window.addEventListener("pagehide", leave);
     document.addEventListener("visibilitychange", visibility);
     return () => {
       interrupt();
+      flushSave();
       window.removeEventListener("blur", interrupt);
+      window.removeEventListener("pagehide", leave);
       document.removeEventListener("visibilitychange", visibility);
     };
   }, []);
@@ -308,7 +349,8 @@ export function FreeDictation() {
                 protectedDraft ||
                 tool === "scroll" ||
                 (event.pointerType === "mouse" && event.button !== 0) ||
-                strokes.current.length >= 2000
+                strokes.current.length >= 2000 ||
+                isPalmContact(event)
               )
                 return;
               event.preventDefault();
@@ -317,15 +359,28 @@ export function FreeDictation() {
               active.current = {
                 color: tool === "red" ? "#d43838" : "#193458",
                 erase: tool === "erase",
-                points: [point(event)],
+                points: [
+                  point(event.currentTarget.getBoundingClientRect(), event.clientX, event.clientY),
+                ],
               };
-              paint();
+              drawnPoints.current = 0;
+              paintActive();
             }}
             onPointerMove={(event) => {
               if (!active.current || !pointerLease.current.owns(event.pointerId)) return;
               event.preventDefault();
+              if (isPalmContact(event)) {
+                // A resting hand that spread out: drop it without keeping any ink.
+                active.current = null;
+                const pointerId = pointerLease.current.release();
+                if (pointerId !== null && event.currentTarget.hasPointerCapture(pointerId))
+                  event.currentTarget.releasePointerCapture(pointerId);
+                scheduler.cancel();
+                paint();
+                return;
+              }
               sample(event);
-              scheduler.schedule(paint);
+              scheduler.schedule(paintActive);
             }}
             onPointerUp={finish}
             onPointerCancel={finish}

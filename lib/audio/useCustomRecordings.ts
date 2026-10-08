@@ -1,5 +1,4 @@
-"use client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { recordingError, type CustomRecording, type RecordingInfo } from "./custom-audio";
 import { createRecordingCache } from "./recording-cache";
 import { customAudioStorage } from "./custom-audio-storage";
@@ -28,25 +27,6 @@ export function useCustomRecordings() {
     setLoading(true);
     await load();
   }, [load, cache]);
-  useEffect(() => {
-    const token = ++generation.current;
-    void cache
-      .list()
-      .then((next) => {
-        if (token !== generation.current) return;
-        setRecordings(next);
-        setError("");
-        setLoading(false);
-      })
-      .catch((cause) => {
-        if (token !== generation.current) return;
-        setError(recordingError(cause));
-        setLoading(false);
-      });
-    return () => {
-      generation.current += 1;
-    };
-  }, [cache]);
   const save = useCallback(
     async (recording: CustomRecording) => {
       await customAudioStorage.put(recording);
@@ -68,6 +48,7 @@ export function useCustomRecordings() {
     },
     [cache],
   );
-  return { recordings, loading, error, reload, save, remove, get: cache.get };
+  // The full list is only needed by the recording manager, which calls load() when it opens.
+  return { recordings, loading, error, load, reload, save, remove, get: cache.get };
 }
 export type CustomAudioController = ReturnType<typeof useCustomRecordings>;

@@ -1,4 +1,3 @@
-"use client";
 import { MaterialManager } from "./MaterialManager";
 import { MaterialMetadataEditor } from "./MaterialMetadataEditor";
 import { updateMaterial, replaceLesson } from "../courses/material-actions";

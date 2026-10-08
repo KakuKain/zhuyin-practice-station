@@ -1,4 +1,3 @@
-"use client";
 import { useCallback, useEffect, useEffectEvent } from "react";
 import type { ListenPhase, ListeningQuestion, ListeningSettings, StateSetter } from "../types";
 import type { useListeningTimers } from "./useListeningTimers";

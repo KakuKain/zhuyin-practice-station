@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { ShowMsg } from "../../components/ShowMsg";
 import type { AppController } from "../usePracticeApp";

@@ -1,4 +1,3 @@
-"use client";
 import { courseReviewQueue, type CourseReviewItem } from "./practice/course-review";
 import { useListeningRound } from "./listening/useListeningRound";
 
@@ -219,7 +218,6 @@ export function usePracticeApp() {
     setFillParentChecked,
     setCompletedFillLessons,
     setFillPendingCells,
-    persistFillRef,
   });
 
   const customAudio = useCustomRecordings();

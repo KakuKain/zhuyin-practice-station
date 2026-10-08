@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useRef, useState, type ImgHTMLAttributes } from "react";
 import previews from "./artwork-previews.json";
 

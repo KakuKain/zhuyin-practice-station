@@ -1,4 +1,3 @@
-"use client";
 import { usePersistentState } from "../../lib/storage/usePersistentState";
 import {
   materialsStorageKey,

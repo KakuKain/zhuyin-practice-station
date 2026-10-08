@@ -1,5 +1,3 @@
-"use client";
-
 import type { AppController } from "../usePracticeApp";
 import { fillFavoriteKey, fillLocation } from "../practice/practice-storage";
 import { InkPreview, LoadingOverlay, ResourceNotice } from "../../components/AppChrome";

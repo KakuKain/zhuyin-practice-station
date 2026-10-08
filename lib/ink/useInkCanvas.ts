@@ -1,11 +1,15 @@
-"use client";
-
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 import type { PointerEvent } from "react";
 import type { InkStroke } from "../../features/types";
 import { cloneInk, eraseInsideLasso, InkHistory, isUsableLasso } from "./ink-path";
-import { PointerLease, appendSample, createPaintScheduler } from "./gesture";
-import { pointerPoint, renderInk } from "./ink-render";
+import {
+  PointerLease,
+  appendSample,
+  createPaintScheduler,
+  isPalmContact,
+  pointerSamples,
+} from "./gesture";
+import { pointInRect, pointerPoint, renderInk } from "./ink-render";
 
 type Options = {
   scope: string;
@@ -132,8 +136,8 @@ export function useInkCanvas({
     };
   }, [scope, mounted, count]);
 
-  const lockEvent = useEffectEvent(() => {
-    if (enabled) return;
+  /** Keep the writing so far; an unfinished lasso never erases anything. */
+  const keepActiveStroke = () => {
     const gesture = gestureRef.current;
     if (gesture && !gesture.erase && activeStrokeRef.current?.length)
       commit(gesture.index, [
@@ -141,6 +145,10 @@ export function useInkCanvas({
         activeStrokeRef.current,
       ]);
     cancelGesture();
+  };
+  const lockEvent = useEffectEvent(() => {
+    if (enabled) return;
+    keepActiveStroke();
     changeEraser(null);
     setNotice("");
   });
@@ -154,7 +162,8 @@ export function useInkCanvas({
     [scheduler],
   );
 
-  const interruptInk = useEffectEvent(() => cancelGesture());
+  // Switching apps or a system dialog keeps the stroke, as rotation and locking do.
+  const interruptInk = useEffectEvent(() => keepActiveStroke());
   useEffect(() => {
     const interrupt = () => interruptInk();
     const visibility = () => {
@@ -170,7 +179,12 @@ export function useInkCanvas({
   }, []);
 
   const begin = (event: PointerEvent<HTMLCanvasElement>) => {
-    if (!enabled || gestureRef.current || (event.pointerType === "mouse" && event.button !== 0))
+    if (
+      !enabled ||
+      gestureRef.current ||
+      (event.pointerType === "mouse" && event.button !== 0) ||
+      isPalmContact(event)
+    )
       return;
     event.preventDefault();
     const canvas = event.currentTarget;
@@ -192,13 +206,24 @@ export function useInkCanvas({
   const append = (event: PointerEvent<HTMLCanvasElement>) => {
     const stroke = gestureStrokeRef.current;
     if (!stroke?.length) return;
-    const point = pointerPoint(event.currentTarget, event.clientX, event.clientY);
-    appendSample(stroke, point, (a, b) => Math.hypot(a.x - b.x, a.y - b.y), 0.12);
+    const rect = event.currentTarget.getBoundingClientRect();
+    for (const sample of pointerSamples(event.nativeEvent))
+      appendSample(
+        stroke,
+        pointInRect(rect, sample.clientX, sample.clientY),
+        (a, b) => Math.hypot(a.x - b.x, a.y - b.y),
+        0.12,
+      );
   };
   const move = (event: PointerEvent<HTMLCanvasElement>) => {
     const gesture = gestureRef.current;
     if (!gesture || !pointerLease.current.owns(event.pointerId)) return;
     event.preventDefault();
+    // A resting hand can start small and spread; drop that touch instead of drawing it.
+    if (isPalmContact(event)) {
+      cancelGesture();
+      return;
+    }
     append(event);
     scheduler.schedule(() => {
       const current = gestureRef.current;

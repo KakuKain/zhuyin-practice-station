@@ -1,5 +1,3 @@
-"use client";
-
 import { combinedRhymeGroups } from "../features/symbols/symbols-data";
 
 const combinedGlyphs = Object.fromEntries(
