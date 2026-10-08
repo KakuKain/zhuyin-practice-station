@@ -11,6 +11,7 @@ import { AnswerDisplay } from "../../components/Zhuyin";
 import { AppHeader, LoadingOverlay, ResourceNotice } from "../../components/AppChrome";
 import { ListeningBatchReview } from "./ListeningBatchReview";
 import { ListeningCanvas } from "./ListeningCanvas";
+import { ConfirmDialog } from "../../components/ConfirmDialog";
 
 export function ListeningScreen({ app }: { app: AppController }) {
   const {
@@ -278,35 +279,20 @@ export function ListeningScreen({ app }: { app: AppController }) {
         <LoadingOverlay label={loadingMessage ?? "聲音準備中…"} />
       )}
       {listenExitOpen && (
-        <div className="fill-dialog-backdrop">
-          <div
-            className="fill-dialog"
-            role="alertdialog"
-            aria-modal="true"
-            aria-labelledby="listen-exit-title"
-            aria-describedby="listen-exit-description"
-          >
-            <span className="fill-dialog-eyebrow">聽寫練習</span>
-            <h2 id="listen-exit-title">要先離開聽寫嗎？</h2>
-            <p id="listen-exit-description">
-              {singleQuestionPractice && (listenPhase === "active" || listenPhase === "retry")
-                ? "倒數已暫停。"
-                : ""}
-              離開後，這一輪未完成的進度與筆跡不會保留；已收藏與待補強的題目仍會留下。
-            </p>
-            <button
-              className="fill-dialog-primary"
-              type="button"
-              autoFocus
-              onClick={() => setListenExitOpen(false)}
-            >
-              繼續練習
-            </button>
-            <button className="fill-dialog-secondary" type="button" onClick={confirmLeaveFocus}>
-              結束本輪
-            </button>
-          </div>
-        </div>
+        <ConfirmDialog
+          id="listen-exit"
+          eyebrow="聽寫練習"
+          title="要先離開聽寫嗎？"
+          primaryLabel="繼續練習"
+          onPrimary={() => setListenExitOpen(false)}
+          secondaryLabel="結束本輪"
+          onSecondary={confirmLeaveFocus}
+        >
+          {singleQuestionPractice && (listenPhase === "active" || listenPhase === "retry")
+            ? "倒數已暫停。"
+            : ""}
+          離開後，這一輪未完成的進度與筆跡不會保留；已收藏與待補強的題目仍會留下。
+        </ConfirmDialog>
       )}
     </main>
   );

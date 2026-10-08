@@ -2,8 +2,9 @@ import { lessons, exercises, courseArtwork, lessonNumerals } from "./course-data
 import { circledVocabulary, reviewVocabulary, type CircledTerm } from "./circled-vocabulary";
 import type { LessonExercise, SyllableItem } from "../types";
 import { createZhuyinExercise, type LessonContent } from "./lesson-content";
+import { storageKeys } from "../../lib/storage/storage-keys";
 
-export const materialsStorageKey = "zhuyin-materials-v1";
+export const materialsStorageKey = storageKeys.materials;
 export const builtinMaterialId = "kang-hsuan-grade1-semester1";
 export type CustomLesson = {
   index: number;

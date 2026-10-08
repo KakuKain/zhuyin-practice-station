@@ -7,7 +7,6 @@ export function useListeningSession() {
   const [listenPhase, setListenPhase] = useState<ListenPhase>("ready");
   const [listenExitOpen, setListenExitOpen] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(30);
-  const [playCount, setPlayCount] = useState(0);
   const [listenMessage, setListenMessage] = useState("");
   const [retryMessage, setRetryMessage] = useState("");
   const [sessionScore, setSessionScore] = useState({ listeningCorrect: 0 });
@@ -26,8 +25,6 @@ export function useListeningSession() {
     setListenExitOpen,
     secondsLeft,
     setSecondsLeft,
-    playCount,
-    setPlayCount,
     listenMessage,
     setListenMessage,
     retryMessage,

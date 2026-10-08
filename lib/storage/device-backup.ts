@@ -9,7 +9,8 @@ import {
   validatedFillFavorites,
 } from "../../features/practice/practice-storage";
 import { validateFillDraft } from "../../features/fill/fill-storage";
-import { freeBoardKey, readBoardDraft } from "../ink/free-board";
+import { readBoardDraft } from "../ink/free-board";
+import { fillDraftKeyIndex, ownsStorageKey, storageKeys } from "./storage-keys";
 import { customAudioStorage } from "../audio/custom-audio-storage";
 import {
   validateRecording,
@@ -40,10 +41,7 @@ export type PreparedBackup = {
     unreadable: number;
   };
 };
-export const ownsStorageKey = (key: string) =>
-  /^zhuyin-(materials-v1|practice-state-v[1-4]|fill-favorites-v1|listening-settings-v1|fill-draft-v1-\d+)$/.test(
-    key,
-  ) || key === freeBoardKey;
+export { ownsStorageKey };
 export function snapshotStorage(storage: Storage): Record<string, string> {
   const values: Record<string, string> = {};
   for (let i = 0; i < storage.length; i++) {
@@ -118,9 +116,13 @@ export function prepareDeviceBackup(raw: unknown): PreparedBackup {
   }
   const catalog = buildCatalog(materials);
   // The app reads the newest practice key that exists; older ones are migration input only.
-  const activePracticeKey = [4, 3, 2, 1]
-    .map((version) => `zhuyin-practice-state-v${version}`)
-    .find((key) => storage[key] !== undefined);
+  const practiceKeys = [
+    [storageKeys.practice, 4],
+    [storageKeys.practiceV3, 3],
+    [storageKeys.practiceV2, 2],
+    [storageKeys.practiceV1, 1],
+  ] as const;
+  const activePracticeKey = practiceKeys.find(([key]) => storage[key] !== undefined)?.[0];
   let saved = 0,
     drafts = 0,
     strokes = 0;
@@ -131,24 +133,24 @@ export function prepareDeviceBackup(raw: unknown): PreparedBackup {
       parsed && typeof parsed === "object" && !Array.isArray(parsed)
         ? (parsed as Record<string, unknown>)
         : null;
-    const practice = /^zhuyin-practice-state-v([1-4])$/.exec(key);
-    const draft = /^zhuyin-fill-draft-v1-(\d+)$/.exec(key);
-    if (practice) {
+    const practiceVersion = practiceKeys.find(([practiceKey]) => practiceKey === key)?.[1];
+    const draftIndex = fillDraftKeyIndex(key);
+    if (practiceVersion) {
       if (!record || !Array.isArray(record.savedQuestions)) unreadable++;
       else if (key === activePracticeKey)
-        saved += validatePracticeState(record, Number(practice[1]) as 1 | 2 | 3 | 4, catalog, true)
-          .savedQuestions.length;
-    } else if (key === "zhuyin-fill-favorites-v1") {
+        saved += validatePracticeState(record, practiceVersion, catalog, true).savedQuestions
+          .length;
+    } else if (key === storageKeys.fillFavorites) {
       if (!Array.isArray(parsed)) unreadable++;
       else saved += validatedFillFavorites(parsed, catalog, true).length;
-    } else if (key === "zhuyin-listening-settings-v1") {
+    } else if (key === storageKeys.listeningSettings) {
       if (!record) unreadable++;
-    } else if (draft) {
-      const index = Number(draft[1]),
-        lesson = catalog.find((l) => l.index === index);
-      if (lesson && validateFillDraft(parsed, index, lesson.exercise.lines.flat().length)) drafts++;
+    } else if (draftIndex !== null) {
+      const lesson = catalog.find((l) => l.index === draftIndex);
+      if (lesson && validateFillDraft(parsed, draftIndex, lesson.exercise.lines.flat().length))
+        drafts++;
       else unreadable++;
-    } else if (key === freeBoardKey) {
+    } else if (key === storageKeys.freeBoard) {
       const board = readBoardDraft(parsed, 304);
       if (board) strokes = board.strokes.length;
       else unreadable++;

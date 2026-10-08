@@ -7,6 +7,18 @@ import {
   type DeviceBackup,
 } from "../../lib/storage/device-backup";
 import { recordingKey } from "../../lib/audio/custom-audio";
+import { ownsStorageKey } from "../../lib/storage/storage-keys";
+import { materialsStorageKey } from "../../features/courses/materials";
+import {
+  fillFavoritesStorageKey,
+  firstPracticeStorageKey,
+  practiceStorageKey,
+  previousPracticeStorageKey,
+  thirdPracticeStorageKey,
+} from "../../features/practice/practice-storage";
+import { listeningSettingsStorageKey } from "../../features/listening/listening-data";
+import { freeBoardKey } from "../../lib/ink/free-board";
+import { fillDraftStorageKey } from "../../features/fill/fill-storage";
 const backup = (): DeviceBackup => ({
   format: "zhuyin-device-backup",
   version: 1,
@@ -127,4 +139,22 @@ test("quota failure aborts before any recording mutation", async () => {
   );
   assert.equal(called, false);
   assert.deepEqual(snapshotStorage(storage), { "zhuyin-listening-settings-v1": "old" });
+});
+
+test("every storage key the app writes is owned by device backup", () => {
+  for (const key of [
+    materialsStorageKey,
+    practiceStorageKey,
+    thirdPracticeStorageKey,
+    previousPracticeStorageKey,
+    firstPracticeStorageKey,
+    fillFavoritesStorageKey,
+    listeningSettingsStorageKey,
+    freeBoardKey,
+    fillDraftStorageKey(0),
+    fillDraftStorageKey(12),
+  ])
+    assert.ok(ownsStorageKey(key), key);
+  for (const key of ["unrelated", "zhuyin-fill-draft-v1-x", "zhuyin-practice-state-v5"])
+    assert.equal(ownsStorageKey(key), false, key);
 });

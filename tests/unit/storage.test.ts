@@ -89,7 +89,7 @@ test("v1, v2 and v3 favorites survive migration, dedupe and invalid records", ()
 });
 
 test("hydration never overwrites existing records; quota failures keep in-memory progress", (t) => {
-  const data = new Map([
+  const data = new Map<string, string>([
     [
       practiceStorageKey,
       JSON.stringify({

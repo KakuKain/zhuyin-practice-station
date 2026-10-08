@@ -1,15 +1,12 @@
 import { ShowMsg } from "./ShowMsg";
-import { useSyncExternalStore, type ReactNode } from "react";
+import { createContext, useContext, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 
-const subscribeHeader = () => () => {};
+/** The header's back-button slot, so a panel deep in the page can put its back action there. */
+export const HeaderBackSlot = createContext<HTMLElement | null>(null);
+
 export function HeaderBack({ label, onBack }: { label: string; onBack: () => void }) {
-  const mounted = useSyncExternalStore(
-    subscribeHeader,
-    () => true,
-    () => false,
-  );
-  const target = mounted ? document.getElementById("app-header-back-slot") : null;
+  const target = useContext(HeaderBackSlot);
   return target
     ? createPortal(
         <button className="header-back" type="button" onClick={onBack}>
@@ -53,18 +50,20 @@ export function AppHeader({
   backLabel,
   materialSelector,
   title,
+  backSlotRef,
 }: {
   onCourses: () => void;
   onBack?: () => void;
   backLabel?: string;
   materialSelector?: ReactNode;
   title?: string;
+  backSlotRef?: (element: HTMLDivElement | null) => void;
 }) {
   return (
     <header
       className={`app-header ${onBack ? "has-back" : ""} ${materialSelector ? "has-material-selector" : ""}`}
     >
-      <div id="app-header-back-slot" />
+      <div id="app-header-back-slot" ref={backSlotRef} />
       {title && <h1 className="header-page-title">{title}</h1>}
       {materialSelector}
       {onBack && (

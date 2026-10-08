@@ -5,8 +5,9 @@ import type { CircledTerm } from "../courses/circled-vocabulary";
 import { builtinCatalog, type CatalogLesson } from "../courses/materials";
 import { registeredAudioUrl } from "../../lib/audio/audio-registry";
 import { combinedRhymeExample } from "../symbols/combined-rhyme-audio";
+import { storageKeys } from "../../lib/storage/storage-keys";
 
-export const listeningSettingsStorageKey = "zhuyin-listening-settings-v1";
+export const listeningSettingsStorageKey = storageKeys.listeningSettings;
 
 export const defaultListeningSettings: ListeningSettings = {
   repeatCount: 2,

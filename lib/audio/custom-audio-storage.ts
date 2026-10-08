@@ -4,8 +4,9 @@ import {
   type CustomRecording,
   type RecordingInfo,
 } from "./custom-audio";
+import { customAudioDatabase } from "../storage/storage-keys";
 
-const databaseName = "zhuyin-custom-audio-v1";
+const databaseName = customAudioDatabase;
 const storeName = "recordings";
 type StoredRecording = Omit<CustomRecording, "blob"> & { blob: Blob | ArrayBuffer };
 function hydrateRecording(value: StoredRecording): CustomRecording {

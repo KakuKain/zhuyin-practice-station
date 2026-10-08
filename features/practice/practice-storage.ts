@@ -1,4 +1,5 @@
 import type { FillFavorite, PracticeSession, PracticeState, SavedQuestion } from "../types";
+import { storageKeys } from "../../lib/storage/storage-keys";
 import {
   findQuestionSeed,
   legacySavedQuestionIndexes,
@@ -11,14 +12,11 @@ import {
   validSyllable,
 } from "../courses/materials";
 
-export const practiceStorageKey = "zhuyin-practice-state-v4";
-export const thirdPracticeStorageKey = "zhuyin-practice-state-v3";
-
-export const fillFavoritesStorageKey = "zhuyin-fill-favorites-v1";
-
-export const previousPracticeStorageKey = "zhuyin-practice-state-v2";
-
-export const firstPracticeStorageKey = "zhuyin-practice-state-v1";
+export const practiceStorageKey = storageKeys.practice;
+export const thirdPracticeStorageKey = storageKeys.practiceV3;
+export const previousPracticeStorageKey = storageKeys.practiceV2;
+export const firstPracticeStorageKey = storageKeys.practiceV1;
+export const fillFavoritesStorageKey = storageKeys.fillFavorites;
 
 export const initialPracticeState: PracticeState = {
   savedQuestions: [],

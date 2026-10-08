@@ -1,6 +1,7 @@
 import type { FillDraft, InkStroke } from "../types";
+import { fillDraftStorageKey } from "../../lib/storage/storage-keys";
 
-export const fillDraftStorageKey = (lessonIndex: number) => `zhuyin-fill-draft-v1-${lessonIndex}`;
+export { fillDraftStorageKey };
 
 /**
  * Older versions also set an unread `zhuyin_fill_draft_<n>` marker cookie with `Path=/`,
