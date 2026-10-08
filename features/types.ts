@@ -41,7 +41,12 @@ export type LessonExercise = {
   questions: readonly ListeningSeed[];
 };
 
-export type InkPoint = { x: number; y: number };
+export type InkPoint = {
+  x: number;
+  y: number;
+  /** Full pen width in the same 0–100 units as x/y; absent on legacy ink. */
+  width?: number;
+};
 
 export type InkStroke = InkPoint[];
 

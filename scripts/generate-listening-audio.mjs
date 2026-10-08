@@ -6,7 +6,9 @@ import { join, resolve } from "node:path";
 // Run on macOS when lesson content changes. The generated clips are committed
 // so deployed playback does not depend on a visitor's speech-synthesis support.
 const root = resolve(import.meta.dirname, "..");
-const source = readFileSync(join(root, "features/courses/course-data.ts"), "utf8");
+const source = ["course-data.ts", "legacy-content.ts"]
+  .map((name) => readFileSync(join(root, "features/courses", name), "utf8"))
+  .join("\n");
 const vocabularySource = readFileSync(join(root, "features/courses/circled-vocabulary.ts"), "utf8");
 const circledTexts = [...vocabularySource.matchAll(/term\("([^"]+)"/g)].map((match) => match[1]);
 const texts = new Set([

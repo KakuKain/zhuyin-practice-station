@@ -1,4 +1,3 @@
-"use client";
 import { ShowMsg } from "../../components/ShowMsg";
 import { HeaderBack } from "../../components/AppChrome";
 
@@ -20,8 +19,11 @@ const MaterialsPanel = lazy(() =>
   import("./MaterialsPanel").then((module) => ({ default: module.MaterialsPanel })),
 );
 import { builtinMaterialName } from "../courses/materials";
+// Feature styles load with the chunk (after every eager stylesheet), not on first paint.
 const CustomAudioPanel = lazy(() =>
-  import("./CustomAudioPanel").then((module) => ({ default: module.CustomAudioPanel })),
+  Promise.all([import("./CustomAudioPanel"), import("../../styles/lazy/custom-audio.css")]).then(
+    ([module]) => ({ default: module.CustomAudioPanel }),
+  ),
 );
 
 const DeviceBackupPanel = lazy(() =>
@@ -67,7 +69,7 @@ export function SettingsScreen({
   if (morePanel === "home")
     return (
       <section className="page-section more-page">
-        <PageHeading title="更多" artwork="/course-art/swan-riding-family-watercolor.webp" />
+        <PageHeading title="更多" artwork="course-art/swan-riding-family-watercolor.webp" />
         <div className="more-group">
           <h2>練習設定</h2>
           <div className="more-settings-list">

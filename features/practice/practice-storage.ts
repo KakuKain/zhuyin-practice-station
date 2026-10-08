@@ -1,9 +1,8 @@
 import type { FillFavorite, PracticeSession, PracticeState, SavedQuestion } from "../types";
-import {
-  findQuestionSeed,
-  legacySavedQuestionIndexes,
-  questionId,
-} from "../listening/listening-data";
+import { storageKeys } from "../../lib/storage/storage-keys";
+import { findQuestionSeed, questionId } from "../listening/listening-data";
+import { legacySavedQuestionIndexes } from "../courses/legacy-content";
+import { isCustomLessonIndex } from "../courses/lesson-identity";
 import {
   catalogExercises,
   storedCatalog,
@@ -11,14 +10,11 @@ import {
   validSyllable,
 } from "../courses/materials";
 
-export const practiceStorageKey = "zhuyin-practice-state-v4";
-export const thirdPracticeStorageKey = "zhuyin-practice-state-v3";
-
-export const fillFavoritesStorageKey = "zhuyin-fill-favorites-v1";
-
-export const previousPracticeStorageKey = "zhuyin-practice-state-v2";
-
-export const firstPracticeStorageKey = "zhuyin-practice-state-v1";
+export const practiceStorageKey = storageKeys.practice;
+export const thirdPracticeStorageKey = storageKeys.practiceV3;
+export const previousPracticeStorageKey = storageKeys.practiceV2;
+export const firstPracticeStorageKey = storageKeys.practiceV1;
+export const fillFavoritesStorageKey = storageKeys.fillFavorites;
 
 export const initialPracticeState: PracticeState = {
   savedQuestions: [],
@@ -43,7 +39,8 @@ export function validatePracticeState(
       !item ||
       typeof item !== "object" ||
       !Number.isSafeInteger(item.lessonIndex) ||
-      (!exercises[item.lessonIndex] && !(preserveUnavailableLessons && item.lessonIndex >= 9))
+      (!exercises[item.lessonIndex] &&
+        !(preserveUnavailableLessons && isCustomLessonIndex(item.lessonIndex)))
     )
       return [];
     let id = item.questionId;
@@ -60,7 +57,7 @@ export function validatePracticeState(
     return typeof id === "string" &&
       (findQuestionSeed(item.lessonIndex, id, catalog) ||
         (preserveUnavailableLessons &&
-          item.lessonIndex >= 9 &&
+          isCustomLessonIndex(item.lessonIndex) &&
           !exercises[item.lessonIndex] &&
           /^(characters|words):[\p{Script=Han}]{1,8}$/u.test(id)))
       ? [
@@ -94,7 +91,8 @@ export function validatePracticeState(
         typeof item.id !== "string" ||
         !item.id ||
         !Number.isSafeInteger(item.lessonIndex) ||
-        (!exercises[item.lessonIndex] && !(preserveUnavailableLessons && item.lessonIndex >= 9)) ||
+        (!exercises[item.lessonIndex] &&
+          !(preserveUnavailableLessons && isCustomLessonIndex(item.lessonIndex))) ||
         !["fill", "listening", "single"].includes(item.mode) ||
         !Number.isFinite(item.completedAt) ||
         item.completedAt <= 0 ||
@@ -131,7 +129,8 @@ export function validatePracticeState(
     recentLesson:
       typeof parsed.recentLesson === "number" &&
       Number.isInteger(parsed.recentLesson) &&
-      (exercises[parsed.recentLesson] || (preserveUnavailableLessons && parsed.recentLesson >= 9))
+      (exercises[parsed.recentLesson] ||
+        (preserveUnavailableLessons && isCustomLessonIndex(parsed.recentLesson)))
         ? parsed.recentLesson
         : null,
     completedSessions:
@@ -211,50 +210,56 @@ export function validatedFillFavorites(
     if (
       typeof lessonIndex !== "number" ||
       !Number.isSafeInteger(lessonIndex) ||
-      (!exercises[lessonIndex] && !(preserveUnavailableLessons && lessonIndex >= 9))
+      (!exercises[lessonIndex] && !(preserveUnavailableLessons && isCustomLessonIndex(lessonIndex)))
     )
       continue;
     const lessonItems = exercises[lessonIndex]?.lines.flat();
-    const unavailable = !lessonItems && preserveUnavailableLessons && lessonIndex >= 9;
-    const positions = Array.isArray(candidate.positions)
-      ? candidate.positions.filter(
-          (position): position is number =>
-            typeof position === "number" &&
-            Number.isInteger(position) &&
-            position >= 0 &&
-            position < 200 &&
-            (unavailable ||
-              (lessonItems?.[position]?.character === candidate.character &&
-                lessonItems?.[position]?.zhuyin === candidate.zhuyin)),
-        )
-      : [];
+    const unavailable =
+      !lessonItems && preserveUnavailableLessons && isCustomLessonIndex(lessonIndex);
     if (
-      !positions.length ||
       typeof candidate.character !== "string" ||
       typeof candidate.zhuyin !== "string" ||
       (unavailable &&
         (!/^[\p{Script=Han}]$/u.test(candidate.character) || !validSyllable(candidate.zhuyin)))
     )
       continue;
-    const key = fillFavoriteKey({
-      lessonIndex,
-      character: candidate.character,
-      zhuyin: candidate.zhuyin,
-    });
-    const existing = result.get(key);
-    result.set(key, {
-      lessonIndex,
-      character: candidate.character,
-      zhuyin: candidate.zhuyin,
-      positions: [...new Set([...(existing?.positions ?? []), ...positions])].sort((a, b) => a - b),
-      status:
-        candidate.status === "needs_rewrite" || existing?.status === "needs_rewrite"
-          ? "needs_rewrite"
-          : candidate.status === "mastered"
-            ? "mastered"
-            : "review_later",
-      isFavorite: candidate.isFavorite !== false || Boolean(existing?.isFavorite),
-    });
+    // Positions follow the reading the lesson uses now, so a corrected built-in reading
+    // (for example 教 ㄐㄧㄠˋ → ㄐㄧㄠ) keeps the favorite instead of silently dropping it.
+    const byReading = new Map<string, number[]>();
+    for (const position of Array.isArray(candidate.positions) ? candidate.positions : []) {
+      if (
+        typeof position !== "number" ||
+        !Number.isInteger(position) ||
+        position < 0 ||
+        position >= 200
+      )
+        continue;
+      const reading = unavailable
+        ? candidate.zhuyin
+        : lessonItems?.[position]?.character === candidate.character
+          ? lessonItems[position].zhuyin
+          : null;
+      if (reading !== null) byReading.set(reading, [...(byReading.get(reading) ?? []), position]);
+    }
+    for (const [zhuyin, positions] of byReading) {
+      const key = fillFavoriteKey({ lessonIndex, character: candidate.character, zhuyin });
+      const existing = result.get(key);
+      result.set(key, {
+        lessonIndex,
+        character: candidate.character,
+        zhuyin,
+        positions: [...new Set([...(existing?.positions ?? []), ...positions])].sort(
+          (a, b) => a - b,
+        ),
+        status:
+          candidate.status === "needs_rewrite" || existing?.status === "needs_rewrite"
+            ? "needs_rewrite"
+            : candidate.status === "mastered"
+              ? "mastered"
+              : "review_later",
+        isFavorite: candidate.isFavorite !== false || Boolean(existing?.isFavorite),
+      });
+    }
   }
   return [...result.values()].filter((item) => item.isFavorite || item.status === "needs_rewrite");
 }

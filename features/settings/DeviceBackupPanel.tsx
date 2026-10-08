@@ -1,4 +1,3 @@
-"use client";
 import { useState } from "react";
 import { DownloadSimple, UploadSimple } from "@phosphor-icons/react";
 import { ShowMsg } from "../../components/ShowMsg";
@@ -19,10 +18,14 @@ function download(backup: DeviceBackup, prefix = "注音小練習備份") {
   link.href = url;
   link.download = `${prefix}-${new Date().toISOString().slice(0, 10)}.json`;
   link.click();
-  setTimeout(() => URL.revokeObjectURL(url), 10000);
+  // Safari may wait for the save prompt before reading the file.
+  setTimeout(() => URL.revokeObjectURL(url), 120000);
 }
 export function DeviceBackupPanel() {
   const [pending, setPending] = useState<PreparedBackup | null>(null);
+  // The safety copy is its own step: restoring reloads the page, which could cut a
+  // download that is still waiting for the browser's save prompt.
+  const [safetySaved, setSafetySaved] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [failed, setFailed] = useState(false);
@@ -71,6 +74,7 @@ export function DeviceBackupPanel() {
               const file = event.currentTarget.files?.[0];
               event.currentTarget.value = "";
               setPending(null);
+              setSafetySaved(false);
               if (file)
                 void run(async () => {
                   if (file.size > maxBackupBytes) throw new Error("請選擇 64 MB 以下的備份。");
@@ -98,28 +102,49 @@ export function DeviceBackupPanel() {
               </div>
             ))}
           </dl>
-          <p>還原會取代目前資料，並先下載目前的備份。完成後會自動重新整理。</p>
+          {pending.summary.unreadable > 0 && (
+            <p>有 {pending.summary.unreadable} 項內容這個版本無法讀取，會原樣保留。</p>
+          )}
+          <p>
+            還原會取代目前資料。請先下載目前資料，確認檔案已儲存，再開始還原；完成後會自動重新整理。
+          </p>
           <div className="backup-actions">
             <button
               type="button"
-              className="primary-button"
+              className={safetySaved ? "secondary-button" : "primary-button"}
               disabled={busy}
               onClick={() =>
                 void run(async () => {
                   download(await createDeviceBackup(), "還原前備份");
+                  setSafetySaved(true);
+                })
+              }
+            >
+              <DownloadSimple size={22} aria-hidden="true" />
+              {safetySaved ? "再次下載目前資料" : "1. 下載目前資料"}
+            </button>
+            <button
+              type="button"
+              className="primary-button"
+              disabled={busy || !safetySaved}
+              onClick={() =>
+                void run(async () => {
                   await restoreDeviceBackup(pending);
                   // Reload every in-memory store and recording cache together.
                   window.location.reload();
                 })
               }
             >
-              備份目前資料並還原
+              2. 開始還原
             </button>
             <button
               type="button"
               className="secondary-button"
               disabled={busy}
-              onClick={() => setPending(null)}
+              onClick={() => {
+                setPending(null);
+                setSafetySaved(false);
+              }}
             >
               取消
             </button>

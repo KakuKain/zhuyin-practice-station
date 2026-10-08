@@ -15,39 +15,21 @@
 }
 
 .lesson-page .lesson-heading {
-  min-height: 168px;
-  margin: 10px 0 16px;
-  padding: 12px 16px 10px 24px;
   overflow: hidden;
-  border-radius: 22px;
-  background:
-    linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0.85),
-      rgba(255, 255, 255, 0.48) 54%,
-      transparent 78%
-    ),
-    url("/course-art/lesson-watercolor-landscape.webp") center / cover;
 }
 
 .lesson-page .lesson-heading > div {
-  position: relative;
   min-width: 0;
 }
 
 .lesson-heading-art {
   flex: none;
-  width: clamp(124px, 30vw, 210px);
-  height: clamp(136px, 32vw, 210px);
   object-fit: contain;
   align-self: end;
   margin-bottom: -10px;
-  filter: drop-shadow(0 5px 4px rgba(68, 95, 66, 0.12));
 }
 
 .lesson-page .lesson-heading h1 {
-  font-size: clamp(28px, 5vw, 42px);
-  line-height: 1.14;
   text-wrap: pretty;
 }
 
@@ -58,38 +40,24 @@
   background: transparent;
 }
 
-.lesson-curriculum-heading {
-  margin-block: 20px 12px;
-  font-size: 19px;
-}
-
 .lesson-text-lines {
   display: grid;
   grid-template-columns: repeat(var(--preview-columns), minmax(0, 1fr));
   gap: 0;
-  min-height: calc(var(--preview-max-chars) * 1.24em + 24px);
   margin: 0;
-  padding: 14px 0;
   overflow: visible;
   border: 0;
   border-radius: 0;
-  background: #fffdf4;
-  font-size: clamp(23px, 6.2vw, 36px);
-  touch-action: pan-y;
+  touch-action: pan-y pinch-zoom;
   user-select: none;
 }
 
 .lesson-text-line {
   min-width: 0;
-  padding-inline: 2px;
   white-space: nowrap;
   font-size: inherit;
   line-height: 1.24;
   text-align: start;
-}
-
-.lesson-text-line + .lesson-text-line {
-  border-right: 1px solid #e6eee3;
 }
 
 .lesson-text-lines.is-zhuyin-only {
@@ -105,24 +73,17 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: min(100%, 320px);
-  margin: 12px auto 22px;
 }
 
 .lesson-page-circle {
   display: grid;
   place-items: center;
-  width: 56px;
-  height: 56px;
   border: 0;
   border-radius: 50%;
-  background: var(--ref-blue);
   color: white;
-  box-shadow: 0 4px 10px rgba(20, 110, 226, 0.16);
 }
 
 .lesson-page-circle:disabled {
-  background: #e7edf2;
   color: #9baebe;
   box-shadow: none;
   cursor: default;
@@ -142,19 +103,12 @@
 }
 
 .lesson-symbols {
-  display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 8px;
   margin-top: 0;
 }
 
 .lesson-symbols button {
-  width: 100%;
-  min-height: 78px;
-  padding: 9px 22px 9px 8px;
   border: 0;
-  background: #eff7ff;
-  font-size: 29px;
   cursor: pointer;
 }
 
@@ -164,26 +118,12 @@
   line-height: 1;
 }
 
-.lesson-symbols button.is-combination {
-  font-size: 23px;
-}
-
 .lesson-symbols button svg {
   position: absolute;
-  right: 8px;
-  bottom: 8px;
   color: var(--ref-blue);
 }
 
-.lesson-symbols button.is-playing {
-  background: #d9edff;
-  box-shadow: inset 0 0 0 2px #83c5ff;
-}
-
 @media (min-width: 700px) {
-  .lesson-text-lines {
-    padding: 24px 12px;
-  }
   .lesson-symbols {
     grid-template-columns: repeat(auto-fit, minmax(84px, 1fr));
   }
@@ -329,10 +269,8 @@
   min-height: 118px;
   gap: 6px 8px;
   padding: 10px;
-  border: 0;
   border-radius: 19px;
   text-align: left;
-  box-shadow: none;
 }
 
 .lesson-page .fill-mode {
@@ -353,11 +291,6 @@
   border-radius: 50%;
   background: #d1eaff;
   color: var(--ref-blue);
-}
-
-.lesson-page .listen-mode .mode-icon {
-  background: #d4f3df;
-  color: var(--ref-green);
 }
 
 .lesson-mode-copy {
@@ -381,7 +314,6 @@
 
 .lesson-page .mode-card .lesson-mode-copy strong {
   color: var(--ref-navy);
-  font-size: clamp(15px, 4.3vw, 24px);
   line-height: 1.45;
   white-space: normal;
 }

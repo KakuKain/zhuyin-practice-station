@@ -1,0 +1,374 @@
+/* Writing-first layout; tools and location stay outside the actual square. */
+.has-position-peek .practice-focus-header {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+}
+.has-position-peek .focus-header-status {
+  grid-column: 3;
+  grid-row: 1;
+}
+@media (max-width: 480px) {
+  .has-position-peek .practice-focus-header {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 4px 8px;
+  }
+  .has-position-peek .focus-header-title {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    font-size: 14px;
+  }
+  .has-position-peek .focus-header-stage {
+    display: none;
+  }
+  .has-position-peek .focus-header-status {
+    grid-column: 2;
+  }
+}
+.has-position-peek .fill-focus-body {
+  justify-content: flex-start;
+  gap: 0;
+  padding: 12px 18px max(12px, env(safe-area-inset-bottom));
+}
+.fill-writing-intro {
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto 10px;
+}
+.fill-writing-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.fill-writing-heading h1 {
+  margin: 0;
+  font-size: clamp(22px, 6vw, 26px);
+  line-height: 1.4;
+  letter-spacing: 0.025em;
+}
+.fill-writing-count {
+  flex: none;
+  color: #607c8f;
+  font-size: 13px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.fill-writing-count strong {
+  color: #286b87;
+  font-size: 18px;
+}
+.fill-writing-intro p {
+  margin: 7px 0 13px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.fill-writing-progress {
+  margin-top: 8px;
+  display: block;
+  width: 100%;
+  height: 5px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 10px;
+  background: #e2eeeb;
+  color: #7cbba7;
+  appearance: none;
+}
+.fill-writing-progress::-webkit-progress-bar {
+  border-radius: 10px;
+  background: #e2eeeb;
+}
+.fill-writing-progress::-webkit-progress-value {
+  border-radius: 10px;
+  background: #7cbba7;
+}
+.fill-writing-progress::-moz-progress-bar {
+  border-radius: 10px;
+  background: #7cbba7;
+}
+.fill-writing-workspace {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+  padding: 12px;
+  border: 1px solid #ddeae8;
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.87);
+  box-shadow: 0 8px 24px rgba(45, 86, 97, 0.045);
+}
+.fill-writing-position {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.fill-writing-location {
+  min-width: 0;
+  padding-left: 2px;
+}
+.fill-writing-location > span {
+  display: block;
+  margin-bottom: 2px;
+  color: #627e88;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.fill-writing-location strong {
+  color: #244e64;
+  font-size: 15px;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+.fill-position-peek.is-compact {
+  flex: 0 0 auto;
+  width: auto;
+  margin: 0;
+}
+.fill-position-peek.is-compact .position-peek-button {
+  min-height: 44px;
+  gap: 5px;
+  padding: 8px 10px;
+  border: 1px solid #cee1ed;
+  border-radius: 13px;
+  background: #eff7fc;
+  font-size: 14px;
+}
+.fill-position-peek.is-compact .position-peek-button[aria-expanded="true"] {
+  border-color: #d4a446;
+  background: #fff2c7;
+  color: #815610;
+}
+.has-position-peek .fill-writing-grid {
+  width: min(100%, max(120px, calc(100dvh - 340px)), 400px);
+  flex: 0 0 auto;
+  border: 2px solid #b6d5c9;
+  border-radius: 18px;
+  background: #fffefa;
+  box-shadow: 0 3px 0 #e1eee6;
+}
+.has-position-peek .fill-canvas-tools {
+  min-height: 48px;
+  margin: 0;
+}
+.has-position-peek .fill-focus-body > .ink-notice {
+  width: 100%;
+  min-height: 21px;
+  margin: 12px auto 0;
+  padding-inline: 6px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.has-position-peek .fill-writing-actions {
+  flex: 0 0 auto;
+  margin: 10px auto 0;
+}
+.has-position-peek .fill-save-button {
+  min-height: 56px;
+  gap: 8px;
+  border-radius: 18px;
+  background:
+    linear-gradient(120deg, rgba(70, 145, 239, 0.96), rgba(34, 106, 215, 0.96)),
+    url("/course-art/course-card-paper-v1.webp") center / 240px 240px;
+  box-shadow:
+    0 4px 0 #c9e1f2,
+    0 7px 16px rgba(52, 120, 208, 0.12);
+  font-size: 18px;
+}
+.has-position-peek .fill-save-button:disabled {
+  background: #e6eef4;
+  color: #627c90;
+  box-shadow: 0 3px 0 #dbe6ed;
+}
+.has-position-peek :is(.position-peek-button, .ink-tool, .fill-save-button):focus-visible {
+  outline: 3px solid #2868b9;
+  outline-offset: 3px;
+}
+@media (max-width: 350px) {
+  .has-position-peek .fill-focus-body {
+    padding-inline: 12px;
+  }
+  .fill-writing-workspace {
+    gap: 10px;
+    padding: 10px;
+    border-radius: 22px;
+  }
+  .fill-writing-heading {
+    gap: 8px;
+  }
+  .fill-writing-count {
+    font-size: 12px;
+  }
+  .fill-writing-location strong {
+    font-size: 14px;
+  }
+  .fill-position-peek.is-compact .position-peek-button {
+    padding-inline: 8px;
+    font-size: 13px;
+  }
+}
+
+.fill-position-peek {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto 12px;
+  text-align: center;
+}
+.position-peek-button {
+  flex: none;
+  position: relative;
+  z-index: 52;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 10px 20px;
+  border: 2px solid #b5d6ed;
+  border-radius: 18px;
+  background: #eff8ff;
+  color: #205c99;
+  font-size: 1rem;
+  font-weight: 800;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.position-peek-button[aria-expanded="true"] {
+  background: #fff2b5;
+  border-color: #d99418;
+  color: #72500a;
+}
+.fill-position-peek > p {
+  margin: 0;
+  max-width: 12em;
+  text-align: left;
+  color: #527188;
+  font-size: 0.875rem;
+}
+.fill-position-overlay {
+  position: fixed;
+  z-index: 50;
+  inset: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: var(--position-panel-top) 16px 16px;
+  background: rgba(238, 247, 248, 0.95);
+  pointer-events: none;
+}
+.fill-position-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min(100%, 660px);
+  max-height: calc(100dvh - var(--position-panel-top) - 16px);
+  min-width: 0;
+  padding: 16px;
+  border: 2px solid #c5dfe6;
+  border-radius: 26px;
+  background: #fffefa;
+  box-shadow: 0 12px 34px #3d657c20;
+}
+.fill-position-card > strong {
+  font-size: 1.75rem;
+  color: #173763;
+}
+.fill-position-card > p {
+  font-size: 1rem;
+  color: #527188;
+  margin: 6px 0 18px;
+}
+.fill-position-map {
+  display: flex;
+  gap: 3px;
+  width: 100%;
+  min-height: 0;
+  justify-content: center;
+  overflow: hidden;
+  padding: 8px 0;
+  scroll-behavior: auto;
+}
+.fill-position-column {
+  flex: 0 0 var(--position-cell-size, 40px);
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.fill-position-column > span {
+  color: #416482;
+  font-size: clamp(8px, calc(var(--position-cell-size, 40px) / 4), 12px);
+  font-weight: 750;
+  white-space: nowrap;
+}
+.fill-position-cell {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  border: 2px solid #d7e2e5;
+  border-radius: 9px;
+  background: #f9fcfc;
+}
+.fill-position-cell.has-ink {
+  border-color: #9ac6b1;
+  background: #edf8f0;
+}
+.fill-position-cell.is-current {
+  border: 3px solid #c9870c;
+  background: #fff2ad;
+  box-shadow:
+    0 0 0 3px #ffdb6877,
+    0 0 15px #f4c54477;
+}
+.position-light {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 12px;
+  height: 12px;
+  border: 2px solid #fffefa;
+  border-radius: 50%;
+  background: #f6bc20;
+}
+.position-map-legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  color: #77551a;
+  font-size: 0.875rem;
+}
+.position-map-legend i {
+  width: 14px;
+  height: 14px;
+  border: 2px solid #c9870c;
+  border-radius: 4px;
+  background: #fff2ad;
+}
+@media (max-width: 360px) {
+  .fill-position-card {
+    padding-inline: 8px;
+  }
+}
+@media (min-width: 700px) {
+  .app-shell.is-practice .main-content {
+    width: min(100%, 740px);
+  }
+  .app-shell.is-practice {
+    background-size:
+      100% 240px,
+      auto,
+      auto;
+  }
+  .app-shell.is-practice .bottom-nav button {
+    font-size: 14px;
+  }
+}

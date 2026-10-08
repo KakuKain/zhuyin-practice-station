@@ -1,9 +1,7 @@
-"use client";
-
 import { ShowMsgProvider } from "./ShowMsg";
-import { lazy, Suspense, useSyncExternalStore } from "react";
+import { lazy, Suspense, useState } from "react";
 import { usePracticeApp } from "../features/usePracticeApp";
-import { AppHeader, BottomNav, LoadingOverlay, ResourceNotice } from "./AppChrome";
+import { AppHeader, BottomNav, HeaderBackSlot, LoadingOverlay, ResourceNotice } from "./AppChrome";
 import { FillDialogs } from "../features/fill/FillDialogs";
 import { CourseList } from "../features/courses/CourseList";
 import { MaterialSelector } from "../features/courses/MaterialSelector";
@@ -28,36 +26,33 @@ const SymbolChart = lazy(() =>
 
 import { MaterialContext } from "../features/courses/MaterialContext";
 
-const subscribeToHydration = () => () => {};
-const clientReady = () => true;
-const serverReady = () => false;
-
 export function PracticeApp() {
-  const hydrated = useSyncExternalStore(subscribeToHydration, clientReady, serverReady);
   const app = usePracticeApp();
+  const { catalog, playbackRef, finishPlayback } = app;
   return (
     <ShowMsgProvider>
-      <MaterialContext.Provider value={app.catalog}>
-        <PracticeContent app={app} hydrated={hydrated} />
+      <MaterialContext.Provider value={catalog}>
+        {/* One element for every screen: iOS keeps the playback a tap has unlocked. */}
+        <audio
+          ref={playbackRef}
+          onEnded={finishPlayback}
+          preload="none"
+          hidden
+          aria-hidden="true"
+        />
+        <PracticeContent app={app} />
       </MaterialContext.Provider>
     </ShowMsgProvider>
   );
 }
 
-function PracticeContent({
-  app,
-  hydrated,
-}: {
-  app: ReturnType<typeof usePracticeApp>;
-  hydrated: boolean;
-}) {
+function PracticeContent({ app }: { app: ReturnType<typeof usePracticeApp> }) {
+  const [backSlot, setBackSlot] = useState<HTMLElement | null>(null);
   const {
     view,
     isFocusMode,
     activeFillCell,
     fillReviewOpen,
-    playbackRef,
-    finishPlayback,
     navigate,
     loadingMessage,
     resourceError,
@@ -101,41 +96,41 @@ function PracticeContent({
     );
 
   return (
-    <div className={`app-shell is-${view}`} aria-busy={!hydrated}>
-      <audio ref={playbackRef} onEnded={finishPlayback} preload="none" hidden aria-hidden="true" />
-      <AppHeader
-        title={view === "practice" ? "練習" : undefined}
-        materialSelector={view === "courses" ? <MaterialSelector app={app} /> : undefined}
-        onCourses={() => navigate("courses")}
-        onBack={
-          view === "lesson"
-            ? () => navigate("courses")
-            : view === "fill"
-              ? () => navigate("lesson")
-              : undefined
-        }
-        backLabel={view === "fill" ? "回到課文預覽" : "回到課程"}
-      />
-      <main className="main-content">
-        <ResourceNotice failed={resourceError} />
-        <Suspense
-          fallback={
-            <p className="feature-loading" role="status">
-              正在準備練習…
-            </p>
+    <HeaderBackSlot.Provider value={backSlot}>
+      <div className={`app-shell is-${view}`}>
+        <AppHeader
+          backSlotRef={setBackSlot}
+          title={view === "practice" ? "練習" : undefined}
+          materialSelector={view === "courses" ? <MaterialSelector app={app} /> : undefined}
+          onCourses={() => navigate("courses")}
+          onBack={
+            view === "lesson"
+              ? () => navigate("courses")
+              : view === "fill"
+                ? () => navigate("lesson")
+                : undefined
           }
-        >
-          {renderMain()}
-        </Suspense>
-      </main>
-      <BottomNav
-        active={view === "lesson" || view === "fill" || view === "result" ? "courses" : view}
-        onNavigate={navigate}
-      />
-      {view === "fill" && <FillDialogs app={app} />}
-      {(!hydrated || loadingMessage) && (
-        <LoadingOverlay label={loadingMessage ?? "正在準備練習…"} />
-      )}
-    </div>
+          backLabel={view === "fill" ? "回到課文預覽" : "回到課程"}
+        />
+        <main className="main-content">
+          <ResourceNotice failed={resourceError} />
+          <Suspense
+            fallback={
+              <p className="feature-loading" role="status">
+                正在準備練習…
+              </p>
+            }
+          >
+            {renderMain()}
+          </Suspense>
+        </main>
+        <BottomNav
+          active={view === "lesson" || view === "fill" || view === "result" ? "courses" : view}
+          onNavigate={navigate}
+        />
+        {view === "fill" && <FillDialogs app={app} />}
+        {loadingMessage && <LoadingOverlay label={loadingMessage} />}
+      </div>
+    </HeaderBackSlot.Provider>
   );
 }

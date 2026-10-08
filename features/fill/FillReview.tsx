@@ -1,5 +1,3 @@
-"use client";
-
 import { ProgressiveImage } from "../../components/ProgressiveImage";
 
 import { ShowMsg } from "../../components/ShowMsg";
@@ -80,12 +78,12 @@ export function FillReview({
             <ProgressiveImage
               src={
                 selectedLesson === 0
-                  ? "/course-art/review-sleeping-cat-watercolor-v2.webp"
+                  ? "course-art/review-sleeping-cat-watercolor-v2.webp"
                   : selectedLesson === 7
-                    ? "/course-art/radish-story.webp"
+                    ? "course-art/radish-story.webp"
                     : catalogLesson.artwork
-                      ? `/course-art/${catalogLesson.artwork}-watercolor.webp`
-                      : "/course-art/lesson-watercolor-paper.webp"
+                      ? `course-art/${catalogLesson.artwork}-watercolor.webp`
+                      : "course-art/lesson-watercolor-paper.webp"
               }
               alt=""
             />

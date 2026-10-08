@@ -1,4 +1,3 @@
-"use client";
 import { useCallback, useEffect, useEffectEvent } from "react";
 import type { ListenPhase, ListeningQuestion, ListeningSettings, StateSetter } from "../types";
 import type { useListeningTimers } from "./useListeningTimers";
@@ -18,7 +17,6 @@ type Params = {
   questionDuration: number;
   setSecondsLeft: StateSetter<number>;
   setListenPhase: StateSetter<ListenPhase>;
-  setPlayCount: StateSetter<number>;
   setListenMessage: StateSetter<string>;
 };
 export function useListeningPlayback({
@@ -37,7 +35,6 @@ export function useListeningPlayback({
   questionDuration,
   setSecondsLeft,
   setListenPhase,
-  setPlayCount,
   setListenMessage,
 }: Params) {
   const {
@@ -59,7 +56,6 @@ export function useListeningPlayback({
         repeatTimeoutRef.current = null;
         if (!autoRepeatEnabledRef.current || repeatRemainingRef.current <= 0) return;
         repeatRemainingRef.current -= 1;
-        setPlayCount((current) => current + 1);
         setListenMessage(`第 ${nextPlay} 次播放。`);
         speak(currentQuestion.audioText, { pronunciation: currentQuestion.answer });
       }, listeningSettings.intervalSeconds * 1000);
@@ -74,7 +70,6 @@ export function useListeningPlayback({
     repeatRemainingRef,
     repeatTimeoutRef,
     setListenMessage,
-    setPlayCount,
   ]);
 
   const finishListening = useCallback(
@@ -138,7 +133,6 @@ export function useListeningPlayback({
     autoRepeatEnabledRef.current = true;
     setListenPhase("active");
     setSecondsLeft(questionDuration);
-    setPlayCount(1);
     clearCanvas();
     setListenMessage("播放中。");
     speak(currentQuestion.audioText, { pronunciation: currentQuestion.answer });
@@ -150,13 +144,11 @@ export function useListeningPlayback({
     clearCanvas();
     setListenPhase("retry");
     setSecondsLeft(questionDuration);
-    setPlayCount((current) => current + 1);
     setListenMessage("請重新作答。");
     speak(currentQuestion.audioText, { pronunciation: currentQuestion.answer });
   };
 
   const replayQuestion = () => {
-    setPlayCount((current) => current + 1);
     speak(currentQuestion.audioText, { pronunciation: currentQuestion.answer });
   };
 

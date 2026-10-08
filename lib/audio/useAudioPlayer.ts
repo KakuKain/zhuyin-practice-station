@@ -1,4 +1,3 @@
-"use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { RefObject } from "react";
 import type { ListeningQuestion, StateSetter, View } from "../../features/types";
@@ -22,10 +21,10 @@ type Options = {
 export type ClipOptions = {
   url?: string;
   pronunciation?: string;
-  playbackRate?: number;
   allowSynthesis?: boolean;
   onStarted?: () => void;
   onEnded?: () => void;
+  /** Callers that pass onError show their own message; no page-wide notice is added. */
   onError?: () => void;
 };
 export function useAudioPlayer({
@@ -71,25 +70,10 @@ export function useAudioPlayer({
     if (view === "lesson") audioPreloaderRef.current?.warm(lessonSymbols.map(listeningAudioUrl));
   }, [view, lessonSymbols]);
 
-  useEffect(() => {
-    if (view !== "symbols") return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const urls = entries
-          .filter((entry) => entry.isIntersecting)
-          .map((entry) => (entry.target as HTMLElement).dataset.audioText)
-          .filter((text): text is string => Boolean(text))
-          .map(listeningAudioUrl);
-        audioPreloaderRef.current?.warm(urls);
-        entries
-          .filter((entry) => entry.isIntersecting)
-          .forEach((entry) => observer.unobserve(entry.target));
-      },
-      { rootMargin: "120px" },
-    );
-    document.querySelectorAll("[data-audio-text]").forEach((button) => observer.observe(button));
-    return () => observer.disconnect();
-  }, [view]);
+  // The chart is a lazy chunk, so it reports its visible buttons itself once mounted.
+  const warmSymbols = useCallback((texts: readonly string[]) => {
+    audioPreloaderRef.current?.warm(texts.map(listeningAudioUrl));
+  }, []);
 
   useEffect(() => {
     if (view !== "listen") return;
@@ -139,11 +123,14 @@ export function useAudioPlayer({
 
   const speak = useCallback(
     (text: string, options: ClipOptions = {}) => {
+      const notify = (message: string) => {
+        if (view === "practice" && !options.onError) setPracticeNotice(message);
+      };
       const audio = playbackRef.current;
       if (!audio) {
         setAudioError(true);
         options.onError?.();
-        if (view === "practice") setPracticeNotice("音訊無法播放，請重新整理後再試。");
+        notify("音訊無法播放，請重新整理後再試。");
         return;
       }
       stopPlayback();
@@ -162,23 +149,20 @@ export function useAudioPlayer({
         stopPlayback();
         setAudioError(true);
         options.onError?.();
-        if (view === "practice") setPracticeNotice("音訊尚未準備好，請檢查網路後再播放。");
+        notify("音訊尚未準備好，請檢查網路後再播放。");
       };
       audioLoadTimeoutRef.current = window.setTimeout(failed, 15000);
       const isZhuyinPrompt = /^[\u3105-\u3129]+$/.test(text);
       setPlayingSymbol(isZhuyinPrompt || options.url ? text : null);
       const start = async () => {
-        // A failed custom lookup must not quietly substitute the old unclear voice.
+        // A known custom recording that fails to load rejects here instead of quietly
+        // substituting the old voice; an unavailable recording database resolves to null.
         const custom =
           !options.url && (isZhuyinPrompt || options.pronunciation)
             ? await getCustomRecording(text, options.pronunciation ?? text)
             : null;
         if (playbackToken !== playbackTokenRef.current) return;
-        const policy = clipPolicy(!!custom, isZhuyinPrompt, options.playbackRate);
-        audio.playbackRate = policy.playbackRate;
-        audio.preservesPitch = true;
-        (audio as HTMLAudioElement & { webkitPreservesPitch?: boolean }).webkitPreservesPitch =
-          true;
+        const policy = clipPolicy(!!custom, isZhuyinPrompt);
         const url =
           options.url ??
           registeredAudioUrl(text, options.pronunciation) ??
@@ -194,6 +178,12 @@ export function useAudioPlayer({
           customUrlRef.current = URL.createObjectURL(custom.blob);
           audio.src = customUrlRef.current;
         } else audio.src = audioPreloaderRef.current?.playbackUrl(playbackUrl) ?? playbackUrl;
+        // Assigning src resets the rate, so normal speed is set afterwards.
+        audio.defaultPlaybackRate = 1;
+        audio.playbackRate = 1;
+        audio.preservesPitch = true;
+        (audio as HTMLAudioElement & { webkitPreservesPitch?: boolean }).webkitPreservesPitch =
+          true;
         await audio
           .play()
           .then(() => {
@@ -215,12 +205,11 @@ export function useAudioPlayer({
               setAudioLoading(false);
               setAudioError(true);
               options.onError?.();
-              if (view === "practice")
-                setPracticeNotice(
-                  custom
-                    ? "自訂錄音無法播放，請到「更多 → 自訂讀音」重新錄製。"
-                    : "注音讀音無法播放，請重新整理後再試。",
-                );
+              notify(
+                custom
+                  ? "自訂錄音無法播放，請到「更多 → 自訂讀音」重新錄製。"
+                  : "注音讀音無法播放，請重新整理後再試。",
+              );
               return;
             }
             if ("speechSynthesis" in window) {
@@ -244,7 +233,7 @@ export function useAudioPlayer({
               setAudioLoading(false);
               setAudioError(true);
               options.onError?.();
-              if (view === "practice") setPracticeNotice("音訊無法播放，請檢查音量或網路後再試。");
+              notify("音訊無法播放，請檢查音量或網路後再試。");
             }
           });
       };
@@ -269,5 +258,6 @@ export function useAudioPlayer({
     finishPlayback,
     speak,
     playPreviewSymbol,
+    warmSymbols,
   };
 }

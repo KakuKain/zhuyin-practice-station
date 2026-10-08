@@ -1,5 +1,3 @@
-"use client";
-
 import { useCatalogLesson } from "../courses/MaterialContext";
 import type { AppController } from "../usePracticeApp";
 import { Headphones, PencilLine } from "@phosphor-icons/react";

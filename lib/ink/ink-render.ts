@@ -1,14 +1,31 @@
 import type { InkPoint, InkStroke } from "../../features/types";
+import { inkOutline } from "./ink-brush";
+
+const pathCache = new WeakMap<InkStroke, { outline: string; path: Path2D }>();
+function brushPath(stroke: InkStroke) {
+  const outline = inkOutline(stroke);
+  const saved = pathCache.get(stroke);
+  if (saved?.outline === outline) return saved.path;
+  const path = new Path2D(outline);
+  pathCache.set(stroke, { outline, path });
+  return path;
+}
 
 export function pointerPoint(
   canvas: HTMLCanvasElement,
   clientX: number,
   clientY: number,
 ): InkPoint {
-  const rect = canvas.getBoundingClientRect();
+  return pointInRect(canvas.getBoundingClientRect(), clientX, clientY);
+}
+
+/** 0–100 coordinates to 0.01, finer than a device pixel on any writing cell. */
+const round = (value: number) => Math.round(value * 100) / 100;
+
+export function pointInRect(rect: DOMRect, clientX: number, clientY: number): InkPoint {
   return {
-    x: Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100)),
-    y: Math.max(0, Math.min(100, ((clientY - rect.top) / rect.height) * 100)),
+    x: round(Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100))),
+    y: round(Math.max(0, Math.min(100, ((clientY - rect.top) / rect.height) * 100))),
   };
 }
 
@@ -38,6 +55,13 @@ export function renderInk(canvas: HTMLCanvasElement, strokes: InkStroke[], lasso
   };
   for (const stroke of strokes) {
     if (!stroke.length) continue;
+    if (stroke.some((point) => point.width !== undefined)) {
+      context.save();
+      context.scale(rect.width / 100, rect.height / 100);
+      context.fill(brushPath(stroke));
+      context.restore();
+      continue;
+    }
     if (stroke.length === 1) {
       context.beginPath();
       context.arc(

@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useRef, useState } from "react";
 import type { PreviewMode } from "../types";
 import { paginateLesson } from "./lesson-pagination";

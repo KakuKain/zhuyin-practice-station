@@ -1,5 +1,3 @@
-"use client";
-
 import { ArrowUUpLeft, Eraser, Trash } from "@phosphor-icons/react";
 
 export function InkTools({

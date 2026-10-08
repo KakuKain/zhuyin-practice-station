@@ -1,6 +1,13 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:4173/";
+// Tests run against the same static build that GitHub Pages serves, under the same base path.
+const base = process.env.PAGES_BASE_PATH ?? "/zhuyin-practice-station/";
+const port = Number(process.env.PLAYWRIGHT_PORT ?? 4176);
+const baseURL = `http://127.0.0.1:${port}${base}`;
+
+// The main device is an Android tablet written on with a capacitive stylus, which the
+// browser reports as touch. A Redmi Pad class screen is about 800 × 1280 CSS pixels.
+const androidTablet = { ...devices["Galaxy Tab S9"], deviceScaleFactor: 1.5 };
 
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -17,16 +24,23 @@ export default defineConfig({
     screenshot: "only-on-failure",
   },
   projects: [
-    { name: "android-chromium", use: { ...devices["Pixel 7"], browserName: "chromium" } },
-    { name: "iphone-webkit", use: { ...devices["iPhone 13"], browserName: "webkit" } },
+    {
+      name: "android-tablet",
+      use: { ...androidTablet, viewport: { width: 800, height: 1280 } },
+    },
+    {
+      name: "android-tablet-landscape",
+      use: { ...androidTablet, viewport: { width: 1280, height: 800 } },
+    },
+    { name: "ipad-webkit", use: { ...devices["iPad (gen 7)"] } },
+    { name: "android-phone", use: { ...devices["Pixel 7"] } },
     { name: "desktop-chromium", use: { ...devices["Desktop Chrome"] } },
   ],
   webServer: {
-    command:
-      process.env.PLAYWRIGHT_WEB_SERVER_COMMAND ??
-      "npm run start -- --hostname 127.0.0.1 --port 4173",
+    command: `npm run preview -- --host 127.0.0.1 --port ${port} --strictPort`,
     url: baseURL,
-    reuseExistingServer: !process.env.CI,
+    // Always serve the build that was just made, never a leftover dev server.
+    reuseExistingServer: false,
     timeout: 120_000,
   },
 });

@@ -1,5 +1,3 @@
-"use client";
-
 import { ProgressiveImage } from "../../components/ProgressiveImage";
 
 import { PageHeading } from "../../components/PageHeading";
@@ -33,7 +31,7 @@ export function CourseList({
       <PageHeading
         title="選擇課程"
         description="跟著注音，一步一步探索吧！"
-        artwork="/course-art/course-journey-hero-v2.webp"
+        artwork="course-art/course-journey-hero-v2.webp"
       />
       {lessons.length === 0 && (
         <p className="material-note">
@@ -53,7 +51,7 @@ export function CourseList({
                 {index === 0 && (
                   <ProgressiveImage
                     className="journey-flag-scene"
-                    src="/course-art/course-flag-grass-v1.webp"
+                    src="course-art/course-flag-grass-v1.webp"
                     alt=""
                   />
                 )}
@@ -83,7 +81,7 @@ export function CourseList({
                 {item.artwork && (
                   <ProgressiveImage
                     className="journey-art"
-                    src={`/course-art/${item.artwork}-watercolor.webp`}
+                    src={`course-art/${item.artwork}-watercolor.webp`}
                     alt=""
                     aria-hidden="true"
                     loading={index > 3 ? "lazy" : "eager"}
@@ -98,7 +96,7 @@ export function CourseList({
         })}
       </div>
       <div className="journey-footer" aria-hidden="true">
-        <ProgressiveImage src="/course-art/course-journey-footer-sign-v2.webp" alt="" />
+        <ProgressiveImage src="course-art/course-journey-footer-sign-v2.webp" alt="" />
       </div>
     </section>
   );

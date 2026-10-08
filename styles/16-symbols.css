@@ -31,56 +31,6 @@
   min-height: 104px;
 }
 
-.symbol-audio-status {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 56px;
-  margin-bottom: 20px;
-  padding: 10px 12px;
-  border: 1px solid #d2e5ed;
-  border-radius: 16px;
-  background: #eff8fd;
-  color: #2f6085;
-  font-size: 14px;
-}
-
-.symbol-status-icon {
-  display: grid;
-  flex: none;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: #dceefb;
-}
-
-.symbol-status-glyph {
-  display: inline-block;
-  margin-right: 8px;
-  font-family: var(--font-syllable);
-  font-size: 25px;
-  line-height: 1;
-  vertical-align: middle;
-}
-
-.symbol-audio-status.is-error {
-  border-color: #f0c2a1;
-  background: #fff4e8;
-  color: #88471e;
-}
-
-.symbol-audio-spinner {
-  flex: none;
-  width: 18px;
-  height: 18px;
-  margin-left: auto;
-  border: 2px solid #bdd7eb;
-  border-top-color: #2874bd;
-  border-radius: 50%;
-  animation: symbol-audio-spin 0.8s linear infinite;
-}
-
 @keyframes symbol-audio-spin {
   to {
     transform: rotate(360deg);
@@ -249,9 +199,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .symbol-audio-spinner {
-    animation: none;
-  }
   .symbol-chart-button {
     transition: none;
   }

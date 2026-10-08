@@ -1,5 +1,3 @@
-"use client";
-
 import { ProgressiveImage } from "../../components/ProgressiveImage";
 
 import { ShowMsg } from "../../components/ShowMsg";
@@ -131,8 +129,8 @@ export function FillBlank({
             className="fill-sheet-art"
             src={
               catalogLesson.artwork
-                ? `/course-art/${catalogLesson.artwork}-watercolor.webp`
-                : "/course-art/blue-watercolor-pencil-v2.webp"
+                ? `course-art/${catalogLesson.artwork}-watercolor.webp`
+                : "course-art/blue-watercolor-pencil-v2.webp"
             }
             alt=""
             onError={(event) => {
@@ -184,8 +182,8 @@ export function FillBlank({
             className="completion-pencil-art"
             src={
               catalogLesson.artwork
-                ? `/course-art/${catalogLesson.artwork}-watercolor.webp`
-                : "/course-art/blue-watercolor-pencil-v2.webp"
+                ? `course-art/${catalogLesson.artwork}-watercolor.webp`
+                : "course-art/blue-watercolor-pencil-v2.webp"
             }
             alt=""
             onError={(event) => {

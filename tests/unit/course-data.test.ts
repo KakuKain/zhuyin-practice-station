@@ -16,7 +16,6 @@ import {
   findQuestionSeed,
   questionId,
   sectionPosition,
-  zhuyinPlaybackRate,
 } from "../../features/listening/listening-data";
 
 test("all nine lessons keep complete aligned characters and pronunciations", () => {
@@ -75,7 +74,7 @@ test("every current and legacy prompt has a local playable audio file", async ()
     }
   });
   for (const text of texts) {
-    const file = new URL(`../../public${listeningAudioUrl(text).split("?")[0]}`, import.meta.url);
+    const file = new URL(`../../public/${listeningAudioUrl(text).split("?")[0]}`, import.meta.url);
     assert.ok((await stat(file)).size > 1024, text);
     const bytes = await readFile(file);
     if (file.pathname.endsWith(".mp3")) {
@@ -87,7 +86,6 @@ test("every current and legacy prompt has a local playable audio file", async ()
       );
     } else assert.equal(bytes.toString("ascii", 4, 8), "ftyp");
   }
-  assert.equal(zhuyinPlaybackRate, 1);
 });
 
 test("all shipped font assets use WOFF2", async () => {

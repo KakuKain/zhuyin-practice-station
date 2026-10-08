@@ -1,4 +1,3 @@
-"use client";
 import { createContext, useContext } from "react";
 import { builtinCatalog, type CatalogLesson } from "./materials";
 export const MaterialContext = createContext<readonly CatalogLesson[]>(builtinCatalog);

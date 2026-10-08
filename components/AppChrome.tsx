@@ -1,16 +1,12 @@
-"use client";
 import { ShowMsg } from "./ShowMsg";
-import { useSyncExternalStore, type ReactNode } from "react";
+import { createContext, useContext, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 
-const subscribeHeader = () => () => {};
+/** The header's back-button slot, so a panel deep in the page can put its back action there. */
+export const HeaderBackSlot = createContext<HTMLElement | null>(null);
+
 export function HeaderBack({ label, onBack }: { label: string; onBack: () => void }) {
-  const mounted = useSyncExternalStore(
-    subscribeHeader,
-    () => true,
-    () => false,
-  );
-  const target = mounted ? document.getElementById("app-header-back-slot") : null;
+  const target = useContext(HeaderBackSlot);
   return target
     ? createPortal(
         <button className="header-back" type="button" onClick={onBack}>
@@ -23,13 +19,16 @@ export function HeaderBack({ label, onBack }: { label: string; onBack: () => voi
 }
 
 import type { InkStroke, View } from "../features/types";
+import { inkOutline } from "../lib/ink/ink-brush";
 import { ArrowLeft, BookOpenText, Gear, PencilLine, SquaresFour } from "@phosphor-icons/react";
 
 export function InkPreview({ strokes }: { strokes: InkStroke[] }) {
   return (
     <svg viewBox="0 0 100 100" className="ink-preview" aria-hidden="true">
       {strokes.map((stroke, index) =>
-        stroke.length === 1 ? (
+        stroke.some((point) => point.width !== undefined) ? (
+          <path key={index} d={inkOutline(stroke)} fill="#27463f" />
+        ) : stroke.length === 1 ? (
           <circle key={index} cx={stroke[0].x} cy={stroke[0].y} r=".75" />
         ) : (
           <polyline key={index} points={stroke.map((point) => `${point.x},${point.y}`).join(" ")} />
@@ -54,18 +53,20 @@ export function AppHeader({
   backLabel,
   materialSelector,
   title,
+  backSlotRef,
 }: {
   onCourses: () => void;
   onBack?: () => void;
   backLabel?: string;
   materialSelector?: ReactNode;
   title?: string;
+  backSlotRef?: (element: HTMLDivElement | null) => void;
 }) {
   return (
     <header
       className={`app-header ${onBack ? "has-back" : ""} ${materialSelector ? "has-material-selector" : ""}`}
     >
-      <div id="app-header-back-slot" />
+      <div id="app-header-back-slot" ref={backSlotRef} />
       {title && <h1 className="header-page-title">{title}</h1>}
       {materialSelector}
       {onBack && (

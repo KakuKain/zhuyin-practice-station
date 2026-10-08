@@ -1,8 +1,20 @@
 import type { FillDraft, InkStroke } from "../types";
+import { fillDraftStorageKey } from "../../lib/storage/storage-keys";
 
-export const fillDraftStorageKey = (lessonIndex: number) => `zhuyin-fill-draft-v1-${lessonIndex}`;
+export { fillDraftStorageKey };
 
-export const fillDraftCookieKey = (lessonIndex: number) => `zhuyin_fill_draft_${lessonIndex}`;
+/**
+ * Older versions also set an unread `zhuyin_fill_draft_<n>` marker cookie with `Path=/`,
+ * which every page on the same host received. Drafts live only in localStorage now.
+ */
+export function expireLegacyDraftCookies() {
+  if (typeof document === "undefined") return;
+  for (const entry of document.cookie.split(";")) {
+    const name = entry.split("=")[0].trim();
+    if (/^zhuyin_fill_draft_-?\d+$/.test(name))
+      document.cookie = `${name}=; Max-Age=0; Path=/; SameSite=Lax`;
+  }
+}
 
 export const validInkStrokes = (value: unknown): value is InkStroke[] =>
   Array.isArray(value) &&
@@ -23,7 +35,12 @@ export const validInkStrokes = (value: unknown): value is InkStroke[] =>
           point.x >= 0 &&
           point.x <= 100 &&
           point.y >= 0 &&
-          point.y <= 100,
+          point.y <= 100 &&
+          (point.width === undefined ||
+            (typeof point.width === "number" &&
+              Number.isFinite(point.width) &&
+              point.width > 0 &&
+              point.width <= 10)),
       ),
   );
 
@@ -104,10 +121,8 @@ export function validateFillDraft(
 
 export function writeFillDraft(draft: FillDraft) {
   window.localStorage.setItem(fillDraftStorageKey(draft.lessonIndex), JSON.stringify(draft));
-  document.cookie = `${fillDraftCookieKey(draft.lessonIndex)}=1; Max-Age=2592000; Path=/; SameSite=Lax`;
 }
 
 export function clearFillDraft(lessonIndex: number) {
   window.localStorage.removeItem(fillDraftStorageKey(lessonIndex));
-  document.cookie = `${fillDraftCookieKey(lessonIndex)}=; Max-Age=0; Path=/; SameSite=Lax`;
 }

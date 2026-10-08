@@ -13,7 +13,6 @@
 
 .app-shell:is(.is-courses, .is-symbols, .is-practice, .is-more) .app-header {
   border-bottom-color: #e7eee9;
-  background: rgba(255, 254, 250, 0.95);
 }
 
 .app-shell:is(.is-courses, .is-symbols, .is-practice, .is-more) .bottom-nav {
@@ -36,90 +35,28 @@
 
 /* Course trail: quiet paint washes support, rather than compete with, titles. */
 
-.is-courses .course-journey {
-  padding-bottom: 34px;
-}
-
 .is-courses .journey-list {
-  gap: 12px;
   padding-top: 9px;
 }
 
 .is-courses .journey-station {
-  border: 2px solid #fff;
   background: radial-gradient(circle at 28% 22%, #79b6f1, #3775d6 75%);
-  box-shadow: 0 2px 7px rgba(47, 105, 171, 0.25);
-}
-
-.is-courses .journey-card {
-  min-height: 89px;
-  border: 1px solid #d9e9ee;
-  background: linear-gradient(130deg, rgba(255, 255, 255, 0.96), rgba(231, 246, 255, 0.86));
-  box-shadow: 0 7px 14px rgba(57, 101, 105, 0.07);
 }
 
 .is-courses .journey-step-1 .journey-card {
   border-color: #d6e8db;
-  background: linear-gradient(130deg, rgba(255, 255, 255, 0.96), rgba(232, 248, 235, 0.86));
 }
 
 .is-courses .journey-step-2 .journey-card {
   border-color: #ede1c5;
-  background: linear-gradient(130deg, rgba(255, 255, 255, 0.96), rgba(255, 245, 222, 0.87));
-}
-
-.is-courses .journey-arrow {
-  box-shadow: 0 3px 8px rgba(46, 84, 95, 0.09);
 }
 
 /* Practice: empty states feel encouraging, while saved work remains readable. */
 
-.is-practice .practice-page > .section-title-row {
-  margin-top: 19px;
-  margin-bottom: 11px;
-}
-
-.is-practice .practice-page > .section-title-row h2 {
-  font-size: 17px;
-}
-
-.is-practice .list-count {
-  flex: none;
-  padding: 4px 7px;
-  border-radius: 99px;
-  background: #f3f7f4;
-  color: #718390;
-}
-
-.is-practice .empty-reinforce {
-  min-height: 160px;
-  padding: 19px 18px;
-  border: 1px solid #d9e9ec;
-  border-radius: 23px;
-  background:
-    radial-gradient(circle at 86% 15%, rgba(204, 233, 248, 0.48), transparent 41%),
-    linear-gradient(135deg, #fffefa, #f5fbff);
-  box-shadow: 0 6px 15px rgba(58, 105, 103, 0.055);
-}
-
-.is-practice .practice-list-heading + .empty-reinforce {
-  border-color: #dce9d8;
-  background:
-    radial-gradient(circle at 13% 18%, rgba(212, 237, 208, 0.47), transparent 44%),
-    linear-gradient(135deg, #fffefa, #f7fbf2);
-}
-
 .is-practice .empty-reinforce > span {
   display: grid;
   place-items: center;
-  border-radius: 17px;
-  background: #e2f3ff;
   color: #2675bf;
-}
-
-.is-practice .practice-list-heading + .empty-reinforce > span {
-  background: #e6f5e9;
-  color: #27945b;
 }
 
 .is-practice .empty-reinforce strong {
@@ -130,56 +67,24 @@
   color: #61778b;
 }
 
-.is-practice .saved-question,
-.is-practice .practice-row {
-  border-color: #d8e8e2;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.91);
-  box-shadow: 0 5px 13px rgba(58, 105, 103, 0.06);
-}
-
-.is-practice .practice-row-icon {
-  border-radius: 14px;
-  background: #e3f3ff;
-  color: var(--ref-blue);
-}
-
 /* More stays a familiar grouped settings list, now inside the same storybook. */
 
 .is-more .more-group > h2 {
   margin-left: 6px;
-  color: #587181;
-  font-size: 13px;
 }
 
 .is-more .more-settings-list {
   border-color: #d8e7e3;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 6px 14px rgba(61, 102, 100, 0.055);
 }
 
 .is-more .more-settings-list button {
-  min-height: 80px;
   border-bottom-color: #e8efeb;
-}
-
-.is-more .more-row-icon {
-  width: 41px;
-  height: 41px;
-  border-radius: 15px;
 }
 
 .is-more .more-device-note {
   margin-top: 28px;
-  padding: 12px 15px;
   border-radius: 16px;
-  background: rgba(250, 250, 238, 0.86);
   color: #657d81;
-}
-
-.is-more .more-detail-content > h1 {
-  font-size: 31px;
 }
 
 @media (min-width: 700px) {
@@ -287,7 +192,6 @@
 
 .app-shell.is-courses .main-content {
   min-height: 0;
-  padding-bottom: calc(90px + env(safe-area-inset-bottom));
 }
 
 .is-courses .course-journey {
@@ -413,7 +317,6 @@
 
 .is-courses .journey-footer img {
   position: absolute;
-  top: -12px;
   left: 0;
   width: 130px;
   height: 100px;

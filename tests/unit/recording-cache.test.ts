@@ -16,9 +16,12 @@ test("missing recordings skip individual reads and concurrent reads share one lo
     updatedAt: 1,
   };
   const cache = createRecordingCache({
-    list: async () => {
+    keys: async () => {
       lists++;
-      return [clip];
+      return [clip.key];
+    },
+    list: async () => {
+      throw new Error("playback must not read the full list");
     },
     get: async () => {
       gets++;
@@ -41,16 +44,75 @@ test("missing recordings skip individual reads and concurrent reads share one lo
   await cache.get("教", "ㄐㄧㄠ");
   assert.equal(gets, 2);
 });
-test("database failures are surfaced and a later lookup can retry", async () => {
-  let failed = true;
-  const cache = createRecordingCache({
-    list: async () => {
-      if (failed) throw new Error("blocked");
-      return [];
+test("an unavailable database leaves official clips playable and is retried after a pause", async () => {
+  let failed = true,
+    lists = 0,
+    time = 0;
+  const clip: CustomRecording = {
+    key: recordingKey("半", "ㄅㄢˋ"),
+    text: "半",
+    pronunciation: "ㄅㄢˋ",
+    blob: new Blob(["audio"], { type: "audio/wav" }),
+    mimeType: "audio/wav",
+    duration: 1,
+    updatedAt: 1,
+  };
+  const cache = createRecordingCache(
+    {
+      keys: async () => {
+        lists++;
+        if (failed) throw new Error("blocked");
+        return [clip.key];
+      },
+      list: async () => {
+        throw new Error("blocked");
+      },
+      get: async () => clip,
     },
+    12,
+    1000,
+    () => time,
+  );
+  // The manager still sees the failure; playback lookups fall back to official clips.
+  await assert.rejects(cache.list(), /blocked/);
+  assert.equal(await cache.get("ㄅ", "ㄅ"), null);
+  assert.equal(await cache.get("半", "ㄅㄢˋ"), null);
+  assert.equal(lists, 1);
+  failed = false;
+  time = 500;
+  assert.equal(await cache.get("半", "ㄅㄢˋ"), null);
+  assert.equal(lists, 1, "no repeated slow database opens during the pause");
+  time = 1500;
+  assert.equal(await cache.get("半", "ㄅㄢˋ"), clip);
+});
+
+test("a known recording that fails to load is still an error", async () => {
+  const cache = createRecordingCache({
+    keys: async () => [recordingKey("半", "ㄅㄢˋ")],
+    list: async () => [],
+    get: async () => {
+      throw new Error("read failed");
+    },
+  });
+  await assert.rejects(cache.get("半", "ㄅㄢˋ"), /read failed/);
+});
+
+test("saved recordings keep only metadata in the lookup map", async () => {
+  const cache = createRecordingCache({
+    keys: async () => [],
+    list: async () => [],
     get: async () => null,
   });
-  await assert.rejects(cache.get("ㄅ", "ㄅ"), /blocked/);
-  failed = false;
-  assert.equal(await cache.get("ㄅ", "ㄅ"), null);
+  await cache.list();
+  cache.saved({
+    key: recordingKey("狸", "ㄌㄧˊ"),
+    text: "狸",
+    pronunciation: "ㄌㄧˊ",
+    blob: new Blob(["audio"], { type: "audio/wav" }),
+    mimeType: "audio/wav",
+    duration: 1,
+    updatedAt: 1,
+  });
+  const [item] = await cache.list();
+  assert.equal("blob" in item, false);
 });

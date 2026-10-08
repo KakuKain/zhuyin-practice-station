@@ -106,29 +106,9 @@
     box-shadow 0.12s ease;
 }
 
-.syllable-cell,
-.drag-preview {
+.syllable-cell {
   user-select: none;
   -webkit-user-select: none;
-}
-
-.drag-preview {
-  position: fixed;
-  z-index: 100;
-  display: grid;
-  place-items: center;
-  width: 78px;
-  height: 102px;
-  border: 2px solid var(--ref-blue);
-  border-radius: 10px;
-  background: #fff;
-  box-shadow: 0 14px 28px rgba(16, 44, 90, 0.25);
-  pointer-events: none;
-  transform: translate(-50%, -55%) rotate(-4deg) scale(1.05);
-}
-
-.drag-preview .zhuyin-stack {
-  color: var(--ref-navy);
 }
 
 @media (prefers-reduced-motion: reduce) {

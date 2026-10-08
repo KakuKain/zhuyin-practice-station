@@ -20,9 +20,9 @@ test("recording identity preserves tone, polyphonic readings and whole-word boun
 });
 
 test("only confirmed custom audio uses normal speed and never synthetic fallback", () => {
-  assert.deepEqual(clipPolicy(true, false, 0.7), { playbackRate: 1, allowSynthesis: false });
-  assert.deepEqual(clipPolicy(false, true), { playbackRate: 1, allowSynthesis: false });
-  assert.deepEqual(clipPolicy(false, false), { playbackRate: 1, allowSynthesis: true });
+  assert.deepEqual(clipPolicy(true, false), { allowSynthesis: false });
+  assert.deepEqual(clipPolicy(false, true), { allowSynthesis: false });
+  assert.deepEqual(clipPolicy(false, false), { allowSynthesis: true });
 });
 
 test("audio rejects empty, oversized, invalid-duration, non-audio and mismatched records", () => {

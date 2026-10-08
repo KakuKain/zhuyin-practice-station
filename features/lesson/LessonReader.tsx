@@ -1,5 +1,3 @@
-"use client";
-
 import { ProgressiveImage } from "../../components/ProgressiveImage";
 
 import type { AppController } from "../usePracticeApp";
@@ -81,10 +79,10 @@ export function LessonReader({
             className="lesson-heading-art"
             src={
               selectedLesson === 7
-                ? "/course-art/radish-story.webp"
+                ? "course-art/radish-story.webp"
                 : lesson.artwork
-                  ? `/course-art/${lesson.artwork}-watercolor.webp`
-                  : "/course-art/lesson-watercolor-paper.webp"
+                  ? `course-art/${lesson.artwork}-watercolor.webp`
+                  : "course-art/lesson-watercolor-paper.webp"
             }
             alt=""
           />
@@ -129,7 +127,8 @@ export function LessonReader({
         </div>
       )}
       <div className="lesson-curriculum">
-        {!lesson.custom && selectedLesson < 9 && (
+        {/* Only lessons with a recorded reading get the read-aloud control. */}
+        {!lesson.custom && registeredLessonAudioUrl(selectedLesson) !== null && (
           <div className="lesson-reading-controls">
             <button
               type="button"
@@ -140,7 +139,6 @@ export function LessonReader({
                   ? app.stopPlayback()
                   : app.speak(readingKey, {
                       url: registeredLessonAudioUrl(selectedLesson) ?? undefined,
-                      playbackRate: 1,
                       allowSynthesis: false,
                     })
               }
@@ -209,6 +207,11 @@ export function LessonReader({
                 } as React.CSSProperties
               }
               onPointerDown={(event) => {
+                // A second finger means pinch-zoom, not a page swipe.
+                if (!event.isPrimary) {
+                  previewPointerStartRef.current = null;
+                  return;
+                }
                 previewPointerStartRef.current = { x: event.clientX, y: event.clientY };
                 event.currentTarget.setPointerCapture(event.pointerId);
               }}
@@ -216,6 +219,7 @@ export function LessonReader({
                 previewPointerStartRef.current = null;
               }}
               onPointerUp={(event) => {
+                if (!event.isPrimary) return;
                 const start = previewPointerStartRef.current;
                 previewPointerStartRef.current = null;
                 if (!start) return;

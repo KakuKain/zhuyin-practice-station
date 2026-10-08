@@ -1,7 +1,4 @@
-"use client";
-
 import { useRef, useState } from "react";
-import type { RefObject } from "react";
 import { cloneInk } from "../../lib/ink/ink-path";
 import { useInkCanvas } from "../../lib/ink/useInkCanvas";
 import type { FillFavorite, InkStroke, StateSetter, View } from "../types";
@@ -19,7 +16,6 @@ type Options = {
   setFillParentChecked: StateSetter<boolean>;
   setCompletedFillLessons: StateSetter<number[]>;
   setFillPendingCells: StateSetter<Record<number, InkStroke[]>>;
-  persistFillRef: RefObject<() => void>;
 };
 
 export function useFillCanvas({
@@ -35,7 +31,6 @@ export function useFillCanvas({
   setFillParentChecked,
   setCompletedFillLessons,
   setFillPendingCells,
-  persistFillRef,
 }: Options) {
   const [fillIsDirty, setFillIsDirty] = useState(false);
   const fillCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -71,9 +66,9 @@ export function useFillCanvas({
           setFillParentChecked(false);
           setCompletedFillLessons((current) => current.filter((index) => index !== selectedLesson));
         }
-        // Explicit empty drafts prevent a cleared saved cell from reappearing.
+        // Explicit empty drafts prevent a cleared saved cell from reappearing. The draft is
+        // written once, by useFillDraft's effect, after this pending change is committed.
         setFillPendingCells((current) => ({ ...current, [activeFillCell]: cloneInk(strokes) }));
-        persistFillRef.current();
       }
     },
   });

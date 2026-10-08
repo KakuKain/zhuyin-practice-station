@@ -1,4 +1,3 @@
-"use client";
 import { useCallback, useEffect } from "react";
 import type { RefObject } from "react";
 import type { FillDraft, InkStroke, StateSetter, View } from "../types";

@@ -1,5 +1,4 @@
-"use client";
-
+import { useEffect, useRef } from "react";
 import { PageHeading } from "../../components/PageHeading";
 import { ProgressiveImage } from "../../components/ProgressiveImage";
 import { SpeakerHigh } from "@phosphor-icons/react";
@@ -10,9 +9,33 @@ import { symbolGroups, combinedRhymeGroups } from "./symbols-data";
 export function SymbolChart({
   app,
 }: {
-  app: Pick<AppController, "playPreviewSymbol" | "playingSymbol" | "audioLoading" | "audioError">;
+  app: Pick<
+    AppController,
+    "playPreviewSymbol" | "playingSymbol" | "audioLoading" | "audioError" | "warmSymbols"
+  >;
 }) {
-  const { playPreviewSymbol, playingSymbol, audioLoading, audioError } = app;
+  const { playPreviewSymbol, playingSymbol, audioLoading, audioError, warmSymbols } = app;
+  const pageRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    // Prepare only clips whose buttons are about to be visible.
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.filter((entry) => entry.isIntersecting);
+        warmSymbols(
+          visible
+            .map((entry) => (entry.target as HTMLElement).dataset.audioText)
+            .filter((text): text is string => Boolean(text)),
+        );
+        visible.forEach((entry) => observer.unobserve(entry.target));
+      },
+      { rootMargin: "120px" },
+    );
+    pageRef.current
+      ?.querySelectorAll("[data-audio-text]")
+      .forEach((button) => observer.observe(button));
+    return () => observer.disconnect();
+  }, [warmSymbols]);
 
   const message = audioError
     ? "音檔無法播放，請檢查網路，再點一次格子。"
@@ -23,10 +46,10 @@ export function SymbolChart({
       : "點一下格子，就能聽到發音。";
 
   return (
-    <section className="page-section symbol-page">
+    <section className="page-section symbol-page" ref={pageRef}>
       <ProgressiveImage
         className="symbol-page-watercolor"
-        src="/course-art/symbol-chart-watercolor.webp"
+        src="course-art/symbol-chart-watercolor.webp"
         alt=""
         aria-hidden="true"
       />

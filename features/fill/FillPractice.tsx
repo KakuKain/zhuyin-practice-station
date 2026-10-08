@@ -1,5 +1,3 @@
-"use client";
-
 import type { AppController } from "../usePracticeApp";
 import { fillFavoriteKey, fillLocation } from "../practice/practice-storage";
 import { InkPreview, LoadingOverlay, ResourceNotice } from "../../components/AppChrome";
@@ -7,6 +5,7 @@ import { InkNotice, InkTools } from "../../components/InkTools";
 import { FocusHeader } from "../../components/FocusHeader";
 import { ReviewActions } from "../../components/ReviewActions";
 import { ZhuyinStack } from "../../components/Zhuyin";
+import { ConfirmDialog } from "../../components/ConfirmDialog";
 
 export function FillPractice({
   app,
@@ -188,39 +187,20 @@ export function FillPractice({
         </div>
       )}
       {fillPracticeExitOpen && (
-        <div className="fill-dialog-backdrop">
-          <div
-            className="fill-dialog"
-            role="alertdialog"
-            aria-modal="true"
-            aria-labelledby="practice-exit-title"
-            aria-describedby="practice-exit-description"
-          >
-            <span className="fill-dialog-eyebrow">單題重練</span>
-            <h2 id="practice-exit-title">這格還沒寫完</h2>
-            <p id="practice-exit-description">
-              現在離開會失去這次筆跡；收藏與待補強仍會保留，可以之後再練。
-            </p>
-            <button
-              className="fill-dialog-primary"
-              type="button"
-              autoFocus
-              onClick={() => setFillPracticeExitOpen(false)}
-            >
-              繼續寫
-            </button>
-            <button
-              className="fill-dialog-secondary"
-              type="button"
-              onClick={() => {
-                setFillPracticeExitOpen(false);
-                setView("practice");
-              }}
-            >
-              離開這格
-            </button>
-          </div>
-        </div>
+        <ConfirmDialog
+          id="practice-exit"
+          eyebrow="單題重練"
+          title="這格還沒寫完"
+          primaryLabel="繼續寫"
+          onPrimary={() => setFillPracticeExitOpen(false)}
+          secondaryLabel="離開這格"
+          onSecondary={() => {
+            setFillPracticeExitOpen(false);
+            setView("practice");
+          }}
+        >
+          現在離開會失去這次筆跡；收藏與待補強仍會保留，可以之後再練。
+        </ConfirmDialog>
       )}
     </main>
   );

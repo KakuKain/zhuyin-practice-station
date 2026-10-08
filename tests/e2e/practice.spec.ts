@@ -99,6 +99,11 @@ test("title handwriting retains ink and resumes the same cell after reload", asy
   await expect(page.locator(".fill-writing-location")).toContainText("標題 · 第 2 格");
   await page.getByRole("button", { name: "回到默寫", exact: true }).click();
   await expect(page.locator(".fill-cell.is-filled")).toHaveCount(1);
+  // Looking at a finished cell without changing it keeps it finished.
+  await page.getByRole("button", { name: "標題第 1 格，修改注音", exact: true }).click();
+  await page.getByRole("button", { name: "回到默寫", exact: true }).click();
+  await expect(page.locator(".fill-cell.is-filled")).toHaveCount(1);
+  await expect(page.locator(".fill-cell.is-in-progress")).toHaveCount(0);
   await page.reload();
   await openLesson(page);
   await page.getByRole("button", { name: /第一關 課文默寫/ }).click();
@@ -185,6 +190,10 @@ test("a second pointer never joins the active stroke on the free board", async (
     emit("pointerup", 1, 40, 40);
   });
   expect(await inkPixels(canvas)).toBeGreaterThan(20);
+  // The board is written once the hand rests, not on every lift.
+  await expect
+    .poll(() => page.evaluate(() => localStorage.getItem("kid-free-dictation-v1")))
+    .not.toBeNull();
   const stored = await page.evaluate(() =>
     JSON.parse(localStorage.getItem("kid-free-dictation-v1")!),
   );
@@ -196,6 +205,61 @@ test("a second pointer never joins the active stroke on the free board", async (
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
 
+test("a resting palm never writes on the free board", async ({ page }) => {
+  await page.goto("./");
+  await page.getByRole("button", { name: "練習", exact: true }).click();
+  const canvas = page.getByLabel("自由聽寫作答畫板", { exact: true });
+  await expect(canvas).toBeVisible();
+  await canvas.evaluate((el) => {
+    const box = el.getBoundingClientRect();
+    const emit = (type: string, id: number, x: number, y: number, size: number) =>
+      el.dispatchEvent(
+        new PointerEvent(type, {
+          pointerId: id,
+          pointerType: "touch",
+          clientX: box.x + x,
+          clientY: box.y + y,
+          width: size,
+          height: size,
+          bubbles: true,
+        }),
+      );
+    el.setPointerCapture = () => {};
+    el.hasPointerCapture = () => false;
+    // A palm-sized contact is ignored from the start.
+    emit("pointerdown", 1, 60, 60, 160);
+    emit("pointermove", 1, 90, 90, 160);
+    emit("pointerup", 1, 90, 90, 160);
+    // A touch that starts small and spreads into a palm is dropped.
+    emit("pointerdown", 2, 30, 30, 20);
+    emit("pointermove", 2, 50, 50, 24);
+    emit("pointermove", 2, 70, 70, 150);
+    emit("pointerup", 2, 70, 70, 150);
+  });
+  expect(await inkPixels(canvas)).toBe(0);
+  // A stylus-sized touch still writes.
+  await canvas.evaluate((el) => {
+    const box = el.getBoundingClientRect();
+    for (const [type, x] of [
+      ["pointerdown", 20],
+      ["pointermove", 60],
+      ["pointerup", 60],
+    ] as const)
+      el.dispatchEvent(
+        new PointerEvent(type, {
+          pointerId: 3,
+          pointerType: "touch",
+          clientX: box.x + x,
+          clientY: box.y + x,
+          width: 30,
+          height: 30,
+          bubbles: true,
+        }),
+      );
+  });
+  await expect.poll(() => inkPixels(canvas)).toBeGreaterThan(20);
+});
+
 test("device backup previews, restores and preserves unrelated browser storage", async ({
   page,
 }) => {
@@ -204,6 +268,9 @@ test("device backup previews, restores and preserves unrelated browser storage",
   await page.evaluate(async () => {
     await new Promise<void>((resolve, reject) => {
       const request = indexedDB.open("zhuyin-custom-audio-v1", 1);
+      // The app opens the recording database only when it is first needed.
+      request.onupgradeneeded = () =>
+        request.result.createObjectStore("recordings", { keyPath: "key" });
       request.onsuccess = () => {
         const db = request.result;
         const tx = db.transaction("recordings", "readwrite");
@@ -259,13 +326,16 @@ test("device backup previews, restores and preserves unrelated browser storage",
     buffer: Buffer.from(JSON.stringify(backup)),
   });
   await expect(page.getByRole("heading", { name: "確認還原內容" })).toBeVisible();
+  const restore = page.getByRole("button", { name: "2. 開始還原", exact: true });
+  await expect(restore).toBeDisabled();
   const download = page.waitForEvent("download");
-  const refreshed = page.waitForEvent("domcontentloaded");
-  await page.getByRole("button", { name: "備份目前資料並還原", exact: true }).click();
+  await page.getByRole("button", { name: "1. 下載目前資料", exact: true }).click();
   const saved = await download;
   expect(saved.suggestedFilename()).toContain("還原前備份");
   const before = JSON.parse(readFileSync((await saved.path())!, "utf8"));
   expect(before.recordings[0].base64).toBe(Buffer.from("old voice").toString("base64"));
+  const refreshed = page.waitForEvent("domcontentloaded");
+  await restore.click();
   await refreshed;
   await expect(page.locator(".journey-card")).toHaveCount(12);
   const restoredVoice = await page.evaluate(async () => {

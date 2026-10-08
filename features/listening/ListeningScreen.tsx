@@ -1,5 +1,3 @@
-"use client";
-
 import { ProgressiveImage } from "../../components/ProgressiveImage";
 
 import { ShowMsg } from "../../components/ShowMsg";
@@ -13,6 +11,7 @@ import { AnswerDisplay } from "../../components/Zhuyin";
 import { AppHeader, LoadingOverlay, ResourceNotice } from "../../components/AppChrome";
 import { ListeningBatchReview } from "./ListeningBatchReview";
 import { ListeningCanvas } from "./ListeningCanvas";
+import { ConfirmDialog } from "../../components/ConfirmDialog";
 
 export function ListeningScreen({ app }: { app: AppController }) {
   const {
@@ -23,7 +22,6 @@ export function ListeningScreen({ app }: { app: AppController }) {
     currentQuestionSaved,
     deferRemediation,
     finishListening,
-    finishPlayback,
     handleParentDecision,
     hasCompleteInk,
     isWordQuestion,
@@ -34,7 +32,6 @@ export function ListeningScreen({ app }: { app: AppController }) {
     listeningSettings,
     loadingMessage,
     resourceError,
-    playbackRef,
     replayQuestion,
     retryMessage,
     secondsLeft,
@@ -56,7 +53,6 @@ export function ListeningScreen({ app }: { app: AppController }) {
   const catalogLesson = useCatalogLesson(app.selectedLesson);
   return (
     <main className={`focus-shell phase-${listenPhase}`}>
-      <audio ref={playbackRef} onEnded={finishPlayback} preload="none" hidden aria-hidden="true" />
       {listenPhase === "ready" || listenPhase === "batch_review" ? (
         <AppHeader onCourses={leaveFocus} onBack={leaveFocus} backLabel="返回" />
       ) : (
@@ -90,7 +86,7 @@ export function ListeningScreen({ app }: { app: AppController }) {
       )}
       <div className="focus-content">
         <ResourceNotice failed={resourceError} />
-        <p className="sr-only" aria-live="polite">
+        <p className="visually-hidden" aria-live="polite">
           {listenMessage}
         </p>
         {listenPhase === "ready" ? (
@@ -125,7 +121,7 @@ export function ListeningScreen({ app }: { app: AppController }) {
                 >
                   <ProgressiveImage
                     className="listen-start-art"
-                    src="/course-art/listening-play-button-watercolor-v1.webp"
+                    src="course-art/listening-play-button-watercolor-v1.webp"
                     width={640}
                     height={640}
                     alt=""
@@ -138,12 +134,12 @@ export function ListeningScreen({ app }: { app: AppController }) {
                     className="listen-ready-art"
                     src={
                       catalogLesson.listeningOnly
-                        ? "/course-art/review-sleeping-cat-watercolor-v2.webp"
+                        ? "course-art/review-sleeping-cat-watercolor-v2.webp"
                         : app.selectedLesson === 7
-                          ? "/course-art/radish-story.webp"
+                          ? "course-art/radish-story.webp"
                           : catalogLesson.artwork
-                            ? `/course-art/${catalogLesson.artwork}-watercolor.webp`
-                            : "/course-art/lesson-watercolor-paper.webp"
+                            ? `course-art/${catalogLesson.artwork}-watercolor.webp`
+                            : "course-art/lesson-watercolor-paper.webp"
                     }
                     alt=""
                   />
@@ -283,35 +279,20 @@ export function ListeningScreen({ app }: { app: AppController }) {
         <LoadingOverlay label={loadingMessage ?? "聲音準備中…"} />
       )}
       {listenExitOpen && (
-        <div className="fill-dialog-backdrop">
-          <div
-            className="fill-dialog"
-            role="alertdialog"
-            aria-modal="true"
-            aria-labelledby="listen-exit-title"
-            aria-describedby="listen-exit-description"
-          >
-            <span className="fill-dialog-eyebrow">聽寫練習</span>
-            <h2 id="listen-exit-title">要先離開聽寫嗎？</h2>
-            <p id="listen-exit-description">
-              {singleQuestionPractice && (listenPhase === "active" || listenPhase === "retry")
-                ? "倒數已暫停。"
-                : ""}
-              離開後，這一輪未完成的進度與筆跡不會保留；已收藏與待補強的題目仍會留下。
-            </p>
-            <button
-              className="fill-dialog-primary"
-              type="button"
-              autoFocus
-              onClick={() => setListenExitOpen(false)}
-            >
-              繼續練習
-            </button>
-            <button className="fill-dialog-secondary" type="button" onClick={confirmLeaveFocus}>
-              結束本輪
-            </button>
-          </div>
-        </div>
+        <ConfirmDialog
+          id="listen-exit"
+          eyebrow="聽寫練習"
+          title="要先離開聽寫嗎？"
+          primaryLabel="繼續練習"
+          onPrimary={() => setListenExitOpen(false)}
+          secondaryLabel="結束本輪"
+          onSecondary={confirmLeaveFocus}
+        >
+          {singleQuestionPractice && (listenPhase === "active" || listenPhase === "retry")
+            ? "倒數已暫停。"
+            : ""}
+          離開後，這一輪未完成的進度與筆跡不會保留；已收藏與待補強的題目仍會留下。
+        </ConfirmDialog>
       )}
     </main>
   );

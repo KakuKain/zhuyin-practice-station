@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import "../styles/00-reset.css";
 @import "../styles/00-foundation.css";
 @import "../styles/01-shell-course-base.css";
 @import "../styles/02-typography.css";
@@ -17,8 +17,7 @@
 @import "../styles/15-listening.css";
 @import "../styles/16-symbols.css";
 @import "../styles/17-consistency.css";
-@import "../styles/18-position-sound-practice.css";
-@import "../styles/19-custom-audio.css";
+@import "../styles/18-position-practice.css";
 
 @import "../styles/20-materials.css";
 

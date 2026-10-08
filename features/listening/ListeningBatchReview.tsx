@@ -1,4 +1,3 @@
-"use client";
 import { isListeningAnswerComplete } from "./listening-policy";
 import type { AppController } from "../usePracticeApp";
 import { InkPreview } from "../../components/AppChrome";

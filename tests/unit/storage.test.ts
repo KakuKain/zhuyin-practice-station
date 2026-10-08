@@ -89,7 +89,7 @@ test("v1, v2 and v3 favorites survive migration, dedupe and invalid records", ()
 });
 
 test("hydration never overwrites existing records; quota failures keep in-memory progress", (t) => {
-  const data = new Map([
+  const data = new Map<string, string>([
     [
       practiceStorageKey,
       JSON.stringify({
@@ -159,4 +159,32 @@ test("v3 migration preserves pending work and all legacy stars; v4 merges flags"
   assert.equal(savedQuestions.length, 1);
   assert.equal(savedQuestions[0].isFavorite, true);
   assert.equal(savedQuestions[0].needsPractice, true);
+});
+
+test("fill favorites follow a corrected built-in reading instead of being dropped", () => {
+  const [favorite] = validatedFillFavorites([
+    {
+      lessonIndex: 5,
+      character: "教",
+      zhuyin: "ㄐㄧㄠˋ",
+      positions: [14, 23],
+      status: "needs_rewrite",
+      isFavorite: true,
+    },
+  ]);
+  assert.deepEqual(favorite, {
+    lessonIndex: 5,
+    character: "教",
+    zhuyin: "ㄐㄧㄠ",
+    positions: [14, 23],
+    status: "needs_rewrite",
+    isFavorite: true,
+  });
+  // A different character at the stored position still cannot claim it.
+  assert.deepEqual(
+    validatedFillFavorites([
+      { lessonIndex: 5, character: "學", zhuyin: "ㄒㄩㄝˊ", positions: [14], isFavorite: true },
+    ]),
+    [],
+  );
 });

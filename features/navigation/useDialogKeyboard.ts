@@ -1,4 +1,3 @@
-"use client";
 import { useEffect, useEffectEvent } from "react";
 
 export function useDialogKeyboard(open: boolean, onCancel: () => void) {

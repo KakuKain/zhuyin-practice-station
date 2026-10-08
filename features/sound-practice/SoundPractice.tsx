@@ -1,4 +1,3 @@
-"use client";
 import { ShowMsg } from "../../components/ShowMsg";
 
 import { useEffect, useRef, useState } from "react";
@@ -59,7 +58,6 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => 
       if (token !== generation.current) return;
       audio.speak(pair.sounds[choice].audioText, {
         pronunciation: pair.sounds[choice].label,
-        playbackRate: 1,
         allowSynthesis: false,
         onStarted: () => {
           if (token === generation.current) setPreviewingSound(choice);
@@ -96,7 +94,6 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => 
     setPlaying(true);
     audio.speak(pair.sounds[questions[questionIndex].target].audioText, {
       pronunciation: pair.sounds[questions[questionIndex].target].label,
-      playbackRate: 1,
       allowSynthesis: false,
       onError: () => {
         if (token === generation.current) setPlaying(false);
@@ -157,7 +154,7 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => 
               </h2>
               <p>每組 6 題</p>
             </div>
-            <img src="/course-art/sound-headphone-cat.webp" alt="" />
+            <img src="course-art/sound-headphone-cat.webp" alt="" />
           </div>
           <div className="sound-pair-list">
             {soundPairs.map((item) => (
@@ -185,7 +182,7 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => 
         </>
       ) : finished ? (
         <div className="sound-practice-card sound-finished">
-          <img className="sound-complete-art" src="/course-art/sound-complete-cat.webp" alt="" />
+          <img className="sound-complete-art" src="course-art/sound-complete-cat.webp" alt="" />
           <h2 ref={titleRef} tabIndex={-1}>
             這一組練完了！
           </h2>
@@ -216,7 +213,7 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => 
             <h2 ref={titleRef} tabIndex={-1}>
               聽聽兩個音
             </h2>
-            <img src="/course-art/sound-headphone-cat.webp" alt="" />
+            <img src="course-art/sound-headphone-cat.webp" alt="" />
           </div>
           <div className="sound-comparison-symbols" dir="rtl" aria-label={pair.title}>
             {pair.sounds.map((sound, choice) => (
@@ -242,8 +239,8 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => 
             <img
               src={
                 playing
-                  ? "/course-art/listening-stop-button-watercolor-v1.webp"
-                  : "/course-art/listening-play-button-watercolor-v1.webp"
+                  ? "course-art/listening-stop-button-watercolor-v1.webp"
+                  : "course-art/listening-play-button-watercolor-v1.webp"
               }
               alt=""
             />
@@ -271,7 +268,7 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => 
             你聽到哪個音？
           </h2>
           <div className="sound-question-listening">
-            <img className="sound-question-cat" src="/course-art/sound-headphone-cat.webp" alt="" />
+            <img className="sound-question-cat" src="course-art/sound-headphone-cat.webp" alt="" />
             <button
               type="button"
               className="sound-replay"
@@ -279,7 +276,7 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => 
               disabled={audio.audioLoading || playing || feedback !== null}
               aria-busy={audio.audioLoading}
             >
-              <img src="/course-art/listening-play-button-watercolor-v1.webp" alt="" />
+              <img src="course-art/listening-play-button-watercolor-v1.webp" alt="" />
               <span>
                 {audio.audioLoading
                   ? "聲音載入中…"
@@ -334,10 +331,14 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => 
               );
             })}
           </div>
+          {/* Mounted before any answer so screen readers announce each change. */}
+          <span className="visually-hidden" role="status">
+            {feedback === "correct" ? "答對了！" : feedback ? "再試一次" : ""}
+          </span>
           {feedback && (
             <div
               className={`sound-feedback-animation is-${feedback}`}
-              role="status"
+              aria-hidden="true"
               key={`${index}-${selected}`}
             >
               {feedback === "correct" ? (

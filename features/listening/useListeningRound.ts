@@ -1,4 +1,3 @@
-"use client";
 import type { RefObject } from "react";
 import type {
   InkStroke,
@@ -59,7 +58,6 @@ export function useListeningRound({
     setListeningDrafts,
     setListenIndex,
     setListenPhase,
-    setPlayCount,
     setBatchNeedsReview,
     batchNeedsReview,
     setReviewedIndexes,
@@ -77,7 +75,6 @@ export function useListeningRound({
     stopPlayback();
     setListenIndex(index);
     setListenPhase("active");
-    setPlayCount(1);
     resumeListening();
     const question = listeningQuestions[index];
     speak(question.audioText, { pronunciation: question.answer });

@@ -55,7 +55,7 @@ test("all 22 combined rhymes have a unique playable local clip", () => {
   for (const rhyme of rhymes) {
     assert.equal(rhyme.length, 2);
     assert.ok(
-      existsSync(new URL(`../../public${listeningAudioUrl(rhyme)}`, import.meta.url)),
+      existsSync(new URL(`../../public/${listeningAudioUrl(rhyme)}`, import.meta.url)),
       rhyme,
     );
   }
@@ -72,10 +72,10 @@ test("combined-rhyme playback uses Gemini syllable recordings with explicit tone
   assert.equal(combinedRhymeExamples.length, 22);
   assert.equal(manifest.clips.length, 22);
   for (const example of combinedRhymeExamples) {
-    assert.ok(listeningAudioUrl(example.rhyme).startsWith("/listening-audio/gemini/rhymes/"));
+    assert.ok(listeningAudioUrl(example.rhyme).startsWith("listening-audio/gemini/rhymes/"));
     assert.ok(
       existsSync(
-        new URL(`../../public${listeningAudioUrl(example.rhyme).split("?")[0]}`, import.meta.url),
+        new URL(`../../public/${listeningAudioUrl(example.rhyme).split("?")[0]}`, import.meta.url),
       ),
     );
     assert.equal(example.zhuyin, example.rhyme + (example.rhyme === "ㄧㄞ" ? "ˊ" : ""));
@@ -84,7 +84,7 @@ test("combined-rhyme playback uses Gemini syllable recordings with explicit tone
     const clip = manifest.clips.find((item: { rhyme: string }) => item.rhyme === example.rhyme);
     assert.ok(clip);
     assert.equal(clip.record, example.record);
-    const bytes = readFileSync(new URL(`../../public${example.audioUrl}`, import.meta.url));
+    const bytes = readFileSync(new URL(`../../public/${example.audioUrl}`, import.meta.url));
     assert.equal(createHash("sha256").update(bytes).digest("hex"), clip.sha256);
     assert.equal(bytes.length, clip.bytes);
   }

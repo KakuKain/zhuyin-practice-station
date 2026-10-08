@@ -1,12 +1,17 @@
 import type { ListenCategory, ListeningQuestion, ListeningSeed, ListeningSettings } from "../types";
-import { exercises, firstListeningQuestions } from "../courses/course-data";
-import { legacyCircledVocabulary } from "../courses/legacy-circled-vocabulary";
+import { exercises } from "../courses/course-data";
+import {
+  extraWordQuestions,
+  firstListeningQuestions,
+  legacyCircledVocabulary,
+} from "../courses/legacy-content";
 import type { CircledTerm } from "../courses/circled-vocabulary";
 import { builtinCatalog, type CatalogLesson } from "../courses/materials";
 import { registeredAudioUrl } from "../../lib/audio/audio-registry";
 import { combinedRhymeExample } from "../symbols/combined-rhyme-audio";
+import { storageKeys } from "../../lib/storage/storage-keys";
 
-export const listeningSettingsStorageKey = "zhuyin-listening-settings-v1";
+export const listeningSettingsStorageKey = storageKeys.listeningSettings;
 
 export const defaultListeningSettings: ListeningSettings = {
   repeatCount: 2,
@@ -14,70 +19,7 @@ export const defaultListeningSettings: ListeningSettings = {
   answerTime: "standard",
 };
 
-export const audioPlaybackRate = 0.76;
-
-export const zhuyinPlaybackRate = 1;
-
 export const audioTailDelayMs = 650;
-
-export const extraWordQuestions: Record<number, readonly ListeningSeed[]> = {
-  0: [
-    {
-      category: "words",
-      answer: "ㄉㄧˋ|ㄧ",
-      audioText: "第一",
-      distractors: ["ㄉㄧˋ|ㄇㄧ", "ㄆㄠˇ|ㄧ"],
-    },
-  ],
-  1: [
-    {
-      category: "words",
-      answer: "ㄉㄜˊ|ㄧˋ",
-      audioText: "得意",
-      distractors: ["ㄉㄜˊ|ㄜˊ", "ㄈㄨ|ㄧˋ"],
-    },
-  ],
-  2: [
-    {
-      category: "words",
-      answer: "ㄆㄠˋ|ㄗㄠˇ",
-      audioText: "泡澡",
-      distractors: ["ㄆㄠˊ|ㄗㄠˇ", "ㄆㄠˋ|ㄗㄠˋ"],
-    },
-    {
-      category: "words",
-      answer: "ㄅㄢˋ|ㄌㄨˋ",
-      audioText: "半路",
-      distractors: ["ㄅㄢˋ|ㄌㄧˊ", "ㄏㄜˊ|ㄌㄨˋ"],
-    },
-    {
-      category: "words",
-      answer: "ㄩˋ|ㄉㄠˋ",
-      audioText: "遇到",
-      distractors: ["ㄩˋ|ㄗㄠˇ", "ㄑㄩˋ|ㄉㄠˋ"],
-    },
-    {
-      category: "words",
-      answer: "ㄓㄨˊ|ㄔㄠˊ",
-      audioText: "築巢",
-      distractors: ["ㄓㄨˊ|ㄗㄠˇ", "ㄔㄠˊ|ㄓㄨˊ"],
-    },
-  ],
-  3: [
-    {
-      category: "words",
-      answer: "ㄅㄟ|˙ㄓㄜ",
-      audioText: "背著",
-      distractors: ["ㄅㄟˋ|˙ㄓㄜ", "ㄅㄟ|ㄕㄨ"],
-    },
-    {
-      category: "words",
-      answer: "ㄌㄚ|ㄕㄡˇ",
-      audioText: "拉手",
-      distractors: ["ㄌㄚ|ㄕㄨ", "ㄕㄡˇ|ㄌㄚ"],
-    },
-  ],
-};
 
 export function shuffleItems<T>(items: readonly T[]): T[] {
   const shuffled = [...items];
@@ -105,9 +47,9 @@ export function dictationAudioUrl(text: string): string {
   const registered = registeredAudioUrl(text);
   if (registered) return registered;
   const filename = [...text].map((character) => character.codePointAt(0)!.toString(16)).join("-");
-  if (combinedRhymeExample(text)) return `/listening-audio/gemini/rhymes/${filename}.m4a`;
+  if (combinedRhymeExample(text)) return `listening-audio/gemini/rhymes/${filename}.m4a`;
   // These 37 clips changed source in v44; the query bypasses older browser caches.
-  return `/listening-audio/${filename}.m4a${naturalReadingPrompts.has(text) ? "?v=57" : /^[\u3105-\u3129]$/.test(text) ? "?v=44" : ""}`;
+  return `listening-audio/${filename}.m4a${naturalReadingPrompts.has(text) ? "?v=57" : /^[\u3105-\u3129]$/.test(text) ? "?v=44" : ""}`;
 }
 
 export function questionSeedsForLesson(
@@ -258,11 +200,6 @@ export function sectionPosition(questions: readonly ListeningQuestion[], index: 
     total: Math.max(1, questions.filter((question) => question.category === category).length),
   };
 }
-
-export const legacySavedQuestionIndexes: Record<number, readonly number[]> = {
-  0: [4, 5, 7],
-  2: [4, 5, 6],
-};
 
 export function listeningSectionLabel(questions: readonly ListeningQuestion[], index: number) {
   const category = questions[index]?.category;

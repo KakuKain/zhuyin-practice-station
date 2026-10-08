@@ -4,8 +4,9 @@ import {
   type CustomRecording,
   type RecordingInfo,
 } from "./custom-audio";
+import { customAudioDatabase } from "../storage/storage-keys";
 
-const databaseName = "zhuyin-custom-audio-v1";
+const databaseName = customAudioDatabase;
 const storeName = "recordings";
 type StoredRecording = Omit<CustomRecording, "blob"> & { blob: Blob | ArrayBuffer };
 function hydrateRecording(value: StoredRecording): CustomRecording {
@@ -114,6 +115,13 @@ export const customAudioStorage = {
     });
     if (!value) return null;
     return hydrateRecording(value);
+  },
+  /** Identities only: playback needs to know what exists without reading any audio. */
+  keys(): Promise<string[]> {
+    return transaction("readonly", (store, result) => {
+      const request = store.getAllKeys();
+      request.onsuccess = () => result(request.result.map(String));
+    });
   },
   list(): Promise<RecordingInfo[]> {
     return transaction("readonly", (store, result) => {

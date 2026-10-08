@@ -1,5 +1,3 @@
-"use client";
-
 import type { AppController } from "../usePracticeApp";
 import { LoadingOverlay, ResourceNotice } from "../../components/AppChrome";
 import { InkStatus, InkTools } from "../../components/InkTools";

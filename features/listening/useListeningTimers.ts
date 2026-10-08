@@ -1,4 +1,3 @@
-"use client";
 import { useCallback, useRef } from "react";
 
 /** One owner for the answer clock, delayed repetitions, and playback-end callbacks. */

@@ -1,4 +1,15 @@
-import type { LessonExercise, ListeningSeed, SyllableItem } from "../types";
+import type { LessonExercise, SyllableItem } from "../types";
+import {
+  firstListeningQuestions,
+  secondListeningQuestions,
+  thirdListeningQuestions,
+  fourthListeningQuestions,
+  fifthListeningQuestions,
+  sixthListeningQuestions,
+  seventhListeningQuestions,
+  eighthListeningQuestions,
+  ninthListeningQuestions,
+} from "./legacy-content";
 
 export const lessonNumerals = ["一", "二", "三", "四", "五", "六", "七", "八", "九"] as const;
 
@@ -321,141 +332,6 @@ export const ninthLessonLines = annotateLessonLines(lessons[8].lines, [
   ["ㄉㄚˋ", "ㄐㄧㄚ", "˙ㄉㄜ", "ㄅㄧㄠˇ", "ㄧㄢˇ"],
   ["ㄓㄣ", "ㄐㄧㄥ", "ㄘㄞˇ"],
 ]);
-
-export function wordQuestion(
-  audioText: string,
-  answer: string,
-  distractors: readonly [string, string],
-): ListeningSeed {
-  return { category: "words", audioText, answer, distractors };
-}
-
-export const fifthListeningQuestions = [
-  wordQuestion("朋友", "ㄆㄥˊ|ㄧㄡˇ", ["ㄆㄥˊ|ㄧㄡ", "ㄆㄥˋ|ㄧㄡˇ"]),
-  wordQuestion("一起", "ㄧˋ|ㄑㄧˇ", ["ㄧ|ㄑㄧˇ", "ㄧˋ|ㄑㄧ"]),
-  wordQuestion("翹翹", "ㄑㄧㄠˋ|ㄑㄧㄠˋ", ["ㄑㄧㄠˊ|ㄑㄧㄠˋ", "ㄑㄧㄠˋ|ㄑㄧㄠˊ"]),
-  wordQuestion("小鳥", "ㄒㄧㄠˇ|ㄋㄧㄠˇ", ["ㄒㄧㄠˇ|ㄋㄧㄠˋ", "ㄒㄧㄠˋ|ㄋㄧㄠˇ"]),
-];
-
-export const sixthListeningQuestions = [
-  wordQuestion("老師", "ㄌㄠˇ|ㄕ", ["ㄌㄠˋ|ㄕ", "ㄌㄠˇ|ㄕˋ"]),
-  wordQuestion("紅花", "ㄏㄨㄥˊ|ㄏㄨㄚ", ["ㄏㄨㄥˊ|ㄏㄨㄚˋ", "ㄏㄨㄥˋ|ㄏㄨㄚ"]),
-  wordQuestion("謝謝", "ㄒㄧㄝˋ|˙ㄒㄧㄝ", ["ㄒㄧㄝˋ|ㄒㄧㄝˋ", "ㄒㄧㄝˋ|ㄒㄧㄝ"]),
-  wordQuestion("讀書", "ㄉㄨˊ|ㄕㄨ", ["ㄉㄨˋ|ㄕㄨ", "ㄉㄨˊ|ㄕㄨˋ"]),
-];
-
-export const seventhListeningQuestions = [
-  wordQuestion("烏龜", "ㄨ|ㄍㄨㄟ", ["ㄨˋ|ㄍㄨㄟ", "ㄨ|ㄍㄨㄟˋ"]),
-  wordQuestion("兔子", "ㄊㄨˋ|˙ㄗ", ["ㄊㄨˋ|ㄗˇ", "ㄊㄨˊ|˙ㄗ"]),
-  wordQuestion("比賽", "ㄅㄧˇ|ㄙㄞˋ", ["ㄅㄧˋ|ㄙㄞˋ", "ㄅㄧˇ|ㄙㄞ"]),
-  wordQuestion("午覺", "ㄨˇ|ㄐㄧㄠˋ", ["ㄨˇ|ㄐㄩㄝˊ", "ㄨˋ|ㄐㄧㄠˋ"]),
-];
-
-export const eighthListeningQuestions = [
-  wordQuestion("菜園", "ㄘㄞˋ|ㄩㄢˊ", ["ㄘㄞˊ|ㄩㄢˊ", "ㄘㄞˋ|ㄩㄢˇ"]),
-  wordQuestion("蘿蔔", "ㄌㄨㄛˊ|˙ㄅㄛ", ["ㄌㄨㄛˊ|ㄅㄛˊ", "ㄌㄨㄛˋ|˙ㄅㄛ"]),
-  wordQuestion("黃牛", "ㄏㄨㄤˊ|ㄋㄧㄡˊ", ["ㄏㄨㄤˊ|ㄋㄧㄡˇ", "ㄏㄨㄤˋ|ㄋㄧㄡˊ"]),
-  wordQuestion("浣熊", "ㄨㄢˇ|ㄒㄩㄥˊ", ["ㄏㄨㄢˋ|ㄒㄩㄥˊ", "ㄨㄢˇ|ㄒㄩㄥˇ"]),
-];
-
-export const ninthListeningQuestions = [
-  wordQuestion("山崖", "ㄕㄢ|ㄧㄞˊ", ["ㄕㄢ|ㄧㄚˊ", "ㄕㄢˋ|ㄧㄞˊ"]),
-  wordQuestion("動物", "ㄉㄨㄥˋ|ㄨˋ", ["ㄉㄨㄥ|ㄨˋ", "ㄉㄨㄥˋ|ㄨˇ"]),
-  wordQuestion("馴鹿", "ㄒㄩㄣˊ|ㄌㄨˋ", ["ㄒㄩㄣˋ|ㄌㄨˋ", "ㄒㄩㄣˊ|ㄌㄨˇ"]),
-  wordQuestion("精彩", "ㄐㄧㄥ|ㄘㄞˇ", ["ㄐㄧㄥˋ|ㄘㄞˇ", "ㄐㄧㄥ|ㄘㄞˋ"]),
-];
-
-export const firstListeningQuestions = [
-  { category: "symbols", answer: "ㄅ", audioText: "ㄅ", distractors: ["ㄆ", "ㄇ"] },
-  { category: "symbols", answer: "ㄆ", audioText: "ㄆ", distractors: ["ㄅ", "ㄉ"] },
-  { category: "symbols", answer: "ㄇ", audioText: "ㄇ", distractors: ["ㄅ", "ㄆ"] },
-  { category: "symbols", answer: "ㄉ", audioText: "ㄉ", distractors: ["ㄇ", "ㄅ"] },
-  { category: "characters", answer: "ㄇㄠ", audioText: "貓", distractors: ["ㄇㄧ", "ㄆㄠˇ"] },
-  { category: "characters", answer: "ㄇㄧ", audioText: "咪", distractors: ["ㄇㄠ", "ㄅㄧ"] },
-  { category: "characters", answer: "ㄉㄧˋ", audioText: "弟", distractors: ["˙ㄉㄧ", "ㄧ"] },
-  { category: "characters", answer: "ㄆㄠˇ", audioText: "跑", distractors: ["ㄆㄠˊ", "ㄆㄠˋ"] },
-  {
-    category: "words",
-    answer: "ㄇㄠ|ㄇㄧ",
-    audioText: "貓咪",
-    distractors: ["ㄇㄠ|ㄇㄠ", "ㄇㄧ|ㄇㄧ"],
-  },
-  {
-    category: "words",
-    answer: "ㄉㄧˋ|˙ㄉㄧ",
-    audioText: "弟弟",
-    distractors: ["ㄉㄧˋ|ㄉㄧˋ", "˙ㄉㄧ|ㄉㄧˋ"],
-  },
-] as const;
-
-export const secondListeningQuestions = [
-  { category: "symbols", answer: "ㄈ", audioText: "ㄈ", distractors: ["ㄏ", "ㄓ"] },
-  { category: "symbols", answer: "ㄏ", audioText: "ㄏ", distractors: ["ㄈ", "ㄔ"] },
-  { category: "symbols", answer: "ㄓ", audioText: "ㄓ", distractors: ["ㄔ", "ㄏ"] },
-  { category: "symbols", answer: "ㄔ", audioText: "ㄔ", distractors: ["ㄓ", "ㄈ"] },
-  { category: "characters", answer: "ㄜˊ", audioText: "鵝", distractors: ["ㄅㄠˇ", "ㄏㄚ"] },
-  { category: "characters", answer: "ㄅㄠˇ", audioText: "寶", distractors: ["˙ㄅㄠ", "ㄏㄠˇ"] },
-  { category: "characters", answer: "ㄈㄨ", audioText: "孵", distractors: ["ㄔㄨ", "ㄨˇ"] },
-  { category: "characters", answer: "ㄧˋ", audioText: "意", distractors: ["ㄧ", "ㄜˊ"] },
-  {
-    category: "words",
-    answer: "ㄅㄠˇ|˙ㄅㄠ",
-    audioText: "寶寶",
-    distractors: ["ㄅㄠˇ|ㄅㄠˇ", "˙ㄅㄠ|ㄅㄠˇ"],
-  },
-  {
-    category: "words",
-    answer: "ㄈㄨ|ㄔㄨ",
-    audioText: "孵出",
-    distractors: ["ㄈㄨ|ㄈㄨ", "ㄔㄨ|ㄈㄨ"],
-  },
-] as const;
-
-export const thirdListeningQuestions = [
-  { category: "symbols", answer: "ㄌ", audioText: "ㄌ", distractors: ["ㄑ", "ㄗ"] },
-  { category: "symbols", answer: "ㄑ", audioText: "ㄑ", distractors: ["ㄌ", "ㄩ"] },
-  { category: "symbols", answer: "ㄗ", audioText: "ㄗ", distractors: ["ㄌ", "ㄑ"] },
-  { category: "symbols", answer: "ㄩ", audioText: "ㄩ", distractors: ["ㄗ", "ㄑ"] },
-  { category: "characters", answer: "ㄑㄩˋ", audioText: "去", distractors: ["ㄑㄩ", "ㄑㄩˇ"] },
-  { category: "characters", answer: "ㄗㄠˇ", audioText: "澡", distractors: ["ㄗㄠ", "ㄗㄠˋ"] },
-  { category: "characters", answer: "ㄔㄠˊ", audioText: "巢", distractors: ["ㄔㄠ", "ㄔㄠˇ"] },
-  { category: "characters", answer: "ㄏㄜˊ", audioText: "河", distractors: ["ㄌㄧˊ", "ㄇㄚˇ"] },
-  {
-    category: "words",
-    answer: "ㄏㄜˊ|ㄇㄚˇ",
-    audioText: "河馬",
-    distractors: ["ㄏㄜˊ|ㄌㄧˊ", "ㄇㄚˇ|ㄏㄜˊ"],
-  },
-  {
-    category: "words",
-    answer: "ㄏㄜˊ|ㄌㄧˊ",
-    audioText: "河狸",
-    distractors: ["ㄏㄜˊ|ㄇㄚˇ", "ㄌㄧˊ|ㄏㄜˊ"],
-  },
-] as const;
-
-export const fourthListeningQuestions = [
-  { category: "symbols", answer: "ㄒ", audioText: "ㄒ", distractors: ["ㄕ", "ㄟ"] },
-  { category: "symbols", answer: "ㄕ", audioText: "ㄕ", distractors: ["ㄒ", "ㄦ"] },
-  { category: "symbols", answer: "ㄟ", audioText: "ㄟ", distractors: ["ㄡ", "ㄦ"] },
-  { category: "symbols", answer: "ㄡ", audioText: "ㄡ", distractors: ["ㄟ", "ㄦ"] },
-  { category: "characters", answer: "ㄅㄟ", audioText: "背", distractors: ["ㄅㄟˋ", "ㄅㄠ"] },
-  { category: "characters", answer: "ㄕㄨ", audioText: "書", distractors: ["ㄕㄡˇ", "ㄕㄨˋ"] },
-  { category: "characters", answer: "ㄒㄧㄠˋ", audioText: "笑", distractors: ["ㄒㄧ", "ㄒㄧㄠ"] },
-  { category: "characters", answer: "ㄏㄨㄢ", audioText: "歡", distractors: ["ㄏㄨㄢˊ", "ㄏㄠˇ"] },
-  {
-    category: "words",
-    answer: "ㄕㄨ|ㄅㄠ",
-    audioText: "書包",
-    distractors: ["ㄕㄡˇ|ㄅㄠ", "ㄕㄨ|ㄅㄟ"],
-  },
-  {
-    category: "words",
-    answer: "ㄏㄨㄢ|ㄒㄧˇ",
-    audioText: "歡喜",
-    distractors: ["ㄏㄨㄢ|ㄒㄧ", "ㄏㄠˇ|ㄒㄧˇ"],
-  },
-] as const;
 
 export const exercises: Record<number, LessonExercise> = {
   0: { lines: firstLessonLines, questions: firstListeningQuestions },

@@ -1,4 +1,6 @@
-export const freeBoardKey = "kid-free-dictation-v1";
+import { storageKeys } from "../storage/storage-keys";
+
+export const freeBoardKey = storageKeys.freeBoard;
 export const boardStep = 152;
 export const boardHeight = 1812;
 export type BoardStroke = { color: string; erase: boolean; points: [number, number][] };

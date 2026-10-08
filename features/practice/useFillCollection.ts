@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useRef, useState } from "react";
 import { builtinCatalog, type CatalogLesson } from "../courses/materials";
 import { usePersistentState } from "../../lib/storage/usePersistentState";

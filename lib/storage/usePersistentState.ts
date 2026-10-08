@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useSyncExternalStore } from "react";
 import { createPersistentStore } from "./persistent-store";
 

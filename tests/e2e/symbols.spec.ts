@@ -168,3 +168,20 @@ test("failed chart audio shows an actionable error and can be retried", async ({
     .toBe(true);
   await expect(symbol).toHaveAttribute("aria-pressed", "false", { timeout: 10_000 });
 });
+
+test("official chart audio still plays when recording storage is unavailable", async ({ page }) => {
+  await page.addInitScript(() => {
+    // Blocked site data: every open of the recording database fails.
+    IDBFactory.prototype.open = function () {
+      throw new DOMException("blocked", "SecurityError");
+    };
+  });
+  await page.goto("./");
+  await page.getByRole("button", { name: "注音", exact: true }).click();
+  const symbol = page.getByRole("button", { name: "播放注音符號 ㄅ", exact: true });
+  await symbol.click();
+  await expect
+    .poll(() => page.locator("audio").evaluate((audio: HTMLAudioElement) => !audio.paused))
+    .toBe(true);
+  await expect(page.getByText("音檔無法播放", { exact: false })).toHaveCount(0);
+});

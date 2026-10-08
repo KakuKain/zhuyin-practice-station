@@ -1,4 +1,3 @@
-"use client";
 import { ShowMsg } from "../../components/ShowMsg";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -43,6 +42,10 @@ type PreviewRecording = CustomRecording & { previewUrl: string };
 
 export function CustomAudioPanel(props: Props) {
   const catalog = useCatalog();
+  const { load } = props.audio;
+  useEffect(() => {
+    void load();
+  }, [load]);
   const recordingLessons = catalog.map((lesson) => ({
     label: `${lesson.materialName} · ${lesson.listeningOnly ? `${lesson.title}（${lesson.reviewRange}）` : `第${lesson.number}課 · ${lesson.title}`}`,
     prompts: [

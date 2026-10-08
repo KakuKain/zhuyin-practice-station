@@ -15,6 +15,18 @@ import {
 } from "../../features/courses/materials";
 import { buildListeningSession, findQuestionSeed } from "../../features/listening/listening-data";
 import {
+  builtinLessonIndex,
+  firstCustomLessonIndex,
+  isCustomLessonIndex,
+} from "../../features/courses/lesson-identity";
+import {
+  courseArtwork,
+  exercises,
+  lessonNumerals,
+  lessons,
+} from "../../features/courses/course-data";
+import { circledVocabulary } from "../../features/courses/circled-vocabulary";
+import {
   validatePracticeState,
   validatedFillFavorites,
 } from "../../features/practice/practice-storage";
@@ -180,4 +192,49 @@ test("three reviews follow each lesson group without changing existing lesson id
   );
   assert.ok(builtinReviews.every((lesson) => lesson.listeningOnly && lesson.terms.length > 0));
   assert.equal(validatePracticeState({ recentLesson: -1 }, 4, builtinCatalog).recentLesson, -1);
+});
+
+test("built-in, review and custom lesson identities never overlap", () => {
+  for (let position = 0; position < 9; position++)
+    assert.equal(builtinLessonIndex(position), position);
+  // A future 10th textbook lesson must not take over a parent's first custom lesson.
+  assert.equal(isCustomLessonIndex(builtinLessonIndex(9)), false);
+  assert.notEqual(builtinLessonIndex(9), firstCustomLessonIndex);
+  assert.equal(isCustomLessonIndex(firstCustomLessonIndex), true);
+  for (const review of builtinCatalog.filter((lesson) => lesson.listeningOnly))
+    assert.ok(review.index < 0 && !isCustomLessonIndex(review.index));
+  assert.equal(builtinCatalog.filter((lesson) => !lesson.listeningOnly).length, lessons.length);
+  // Imported materials cannot claim a built-in identity.
+  const material = (index: number) => ({
+    version: 1,
+    activeId: "x",
+    nextIndex: 10,
+    materials: [
+      {
+        id: "x",
+        name: "自訂",
+        publisher: "",
+        grade: "",
+        semester: "",
+        lessons: [{ index, title: "第十課", terms: [{ text: "貓", syllables: ["ㄇㄠ"] }] }],
+      },
+    ],
+  });
+  assert.equal(validateMaterials(material(firstCustomLessonIndex)).materials.length, 1);
+  assert.throws(() => validateMaterials(material(builtinLessonIndex(9))));
+  assert.throws(() => validateMaterials(material(8)));
+});
+
+test("every built-in lesson has its readings, vocabulary, artwork and numeral", () => {
+  assert.equal(Object.keys(exercises).length, lessons.length);
+  assert.equal(circledVocabulary.length, lessons.length);
+  assert.equal(courseArtwork.length, lessons.length);
+  assert.equal(lessonNumerals.length, lessons.length);
+  for (const lesson of builtinLessons) {
+    assert.ok(
+      lesson.exercise.lines.flat().every((item) => item.zhuyin),
+      lesson.title,
+    );
+    assert.ok(lesson.terms.length, lesson.title);
+  }
 });

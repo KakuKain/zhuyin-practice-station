@@ -137,6 +137,52 @@ export function silenceBounds(samples: Float32Array, sampleRate: number): [numbe
   ];
 }
 
+/** Speech needs nothing above 11 kHz; this keeps a trimmed take at about 44 KB a second. */
+export const speechSampleRate = 22050;
+
+/** Box-filtered resampling: each output sample averages the input span it covers. */
+export function downsample(samples: Float32Array, fromRate: number, toRate = speechSampleRate) {
+  if (fromRate <= toRate) return samples;
+  const ratio = fromRate / toRate;
+  const output = new Float32Array(Math.floor(samples.length / ratio));
+  for (let index = 0; index < output.length; index++) {
+    const start = Math.floor(index * ratio);
+    const end = Math.min(samples.length, Math.max(start + 1, Math.floor((index + 1) * ratio)));
+    let sum = 0;
+    for (let source = start; source < end; source++) sum += samples[source];
+    output[index] = sum / (end - start);
+  }
+  return output;
+}
+
+/** 16-bit mono PCM WAV. */
+export function encodeWav(samples: Float32Array, sampleRate: number): Blob {
+  const bytes = new ArrayBuffer(44 + samples.length * 2);
+  const view = new DataView(bytes);
+  const label = (offset: number, text: string) => {
+    for (let index = 0; index < text.length; index++)
+      view.setUint8(offset + index, text.charCodeAt(index));
+  };
+  label(0, "RIFF");
+  view.setUint32(4, bytes.byteLength - 8, true);
+  label(8, "WAVE");
+  label(12, "fmt ");
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);
+  view.setUint16(22, 1, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * 2, true);
+  view.setUint16(32, 2, true);
+  view.setUint16(34, 16, true);
+  label(36, "data");
+  view.setUint32(40, bytes.byteLength - 44, true);
+  for (let index = 0; index < samples.length; index++) {
+    const sample = Math.max(-1, Math.min(1, samples[index]));
+    view.setInt16(44 + index * 2, Math.round(sample * (sample < 0 ? 32768 : 32767)), true);
+  }
+  return new Blob([bytes], { type: "audio/wav" });
+}
+
 export async function trimRecordingSilence(blob: Blob): Promise<Blob> {
   const context = new AudioContext();
   try {
@@ -150,34 +196,9 @@ export async function trimRecordingSilence(blob: Blob): Promise<Blob> {
     const [start, end] = silenceBounds(mono, buffer.sampleRate);
     if ((end - start) / buffer.sampleRate < 0.5 || (start === 0 && end === mono.length))
       return blob;
-    const bytes = new ArrayBuffer(44 + (end - start) * 2);
-    const view = new DataView(bytes);
-    const label = (offset: number, text: string) => {
-      for (let index = 0; index < text.length; index++)
-        view.setUint8(offset + index, text.charCodeAt(index));
-    };
-    label(0, "RIFF");
-    view.setUint32(4, bytes.byteLength - 8, true);
-    label(8, "WAVE");
-    label(12, "fmt ");
-    view.setUint32(16, 16, true);
-    view.setUint16(20, 1, true);
-    view.setUint16(22, 1, true);
-    view.setUint32(24, buffer.sampleRate, true);
-    view.setUint32(28, buffer.sampleRate * 2, true);
-    view.setUint16(32, 2, true);
-    view.setUint16(34, 16, true);
-    label(36, "data");
-    view.setUint32(40, bytes.byteLength - 44, true);
-    for (let index = start; index < end; index++) {
-      const sample = Math.max(-1, Math.min(1, mono[index]));
-      view.setInt16(
-        44 + (index - start) * 2,
-        Math.round(sample * (sample < 0 ? 32768 : 32767)),
-        true,
-      );
-    }
-    return new Blob([bytes], { type: "audio/wav" });
+    // Decoders often run at 48 kHz or more; PCM at that rate would be 2–4× larger.
+    const rate = Math.min(buffer.sampleRate, speechSampleRate);
+    return encodeWav(downsample(mono.subarray(start, end), buffer.sampleRate, rate), rate);
   } catch {
     // Unsupported decoding must never discard the original take.
     return blob;

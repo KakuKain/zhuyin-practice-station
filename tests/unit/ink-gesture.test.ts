@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { PointerLease, appendSample } from "../../lib/ink/gesture";
+import { PointerLease, appendSample, isPalmContact } from "../../lib/ink/gesture";
 import { readBoardDraft } from "../../lib/ink/free-board";
 
 test("additional pointers never take over, even when they release first", () => {
@@ -11,6 +11,20 @@ test("additional pointers never take over, even when they release first", () => 
   assert.equal(lease.owns(11), true);
   assert.equal(lease.release(), 11);
   assert.ok(lease.acquire(13));
+});
+test("capacitive tips and fingers with elongated contacts remain writable", () => {
+  for (const [width, height] of [
+    [1, 1],
+    [30, 30],
+    [140, 24],
+    [24, 140],
+  ])
+    assert.equal(isPalmContact({ pointerType: "touch", width, height }), false);
+});
+test("only broad touch contacts are rejected as possible palms", () => {
+  assert.equal(isPalmContact({ pointerType: "touch", width: 140, height: 120 }), true);
+  for (const pointerType of ["pen", "mouse"])
+    assert.equal(isPalmContact({ pointerType, width: 140, height: 120 }), false);
 });
 test("long strokes remain bounded and retain their endpoints", () => {
   const points = [0];

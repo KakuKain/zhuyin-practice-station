@@ -191,3 +191,11 @@ test("draft capture preserves erased cells without inventing untouched blank dra
   assert.equal(shouldCaptureFillCell(0, [], { 0: line }, {}), true);
   assert.equal(shouldCaptureFillCell(0, [], {}, { 0: [] }), true);
 });
+
+test("reopening a completed cell without edits does not turn it into pending work", () => {
+  const reopened = line.map((stroke) => stroke.map((p) => ({ ...p })));
+  assert.equal(shouldCaptureFillCell(0, reopened, { 0: line }, {}), false);
+  assert.equal(isFillCellComplete(0, { 0: line }, {}), true);
+  const edited = [...reopened, [point(20, 20), point(80, 80)]];
+  assert.equal(shouldCaptureFillCell(0, edited, { 0: line }, {}), true);
+});

@@ -1,38 +1,97 @@
 import { recordingKey, type CustomRecording, type RecordingInfo } from "./custom-audio";
 
 type Storage = {
+  keys: () => Promise<string[]>;
   list: () => Promise<RecordingInfo[]>;
   get: (text: string, pronunciation: string) => Promise<CustomRecording | null>;
 };
 
-/** Missing identities need no database lookup; retain only a small LRU of blobs. */
-export function createRecordingCache(storage: Storage, limit = 12) {
-  let metadata: Map<string, RecordingInfo> | null = null;
-  let pending: Promise<RecordingInfo[]> | null = null;
+const info = ({ key, text, pronunciation, mimeType, duration, updatedAt }: RecordingInfo) => ({
+  key,
+  text,
+  pronunciation,
+  mimeType,
+  duration,
+  updatedAt,
+});
+
+/**
+ * Playback only needs to know which identities exist, read once as keys, so the app never
+ * reads every recording's audio at start-up. The full list is loaded when the recording
+ * manager asks for it. A small LRU keeps recently played blobs.
+ *
+ * When the recording database cannot be opened at all (blocked site data, a damaged
+ * store), playback lookups resolve to "no custom recording" so official clips keep
+ * working, and the database is retried after a pause rather than on every tap. `list()`
+ * still rejects so the recording manager can explain the problem. A recording that is
+ * known to exist but fails to load is still an error: it must not be replaced silently.
+ */
+export function createRecordingCache(
+  storage: Storage,
+  limit = 12,
+  retryMs = 30000,
+  now = Date.now,
+) {
+  let known: Set<string> | null = null;
+  let pendingKeys: Promise<Set<string>> | null = null;
+  let infos: Map<string, RecordingInfo> | null = null;
+  let pendingList: Promise<RecordingInfo[]> | null = null;
+  let unavailableUntil = 0;
   const clips = new Map<string, Promise<CustomRecording | null>>();
   let generation = 0;
+  const loadKeys = () => {
+    if (known) return Promise.resolve(known);
+    if (pendingKeys) return pendingKeys;
+    const token = generation;
+    const request = storage
+      .keys()
+      .then((keys) => {
+        const result = new Set(keys);
+        if (generation === token) known = result;
+        unavailableUntil = 0;
+        return result;
+      })
+      .finally(() => {
+        if (pendingKeys === request) pendingKeys = null;
+      });
+    pendingKeys = request;
+    return request;
+  };
   const list = () => {
-    if (metadata) return Promise.resolve([...metadata.values()]);
-    if (pending) return pending;
+    if (infos) return Promise.resolve([...infos.values()]);
+    if (pendingList) return pendingList;
     const token = generation;
     const request = storage
       .list()
       .then((items) => {
-        if (generation === token) metadata = new Map(items.map((item) => [item.key, item]));
-        return items;
+        if (generation === token) {
+          infos = new Map(items.map((item) => [item.key, info(item)]));
+          known = new Set(infos.keys());
+        }
+        unavailableUntil = 0;
+        return items.map(info);
       })
       .finally(() => {
-        if (pending === request) pending = null;
+        if (pendingList === request) pendingList = null;
       });
-    pending = request;
+    pendingList = request;
     return request;
   };
   return {
     list,
     async get(text: string, pronunciation: string) {
-      if (!metadata) await list();
+      let identities = known;
+      if (!identities) {
+        if (now() < unavailableUntil) return null;
+        try {
+          identities = await loadKeys();
+        } catch {
+          unavailableUntil = now() + retryMs;
+          return null;
+        }
+      }
       const key = recordingKey(text, pronunciation);
-      if (!metadata?.has(key)) return null;
+      if (!identities.has(key)) return null;
       let request = clips.get(key);
       if (!request) {
         request = storage.get(text, pronunciation).catch((error) => {
@@ -49,20 +108,25 @@ export function createRecordingCache(storage: Storage, limit = 12) {
     },
     saved(recording: CustomRecording) {
       generation++;
-      pending = null;
-      metadata?.set(recording.key, recording);
+      pendingKeys = pendingList = null;
+      known?.add(recording.key);
+      // Keep metadata only; the bytes stay in IndexedDB and the small clip LRU.
+      infos?.set(recording.key, info(recording));
       clips.delete(recording.key);
     },
     removed(key: string) {
       generation++;
-      pending = null;
-      metadata?.delete(key);
+      pendingKeys = pendingList = null;
+      known?.delete(key);
+      infos?.delete(key);
       clips.delete(key);
     },
     invalidate() {
       generation++;
-      pending = null;
-      metadata = null;
+      pendingKeys = pendingList = null;
+      known = null;
+      infos = null;
+      unavailableUntil = 0;
       clips.clear();
     },
   };

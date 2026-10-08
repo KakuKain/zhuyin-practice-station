@@ -7,6 +7,18 @@ import {
   type DeviceBackup,
 } from "../../lib/storage/device-backup";
 import { recordingKey } from "../../lib/audio/custom-audio";
+import { ownsStorageKey } from "../../lib/storage/storage-keys";
+import { materialsStorageKey } from "../../features/courses/materials";
+import {
+  fillFavoritesStorageKey,
+  firstPracticeStorageKey,
+  practiceStorageKey,
+  previousPracticeStorageKey,
+  thirdPracticeStorageKey,
+} from "../../features/practice/practice-storage";
+import { listeningSettingsStorageKey } from "../../features/listening/listening-data";
+import { freeBoardKey } from "../../lib/ink/free-board";
+import { fillDraftStorageKey } from "../../features/fill/fill-storage";
 const backup = (): DeviceBackup => ({
   format: "zhuyin-device-backup",
   version: 1,
@@ -52,15 +64,15 @@ test("backup keeps recording bytes and their exact pronunciation identity", () =
   assert.equal(prepared.recordings[0].blob.size, 5);
   assert.equal(prepared.summary.recordings, 1);
 });
-test("unsupported keys, invalid settings, broken drafts and mismatched audio cannot be restored", () => {
-  const patches: Record<string, string>[] = [
+test("unsupported keys, oversized values and mismatched audio cannot be restored", () => {
+  const patches: Record<string, unknown>[] = [
     { other: "{}" },
-    { "zhuyin-listening-settings-v1": "{}" },
-    { "zhuyin-fill-draft-v1-0": "{}" },
+    { "zhuyin-listening-settings-v1": 3 },
+    { "zhuyin-listening-settings-v1": "x".repeat(5 * 1024 * 1024 + 1) },
   ];
   for (const patch of patches) {
     const value = backup();
-    value.storage = patch;
+    value.storage = patch as Record<string, string>;
     assert.throws(() => prepareDeviceBackup(value));
   }
   const value = backup();
@@ -75,6 +87,33 @@ test("unsupported keys, invalid settings, broken drafts and mismatched audio can
   });
   assert.throws(() => prepareDeviceBackup(value));
 });
+test("older shapes, corrected readings and unreadable values restore exactly as saved", async () => {
+  const value = backup();
+  value.storage = {
+    // Saved before answerTime existed; the app fills in the default when reading.
+    "zhuyin-listening-settings-v1": JSON.stringify({ repeatCount: 3, intervalSeconds: 10 }),
+    // Lesson 6 later corrected 教 from ㄐㄧㄠˋ to ㄐㄧㄠ.
+    "zhuyin-fill-favorites-v1": JSON.stringify([
+      {
+        lessonIndex: 5,
+        character: "教",
+        zhuyin: "ㄐㄧㄠˋ",
+        positions: [14],
+        status: "review_later",
+        isFavorite: true,
+      },
+    ]),
+    "zhuyin-fill-draft-v1-0": "{}",
+    "kid-free-dictation-v1": "{not json",
+  };
+  const prepared = prepareDeviceBackup(value);
+  assert.equal(prepared.summary.unreadable, 2);
+  const storage = memory({ unrelated: "keep" });
+  await restoreDeviceBackup(prepared, storage, async () => {});
+  for (const [key, text] of Object.entries(value.storage)) assert.equal(storage.getItem(key), text);
+  assert.equal(storage.getItem("unrelated"), "keep");
+});
+
 test("a late database abort rolls local values back and leaves unrelated application data intact", async () => {
   const storage = memory({ "zhuyin-listening-settings-v1": "old", unrelated: "keep" });
   await assert.rejects(
@@ -100,4 +139,22 @@ test("quota failure aborts before any recording mutation", async () => {
   );
   assert.equal(called, false);
   assert.deepEqual(snapshotStorage(storage), { "zhuyin-listening-settings-v1": "old" });
+});
+
+test("every storage key the app writes is owned by device backup", () => {
+  for (const key of [
+    materialsStorageKey,
+    practiceStorageKey,
+    thirdPracticeStorageKey,
+    previousPracticeStorageKey,
+    firstPracticeStorageKey,
+    fillFavoritesStorageKey,
+    listeningSettingsStorageKey,
+    freeBoardKey,
+    fillDraftStorageKey(0),
+    fillDraftStorageKey(12),
+  ])
+    assert.ok(ownsStorageKey(key), key);
+  for (const key of ["unrelated", "zhuyin-fill-draft-v1-x", "zhuyin-practice-state-v5"])
+    assert.equal(ownsStorageKey(key), false, key);
 });
