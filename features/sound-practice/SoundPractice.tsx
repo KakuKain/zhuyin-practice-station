@@ -2,14 +2,7 @@
 import { ShowMsg } from "../../components/ShowMsg";
 
 import { useEffect, useRef, useState } from "react";
-import {
-  ArrowLeft,
-  CaretRight,
-  Check,
-  CheckCircle,
-  XCircle,
-  SpeakerHigh,
-} from "@phosphor-icons/react";
+import { ArrowLeft, ArrowRight, CaretRight, CheckCircle, XCircle } from "@phosphor-icons/react";
 import { SectionHeading } from "../../components/AppChrome";
 import { ZhuyinStack } from "../../components/Zhuyin";
 import type { AppController } from "../usePracticeApp";
@@ -24,7 +17,7 @@ type Audio = Pick<AppController, "speak" | "stopPlayback" | "audioLoading" | "au
 export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => void }) {
   const stopPlayback = audio.stopPlayback;
   const [pair, setPair] = useState<SoundPair | null>(null);
-  const [heard, setHeard] = useState<number[]>([]);
+  const [previewingSound, setPreviewingSound] = useState<number | null>(null);
   const [round, setRound] = useState<SoundQuestion[]>([]);
   const [index, setIndex] = useState(0);
   const [canChoose, setCanChoose] = useState(false);
@@ -33,11 +26,13 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => 
   const [selected, setSelected] = useState<number | null>(null);
   const generation = useRef(0);
   const feedbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const previewTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   useEffect(
     () => () => {
       generation.current += 1;
       if (feedbackTimer.current) clearTimeout(feedbackTimer.current);
+      if (previewTimer.current) clearTimeout(previewTimer.current);
       stopPlayback();
     },
     [stopPlayback],
@@ -48,25 +43,46 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => 
   const cancel = () => {
     if (feedbackTimer.current) clearTimeout(feedbackTimer.current);
     feedbackTimer.current = null;
+    if (previewTimer.current) clearTimeout(previewTimer.current);
+    previewTimer.current = null;
     generation.current += 1;
     audio.stopPlayback();
     setPlaying(false);
+    setPreviewingSound(null);
   };
-  const compare = (choice: number) => {
+  const compare = () => {
     if (!pair) return;
     cancel();
     const token = generation.current;
     setPlaying(true);
-    audio.speak(pair.sounds[choice].audioText, {
-      pronunciation: pair.sounds[choice].label,
-      playbackRate: 1,
-      allowSynthesis: false,
-      onEnded: () => {
-        if (token !== generation.current) return;
-        setPlaying(false);
-        setHeard((current) => (current.includes(choice) ? current : [...current, choice]));
-      },
-    });
+    const playSound = (choice: number) => {
+      if (token !== generation.current) return;
+      audio.speak(pair.sounds[choice].audioText, {
+        pronunciation: pair.sounds[choice].label,
+        playbackRate: 1,
+        allowSynthesis: false,
+        onStarted: () => {
+          if (token === generation.current) setPreviewingSound(choice);
+        },
+        onError: () => {
+          if (token !== generation.current) return;
+          generation.current += 1;
+          setPreviewingSound(null);
+          setPlaying(false);
+        },
+        onEnded: () => {
+          if (token !== generation.current) return;
+          setPreviewingSound(null);
+          if (choice === 0) {
+            previewTimer.current = setTimeout(() => {
+              previewTimer.current = null;
+              playSound(1);
+            }, 650);
+          } else setPlaying(false);
+        },
+      });
+    };
+    playSound(0);
   };
   const playQuestion = (questions = round, questionIndex = index, preserveAnswer = false) => {
     if (!pair || !questions[questionIndex]) return;
@@ -82,6 +98,9 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => 
       pronunciation: pair.sounds[questions[questionIndex].target].label,
       playbackRate: 1,
       allowSynthesis: false,
+      onError: () => {
+        if (token === generation.current) setPlaying(false);
+      },
       onEnded: () => {
         if (token !== generation.current) return;
         setPlaying(false);
@@ -92,7 +111,6 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => 
   const reset = () => {
     cancel();
     setPair(null);
-    setHeard([]);
     setRound([]);
     setIndex(0);
     setFeedback(null);
@@ -106,13 +124,26 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => 
       onBack?.();
     }
   };
+  const answering = round.length > 0 && !finished;
+  const backControl = ((pair && !finished) || onBack) && (
+    <button type="button" className="sound-back" onClick={back}>
+      <ArrowLeft size={18} aria-hidden="true" />
+      {pair ? (!round.length ? "換一組" : "換一組聲音") : "回到練習"}
+    </button>
+  );
   return (
-    <section className="page-section sound-practice-page">
-      {((pair && !finished) || onBack) && (
-        <button type="button" className="sound-back" onClick={back}>
-          <ArrowLeft size={18} aria-hidden="true" />
-          {pair ? "換一組聲音" : "回到練習"}
-        </button>
+    <section
+      className={`page-section sound-practice-page${!pair ? " is-selecting" : !round.length ? " is-comparing" : answering ? " is-answering" : ""}`}
+    >
+      {answering ? (
+        <div className="sound-question-toolbar">
+          {backControl}
+          <span className="sound-progress" aria-label={`第 ${index + 1} 題，共 ${round.length} 題`}>
+            {index + 1} / {round.length}
+          </span>
+        </div>
+      ) : (
+        backControl
       )}
       {onBack && (
         <SectionHeading title="辨音小練習" description="一次分辨兩個音，不用寫字、不計時。" />
@@ -133,13 +164,19 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => 
               <button
                 type="button"
                 key={item.id}
+                aria-label={item.title}
+                className={item.id === "tone-2-3" ? "is-tone-pair" : undefined}
                 onClick={() => {
                   cancel();
                   setPair(item);
                 }}
               >
-                <span>{item.title}</span>
-                <span className="sound-pair-arrow">
+                <span className="sound-pair-label" aria-hidden="true">
+                  <span>{item.title.split(" / ")[0]}</span>
+                  <span className="sound-pair-connector">與</span>
+                  <span>{item.title.split(" / ")[1]}</span>
+                </span>
+                <span className="sound-pair-arrow" aria-hidden="true">
                   <CaretRight size={22} weight="bold" aria-hidden="true" />
                 </span>
               </button>
@@ -174,39 +211,50 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => 
           </div>
         </div>
       ) : !round.length ? (
-        <div className="sound-practice-card">
-          <h2 ref={titleRef} tabIndex={-1}>
-            先聽聽兩個音
-          </h2>
-          <p>先聽兩個音，再開始練習。</p>
-          <div className="sound-choice-row" dir="rtl">
+        <div className="sound-comparison">
+          <div className="sound-comparison-heading">
+            <h2 ref={titleRef} tabIndex={-1}>
+              聽聽兩個音
+            </h2>
+            <img src="/course-art/sound-headphone-cat.webp" alt="" />
+          </div>
+          <div className="sound-comparison-symbols" dir="rtl" aria-label={pair.title}>
             {pair.sounds.map((sound, choice) => (
-              <button
-                type="button"
-                className="sound-choice"
+              <span
+                className={`sound-preview-symbol${previewingSound === choice ? " is-speaking" : ""}`}
                 key={sound.label}
-                onClick={() => compare(choice)}
-                aria-label={`聽 ${sound.label}`}
+                data-symbol={sound.label}
               >
                 <ZhuyinStack text={sound.label} literalSymbol />
-                <span>{sound.caption ?? "點一下聽"}</span>
-                <span className="sound-heard">
-                  {heard.includes(choice) ? (
-                    <>
-                      <Check size={16} aria-hidden="true" />
-                      聽過了
-                    </>
-                  ) : (
-                    <SpeakerHigh size={20} aria-hidden="true" />
-                  )}
-                </span>
-              </button>
+                {sound.caption && <span className="sound-preview-caption">{sound.caption}</span>}
+              </span>
             ))}
+            <span className="sound-comparison-connector" aria-hidden="true">
+              與
+            </span>
           </div>
           <button
             type="button"
+            className="sound-comparison-play"
+            onClick={() => (playing ? cancel() : compare())}
+            aria-busy={audio.audioLoading}
+          >
+            <img
+              src={
+                playing
+                  ? "/course-art/listening-stop-button-watercolor-v1.webp"
+                  : "/course-art/listening-play-button-watercolor-v1.webp"
+              }
+              alt=""
+            />
+            <span>{playing ? "停止播放" : "依序聽兩個音"}</span>
+          </button>
+          <span className="visually-hidden" role="status">
+            {previewingSound !== null ? `正在播放 ${pair.sounds[previewingSound].label}` : ""}
+          </span>
+          <button
+            type="button"
             className="sound-primary"
-            disabled={heard.length < 2 || audio.audioLoading || (playing && !audio.audioError)}
             onClick={() => {
               const questions = makeSoundRound();
               setRound(questions);
@@ -214,30 +262,33 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => 
               playQuestion(questions, 0);
             }}
           >
-            開始 6 題練習
+            開始練習 <ArrowRight size={22} aria-hidden="true" />
           </button>
         </div>
       ) : (
-        <div className="sound-practice-card">
-          <span className="sound-progress">
-            第 {index + 1} 題 / {round.length}
-          </span>
+        <div className="sound-practice-card sound-question-card">
           <h2 ref={titleRef} tabIndex={-1}>
-            聽一聽，選注音
+            你聽到哪個音？
           </h2>
-          <button
-            type="button"
-            className="sound-replay"
-            onClick={() => playQuestion(round, index, feedback === "correct")}
-            disabled={audio.audioLoading || playing || feedback !== null}
-          >
-            <img src="/course-art/listening-play-button-watercolor-v1.webp" alt="" />
-            {audio.audioLoading
-              ? "聲音載入中…"
-              : playing && !audio.audioError
-                ? "正在播放…"
-                : "再聽一次"}
-          </button>
+          <div className="sound-question-listening">
+            <img className="sound-question-cat" src="/course-art/sound-headphone-cat.webp" alt="" />
+            <button
+              type="button"
+              className="sound-replay"
+              onClick={() => playQuestion(round, index, feedback === "correct")}
+              disabled={audio.audioLoading || playing || feedback !== null}
+              aria-busy={audio.audioLoading}
+            >
+              <img src="/course-art/listening-play-button-watercolor-v1.webp" alt="" />
+              <span>
+                {audio.audioLoading
+                  ? "聲音載入中…"
+                  : playing && !audio.audioError
+                    ? "正在播放…"
+                    : "再聽一次"}
+              </span>
+            </button>
+          </div>
           <div className="sound-choice-row" dir="rtl">
             {round[index].order.map((choice) => {
               const sound = pair.sounds[choice];
@@ -283,7 +334,6 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => 
               );
             })}
           </div>
-          <div className="sound-feedback-space" aria-hidden="true" />
           {feedback && (
             <div
               className={`sound-feedback-animation is-${feedback}`}

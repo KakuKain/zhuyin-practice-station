@@ -311,7 +311,7 @@ test("device backup previews, restores and preserves unrelated browser storage",
 test("sound practice animates wrong retry and correct automatic progression", async ({ page }) => {
   await page.addInitScript(() => {
     HTMLMediaElement.prototype.play = function () {
-      setTimeout(() => this.dispatchEvent(new Event("ended")), 80);
+      setTimeout(() => this.dispatchEvent(new Event("ended")), 1000);
       return Promise.resolve();
     };
     HTMLMediaElement.prototype.pause = function () {};
@@ -322,11 +322,20 @@ test("sound practice animates wrong retry and correct automatic progression", as
   await page.getByRole("button", { name: "辨音練習", exact: true }).click();
   await expect(page.getByRole("heading", { name: "練習", exact: true })).toBeVisible();
   await page.locator(".sound-pair-list button").first().click();
-  for (const button of await page.locator(".sound-choice-row button").all()) {
-    await button.click();
-    await expect(button.locator(".sound-heard")).toContainText("聽過了");
-  }
+  await expect(page.getByRole("heading", { name: "聽聽兩個音", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "依序聽兩個音", exact: true }).click();
+  await expect(page.locator(".sound-preview-symbol.is-speaking")).toHaveAttribute(
+    "data-symbol",
+    "ㄓ",
+  );
+  await expect(page.locator(".sound-preview-symbol.is-speaking")).toHaveAttribute(
+    "data-symbol",
+    "ㄔ",
+  );
+  await expect(page.getByRole("button", { name: "依序聽兩個音", exact: true })).toBeVisible();
+  await expect(page.locator(".sound-preview-symbol.is-speaking")).toHaveCount(0);
   await page.getByRole("button", { name: /開始.*練習/ }).click();
+  await expect(page.getByRole("heading", { name: "你聽到哪個音？", exact: true })).toBeVisible();
   await expect(page.locator(".sound-choice-row button").first()).toBeEnabled();
   for (let i = 0; i < 6; i++) {
     const src = await page.locator("audio").getAttribute("src");

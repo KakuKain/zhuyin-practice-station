@@ -16,7 +16,6 @@ import {
 } from "@phosphor-icons/react";
 import { ShowMsg } from "../../components/ShowMsg";
 import { FavoriteButton } from "../../components/ReviewActions";
-import { PageHeading } from "../../components/PageHeading";
 const SoundPractice = lazy(() =>
   import("../sound-practice/SoundPractice").then((module) => ({ default: module.SoundPractice })),
 );
@@ -87,7 +86,6 @@ export function PracticeList({ app }: { app: AppController }) {
     <section
       className={`page-section practice-page practice-grouped-page${tab === "sound" ? " is-sound-tab" : ""}`}
     >
-      <PageHeading title="練習" artwork="/course-art/happy-watercolor.webp" />
       <div className="practice-section-tabs" role="group" aria-label="練習功能">
         {(
           [
@@ -103,6 +101,7 @@ export function PracticeList({ app }: { app: AppController }) {
             onClick={() => {
               app.stopPlayback();
               setTab(value);
+              window.scrollTo({ top: 0, behavior: "instant" });
             }}
           >
             {label}

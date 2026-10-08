@@ -24,7 +24,9 @@ export type ClipOptions = {
   pronunciation?: string;
   playbackRate?: number;
   allowSynthesis?: boolean;
+  onStarted?: () => void;
   onEnded?: () => void;
+  onError?: () => void;
 };
 export function useAudioPlayer({
   view,
@@ -140,6 +142,7 @@ export function useAudioPlayer({
       const audio = playbackRef.current;
       if (!audio) {
         setAudioError(true);
+        options.onError?.();
         if (view === "practice") setPracticeNotice("音訊無法播放，請重新整理後再試。");
         return;
       }
@@ -158,6 +161,7 @@ export function useAudioPlayer({
         if (playbackToken !== playbackTokenRef.current) return;
         stopPlayback();
         setAudioError(true);
+        options.onError?.();
         if (view === "practice") setPracticeNotice("音訊尚未準備好，請檢查網路後再播放。");
       };
       audioLoadTimeoutRef.current = window.setTimeout(failed, 15000);
@@ -193,7 +197,9 @@ export function useAudioPlayer({
         await audio
           .play()
           .then(() => {
+            if (playbackToken !== playbackTokenRef.current) return;
             loaded();
+            options.onStarted?.();
             // Retain downloaded official clips for subsequent taps and replay.
             if (!custom) audioPreloaderRef.current?.warm([playbackUrl]);
           })
@@ -208,6 +214,7 @@ export function useAudioPlayer({
               setPlayingSymbol(null);
               setAudioLoading(false);
               setAudioError(true);
+              options.onError?.();
               if (view === "practice")
                 setPracticeNotice(
                   custom
@@ -225,13 +232,18 @@ export function useAudioPlayer({
                   finishPlayback();
                 }
               };
-              utterance.onstart = loaded;
+              utterance.onstart = () => {
+                if (playbackToken !== playbackTokenRef.current) return;
+                loaded();
+                options.onStarted?.();
+              };
               utterance.onerror = failed;
               window.speechSynthesis.speak(utterance);
             } else {
               loaded();
               setAudioLoading(false);
               setAudioError(true);
+              options.onError?.();
               if (view === "practice") setPracticeNotice("音訊無法播放，請檢查音量或網路後再試。");
             }
           });

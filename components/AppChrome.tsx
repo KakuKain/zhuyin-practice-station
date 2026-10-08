@@ -53,17 +53,20 @@ export function AppHeader({
   onBack,
   backLabel,
   materialSelector,
+  title,
 }: {
   onCourses: () => void;
   onBack?: () => void;
   backLabel?: string;
   materialSelector?: ReactNode;
+  title?: string;
 }) {
   return (
     <header
       className={`app-header ${onBack ? "has-back" : ""} ${materialSelector ? "has-material-selector" : ""}`}
     >
       <div id="app-header-back-slot" />
+      {title && <h1 className="header-page-title">{title}</h1>}
       {materialSelector}
       {onBack && (
         <button className="header-back" type="button" onClick={onBack}>

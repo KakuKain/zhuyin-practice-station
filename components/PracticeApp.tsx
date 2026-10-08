@@ -104,6 +104,7 @@ function PracticeContent({
     <div className={`app-shell is-${view}`} aria-busy={!hydrated}>
       <audio ref={playbackRef} onEnded={finishPlayback} preload="none" hidden aria-hidden="true" />
       <AppHeader
+        title={view === "practice" ? "練習" : undefined}
         materialSelector={view === "courses" ? <MaterialSelector app={app} /> : undefined}
         onCourses={() => navigate("courses")}
         onBack={
