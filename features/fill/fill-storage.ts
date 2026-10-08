@@ -35,7 +35,12 @@ export const validInkStrokes = (value: unknown): value is InkStroke[] =>
           point.x >= 0 &&
           point.x <= 100 &&
           point.y >= 0 &&
-          point.y <= 100,
+          point.y <= 100 &&
+          (point.width === undefined ||
+            (typeof point.width === "number" &&
+              Number.isFinite(point.width) &&
+              point.width > 0 &&
+              point.width <= 10)),
       ),
   );
 

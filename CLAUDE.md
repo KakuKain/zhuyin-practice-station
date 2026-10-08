@@ -99,8 +99,12 @@ Layout: `features/<feature>/` holds feature UI and logic, `components/` holds sh
 - Only one pointer draws at a time (`PointerLease`). A second touch must not continue the first stroke.
 - A capacitive stylus reports `pointerType: "touch"`, so `isPalmContact` (in `lib/ink/gesture.ts`) judges a resting hand by contact size alone. The exact rule and threshold are documented there; they are untuned on the real tablet. Devices that report 1 × 1 are never rejected.
   - A palm-sized touch never starts a stroke.
-  - A stroke whose contact spreads to palm size is dropped.
+  - Writing cells keep ink already accepted and ignore later palm-sized samples of that touch.
+  - The free board drops a stroke whose contact spreads to palm size.
 - `pointerSamples` feeds every coalesced pointer event into the stroke.
+- New writing-cell strokes store a per-point `width` (same 0–100 units) from `lib/ink/ink-brush.ts`. Width comes from writing speed for touch and passive capacitive pens, and from real pressure for active pens. Old x/y-only ink stays valid.
+- The canvas and review thumbnails (`InkPreview`) draw the same `inkOutline`, and lasso erase interpolates widths.
+- If pointer capture fails, a window-level `pointerup` or `pointercancel` ends the stroke.
 - Long strokes are capped at about 1900 samples, and redraws are batched per animation frame.
 - The free board draws only new segments while writing, repaints fully when a stroke ends, and writes localStorage 600 ms after the last stroke and on `pagehide`/hidden.
 - An interruption (blur, hidden, rotation, lock) keeps the stroke in progress, but never completes an eraser lasso.

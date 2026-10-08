@@ -19,13 +19,16 @@ export function HeaderBack({ label, onBack }: { label: string; onBack: () => voi
 }
 
 import type { InkStroke, View } from "../features/types";
+import { inkOutline } from "../lib/ink/ink-brush";
 import { ArrowLeft, BookOpenText, Gear, PencilLine, SquaresFour } from "@phosphor-icons/react";
 
 export function InkPreview({ strokes }: { strokes: InkStroke[] }) {
   return (
     <svg viewBox="0 0 100 100" className="ink-preview" aria-hidden="true">
       {strokes.map((stroke, index) =>
-        stroke.length === 1 ? (
+        stroke.some((point) => point.width !== undefined) ? (
+          <path key={index} d={inkOutline(stroke)} fill="#27463f" />
+        ) : stroke.length === 1 ? (
           <circle key={index} cx={stroke[0].x} cy={stroke[0].y} r=".75" />
         ) : (
           <polyline key={index} points={stroke.map((point) => `${point.x},${point.y}`).join(" ")} />

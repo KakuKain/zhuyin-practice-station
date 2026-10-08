@@ -18,14 +18,15 @@ export class PointerLease {
 
 /**
  * A capacitive stylus and a fingertip both arrive as pointerType "touch", so contact size
- * is the only hint that a touch is the side of a hand resting on the screen. Devices that
- * do not report contact size send 1 × 1 and are never rejected. The threshold, about 17 mm
- * on a 10-inch tablet, is far above a stylus tip or a child's fingertip. It has not been
- * tuned on the Redmi tablet itself.
+ * is only a hint that a touch is the side of a hand resting on the screen. Require a
+ * broad contact in both directions: a tilted capacitive tip or fingertip can report an
+ * elongated contact. Devices that do not report contact size send 1 × 1 and are never
+ * rejected. This conservative CSS-pixel threshold is not hardware palm detection and
+ * has not been tuned on the Redmi tablet itself.
  */
 export const palmContactSize = 100;
 export function isPalmContact(event: { pointerType: string; width: number; height: number }) {
-  return event.pointerType === "touch" && Math.max(event.width, event.height) >= palmContactSize;
+  return event.pointerType === "touch" && Math.min(event.width, event.height) >= palmContactSize;
 }
 
 /**

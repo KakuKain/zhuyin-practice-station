@@ -10,6 +10,7 @@ import {
   pointerSamples,
 } from "./gesture";
 import { pointInRect, pointerPoint, renderInk } from "./ink-render";
+import { createInkBrush } from "./ink-brush";
 
 type Options = {
   scope: string;
@@ -44,6 +45,8 @@ export function useInkCanvas({
     pointerId: number;
     canvas: HTMLCanvasElement;
     erase: boolean;
+    blocked: boolean;
+    brush: ReturnType<typeof createInkBrush>;
   } | null>(null);
   const pointerLease = useRef(new PointerLease());
 
@@ -164,15 +167,25 @@ export function useInkCanvas({
 
   // Switching apps or a system dialog keeps the stroke, as rotation and locking do.
   const interruptInk = useEffectEvent(() => keepActiveStroke());
+  const releaseOutsideCanvas = useEffectEvent((event: globalThis.PointerEvent) => {
+    // Canvas handlers normally finish first. If capture failed or the canvas missed the
+    // release, keep its existing samples without mapping window coordinates into the cell.
+    if (gestureRef.current && pointerLease.current.owns(event.pointerId)) keepActiveStroke();
+  });
   useEffect(() => {
     const interrupt = () => interruptInk();
+    const release = (event: globalThis.PointerEvent) => releaseOutsideCanvas(event);
     const visibility = () => {
       if (document.hidden) interrupt();
     };
     window.addEventListener("blur", interrupt);
+    window.addEventListener("pointerup", release);
+    window.addEventListener("pointercancel", release);
     document.addEventListener("visibilitychange", visibility);
     return () => {
       window.removeEventListener("blur", interrupt);
+      window.removeEventListener("pointerup", release);
+      window.removeEventListener("pointercancel", release);
       document.removeEventListener("visibilitychange", visibility);
       interrupt();
     };
@@ -191,39 +204,53 @@ export function useInkCanvas({
     const index = Number(canvas.dataset.wordIndex ?? 0);
     if (!historiesRef.current[index]) return;
     if (!pointerLease.current.acquire(event.pointerId)) return;
-    canvas.setPointerCapture(event.pointerId);
     gestureRef.current = {
       index,
       pointerId: event.pointerId,
       canvas,
       erase: eraserRef.current === index,
+      blocked: false,
+      brush: createInkBrush(canvas.getBoundingClientRect().width),
     };
-    gestureStrokeRef.current = [pointerPoint(canvas, event.clientX, event.clientY)];
+    const firstPoint = pointerPoint(canvas, event.clientX, event.clientY);
+    gestureStrokeRef.current = [
+      gestureRef.current.erase ? firstPoint : gestureRef.current.brush(firstPoint, event),
+    ];
     activeStrokeRef.current = gestureRef.current.erase ? null : gestureStrokeRef.current;
+    try {
+      canvas.setPointerCapture(event.pointerId);
+    } catch {
+      // Some touch drivers can end a contact before capture is assigned. Keep the
+      // initial mark and let pointerup/cancel (including the window fallback) release it.
+    }
     setNotice("");
     paint(index, canvas);
   };
   const append = (event: PointerEvent<HTMLCanvasElement>) => {
     const stroke = gestureStrokeRef.current;
-    if (!stroke?.length) return;
-    const rect = event.currentTarget.getBoundingClientRect();
-    for (const sample of pointerSamples(event.nativeEvent))
+    const gesture = gestureRef.current;
+    if (!stroke?.length || !gesture || event.currentTarget !== gesture.canvas) return;
+    const rect = gesture.canvas.getBoundingClientRect();
+    for (const sample of pointerSamples(event.nativeEvent)) {
+      const point = pointInRect(rect, sample.clientX, sample.clientY);
       appendSample(
         stroke,
-        pointInRect(rect, sample.clientX, sample.clientY),
+        gesture.erase ? point : gesture.brush(point, sample),
         (a, b) => Math.hypot(a.x - b.x, a.y - b.y),
         0.12,
       );
+    }
   };
   const move = (event: PointerEvent<HTMLCanvasElement>) => {
     const gesture = gestureRef.current;
     if (!gesture || !pointerLease.current.owns(event.pointerId)) return;
     event.preventDefault();
-    // A resting hand can start small and spread; drop that touch instead of drawing it.
+    // Contact geometry can fluctuate on capacitive pens. Preserve accepted ink and
+    // ignore suspect samples until this touch lifts; never discard the whole stroke.
     if (isPalmContact(event)) {
-      cancelGesture();
-      return;
+      gesture.blocked = true;
     }
+    if (gesture.blocked) return;
     append(event);
     scheduler.schedule(() => {
       const current = gestureRef.current;
@@ -233,13 +260,14 @@ export function useInkCanvas({
   const end = (event: PointerEvent<HTMLCanvasElement>) => {
     const gesture = gestureRef.current;
     if (!gesture || !pointerLease.current.owns(event.pointerId)) return;
-    if (event.type === "pointerup") append(event);
+    if (isPalmContact(event)) gesture.blocked = true;
+    if (event.type === "pointerup" && !gesture.blocked) append(event);
     const stroke = gestureStrokeRef.current;
     if (stroke?.length) {
       const history = historiesRef.current[gesture.index];
       if (gesture.erase) {
         // Pointer cancellation must leave the ink untouched.
-        if (event.type === "pointerup") {
+        if (event.type === "pointerup" && !gesture.blocked) {
           const changed = commit(gesture.index, eraseInsideLasso(history.strokes, stroke));
           setNotice(
             !isUsableLasso(stroke)
@@ -252,7 +280,13 @@ export function useInkCanvas({
       } else commit(gesture.index, [...history.strokes, stroke]);
     }
     stopGesture();
-    if (gesture.erase && event.type === "pointerup" && stroke && isUsableLasso(stroke))
+    if (
+      gesture.erase &&
+      !gesture.blocked &&
+      event.type === "pointerup" &&
+      stroke &&
+      isUsableLasso(stroke)
+    )
       changeEraser(null);
     paint(gesture.index, gesture.canvas);
   };

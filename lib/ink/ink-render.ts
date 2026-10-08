@@ -1,4 +1,15 @@
 import type { InkPoint, InkStroke } from "../../features/types";
+import { inkOutline } from "./ink-brush";
+
+const pathCache = new WeakMap<InkStroke, { outline: string; path: Path2D }>();
+function brushPath(stroke: InkStroke) {
+  const outline = inkOutline(stroke);
+  const saved = pathCache.get(stroke);
+  if (saved?.outline === outline) return saved.path;
+  const path = new Path2D(outline);
+  pathCache.set(stroke, { outline, path });
+  return path;
+}
 
 export function pointerPoint(
   canvas: HTMLCanvasElement,
@@ -44,6 +55,13 @@ export function renderInk(canvas: HTMLCanvasElement, strokes: InkStroke[], lasso
   };
   for (const stroke of strokes) {
     if (!stroke.length) continue;
+    if (stroke.some((point) => point.width !== undefined)) {
+      context.save();
+      context.scale(rect.width / 100, rect.height / 100);
+      context.fill(brushPath(stroke));
+      context.restore();
+      continue;
+    }
     if (stroke.length === 1) {
       context.beginPath();
       context.arc(

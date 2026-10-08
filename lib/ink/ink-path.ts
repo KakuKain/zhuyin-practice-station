@@ -1,4 +1,5 @@
 import type { InkPoint, InkStroke } from "../../features/types";
+import { legacyInkWidth } from "./ink-brush";
 
 const EPSILON = 0.000001;
 export const cloneInk = (strokes: InkStroke[]) =>
@@ -9,6 +10,13 @@ const subtract = (a: InkPoint, b: InkPoint) => ({ x: a.x - b.x, y: a.y - b.y });
 const interpolate = (a: InkPoint, b: InkPoint, t: number) => ({
   x: a.x + (b.x - a.x) * t,
   y: a.y + (b.y - a.y) * t,
+  ...(a.width !== undefined || b.width !== undefined
+    ? {
+        width:
+          (a.width ?? legacyInkWidth) +
+          ((b.width ?? legacyInkWidth) - (a.width ?? legacyInkWidth)) * t,
+      }
+    : {}),
 });
 const samePoint = (a: InkPoint, b: InkPoint) => Math.hypot(a.x - b.x, a.y - b.y) < EPSILON;
 
