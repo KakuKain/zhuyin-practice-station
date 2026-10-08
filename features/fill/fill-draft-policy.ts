@@ -15,5 +15,8 @@ export function shouldCaptureFillCell(
   pending: Record<number, InkStroke[]>,
 ) {
   // Preserve explicit clears, but merely opening a blank cell is not a draft.
-  return ink.length > 0 || pending[index] !== undefined || Boolean(strokes[index]?.length);
+  if (pending[index] !== undefined) return true;
+  // Reopening a completed cell without edits shows the same ink; that is not a draft either.
+  if (strokes[index]?.length) return JSON.stringify(ink) !== JSON.stringify(strokes[index]);
+  return ink.length > 0;
 }

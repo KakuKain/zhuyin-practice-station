@@ -99,6 +99,11 @@ test("title handwriting retains ink and resumes the same cell after reload", asy
   await expect(page.locator(".fill-writing-location")).toContainText("標題 · 第 2 格");
   await page.getByRole("button", { name: "回到默寫", exact: true }).click();
   await expect(page.locator(".fill-cell.is-filled")).toHaveCount(1);
+  // Looking at a finished cell without changing it keeps it finished.
+  await page.getByRole("button", { name: "標題第 1 格，修改注音", exact: true }).click();
+  await page.getByRole("button", { name: "回到默寫", exact: true }).click();
+  await expect(page.locator(".fill-cell.is-filled")).toHaveCount(1);
+  await expect(page.locator(".fill-cell.is-in-progress")).toHaveCount(0);
   await page.reload();
   await openLesson(page);
   await page.getByRole("button", { name: /第一關 課文默寫/ }).click();
@@ -259,13 +264,16 @@ test("device backup previews, restores and preserves unrelated browser storage",
     buffer: Buffer.from(JSON.stringify(backup)),
   });
   await expect(page.getByRole("heading", { name: "確認還原內容" })).toBeVisible();
+  const restore = page.getByRole("button", { name: "2. 開始還原", exact: true });
+  await expect(restore).toBeDisabled();
   const download = page.waitForEvent("download");
-  const refreshed = page.waitForEvent("domcontentloaded");
-  await page.getByRole("button", { name: "備份目前資料並還原", exact: true }).click();
+  await page.getByRole("button", { name: "1. 下載目前資料", exact: true }).click();
   const saved = await download;
   expect(saved.suggestedFilename()).toContain("還原前備份");
   const before = JSON.parse(readFileSync((await saved.path())!, "utf8"));
   expect(before.recordings[0].base64).toBe(Buffer.from("old voice").toString("base64"));
+  const refreshed = page.waitForEvent("domcontentloaded");
+  await restore.click();
   await refreshed;
   await expect(page.locator(".journey-card")).toHaveCount(12);
   const restoredVoice = await page.evaluate(async () => {

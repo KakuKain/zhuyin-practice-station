@@ -75,7 +75,7 @@
   border-radius: 0;
   background: #fffdf4;
   font-size: clamp(23px, 6.2vw, 36px);
-  touch-action: pan-y;
+  touch-action: pan-y pinch-zoom;
   user-select: none;
 }
 

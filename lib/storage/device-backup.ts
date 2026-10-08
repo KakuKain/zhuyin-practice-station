@@ -8,8 +8,7 @@ import {
   validatePracticeState,
   validatedFillFavorites,
 } from "../../features/practice/practice-storage";
-import { validateFillDraft, fillDraftCookieKey } from "../../features/fill/fill-storage";
-import { validateListeningSettings } from "../../features/settings/listening-settings";
+import { validateFillDraft } from "../../features/fill/fill-storage";
 import { freeBoardKey, readBoardDraft } from "../ink/free-board";
 import { customAudioStorage } from "../audio/custom-audio-storage";
 import {
@@ -37,6 +36,8 @@ export type PreparedBackup = {
     drafts: number;
     strokes: number;
     recordings: number;
+    /** Values this version cannot read; they are restored unchanged instead of blocking the file. */
+    unreadable: number;
   };
 };
 export const ownsStorageKey = (key: string) =>
@@ -94,51 +95,63 @@ export function prepareDeviceBackup(raw: unknown): PreparedBackup {
   for (const [key, text] of Object.entries(value.storage)) {
     if (!ownsStorageKey(key) || typeof text !== "string" || text.length > 5 * 1024 * 1024)
       return fail();
-    JSON.parse(text);
     storage[key] = text;
   }
-  const materials = storage[materialsStorageKey]
-    ? validateMaterials(JSON.parse(storage[materialsStorageKey]))
-    : initialMaterials;
+  // The app reads every key leniently and migrates old shapes, so a backup restores the
+  // exact saved text. Validators only describe the contents; an older settings shape, a
+  // corrected lesson reading or a value this version cannot read must not block the file.
+  const parse = (text: string): unknown => {
+    try {
+      return JSON.parse(text);
+    } catch {
+      return undefined;
+    }
+  };
+  let unreadable = 0;
+  let materials = initialMaterials;
+  if (storage[materialsStorageKey] !== undefined) {
+    try {
+      materials = validateMaterials(JSON.parse(storage[materialsStorageKey]));
+    } catch {
+      unreadable++;
+    }
+  }
   const catalog = buildCatalog(materials);
+  // The app reads the newest practice key that exists; older ones are migration input only.
+  const activePracticeKey = [4, 3, 2, 1]
+    .map((version) => `zhuyin-practice-state-v${version}`)
+    .find((key) => storage[key] !== undefined);
   let saved = 0,
     drafts = 0,
     strokes = 0;
   for (const [key, text] of Object.entries(storage)) {
-    const parsed = JSON.parse(text);
+    if (key === materialsStorageKey) continue;
+    const parsed = parse(text);
+    const record =
+      parsed && typeof parsed === "object" && !Array.isArray(parsed)
+        ? (parsed as Record<string, unknown>)
+        : null;
     const practice = /^zhuyin-practice-state-v([1-4])$/.exec(key);
     const draft = /^zhuyin-fill-draft-v1-(\d+)$/.exec(key);
     if (practice) {
-      if (!parsed || !Array.isArray(parsed.savedQuestions)) return fail();
-      const checked = validatePracticeState(
-        parsed,
-        Number(practice[1]) as 1 | 2 | 3 | 4,
-        catalog,
-        true,
-      );
-      if (
-        checked.savedQuestions.length !== parsed.savedQuestions.length ||
-        (parsed.history && checked.history.length !== parsed.history.length)
-      )
-        return fail();
-      if (practice[1] === "4") saved += checked.savedQuestions.length;
+      if (!record || !Array.isArray(record.savedQuestions)) unreadable++;
+      else if (key === activePracticeKey)
+        saved += validatePracticeState(record, Number(practice[1]) as 1 | 2 | 3 | 4, catalog, true)
+          .savedQuestions.length;
     } else if (key === "zhuyin-fill-favorites-v1") {
-      const checked = validatedFillFavorites(parsed, catalog, true);
-      if (!Array.isArray(parsed) || checked.length !== parsed.length) return fail();
-      saved += checked.length;
+      if (!Array.isArray(parsed)) unreadable++;
+      else saved += validatedFillFavorites(parsed, catalog, true).length;
     } else if (key === "zhuyin-listening-settings-v1") {
-      const checked = validateListeningSettings(parsed);
-      if (Object.entries(checked).some(([k, v]) => parsed[k] !== v)) return fail();
+      if (!record) unreadable++;
     } else if (draft) {
       const index = Number(draft[1]),
         lesson = catalog.find((l) => l.index === index);
-      if (!lesson || !validateFillDraft(parsed, index, lesson.exercise.lines.flat().length))
-        return fail();
-      drafts++;
+      if (lesson && validateFillDraft(parsed, index, lesson.exercise.lines.flat().length)) drafts++;
+      else unreadable++;
     } else if (key === freeBoardKey) {
       const board = readBoardDraft(parsed, 304);
-      if (!board) return fail();
-      strokes = board.strokes.length;
+      if (board) strokes = board.strokes.length;
+      else unreadable++;
     }
   }
   const keys = new Set<string>();
@@ -177,6 +190,7 @@ export function prepareDeviceBackup(raw: unknown): PreparedBackup {
       drafts,
       strokes,
       recordings: recordings.length,
+      unreadable,
     },
   };
 }
@@ -203,15 +217,5 @@ export async function restoreDeviceBackup(
       throw new Error("還原未完成，裝置空間不足。請保留下載的備份，釋放空間後再還原。");
     }
     throw error;
-  }
-  if (typeof document !== "undefined") {
-    const indexes = new Set(
-      [...Object.keys(before), ...Object.keys(checked.backup.storage)].flatMap((k) => {
-        const m = /^zhuyin-fill-draft-v1-(\d+)$/.exec(k);
-        return m ? [Number(m[1])] : [];
-      }),
-    );
-    for (const index of indexes)
-      document.cookie = `${fillDraftCookieKey(index)}=${checked.backup.storage[`zhuyin-fill-draft-v1-${index}`] ? "1" : ""}; path=/; max-age=${checked.backup.storage[`zhuyin-fill-draft-v1-${index}`] ? 2592000 : 0}; SameSite=Lax`;
   }
 }

@@ -5,10 +5,28 @@ type Storage = {
   get: (text: string, pronunciation: string) => Promise<CustomRecording | null>;
 };
 
-/** Missing identities need no database lookup; retain only a small LRU of blobs. */
-export function createRecordingCache(storage: Storage, limit = 12) {
+const info = ({ key, text, pronunciation, mimeType, duration, updatedAt }: RecordingInfo) => ({
+  key,
+  text,
+  pronunciation,
+  mimeType,
+  duration,
+  updatedAt,
+});
+
+/**
+ * Missing identities need no database lookup; retain only a small LRU of blobs.
+ *
+ * When the recording database cannot be opened at all (blocked site data, a damaged
+ * store), playback lookups resolve to "no custom recording" so official clips keep
+ * working, and the database is retried after a pause rather than on every tap. `list()`
+ * still rejects so the recording manager can explain the problem. A recording that is
+ * known to exist but fails to load is still an error: it must not be replaced silently.
+ */
+export function createRecordingCache(storage: Storage, limit = 12, retryMs = 30000, now = Date.now) {
   let metadata: Map<string, RecordingInfo> | null = null;
   let pending: Promise<RecordingInfo[]> | null = null;
+  let unavailableUntil = 0;
   const clips = new Map<string, Promise<CustomRecording | null>>();
   let generation = 0;
   const list = () => {
@@ -18,7 +36,8 @@ export function createRecordingCache(storage: Storage, limit = 12) {
     const request = storage
       .list()
       .then((items) => {
-        if (generation === token) metadata = new Map(items.map((item) => [item.key, item]));
+        if (generation === token) metadata = new Map(items.map((item) => [item.key, info(item)]));
+        unavailableUntil = 0;
         return items;
       })
       .finally(() => {
@@ -30,7 +49,15 @@ export function createRecordingCache(storage: Storage, limit = 12) {
   return {
     list,
     async get(text: string, pronunciation: string) {
-      if (!metadata) await list();
+      if (!metadata) {
+        if (now() < unavailableUntil) return null;
+        try {
+          await list();
+        } catch {
+          unavailableUntil = now() + retryMs;
+          return null;
+        }
+      }
       const key = recordingKey(text, pronunciation);
       if (!metadata?.has(key)) return null;
       let request = clips.get(key);
@@ -50,7 +77,8 @@ export function createRecordingCache(storage: Storage, limit = 12) {
     saved(recording: CustomRecording) {
       generation++;
       pending = null;
-      metadata?.set(recording.key, recording);
+      // Keep metadata only; the bytes stay in IndexedDB and the small clip LRU.
+      metadata?.set(recording.key, info(recording));
       clips.delete(recording.key);
     },
     removed(key: string) {
@@ -63,6 +91,7 @@ export function createRecordingCache(storage: Storage, limit = 12) {
       generation++;
       pending = null;
       metadata = null;
+      unavailableUntil = 0;
       clips.clear();
     },
   };

@@ -139,15 +139,9 @@ export function useFillProgress({
   };
 
   const leaveFillCell = () => {
-    if (fillDraftRef.current.length && activeFillCell !== null) {
-      setFillPendingCells((current) => ({
-        ...current,
-        [activeFillCell]: fillDraftRef.current.map((stroke) =>
-          stroke.map((point) => ({ ...point })),
-        ),
-      }));
-      persistFillRef.current();
-    }
+    // Every real edit already recorded pending ink; merely viewing a completed
+    // cell must not turn it back into unfinished work.
+    if (activeFillCell !== null) persistFillRef.current();
     setActiveFillCell(null);
   };
 

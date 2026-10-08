@@ -14,10 +14,6 @@ export const defaultListeningSettings: ListeningSettings = {
   answerTime: "standard",
 };
 
-export const audioPlaybackRate = 0.76;
-
-export const zhuyinPlaybackRate = 1;
-
 export const audioTailDelayMs = 650;
 
 export const extraWordQuestions: Record<number, readonly ListeningSeed[]> = {

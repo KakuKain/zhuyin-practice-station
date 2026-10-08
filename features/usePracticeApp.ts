@@ -234,6 +234,7 @@ export function usePracticeApp() {
     finishPlayback,
     speak,
     playPreviewSymbol,
+    warmSymbols,
   } = useAudioPlayer({
     view,
     lessonSymbols: lesson.symbols,
@@ -443,7 +444,7 @@ export function usePracticeApp() {
   const openSavedQuestion = (lessonIndex: number, id: string, queued = false) => {
     if (!queued) reviewQueueRef.current = [];
     const seed = findQuestionSeed(lessonIndex, id, catalog);
-    if (!seed) return;
+    if (!seed) return false;
     showLoading("正在開啟收藏題目…");
     setSelectedLesson(lessonIndex);
     setSessionQuestions([makeQuestion(seed)]);
@@ -455,6 +456,7 @@ export function usePracticeApp() {
     setUnfavoriteFillUndo(null);
     resetListeningQuestion(0);
     setView("listen");
+    return true;
   };
 
   const openFill = () => {
@@ -555,10 +557,14 @@ export function usePracticeApp() {
   };
 
   const advanceReviewQueue = () => {
-    const next = reviewQueueRef.current.shift();
-    if (!next) return;
-    if (next.mode === "fill") openFillFavorite(next.favorite, true);
-    else openSavedQuestion(next.lessonIndex, next.questionId, true);
+    // A question whose lesson can no longer be resolved is skipped, not a dead end.
+    for (let next = reviewQueueRef.current.shift(); next; next = reviewQueueRef.current.shift()) {
+      if (next.mode === "fill") {
+        openFillFavorite(next.favorite, true);
+        return;
+      }
+      if (openSavedQuestion(next.lessonIndex, next.questionId, true)) return;
+    }
   };
   const startCourseReview = (lessonIndex: number, mode: "all" | "fill" | "listening") => {
     reviewQueueRef.current = courseReviewQueue(
@@ -566,6 +572,9 @@ export function usePracticeApp() {
       mode,
       fillFavorites,
       practiceState.savedQuestions,
+    ).filter(
+      (item) =>
+        item.mode === "fill" || Boolean(findQuestionSeed(item.lessonIndex, item.questionId, catalog)),
     );
     advanceReviewQueue();
   };
@@ -826,6 +835,7 @@ export function usePracticeApp() {
     pendingSessionCount,
     playCount,
     playPreviewSymbol,
+    warmSymbols,
     playbackRef,
     playingSymbol,
     practiceNotice,

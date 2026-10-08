@@ -37,12 +37,9 @@ export function validateRecording(recording: CustomRecording): void {
   validateAudio(blob, duration);
 }
 
-/** Custom recordings never fall back to a synthetic voice, nor get slowed down. */
-export function clipPolicy(custom: boolean, symbol: boolean, requestedRate?: number) {
-  return {
-    playbackRate: custom ? 1 : (requestedRate ?? (1)),
-    allowSynthesis: !custom && !symbol,
-  };
+/** Custom recordings and official symbol clips never fall back to a synthetic voice. */
+export function clipPolicy(custom: boolean, symbol: boolean) {
+  return { allowSynthesis: !custom && !symbol };
 }
 
 export function recordingError(error: unknown): string {

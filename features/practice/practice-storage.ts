@@ -216,45 +216,50 @@ export function validatedFillFavorites(
       continue;
     const lessonItems = exercises[lessonIndex]?.lines.flat();
     const unavailable = !lessonItems && preserveUnavailableLessons && lessonIndex >= 9;
-    const positions = Array.isArray(candidate.positions)
-      ? candidate.positions.filter(
-          (position): position is number =>
-            typeof position === "number" &&
-            Number.isInteger(position) &&
-            position >= 0 &&
-            position < 200 &&
-            (unavailable ||
-              (lessonItems?.[position]?.character === candidate.character &&
-                lessonItems?.[position]?.zhuyin === candidate.zhuyin)),
-        )
-      : [];
     if (
-      !positions.length ||
       typeof candidate.character !== "string" ||
       typeof candidate.zhuyin !== "string" ||
       (unavailable &&
         (!/^[\p{Script=Han}]$/u.test(candidate.character) || !validSyllable(candidate.zhuyin)))
     )
       continue;
-    const key = fillFavoriteKey({
-      lessonIndex,
-      character: candidate.character,
-      zhuyin: candidate.zhuyin,
-    });
-    const existing = result.get(key);
-    result.set(key, {
-      lessonIndex,
-      character: candidate.character,
-      zhuyin: candidate.zhuyin,
-      positions: [...new Set([...(existing?.positions ?? []), ...positions])].sort((a, b) => a - b),
-      status:
-        candidate.status === "needs_rewrite" || existing?.status === "needs_rewrite"
-          ? "needs_rewrite"
-          : candidate.status === "mastered"
-            ? "mastered"
-            : "review_later",
-      isFavorite: candidate.isFavorite !== false || Boolean(existing?.isFavorite),
-    });
+    // Positions follow the reading the lesson uses now, so a corrected built-in reading
+    // (for example 教 ㄐㄧㄠˋ → ㄐㄧㄠ) keeps the favorite instead of silently dropping it.
+    const byReading = new Map<string, number[]>();
+    for (const position of Array.isArray(candidate.positions) ? candidate.positions : []) {
+      if (
+        typeof position !== "number" ||
+        !Number.isInteger(position) ||
+        position < 0 ||
+        position >= 200
+      )
+        continue;
+      const reading = unavailable
+        ? candidate.zhuyin
+        : lessonItems?.[position]?.character === candidate.character
+          ? lessonItems[position].zhuyin
+          : null;
+      if (reading !== null) byReading.set(reading, [...(byReading.get(reading) ?? []), position]);
+    }
+    for (const [zhuyin, positions] of byReading) {
+      const key = fillFavoriteKey({ lessonIndex, character: candidate.character, zhuyin });
+      const existing = result.get(key);
+      result.set(key, {
+        lessonIndex,
+        character: candidate.character,
+        zhuyin,
+        positions: [...new Set([...(existing?.positions ?? []), ...positions])].sort(
+          (a, b) => a - b,
+        ),
+        status:
+          candidate.status === "needs_rewrite" || existing?.status === "needs_rewrite"
+            ? "needs_rewrite"
+            : candidate.status === "mastered"
+              ? "mastered"
+              : "review_later",
+        isFavorite: candidate.isFavorite !== false || Boolean(existing?.isFavorite),
+      });
+    }
   }
   return [...result.values()].filter((item) => item.isFavorite || item.status === "needs_rewrite");
 }

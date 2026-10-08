@@ -59,7 +59,6 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => 
       if (token !== generation.current) return;
       audio.speak(pair.sounds[choice].audioText, {
         pronunciation: pair.sounds[choice].label,
-        playbackRate: 1,
         allowSynthesis: false,
         onStarted: () => {
           if (token === generation.current) setPreviewingSound(choice);
@@ -96,7 +95,6 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => 
     setPlaying(true);
     audio.speak(pair.sounds[questions[questionIndex].target].audioText, {
       pronunciation: pair.sounds[questions[questionIndex].target].label,
-      playbackRate: 1,
       allowSynthesis: false,
       onError: () => {
         if (token === generation.current) setPlaying(false);
@@ -334,10 +332,14 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => 
               );
             })}
           </div>
+          {/* Mounted before any answer so screen readers announce each change. */}
+          <span className="visually-hidden" role="status">
+            {feedback === "correct" ? "答對了！" : feedback ? "再試一次" : ""}
+          </span>
           {feedback && (
             <div
               className={`sound-feedback-animation is-${feedback}`}
-              role="status"
+              aria-hidden="true"
               key={`${index}-${selected}`}
             >
               {feedback === "correct" ? (

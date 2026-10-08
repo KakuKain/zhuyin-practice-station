@@ -16,7 +16,6 @@ import {
   findQuestionSeed,
   questionId,
   sectionPosition,
-  zhuyinPlaybackRate,
 } from "../../features/listening/listening-data";
 
 test("all nine lessons keep complete aligned characters and pronunciations", () => {
@@ -87,7 +86,6 @@ test("every current and legacy prompt has a local playable audio file", async ()
       );
     } else assert.equal(bytes.toString("ascii", 4, 8), "ftyp");
   }
-  assert.equal(zhuyinPlaybackRate, 1);
 });
 
 test("all shipped font assets use WOFF2", async () => {

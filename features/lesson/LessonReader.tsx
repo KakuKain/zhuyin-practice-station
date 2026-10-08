@@ -140,7 +140,6 @@ export function LessonReader({
                   ? app.stopPlayback()
                   : app.speak(readingKey, {
                       url: registeredLessonAudioUrl(selectedLesson) ?? undefined,
-                      playbackRate: 1,
                       allowSynthesis: false,
                     })
               }
@@ -209,6 +208,11 @@ export function LessonReader({
                 } as React.CSSProperties
               }
               onPointerDown={(event) => {
+                // A second finger means pinch-zoom, not a page swipe.
+                if (!event.isPrimary) {
+                  previewPointerStartRef.current = null;
+                  return;
+                }
                 previewPointerStartRef.current = { x: event.clientX, y: event.clientY };
                 event.currentTarget.setPointerCapture(event.pointerId);
               }}
@@ -216,6 +220,7 @@ export function LessonReader({
                 previewPointerStartRef.current = null;
               }}
               onPointerUp={(event) => {
+                if (!event.isPrimary) return;
                 const start = previewPointerStartRef.current;
                 previewPointerStartRef.current = null;
                 if (!start) return;
