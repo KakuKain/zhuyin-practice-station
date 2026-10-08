@@ -5,7 +5,7 @@ import { symbolGroups } from "../../features/symbols/symbols-data";
 test("all lesson titles and lesson headings use annotated text without changing accessible names", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("./");
   await expect(page.locator(".journey-card-copy strong .annotated-text")).toHaveCount(12);
   expect(
     await page
@@ -77,7 +77,7 @@ test("all-symbol navigation has separate consonant/vowel grids and normal-speed 
     await new Promise((resolve) => setTimeout(resolve, 500));
     await route.continue();
   });
-  await page.goto("/");
+  await page.goto("./");
   const nav = page.getByRole("navigation", { name: "主要導覽" });
   await expect(nav.getByRole("button")).toHaveCount(4);
   await nav.getByRole("button", { name: "注音", exact: true }).click();
@@ -153,7 +153,7 @@ test("all-symbol navigation has separate consonant/vowel grids and normal-speed 
 
 test("failed chart audio shows an actionable error and can be retried", async ({ page }) => {
   await page.route("**/listening-audio/**", (route) => route.abort());
-  await page.goto("/");
+  await page.goto("./");
   await page.getByRole("button", { name: "注音", exact: true }).click();
   const symbol = page.getByRole("button", { name: "播放注音符號 ㄠ", exact: true });
   await symbol.click();

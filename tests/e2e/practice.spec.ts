@@ -47,7 +47,7 @@ async function seedFavorite(page: Page, text = "皮包", answer = "words:皮包"
       ),
     { answer },
   );
-  await page.goto("/");
+  await page.goto("./");
   await openRecords(page);
   const row = page.locator(".practice-item").filter({ hasText: text });
   await row.getByRole("button", { name: `重練${text}（聽寫）`, exact: true }).click();
@@ -60,7 +60,7 @@ test.beforeEach(async ({ page }) => {
 test("courses include reviews, shared headings and settings survive reload", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
-  await page.goto("/");
+  await page.goto("./");
   await expect(page.locator(".journey-card")).toHaveCount(12);
   await openLesson(page);
   await page.getByRole("button", { name: "純注音", exact: true }).click();
@@ -85,7 +85,7 @@ test("courses include reviews, shared headings and settings survive reload", asy
 });
 
 test("title handwriting retains ink and resumes the same cell after reload", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("./");
   await openLesson(page);
   await page.getByRole("button", { name: /第一關 課文默寫/ }).click();
   await page.getByRole("button", { name: /從第一格開始/ }).click();
@@ -109,7 +109,7 @@ test("title handwriting retains ink and resumes the same cell after reload", asy
 test("whole-round listening keeps drafts and compares only when writing finishes", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("./");
   await openLesson(page);
   await page.getByRole("button", { name: /第二關 聽寫/ }).click();
   await page.getByRole("button", { name: "開始聽", exact: true }).click();
@@ -158,7 +158,7 @@ test("word writing has large vertical cells and isolated clear/undo", async ({ p
 });
 
 test("a second pointer never joins the active stroke on the free board", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("./");
   await page.getByRole("button", { name: "練習", exact: true }).click();
   const canvas = page.getByLabel("自由聽寫作答畫板", { exact: true });
   await expect(canvas).toBeVisible();
@@ -199,7 +199,7 @@ test("a second pointer never joins the active stroke on the free board", async (
 test("device backup previews, restores and preserves unrelated browser storage", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("./");
   await page.evaluate(() => localStorage.setItem("unrelated-test-key", "keep"));
   await page.evaluate(async () => {
     await new Promise<void>((resolve, reject) => {
@@ -317,7 +317,7 @@ test("sound practice animates wrong retry and correct automatic progression", as
     HTMLMediaElement.prototype.pause = function () {};
   });
   await page.route("**/listening-audio/**", (route) => route.abort());
-  await page.goto("/");
+  await page.goto("./");
   await page.getByRole("button", { name: "練習", exact: true }).click();
   await page.getByRole("button", { name: "辨音練習", exact: true }).click();
   await expect(page.getByRole("heading", { name: "練習", exact: true })).toBeVisible();

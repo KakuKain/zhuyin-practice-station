@@ -2,7 +2,7 @@
 
 給台灣國小一年級學生與家長使用的免登入網站，收錄第一至第九課及三組複習。
 
-公開網站：[一年級注音練習站](https://zhuyin-practice-station.ihealdev.chatgpt.site/)
+公開網站：[一年級注音練習站](https://kakukain.github.io/zhuyin-practice-station/)
 
 - 課文：國字＋注音／純注音直排預覽，課名與課文頁標題都有旁注音，手機支援翻頁。
 - 注音表：下方「注音」導覽，21 個聲符、16 個韻符、22 個結合韻分區；基本符號播放教育部錄音，結合韻使用 Gemini 靜態音檔。
@@ -38,7 +38,16 @@ npm run test:e2e              # Android Chrome、iPhone WebKit、桌面 Chrome
 
 `public/` 只放部署用素材，原始字體／插圖留在 `assets/`，視覺參考在 `docs/visual-qa/`。未啟用的 D1／登入範例在 `examples/`，不參與 app 的 lint／型別檢查／建置；沒有安裝資料庫套件。
 
-正式站使用既有 Sites 專案，設定在 `.openai/hosting.json`。`npm run build` 產生 Cloudflare Worker 相容的 `dist/`，`tooling/build/sites-vite-plugin.ts` 複製部署 metadata。GitHub 是公開原始碼與 CI；推送 GitHub 不代表已部署，發布仍須完成 Sites 的版本保存與部署流程。不要把 token、實際 binding ID 或其他密鑰寫進版本控制。
+正式站改用 KakuKain 儲存庫的 GitHub Pages。推送 `main` 會由 `.github/workflows/pages.yml` 執行檢查、靜態建置與部署；只有檢查通過才發布。網站沿用原本的 React 元件與靜態音檔，沒有伺服器 API。
+
+```sh
+npm run build:pages            # 產生 dist-pages/，檢查素材完整性與子路徑
+npm run preview:pages          # 開啟 /zhuyin-practice-station/ 預覽
+```
+
+`vite.pages.config.ts` 處理專案子路徑；需要根目錄或自訂網域時可設定 `PAGES_BASE_PATH=/`。原 Sites 的 `.openai/hosting.json` 與 `npm run build` 保留作為舊站的相容建置。不要把 token 或其他密鑰寫進版本控制。
+
+網站來源改變後，瀏覽器不會自動移轉舊站的紀錄。先在[舊站](https://zhuyin-practice-station.ihealdev.chatgpt.site/)「更多 → 裝置備份」匯出，再於新站匯入；音檔和教材隨網站一起發布，不需要另行移轉。
 
 ## 素材與授權
 

@@ -238,7 +238,7 @@
 
 @media (max-width: 380px) {
   .symbol-chart-grid {
-    gap: 6px;
+    gap: 4px;
   }
   .symbol-chart-button {
     border-radius: 10px;
