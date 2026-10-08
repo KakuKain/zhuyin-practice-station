@@ -1,36 +1,3 @@
-.active-material-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 16px 20px;
-  margin: 0 0 24px;
-  border: 1px solid #cbd8cf;
-  background: #f5f8ed;
-  border-radius: 20px;
-}
-.active-material-bar div {
-  display: grid;
-  gap: 5px;
-  min-width: 0;
-}
-.active-material-bar strong {
-  overflow-wrap: anywhere;
-  color: #37574b;
-}
-.active-material-bar small {
-  color: #5a6b62;
-}
-.active-material-bar button {
-  flex-shrink: 0;
-  min-height: 44px;
-  padding: 8px 12px;
-  color: #345c4e;
-  border: 1px solid #b2c8bb;
-  border-radius: 12px;
-  background: #fff;
-  font-weight: 700;
-}
 .journey-card.is-custom-material {
   background: #f4f7eb url("/course-art/lesson-watercolor-paper.webp") center/cover;
   min-height: 120px;
@@ -163,45 +130,7 @@ button.material-primary {
   height: 22px;
   accent-color: #426b53;
 }
-.material-success {
-  padding: 14px;
-  background: #ecf5e9;
-  border: 1px solid #bfd2b7;
-  border-radius: 12px;
-  color: #315c38;
-  line-height: 1.7;
-}
-.material-lesson-list {
-  padding-left: 24px;
-}
-.material-lesson-list li {
-  padding: 8px 0;
-}
-.material-lesson-list small {
-  margin-left: 12px;
-  color: #536c59;
-}
-.imported-preview-cell {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-family: sans-serif;
-}
-.lesson-text-line .imported-preview-cell > span:first-child {
-  font-family: sans-serif;
-}
-.imported-preview-cell .zhuyin-stack {
-  font-family: sans-serif;
-  font-size: 28px;
-}
 @media (max-width: 380px) {
-  .active-material-bar {
-    padding: 12px;
-    gap: 8px;
-  }
-  .active-material-bar strong {
-    font-size: 14px;
-  }
   .material-progress {
     gap: 8px;
     font-size: 12px;

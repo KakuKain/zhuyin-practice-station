@@ -127,7 +127,8 @@ export function LessonReader({
         </div>
       )}
       <div className="lesson-curriculum">
-        {!lesson.custom && selectedLesson < 9 && (
+        {/* Only lessons with a recorded reading get the read-aloud control. */}
+        {!lesson.custom && registeredLessonAudioUrl(selectedLesson) !== null && (
           <div className="lesson-reading-controls">
             <button
               type="button"

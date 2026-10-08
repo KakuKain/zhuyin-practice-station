@@ -1,6 +1,10 @@
 import type { ListenCategory, ListeningQuestion, ListeningSeed, ListeningSettings } from "../types";
-import { exercises, firstListeningQuestions } from "../courses/course-data";
-import { legacyCircledVocabulary } from "../courses/legacy-circled-vocabulary";
+import { exercises } from "../courses/course-data";
+import {
+  extraWordQuestions,
+  firstListeningQuestions,
+  legacyCircledVocabulary,
+} from "../courses/legacy-content";
 import type { CircledTerm } from "../courses/circled-vocabulary";
 import { builtinCatalog, type CatalogLesson } from "../courses/materials";
 import { registeredAudioUrl } from "../../lib/audio/audio-registry";
@@ -16,65 +20,6 @@ export const defaultListeningSettings: ListeningSettings = {
 };
 
 export const audioTailDelayMs = 650;
-
-export const extraWordQuestions: Record<number, readonly ListeningSeed[]> = {
-  0: [
-    {
-      category: "words",
-      answer: "ㄉㄧˋ|ㄧ",
-      audioText: "第一",
-      distractors: ["ㄉㄧˋ|ㄇㄧ", "ㄆㄠˇ|ㄧ"],
-    },
-  ],
-  1: [
-    {
-      category: "words",
-      answer: "ㄉㄜˊ|ㄧˋ",
-      audioText: "得意",
-      distractors: ["ㄉㄜˊ|ㄜˊ", "ㄈㄨ|ㄧˋ"],
-    },
-  ],
-  2: [
-    {
-      category: "words",
-      answer: "ㄆㄠˋ|ㄗㄠˇ",
-      audioText: "泡澡",
-      distractors: ["ㄆㄠˊ|ㄗㄠˇ", "ㄆㄠˋ|ㄗㄠˋ"],
-    },
-    {
-      category: "words",
-      answer: "ㄅㄢˋ|ㄌㄨˋ",
-      audioText: "半路",
-      distractors: ["ㄅㄢˋ|ㄌㄧˊ", "ㄏㄜˊ|ㄌㄨˋ"],
-    },
-    {
-      category: "words",
-      answer: "ㄩˋ|ㄉㄠˋ",
-      audioText: "遇到",
-      distractors: ["ㄩˋ|ㄗㄠˇ", "ㄑㄩˋ|ㄉㄠˋ"],
-    },
-    {
-      category: "words",
-      answer: "ㄓㄨˊ|ㄔㄠˊ",
-      audioText: "築巢",
-      distractors: ["ㄓㄨˊ|ㄗㄠˇ", "ㄔㄠˊ|ㄓㄨˊ"],
-    },
-  ],
-  3: [
-    {
-      category: "words",
-      answer: "ㄅㄟ|˙ㄓㄜ",
-      audioText: "背著",
-      distractors: ["ㄅㄟˋ|˙ㄓㄜ", "ㄅㄟ|ㄕㄨ"],
-    },
-    {
-      category: "words",
-      answer: "ㄌㄚ|ㄕㄡˇ",
-      audioText: "拉手",
-      distractors: ["ㄌㄚ|ㄕㄨ", "ㄕㄡˇ|ㄌㄚ"],
-    },
-  ],
-};
 
 export function shuffleItems<T>(items: readonly T[]): T[] {
   const shuffled = [...items];
@@ -255,11 +200,6 @@ export function sectionPosition(questions: readonly ListeningQuestion[], index: 
     total: Math.max(1, questions.filter((question) => question.category === category).length),
   };
 }
-
-export const legacySavedQuestionIndexes: Record<number, readonly number[]> = {
-  0: [4, 5, 7],
-  2: [4, 5, 6],
-};
 
 export function listeningSectionLabel(questions: readonly ListeningQuestion[], index: number) {
   const category = questions[index]?.category;

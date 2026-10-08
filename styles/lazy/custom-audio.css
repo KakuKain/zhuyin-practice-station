@@ -1,3 +1,4 @@
+/* Loaded by the lazy CustomAudioPanel import in SettingsScreen, after every eager stylesheet. */
 .custom-audio-panel {
   --audio-blue: #216cce;
   --audio-ink: #183e68;
@@ -5,24 +6,6 @@
 .custom-audio-panel .more-detail-intro,
 .custom-audio-panel .more-detail-footnote {
   font-size: 16px;
-}
-.custom-audio-local-note {
-  margin: 22px 0;
-  padding: 17px 19px;
-  border: 1px solid #c9dfe9;
-  border-radius: 19px;
-  background: #eef8fc;
-  color: #42647b;
-  font-size: 15px;
-  line-height: 1.7;
-}
-.custom-audio-local-note strong {
-  display: block;
-  color: #254e70;
-  font-size: 16px;
-}
-.custom-audio-local-note p {
-  margin: 5px 0 0;
 }
 .custom-audio-picker {
   display: grid;
@@ -80,28 +63,6 @@
 .custom-audio-badge.is-recorded {
   color: #27755e;
   background: #daf1e7;
-}
-.custom-audio-pronunciation {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 21px;
-  min-height: 98px;
-  margin-top: 12px;
-}
-.custom-audio-pronunciation strong {
-  font-size: clamp(32px, 8vw, 43px);
-  color: #143760;
-  font-weight: 800;
-}
-.custom-audio-pronunciation.is-word {
-  flex-direction: column;
-  gap: 14px;
-  padding: 12px 0;
-}
-.custom-audio-pronunciation .answer-display {
-  gap: 12px;
-  font-size: 44px;
 }
 .custom-audio-target p,
 .custom-audio-capture p,
@@ -250,26 +211,6 @@
   width: 100%;
   margin-top: 12px;
 }
-.custom-audio-error {
-  margin: 17px 21px;
-  color: #9a352f;
-  font-size: 16px;
-  line-height: 1.7;
-}
-.custom-audio-error button {
-  min-height: 44px;
-  text-decoration: underline;
-}
-.custom-audio-status {
-  margin: 0;
-  padding: 0 21px;
-  color: #2f7461;
-  font-size: 16px;
-  line-height: 1.7;
-}
-.custom-audio-status:not(:empty) {
-  padding-bottom: 21px;
-}
 @media (max-width: 360px) {
   .custom-audio-target,
   .custom-audio-capture,
@@ -277,10 +218,6 @@
   .custom-audio-saved {
     padding-left: 16px;
     padding-right: 16px;
-  }
-  .custom-audio-pronunciation {
-    gap: 12px;
-    flex-wrap: wrap;
   }
 }
 

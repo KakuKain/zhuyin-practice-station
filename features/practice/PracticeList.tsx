@@ -14,8 +14,12 @@ import {
 } from "@phosphor-icons/react";
 import { ShowMsg } from "../../components/ShowMsg";
 import { FavoriteButton } from "../../components/ReviewActions";
+// Feature styles load with the chunk (after every eager stylesheet), not on first paint.
 const SoundPractice = lazy(() =>
-  import("../sound-practice/SoundPractice").then((module) => ({ default: module.SoundPractice })),
+  Promise.all([
+    import("../sound-practice/SoundPractice"),
+    import("../../styles/lazy/sound-practice.css"),
+  ]).then(([module]) => ({ default: module.SoundPractice })),
 );
 import { useCatalog } from "../courses/MaterialContext";
 import { findQuestionSeed } from "../listening/listening-data";

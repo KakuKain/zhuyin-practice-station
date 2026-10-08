@@ -1,10 +1,8 @@
 import type { FillFavorite, PracticeSession, PracticeState, SavedQuestion } from "../types";
 import { storageKeys } from "../../lib/storage/storage-keys";
-import {
-  findQuestionSeed,
-  legacySavedQuestionIndexes,
-  questionId,
-} from "../listening/listening-data";
+import { findQuestionSeed, questionId } from "../listening/listening-data";
+import { legacySavedQuestionIndexes } from "../courses/legacy-content";
+import { isCustomLessonIndex } from "../courses/lesson-identity";
 import {
   catalogExercises,
   storedCatalog,
@@ -41,7 +39,8 @@ export function validatePracticeState(
       !item ||
       typeof item !== "object" ||
       !Number.isSafeInteger(item.lessonIndex) ||
-      (!exercises[item.lessonIndex] && !(preserveUnavailableLessons && item.lessonIndex >= 9))
+      (!exercises[item.lessonIndex] &&
+        !(preserveUnavailableLessons && isCustomLessonIndex(item.lessonIndex)))
     )
       return [];
     let id = item.questionId;
@@ -58,7 +57,7 @@ export function validatePracticeState(
     return typeof id === "string" &&
       (findQuestionSeed(item.lessonIndex, id, catalog) ||
         (preserveUnavailableLessons &&
-          item.lessonIndex >= 9 &&
+          isCustomLessonIndex(item.lessonIndex) &&
           !exercises[item.lessonIndex] &&
           /^(characters|words):[\p{Script=Han}]{1,8}$/u.test(id)))
       ? [
@@ -92,7 +91,8 @@ export function validatePracticeState(
         typeof item.id !== "string" ||
         !item.id ||
         !Number.isSafeInteger(item.lessonIndex) ||
-        (!exercises[item.lessonIndex] && !(preserveUnavailableLessons && item.lessonIndex >= 9)) ||
+        (!exercises[item.lessonIndex] &&
+          !(preserveUnavailableLessons && isCustomLessonIndex(item.lessonIndex))) ||
         !["fill", "listening", "single"].includes(item.mode) ||
         !Number.isFinite(item.completedAt) ||
         item.completedAt <= 0 ||
@@ -129,7 +129,8 @@ export function validatePracticeState(
     recentLesson:
       typeof parsed.recentLesson === "number" &&
       Number.isInteger(parsed.recentLesson) &&
-      (exercises[parsed.recentLesson] || (preserveUnavailableLessons && parsed.recentLesson >= 9))
+      (exercises[parsed.recentLesson] ||
+        (preserveUnavailableLessons && isCustomLessonIndex(parsed.recentLesson)))
         ? parsed.recentLesson
         : null,
     completedSessions:
@@ -209,11 +210,12 @@ export function validatedFillFavorites(
     if (
       typeof lessonIndex !== "number" ||
       !Number.isSafeInteger(lessonIndex) ||
-      (!exercises[lessonIndex] && !(preserveUnavailableLessons && lessonIndex >= 9))
+      (!exercises[lessonIndex] && !(preserveUnavailableLessons && isCustomLessonIndex(lessonIndex)))
     )
       continue;
     const lessonItems = exercises[lessonIndex]?.lines.flat();
-    const unavailable = !lessonItems && preserveUnavailableLessons && lessonIndex >= 9;
+    const unavailable =
+      !lessonItems && preserveUnavailableLessons && isCustomLessonIndex(lessonIndex);
     if (
       typeof candidate.character !== "string" ||
       typeof candidate.zhuyin !== "string" ||

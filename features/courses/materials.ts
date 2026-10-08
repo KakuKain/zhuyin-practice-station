@@ -3,6 +3,7 @@ import { circledVocabulary, reviewVocabulary, type CircledTerm } from "./circled
 import type { LessonExercise, SyllableItem } from "../types";
 import { createZhuyinExercise, type LessonContent } from "./lesson-content";
 import { storageKeys } from "../../lib/storage/storage-keys";
+import { builtinLessonIndex, firstCustomLessonIndex, isCustomLessonIndex } from "./lesson-identity";
 
 export const materialsStorageKey = storageKeys.materials;
 export const builtinMaterialId = "kang-hsuan-grade1-semester1";
@@ -47,7 +48,7 @@ export type CatalogLesson = {
 export const initialMaterials: MaterialsState = {
   version: 1,
   activeId: builtinMaterialId,
-  nextIndex: 9,
+  nextIndex: firstCustomLessonIndex,
   materials: [],
 };
 export const builtinMaterialName = "康軒一年級上";
@@ -65,7 +66,7 @@ const titleReadings = [
 // Append to storage order so existing body ink and favorite positions remain stable.
 export const builtinLessons: CatalogLesson[] = lessons.map((lesson, index) => ({
   ...lesson,
-  index,
+  index: builtinLessonIndex(index),
   number: lessonNumerals[index],
   terms: circledVocabulary[index],
   content: {
@@ -112,9 +113,11 @@ export const builtinReviews: CatalogLesson[] = reviewVocabulary.map((terms, inde
     reviewRange: `第${index * 3 + 1}～${index * 3 + 3}課`,
   };
 });
-export const builtinCatalog: CatalogLesson[] = builtinLessons.flatMap((lesson, index) =>
-  (index + 1) % 3 === 0 ? [lesson, builtinReviews[Math.floor(index / 3)]] : [lesson],
-);
+// Each review follows the third lesson it covers; lessons without a review just follow on.
+export const builtinCatalog: CatalogLesson[] = builtinLessons.flatMap((lesson, position) => {
+  const review = (position + 1) % 3 === 0 ? builtinReviews[(position + 1) / 3 - 1] : undefined;
+  return review ? [lesson, review] : [lesson];
+});
 export const validSyllable = (text: string) => /^(?:˙[ㄅ-ㄩ]{1,3}|[ㄅ-ㄩ]{1,3}[ˊˇˋ]?)$/.test(text);
 export function validateTerms(raw: unknown): CircledTerm[] {
   if (!Array.isArray(raw) || raw.length < 1 || raw.length > 100)
@@ -174,7 +177,7 @@ export function validateMaterials(raw: unknown): MaterialsState {
       ...(item.archived === true ? { archived: true } : {}),
       lessons: item.lessons.map((lesson) => {
         if (!lesson || typeof lesson !== "object") throw new Error("課次格式不正確。");
-        if (!Number.isSafeInteger(lesson.index) || lesson.index < 9 || indexes.has(lesson.index))
+        if (!isCustomLessonIndex(lesson.index) || indexes.has(lesson.index))
           throw new Error("課次編號格式不正確。");
         indexes.add(lesson.index);
         const title = shortText(lesson.title);
@@ -184,7 +187,7 @@ export function validateMaterials(raw: unknown): MaterialsState {
           title,
           terms: validateTerms(lesson.terms),
           ...(lesson.archived === true ? { archived: true } : {}),
-          ...(Number.isSafeInteger(lesson.revisionOf) && (lesson.revisionOf ?? 0) >= 9
+          ...(isCustomLessonIndex(lesson.revisionOf ?? -1)
             ? { revisionOf: lesson.revisionOf }
             : {}),
         };
@@ -198,8 +201,8 @@ export function validateMaterials(raw: unknown): MaterialsState {
       ? value.activeId
       : builtinMaterialId,
     nextIndex: Math.max(
-      9,
-      Number.isSafeInteger(value.nextIndex) ? value.nextIndex : 9,
+      firstCustomLessonIndex,
+      isCustomLessonIndex(value.nextIndex) ? value.nextIndex : firstCustomLessonIndex,
       ...[...indexes].map((index) => index + 1),
     ),
   };

@@ -121,19 +121,6 @@
   padding-top: clamp(14px, 3vh, 28px);
 }
 
-.fill-focus-intro {
-  align-items: flex-start;
-}
-
-.listen-audio-note {
-  display: block;
-  margin: -7px 0 1px;
-  color: #527693;
-  font-size: 12px;
-  font-weight: 750;
-  line-height: 1.45;
-}
-
 .review-save {
   display: inline-flex;
   align-items: center;
@@ -145,19 +132,4 @@
 
 .review-save.is-saved svg {
   color: #e9a92f;
-}
-
-.saved-question-actions .saved-remove {
-  color: #a56f0b;
-  border-color: #f0d27f;
-  background: #fff9e7;
-}
-
-.saved-question-actions .saved-remove svg {
-  color: #e8aa2c;
-}
-
-.saved-question-actions .saved-remove:hover {
-  border-color: #e5b448;
-  background: #fff3c9;
 }

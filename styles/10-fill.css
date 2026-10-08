@@ -1,36 +1,5 @@
 /* Dictation: the selected watercolor practice-notebook direction. */
 
-.fill-line-progress {
-  display: grid;
-  grid-template-columns: repeat(var(--line-progress-columns), minmax(0, 1fr));
-  gap: 6px;
-  margin-block: 12px;
-}
-
-.fill-line-progress button {
-  display: grid;
-  justify-items: center;
-  gap: 3px;
-  min-height: 52px;
-  padding: 7px 4px;
-  border: 1px solid #d0e4ee;
-  border-radius: 12px;
-  background: #f3f9ff;
-  color: #28597f;
-  font-size: 14px;
-  font-weight: 750;
-}
-
-.fill-line-progress button small {
-  direction: ltr;
-  font-size: 12px;
-}
-.fill-line-progress button.is-complete {
-  border-color: #a1d0b9;
-  background: #edf8f0;
-  color: #347c59;
-}
-
 .app-shell.is-fill {
   overflow: clip;
   background: #f6fbff;
@@ -90,62 +59,6 @@
   padding: 0;
 }
 
-.fill-story-heading {
-  position: relative;
-  display: flex;
-  min-height: 146px;
-  align-items: end;
-  margin: 0 -14px;
-  padding: 18px 20px 12px;
-  overflow: hidden;
-  background: url("/course-art/lesson-watercolor-paper.webp") center 35% / cover no-repeat;
-}
-
-.fill-story-copy {
-  position: relative;
-  z-index: 1;
-  width: min(70%, 340px);
-}
-
-.fill-story-kicker {
-  color: #5276a3;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-}
-
-.fill-story-heading h1 {
-  width: fit-content;
-  margin: 8px 0 7px;
-  color: var(--ref-navy);
-  font-size: clamp(33px, 9vw, 42px);
-  font-weight: 900;
-  line-height: 1.13;
-  letter-spacing: 0.04em;
-  box-shadow: inset 0 -7px #ffe7a3;
-}
-
-.fill-story-heading .fill-sheet-help {
-  max-width: 320px;
-  margin: 0;
-  color: #607897;
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 1.5;
-}
-
-.fill-story-art {
-  position: absolute;
-  right: 9px;
-  bottom: -5px;
-  width: clamp(105px, 34vw, 150px);
-  height: auto;
-  max-height: 140px;
-  object-fit: contain;
-  object-position: bottom right;
-  pointer-events: none;
-}
-
 .fill-status-line {
   display: flex;
   min-height: 50px;
@@ -176,9 +89,7 @@
 .is-fill .zhuyin-sheet {
   position: relative;
   isolation: isolate;
-  min-height: 410px;
   padding: 14px 11px 112px;
-  overflow: hidden;
   border: 1px solid #e4ebe8;
   border-radius: 22px;
   background:
@@ -322,13 +233,6 @@
 }
 
 @media (max-width: 350px) {
-  .fill-story-copy {
-    width: 72%;
-  }
-  .fill-story-art {
-    right: -18px;
-    width: 112px;
-  }
   .is-fill .zhuyin-sheet {
     padding-inline: 7px;
   }
@@ -373,27 +277,4 @@
 
 .is-fill .fill-sheet-art {
   z-index: 2;
-  right: -10px;
-  bottom: -56px;
-  width: 137px;
-  height: 137px;
-}
-
-.is-fill .fill-page > .fill-begin-button,
-.is-fill .fill-check-actions {
-  margin-top: 66px;
-}
-
-.fill-page .fill-story-heading {
-  min-height: 92px;
-  padding-block: 12px;
-}
-.fill-page .fill-story-heading h1.fill-story-kicker {
-  margin: 0 0 6px;
-  font-size: 20px;
-  line-height: 1.3;
-  box-shadow: none;
-}
-.fill-page .fill-story-art {
-  max-height: 96px;
 }

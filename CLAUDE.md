@@ -49,49 +49,77 @@ There is one build: a static Vite SPA. `index.html` → `app/main.tsx` → `crea
 
 ## Architecture
 
-**There are no routes; this is a single-page state machine.** The entry renders only `<PracticeApp />`. The screen is selected by the `View` union in `features/types.ts`. `features/usePracticeApp.ts` is the cross-feature coordinator and keeps a legacy controller interface for components. Each flow owns its own state:
+**There are no routes; this is a single-page state machine.** The entry renders only `<PracticeApp />`. The screen is selected by the `View` union in `features/types.ts`.
 
-- `useFillSession`: handwriting dictation (默寫)
-- `useListeningSession`, `useListeningRound`, `useListeningPlayback`: listening dictation (聽寫), covering full-round drafting, batch review, replay, and timers
-- `useNavigationSession`: navigation, leave guards, focus, and scroll
+- `features/usePracticeApp.ts` is a thin coordinator. It owns the view and lesson, the shared stores, audio, and the course-review queue. It spreads each flow's API into one flat controller object, which components read through `Pick<AppController, …>`.
+- **Each flow owns its own state and actions:**
+  - `features/listening/useListeningFlow.ts`: listening dictation (聽寫). It composes `useListeningCanvas`, `useListeningPlayback` and `useListeningRound`. A whole-lesson round is untimed and checked at once (`ready → active → batch_review → result`). Single-question practice of a saved question is timed and checked one at a time (`review`, then `remediation_offer → choice → retry_ready → retry`). The parent-decision and remediation actions only exist for single-question practice.
+  - `features/fill/useFillFlow.ts`: handwriting dictation (默寫), whole lesson and single-cell practice. It composes `useFillSession`, `useFillCanvas`, `useFillDraft` and `useFillProgress`.
+  - `fillLayout(lesson)` maps the title column (shown rightmost) to stored cell order.
+- Flows receive `clearNotices`, `continueReview` and `stopReview` from the coordinator instead of reaching into each other.
+- `PracticeList`, `SettingsScreen`, `SymbolChart`, and their heavy sub-panels are `React.lazy` chunks. Keep them out of the initial bundle.
+- One `<audio>` element is mounted at the app root for every screen, so iOS keeps the playback a tap unlocked.
+- Confirmation modals use `components/ConfirmDialog`. Panels put a back button in the header with `HeaderBack`, which renders into the `HeaderBackSlot` context.
 
-`PracticeList`, `SettingsScreen`, `SymbolChart`, and their heavy sub-panels are `React.lazy` chunks. Keep them out of the initial bundle.
-
-Layout: `features/<feature>/` holds feature UI and logic, `components/` holds shared UI (`PageHeading`, `ShowMsg`, `ReviewActions`, `Zhuyin`, `InkTools`), and `lib/` holds infrastructure (ink, audio, storage, loading).
+Layout: `features/<feature>/` holds feature UI and logic, `components/` holds shared UI (`PageHeading`, `ShowMsg`, `ReviewActions`, `Zhuyin`, `InkTools`, `ConfirmDialog`), and `lib/` holds infrastructure (ink, audio, storage, loading).
 
 ### Content and identity
 
-- Lesson text and teacher-circled vocabulary live in `features/courses/course-data.ts` and `circled-vocabulary.ts`. When you edit them, re-verify the zhuyin, IVS glyphs, and audio.
+- Live lesson text and teacher-circled vocabulary live in `features/courses/course-data.ts` and `circled-vocabulary.ts`. When you edit them, re-verify the zhuyin, IVS glyphs, and audio, then run `npm run assets:audio-registry`.
+- `features/courses/legacy-content.ts` is frozen. It holds the first question bank, removed word questions, v1 question indexes and old circled vocabulary, kept only so old saved records resolve. New rounds never draw from it. Add to it; never edit it.
 - Question IDs have the form `類別:朗讀文字`.
 - Review 1, 2, and 3 cover lessons 1–3, 4–6, and 7–9, and are listening-only.
+- **Lesson indexes are permanent identities** (`features/courses/lesson-identity.ts`):
+  - built-in lessons 0–8;
+  - reviews use negative indexes;
+  - custom lessons start at 9 and only grow;
+  - a 10th or later built-in lesson uses `builtinLessonIndex(position)`, which is ≥ 1,000,000.
+  - Use `isCustomLessonIndex`; never compare against 9.
+  - A unit test fails if a built-in lesson is missing its readings, vocabulary, artwork or numeral.
 - Renaming, reordering, or archiving a material keeps its identity. Editing its content creates a new index and archives the old version, so old ink never attaches to new answers.
 
 ### Persistence
 
-- All user data lives in browser `localStorage` behind `lib/storage/persistent-store.ts` (an external store read with `useSyncExternalStore`, not mirrored into React state). Keys are versioned `zhuyin-*`, except the free board's `kid-free-dictation-v1`. Old versions (for example `practice-state` v1–v3) are migrated forward with their original keys preserved.
+- All user data lives in browser `localStorage` behind `lib/storage/persistent-store.ts` (an external store read with `useSyncExternalStore`, not mirrored into React state). Older versions (for example `practice-state` v1–v3) are migrated forward on read, and their original keys are preserved.
+- **Every key is listed in `lib/storage/storage-keys.ts`**, the single registry that device backup (`ownsStorageKey`) is derived from. A new key must be added there, or backup will silently skip it; a unit test checks the known keys.
+- GitHub Pages gives all of the owner's sites one origin, so never read or clear keys you don't own. The localStorage quota is shared too.
+- Read paths are lenient: they migrate old shapes, and a corrected built-in reading moves a fill favorite to the new zhuyin rather than dropping it.
+- Device backup restores the saved text exactly; validators only describe the file in the preview, including a count of values this version cannot read. Restore rejects only unknown keys, non-string or oversized values, and invalid recordings. Its UI makes downloading the current data a separate step before restore reloads the page.
 - Only stores created with `protectUnreadData` (currently materials) refuse to overwrite a value they failed to read; the others overwrite it on the next write. On write failure the store keeps the in-memory state and shows a notice.
-- **Full device backup (`lib/storage/device-backup.ts`) only exports and restores keys matched by the `ownsStorageKey` allowlist regex.** Any new storage key must be added there and validated, or it will be silently left out of backups.
-- Custom recordings live in IndexedDB (`zhuyin-custom-audio-v1`), stored as raw ArrayBuffer bytes rather than Blobs to work around a WebKit Blob-storage bug. Their identity is the full text plus zhuyin, including tones and `|` syllable separators.
-- An unfinished listening round lives in memory only. Fill drafts persist.
+- Custom recordings live in IndexedDB (`zhuyin-custom-audio-v1`), stored as raw ArrayBuffer bytes rather than Blobs to work around a WebKit Blob-storage bug.
+  - Their identity is the full text plus zhuyin, including tones and `|` syllable separators.
+  - Playback only reads the keys (`getAllKeys`); the full list loads when the recording manager opens.
+  - Trimmed takes are re-encoded as 22.05 kHz mono WAV.
+- An unfinished listening round lives in memory only. Fill drafts persist, with one write per change through `useFillDraft`'s effect.
 
-### Ink
+### Ink (tuned for a capacitive stylus on a tablet)
 
-- Fill and listening canvases share `lib/ink/useInkCanvas` and store paths in 0–100 coordinates.
-- The free board stores CSS-pixel coordinates on a fixed 138px/14px grid.
+- Fill and listening canvases share `lib/ink/useInkCanvas` and store paths in 0–100 coordinates rounded to 0.01.
+- The free board stores CSS-pixel coordinates rounded to 0.1 on a fixed 138px/14px grid.
 - Only one pointer draws at a time (`PointerLease`). A second touch must not continue the first stroke.
+- A capacitive stylus reports `pointerType: "touch"`, so `isPalmContact` (in `lib/ink/gesture.ts`) judges a resting hand by contact size alone. The exact rule and threshold are documented there; they are untuned on the real tablet. Devices that report 1 × 1 are never rejected.
+  - A palm-sized touch never starts a stroke.
+  - A stroke whose contact spreads to palm size is dropped.
+- `pointerSamples` feeds every coalesced pointer event into the stroke.
 - Long strokes are capped at about 1900 samples, and redraws are batched per animation frame.
+- The free board draws only new segments while writing, repaints fully when a stroke ends, and writes localStorage 600 ms after the last stroke and on `pagehide`/hidden.
+- An interruption (blur, hidden, rotation, lock) keeps the stroke in progress, but never completes an eraser lasso.
 
 ### Audio
 
-- The 37 basic symbols use Ministry of Education recordings at normal speed.
-- The 22 combined rhymes and lesson readings use static Gemini audio. Most other characters and words use older synthesized files.
+- The 37 basic symbols use Ministry of Education recordings at normal speed. The 22 combined rhymes and lesson readings use static Gemini audio. Most other characters and words use older synthesized files.
+- Reference audio with page-relative URLs (see Build and deploy).
 - Never borrow audio recorded with a different tone for a known reading.
-- A failed custom recording must not fall back to synthesized speech.
-- Preloading is cancellable: at most 2 concurrent requests, each with an 8 s timeout.
+- A custom recording that is known to exist but fails to load is an error and must not fall back to another voice. If the recording database cannot be opened at all, lookups resolve to "none" (retried after 30 s), so official clips keep playing.
+- Callers that pass `onError` to `speak` show their own message; no page-wide notice is added.
+- Preloading is cancellable: at most 2 concurrent requests, each with an 8 s timeout. The symbol chart warms only the buttons it shows.
 
 ### Styles
 
-`app/globals.css` imports `styles/00-…css` through `styles/23-…css` in a fixed cascade order. `00-reset.css` is the former Tailwind preflight, kept in cascade layers so every unlayered rule wins; there is no Tailwind and no utility classes. Order matters. Put new rules in the matching feature file. Shared fonts, size tokens, and tap-target sizes live in `00-foundation.css`. Don't add a parallel font system or override root styles ad hoc.
+- `app/globals.css` imports `styles/00-…css` through `styles/23-…css` in a fixed cascade order. Order matters.
+- `00-reset.css` is the former Tailwind preflight, kept in cascade layers so every unlayered rule wins. There is no Tailwind and there are no utility classes.
+- `styles/lazy/` holds feature CSS loaded by the feature's `lazy()` import, after every eager stylesheet. Keep only selectors scoped to that feature there.
+- Put new rules in the matching feature file. Shared fonts, size tokens, and tap-target sizes live in `00-foundation.css`. Don't add a parallel font system or override root styles ad hoc.
 
 ## Verification conventions
 
