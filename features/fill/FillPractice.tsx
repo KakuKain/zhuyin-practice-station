@@ -13,6 +13,7 @@ export function FillPractice({
   app: Pick<
     AppController,
     | "deferFillPractice"
+    | "leaveFillPractice"
     | "beginFillDrawing"
     | "clearFillDrawing"
     | "fillEraserActive"
@@ -24,7 +25,6 @@ export function FillPractice({
     | "fillCanvasRef"
     | "fillDraftRef"
     | "fillHasInk"
-    | "fillIsDirty"
     | "fillPracticeExitOpen"
     | "fillPracticePhase"
     | "fillPracticeStrokes"
@@ -55,7 +55,7 @@ export function FillPractice({
     fillCanvasRef,
     fillDraftRef,
     fillHasInk,
-    fillIsDirty,
+    leaveFillPractice,
     fillPracticeExitOpen,
     fillPracticePhase,
     fillPracticeStrokes,
@@ -85,13 +85,7 @@ export function FillPractice({
         lessonIndex={favorite.lessonIndex}
         stage={`單題重練 · ${fillPracticePhase === "writing" ? "課文默寫" : "家長檢查"}`}
         progress={location}
-        onBack={() => {
-          if (fillPracticePhase === "writing" && fillIsDirty) {
-            setFillPracticeExitOpen(true);
-            return;
-          }
-          setView("practice");
-        }}
+        onBack={leaveFillPractice}
       />
       {fillPracticePhase === "writing" ? (
         <div className="fill-focus-body">

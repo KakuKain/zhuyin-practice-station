@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 A login-free Zhuyin (注音) practice site for Taiwanese first graders and their parents: lessons 1–9 plus three review sets, a symbol chart, handwriting dictation, listening dictation, and sound discrimination. UI copy and all docs are in Traditional Chinese (zh-Hant). `docs/architecture.md` is the detailed reference for feature boundaries and invariants. Read it before changing state, storage, audio, or ink behavior.
 
-Hard product constraints: no login, no DB, no cloud sync, no PWA, no runtime AI or speech API calls, and no changes to the teacher-defined lesson scope.
+Hard product constraints: no login, no DB, no cloud sync, no service worker or offline cache, no runtime AI or speech API calls, and no changes to the teacher-defined lesson scope. A web app manifest so the site can be added to the home screen (full screen, portrait-locked, no browser UI) is fine.
 
 ## Commands
 
@@ -37,6 +37,8 @@ Asset pipelines:
 
 - After adding or replacing any audio file, run `npm run assets:audio-registry`. It rewrites `public/listening-audio/registry.json` and `lib/audio/audio-index.json` with hashes, durations, and cache-busting URLs.
 - `npm run assets:artwork` generates lossless WebP files in `public/course-art/` from the PNG originals in `assets/artwork/`; `npm run assets:progressive` regenerates the blur-up previews in `components/artwork-previews.json`.
+- New words in `circled-vocabulary.ts` need clips: `node scripts/generate-listening-audio.mjs` (macOS, Meijia voice) creates missing ones, then run `npm run assets:audio-registry`. A word must have a single reading across all content, or no clip can serve it.
+- `node scripts/build-app-icons.mjs` regenerates the home-screen icons in `public/icons/` from `public/favicon.svg`.
 - `python3 scripts/build-yo-fonts.py` rebuilds the lesson font subsets after you add characters or IVS glyphs. `scripts/build-fonts.py` rebuilds the full fonts. Both need fontTools and brotli.
 
 ## Build and deploy
@@ -59,13 +61,15 @@ There is one build: a static Vite SPA. `index.html` → `app/main.tsx` → `crea
 - Flows receive `clearNotices`, `continueReview` and `stopReview` from the coordinator instead of reaching into each other.
 - `PracticeList`, `SettingsScreen`, `SymbolChart`, and their heavy sub-panels are `React.lazy` chunks. Keep them out of the initial bundle.
 - One `<audio>` element is mounted at the app root for every screen, so iOS keeps the playback a tap unlocked.
+- The system back gesture stays inside the app (`features/navigation/useBackGesture.ts`): one history guard entry absorbs each back and runs `goBack` in `usePracticeApp`, the same step as each screen's back button. On the home screen an installed app stays open; a browser tab leaves as usual.
+- Pull-to-refresh is off (`overscroll-behavior-y: none` on the root).
 - Confirmation modals use `components/ConfirmDialog`. Panels put a back button in the header with `HeaderBack`, which renders into the `HeaderBackSlot` context.
 
 Layout: `features/<feature>/` holds feature UI and logic, `components/` holds shared UI (`PageHeading`, `ShowMsg`, `ReviewActions`, `Zhuyin`, `InkTools`, `ConfirmDialog`), and `lib/` holds infrastructure (ink, audio, storage, loading).
 
 ### Content and identity
 
-- Live lesson text and teacher-circled vocabulary live in `features/courses/course-data.ts` and `circled-vocabulary.ts`. When you edit them, re-verify the zhuyin, IVS glyphs, and audio, then run `npm run assets:audio-registry`.
+- Live lesson text and teacher-circled vocabulary live in `features/courses/course-data.ts` and `circled-vocabulary.ts`. Each circled item is one word, never a sentence: sentences the parent typed were only the source for those words (readings sliced from the sentence), and the sentences themselves moved to `legacy-content.ts` (`legacyCircledVocabulary`, `legacyReviewVocabulary`) so old saved questions resolve. When you edit them, re-verify the zhuyin, IVS glyphs, and audio, then run `npm run assets:audio-registry`.
 - `features/courses/legacy-content.ts` is frozen. It holds the first question bank, removed word questions, v1 question indexes and old circled vocabulary, kept only so old saved records resolve. New rounds never draw from it. Add to it; never edit it.
 - Question IDs have the form `類別:朗讀文字`.
 - Review 1, 2, and 3 cover lessons 1–3, 4–6, and 7–9, and are listening-only.
@@ -90,7 +94,10 @@ Layout: `features/<feature>/` holds feature UI and logic, `components/` holds sh
   - Their identity is the full text plus zhuyin, including tones and `|` syllable separators.
   - Playback only reads the keys (`getAllKeys`); the full list loads when the recording manager opens.
   - Trimmed takes are re-encoded as 22.05 kHz mono WAV.
-- An unfinished listening round lives in memory only. Fill drafts persist, with one write per change through `useFillDraft`'s effect.
+- A whole-lesson listening round is saved as it goes in `zhuyin-listening-round-v1` (`features/listening/listening-round-storage.ts`): question order, position, every answer and batch-review marks, one round at a time.
+  - Within 12 h of saving, start-up reopens it directly with a 繼續聽寫 / 重新開始 prompt; older rounds prompt when that lesson's listening opens.
+  - Finishing the check, 結束本輪 or 重新開始 clears it. Single-question practice is not saved.
+- Fill drafts persist, with one write per change through `useFillDraft`'s effect.
 
 ### Ink (tuned for a capacitive stylus on a tablet)
 
@@ -122,6 +129,7 @@ Layout: `features/<feature>/` holds feature UI and logic, `components/` holds sh
 
 - `app/globals.css` imports `styles/00-…css` through `styles/23-…css` in a fixed cascade order. Order matters.
 - `00-reset.css` is the former Tailwind preflight, kept in cascade layers so every unlayered rule wins. There is no Tailwind and there are no utility classes.
+- `24-fill-tablet.css` makes dictation (sheet, writing cell, review) full width at ≥ 600px: the square grows to the space left by the header and controls, and landscape tablets put the heading and finish button beside it. Phones keep the 480px column.
 - `styles/lazy/` holds feature CSS loaded by the feature's `lazy()` import, after every eager stylesheet. Keep only selectors scoped to that feature there.
 - Put new rules in the matching feature file. Shared fonts, size tokens, and tap-target sizes live in `00-foundation.css`. Don't add a parallel font system or override root styles ad hoc.
 

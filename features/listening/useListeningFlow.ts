@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import type { CatalogLesson } from "../courses/materials";
 import type {
   InkStroke,
@@ -24,6 +24,12 @@ import { useListeningPlayback } from "./useListeningPlayback";
 import { useListeningRound } from "./useListeningRound";
 import type { useListeningSession } from "./useListeningSession";
 import type { useListeningTimers } from "./useListeningTimers";
+import {
+  clearListeningRound,
+  readListeningRound,
+  writeListeningRound,
+  type SavedListeningRound,
+} from "./listening-round-storage";
 
 type Options = {
   view: View;
@@ -55,6 +61,8 @@ type Options = {
   /** Called when a single-question practice ends inside a course review queue. */
   continueReview: () => void;
   stopReview: () => void;
+  /** A round saved before a reload, reopened on start-up with a resume prompt. */
+  startupRound?: SavedListeningRound | null;
 };
 
 /**
@@ -63,6 +71,9 @@ type Options = {
  * batch_review → result). Single-question practice from saved questions is timed and checked
  * one at a time (ready → active → review, then remediation_offer → choice → retry_ready →
  * retry → review when it needs work).
+ *
+ * A whole-lesson round is saved as it goes (question order, position, every answer), so a
+ * reload, a discarded tab or a closed app can carry on instead of starting over.
  */
 export function useListeningFlow({
   view,
@@ -88,6 +99,7 @@ export function useListeningFlow({
   clearNotices,
   continueReview,
   stopReview,
+  startupRound = null,
 }: Options) {
   const {
     listenIndex,
@@ -149,6 +161,7 @@ export function useListeningFlow({
     wordLength,
     readDraft: (questionIndex, cellIndex) =>
       listeningDraftsRef.current[questionIndex]?.[cellIndex] ?? [],
+    onInkChange: () => saveRound(),
   });
 
   const hasCompleteInk = isWordQuestion
@@ -245,6 +258,8 @@ export function useListeningFlow({
   const prepareListening = (lessonIndex: number) => {
     showLoading("正在準備聽寫…");
     startSession(buildListeningSession(lessonIndex, catalog), false);
+    const saved = readListeningRound();
+    setResumeRound(saved?.lessonIndex === lessonIndex ? saved : null);
   };
 
   const openListening = () => prepareListening(selectedLesson);
@@ -260,6 +275,8 @@ export function useListeningFlow({
   };
 
   const confirmLeaveFocus = () => {
+    // 結束本輪 discards a round in progress; leaving from the resume prompt keeps it.
+    if (!singleQuestionPractice && !resumeRound) clearListeningRound();
     stopReview();
     clearListenTimers();
     stopPlayback();
@@ -276,6 +293,57 @@ export function useListeningFlow({
       return;
     }
     confirmLeaveFocus();
+  };
+
+  // A saved round waiting for 繼續聽寫 / 重新開始; nothing is saved over it until then.
+  const [resumeRound, setResumeRound] = useState<SavedListeningRound | null>(startupRound);
+  function saveRound() {
+    if (view !== "listen" || singleQuestionPractice || resumeRound) return;
+    if (listenPhase !== "active" && listenPhase !== "batch_review") return;
+    writeListeningRound({
+      version: 1,
+      lessonIndex: selectedLesson,
+      savedAt: Date.now(),
+      questions: listeningQuestions,
+      index: listenIndex,
+      phase: listenPhase,
+      // The current question's ink is only copied into the drafts when moving on.
+      drafts:
+        listenPhase === "active"
+          ? { ...listeningDraftsRef.current, [listenIndex]: readListeningInk() }
+          : listeningDraftsRef.current,
+      batchNeedsReview,
+    });
+  }
+  const saveRoundEvent = useEffectEvent(() => {
+    if (view === "result" && !singleQuestionPractice) clearListeningRound();
+    else saveRound();
+  });
+  useEffect(() => {
+    saveRoundEvent();
+  }, [view, listenPhase, listenIndex, listeningDrafts, batchNeedsReview, listeningQuestions]);
+
+  const continueSavedRound = () => {
+    const round = resumeRound;
+    if (!round) return;
+    setResumeRound(null);
+    listeningDraftsRef.current = round.drafts;
+    setListeningDrafts(round.drafts);
+    setSessionQuestions(round.questions);
+    setBatchNeedsReview(round.batchNeedsReview);
+    setListenIndex(round.index);
+    if (round.phase === "batch_review") {
+      setListenPhase("batch_review");
+      return;
+    }
+    setListenPhase("active");
+    resumeListening();
+    const question = round.questions[round.index];
+    speak(question.audioText, { pronunciation: question.answer });
+  };
+  const discardSavedRound = () => {
+    clearListeningRound();
+    setResumeRound(null);
   };
 
   const toggleCurrentQuestionSaved = () => {
@@ -374,6 +442,9 @@ export function useListeningFlow({
     replayQuestion,
     prepareListening,
     openListening,
+    resumeRound,
+    continueSavedRound,
+    discardSavedRound,
     openSavedQuestion,
     leaveFocus,
     confirmLeaveFocus,

@@ -10,6 +10,8 @@ type Options = {
   isWordQuestion: boolean;
   wordLength: number;
   readDraft?: (questionIndex: number, cellIndex: number) => InkStroke[];
+  /** Every committed change of the current question's ink. */
+  onInkChange?: () => void;
 };
 
 export function useListeningCanvas({
@@ -20,6 +22,7 @@ export function useListeningCanvas({
   isWordQuestion,
   wordLength,
   readDraft,
+  onInkChange,
 }: Options) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wordCanvasRefs = useRef<(HTMLCanvasElement | null)[]>([]);
@@ -30,6 +33,7 @@ export function useListeningCanvas({
     count: isWordQuestion ? wordLength : 1,
     readInitial: (index) => readDraft?.(listenIndex, index) ?? [],
     getCanvas: (index) => (isWordQuestion ? wordCanvasRefs.current[index] : canvasRef.current),
+    onChange: () => onInkChange?.(),
   });
   return {
     readListeningInk: editor.snapshot,

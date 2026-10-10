@@ -213,6 +213,15 @@ export function useFillFlow({
     setView("fill-practice");
   };
 
+  /** Back from single-cell practice: unsaved ink asks first. */
+  const leaveFillPractice = () => {
+    if (session.fillPracticePhase === "writing" && canvas.fillIsDirty) {
+      session.setFillPracticeExitOpen(true);
+      return;
+    }
+    setView("practice");
+  };
+
   const deferFillPractice = () => {
     setPracticeNotice("已保留這題，下次可以再練。");
     setView("practice");
@@ -247,6 +256,7 @@ export function useFillFlow({
     openFillReview,
     rewriteFillCell,
     openFillFavorite,
+    leaveFillPractice,
     deferFillPractice,
     removeFillFavorite,
     markFillFavoritePracticed,

@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { courseReviewQueue, type CourseReviewItem } from "./practice/course-review";
 import { usePersistentState } from "../lib/storage/usePersistentState";
 import { useAudioPlayer } from "../lib/audio/useAudioPlayer";
@@ -9,6 +9,7 @@ import { usePagePosition } from "./navigation/usePagePosition";
 import { useDialogKeyboard } from "./navigation/useDialogKeyboard";
 import { useNavigationSession } from "./navigation/useNavigationSession";
 import { usePracticeNavigation } from "./navigation/practice-navigation";
+import { useBackGesture } from "./navigation/useBackGesture";
 import { usePracticeCollection } from "./practice/usePracticeCollection";
 import { useFillCollection } from "./practice/useFillCollection";
 import { useLessonPreview } from "./lesson/useLessonPreview";
@@ -16,6 +17,7 @@ import { useMaterials } from "./courses/useMaterials";
 import { useListeningSession } from "./listening/useListeningSession";
 import { useListeningTimers } from "./listening/useListeningTimers";
 import { useListeningFlow } from "./listening/useListeningFlow";
+import { startupListeningRound } from "./listening/listening-round-storage";
 import {
   defaultListeningSettings,
   findQuestionSeed,
@@ -32,8 +34,12 @@ import { useFillFlow } from "./fill/useFillFlow";
 export function usePracticeApp() {
   const materials = useMaterials();
   const { catalog } = materials;
+  // After a reload (or a discarded tab) an unfinished listening round reopens right away.
+  const [startupRound] = useState(startupListeningRound);
   const { view, setView, selectedLesson, setSelectedLesson, morePanel, setMorePanel } =
-    useNavigationSession();
+    useNavigationSession(
+      startupRound ? { view: "listen", lesson: startupRound.lessonIndex } : undefined,
+    );
   const { loadingMessage, resourceError, showLoading } = usePageResources(view);
 
   const lesson = catalog.find((item) => item.index === selectedLesson) ?? catalog[0];
@@ -70,7 +76,7 @@ export function usePracticeApp() {
   };
   const continueReview = () => advanceReviewQueue();
 
-  const listeningSession = useListeningSession();
+  const listeningSession = useListeningSession(startupRound?.questions);
   const timers = useListeningTimers();
   const customAudio = useCustomRecordings();
   const audio = useAudioPlayer({
@@ -107,6 +113,7 @@ export function usePracticeApp() {
     clearNotices,
     continueReview,
     stopReview,
+    startupRound,
   });
 
   const fill = useFillFlow({
@@ -178,6 +185,30 @@ export function usePracticeApp() {
     showLoading,
     clearListenTimers: timers.clearListenTimers,
   });
+
+  /** The same step back as each screen's back button, used by the system back gesture. */
+  const goBack = () => {
+    if (fill.fillExitTarget) return fill.setFillExitTarget(null);
+    if (listening.listenExitOpen) return listening.setListenExitOpen(false);
+    if (fill.fillPracticeExitOpen) return fill.setFillPracticeExitOpen(false);
+    switch (view) {
+      case "listen":
+        return listening.leaveFocus();
+      case "fill":
+        if (fill.activeFillCell !== null) return fill.leaveFillCell();
+        if (fill.fillReviewOpen) return fill.setFillReviewOpen(false);
+        return navigate("lesson");
+      case "fill-practice":
+        return fill.leaveFillPractice();
+      case "result":
+        return navigate(lesson.listeningOnly ? "courses" : "lesson");
+      case "more":
+        return morePanel === "home" ? navigate("courses") : setMorePanel("home");
+      default:
+        return navigate("courses");
+    }
+  };
+  useBackGesture(view === "courses", goBack);
 
   usePagePosition(
     view,

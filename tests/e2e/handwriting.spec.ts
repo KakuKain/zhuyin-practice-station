@@ -347,8 +347,15 @@ test("a pointer without capture cannot extend its stroke using another word cell
     ],
     "throw",
   );
-  await expect.poll(async () => (await pixels(first)).count).toBeGreaterThan(100);
+  // The move is painted on the next animation frame; capture after it, not just the dot.
+  await first.evaluate(
+    () =>
+      new Promise<void>((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+      ),
+  );
   const acceptedInk = await pixels(first);
+  expect(acceptedInk.count).toBeGreaterThan(100);
   // Without capture the same physical contact can dispatch on a different canvas.
   await touch(second, [
     { type: "pointermove", id: 1, x: 80, y: 80 },

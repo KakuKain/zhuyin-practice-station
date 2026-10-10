@@ -1,0 +1,107 @@
+/*
+ * 默寫滿版：on tablets (the main device, written on with a capacitive stylus) the dictation
+ * sheet, the writing cell and the parent review use the whole screen instead of the
+ * 480px phone column. Phones keep the layout above.
+ */
+@media (min-width: 600px) {
+  /* Dictation sheet. */
+  .app-shell.is-fill,
+  .app-shell.is-fill .bottom-nav {
+    width: 100%;
+    max-width: none;
+  }
+
+  .fill-page .syllable-row.has-many-lines {
+    grid-auto-columns: minmax(64px, 1fr);
+  }
+
+  /* Bigger cells, but short enough that a landscape sheet still shows its start button. */
+  .fill-page .fill-cell {
+    max-width: min(120px, 11dvh);
+    margin-inline: auto;
+  }
+
+  /*
+   * Writing cell. The square takes what the screen leaves after the header, heading,
+   * tools and the finish button (about 380px tall), so the button never needs a scroll.
+   */
+  .fill-focus-shell {
+    --fill-square: max(280px, min(100vw - 64px, 100dvh - 380px));
+    width: 100%;
+  }
+
+  .fill-focus-shell .fill-writing-grid {
+    width: var(--fill-square);
+  }
+
+  .fill-focus-shell
+    :is(
+      .fill-writing-intro,
+      .fill-writing-workspace,
+      .fill-canvas-tools,
+      .fill-writing-actions,
+      .fill-practice-prompt,
+      .ink-status,
+      .ink-notice
+    ) {
+    width: 100%;
+    max-width: calc(var(--fill-square) + 26px);
+    margin-inline: auto;
+  }
+
+  .fill-review-body {
+    max-width: min(100%, 960px);
+  }
+}
+
+/* Landscape tablets: heading and the finish button beside a square as tall as the screen. */
+@media (min-width: 900px) and (orientation: landscape) {
+  .fill-focus-shell {
+    --fill-square: max(280px, min(100vw - 440px, 100dvh - 212px));
+  }
+
+  .fill-focus-shell .fill-focus-body {
+    display: grid;
+    grid-template-columns: minmax(240px, 320px) auto;
+    grid-template-rows: auto auto auto 1fr;
+    align-content: start;
+    justify-content: center;
+    column-gap: 28px;
+  }
+
+  .fill-focus-shell .fill-focus-body > * {
+    grid-column: 1;
+  }
+
+  .fill-focus-shell
+    :is(
+      .fill-writing-intro,
+      .fill-practice-prompt,
+      .ink-status,
+      .ink-notice,
+      .fill-writing-actions
+    ) {
+    max-width: none;
+    margin-inline: 0;
+  }
+
+  /* Whole-lesson writing: the workspace card holds location, tools and the square. */
+  .fill-focus-shell .fill-focus-body > .fill-writing-workspace {
+    grid-column: 2;
+    grid-row: 1 / -1;
+    margin: 0;
+  }
+
+  /* Single-cell practice: tools above the square in the right column. */
+  .fill-focus-shell .fill-focus-body > .fill-canvas-tools {
+    grid-column: 2;
+    grid-row: 1;
+    margin: 0 0 6px;
+  }
+
+  .fill-focus-shell .fill-focus-body > .fill-writing-grid {
+    grid-column: 2;
+    grid-row: 2 / -1;
+    align-self: start;
+  }
+}

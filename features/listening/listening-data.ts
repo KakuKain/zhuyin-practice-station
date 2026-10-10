@@ -4,6 +4,7 @@ import {
   extraWordQuestions,
   firstListeningQuestions,
   legacyCircledVocabulary,
+  legacyReviewVocabulary,
 } from "../courses/legacy-content";
 import type { CircledTerm } from "../courses/circled-vocabulary";
 import { builtinCatalog, type CatalogLesson } from "../courses/materials";
@@ -65,8 +66,8 @@ export function questionSeedsForLesson(
     audioText: symbol,
     distractors: lesson.symbols.filter((other) => other !== symbol).slice(0, 2),
   }));
-  // Exam prompts stay intact: only explicitly listed single characters become
-  // character questions; whole words and sentences are never split.
+  // Only explicitly listed single characters become character questions; each word is
+  // one question and is never split further.
   const singleTerms = terms.filter((term) => term.syllables.length === 1);
   const uniqueSounds = [...new Set(singleTerms.map((term) => term.syllables[0]))];
   const characters: ListeningSeed[] = singleTerms.map((term) => ({
@@ -146,6 +147,13 @@ export function findQuestionSeed(
       (term) => id === `${term.syllables.length > 1 ? "words" : "characters"}:${term.text}`,
     );
     if (term) return customListeningSeed(term);
+    if (lesson.listeningOnly && lessonIndex < 0) {
+      // Review sentences saved before they were split into words.
+      const legacy = legacyReviewVocabulary[-lessonIndex - 1]?.find(
+        (term) => id === `${term.syllables.length > 1 ? "words" : "characters"}:${term.text}`,
+      );
+      return legacy ? customListeningSeed(legacy) : undefined;
+    }
     if (lesson.custom || lesson.listeningOnly) return undefined;
   }
   const pools = questionSeedsForLesson(lessonIndex, catalog);

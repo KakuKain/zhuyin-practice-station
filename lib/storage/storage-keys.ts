@@ -15,6 +15,8 @@ export const storageKeys = {
   practiceV1: "zhuyin-practice-state-v1",
   fillFavorites: "zhuyin-fill-favorites-v1",
   listeningSettings: "zhuyin-listening-settings-v1",
+  /** The unfinished whole-lesson listening round, so a reload or a closed app can resume it. */
+  listeningRound: "zhuyin-listening-round-v1",
   freeBoard: "kid-free-dictation-v1",
 } as const;
 
