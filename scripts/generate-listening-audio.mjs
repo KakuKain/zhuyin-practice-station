@@ -14,6 +14,8 @@ const circledTexts = [...vocabularySource.matchAll(/term\("([^"]+)"/g)].map((mat
 const texts = new Set([
   ...circledTexts,
   ...circledTexts.flatMap((term) => [...term]),
+  // Legacy terms keep their clips so older saved questions still play.
+  ...[...source.matchAll(/term\("([^"]+)"/g)].map((match) => match[1]),
   ...[...source.matchAll(/audioText: "([^"]+)"/g)].map((match) => match[1]),
   ...[...source.matchAll(/wordQuestion\("([^"]+)"/g)].map((match) => match[1]),
   ...[...source.matchAll(/character: "([^"]+)"/g)].map((match) => match[1]),
@@ -68,6 +70,9 @@ const spokenTextOverrides = new Map([
   ["ㄩㄝ", "約"],
   ["ㄩㄣ", "暈"],
   ["翹", "俏"],
+  // The voice reads 乾 in 魚乾 as ㄍㄢˋ; 竿 has only ㄍㄢ.
+  ["魚乾", "魚竿"],
+  ["奶奶想要魚乾", "奶奶想要魚竿"],
   ["覺", "叫"],
   ["浣", "碗"],
   ["蔔", "伯"],
