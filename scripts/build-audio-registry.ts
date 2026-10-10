@@ -3,7 +3,11 @@ import { createHash } from "node:crypto";
 import { join, relative } from "node:path";
 import { builtinCatalog } from "../features/courses/materials";
 import { combinedRhymeExamples } from "../features/symbols/combined-rhyme-audio";
-import { extraWordQuestions, legacyCircledVocabulary } from "../features/courses/legacy-content";
+import {
+  extraWordQuestions,
+  legacyCircledVocabulary,
+  legacyReviewVocabulary,
+} from "../features/courses/legacy-content";
 const root = process.cwd();
 const audioDir = join(root, "public/listening-audio");
 const gemini = JSON.parse(readFileSync(join(audioDir, "gemini/manifest.json"), "utf8"));
@@ -19,7 +23,7 @@ for (const lesson of builtinCatalog) {
   lesson.exercise.lines.flat().forEach((c) => add(c.character, c.zhuyin));
   lesson.exercise.questions.forEach((q) => add(q.audioText, q.answer));
 }
-Object.values(legacyCircledVocabulary)
+[...legacyCircledVocabulary, ...legacyReviewVocabulary]
   .flat()
   .forEach((t) => add(t.text, t.syllables.join("|")));
 Object.values(extraWordQuestions)

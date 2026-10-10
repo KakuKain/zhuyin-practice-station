@@ -25,7 +25,11 @@ import {
   lessonNumerals,
   lessons,
 } from "../../features/courses/course-data";
-import { circledVocabulary } from "../../features/courses/circled-vocabulary";
+import { circledVocabulary, reviewVocabulary } from "../../features/courses/circled-vocabulary";
+import {
+  legacyCircledVocabulary,
+  legacyReviewVocabulary,
+} from "../../features/courses/legacy-content";
 import {
   validatePracticeState,
   validatedFillFavorites,
@@ -237,4 +241,56 @@ test("every built-in lesson has its readings, vocabulary, artwork and numeral", 
     );
     assert.ok(lesson.terms.length, lesson.title);
   }
+});
+
+test("lesson titles in fill writing use the same readings as the lesson text", () => {
+  const seesaw = builtinLessons[4];
+  const title = seesaw.exercise.lines.flat().slice(-Array.from(seesaw.title).length);
+  assert.deepEqual(
+    title.map((item) => `${item.character}${item.zhuyin}`),
+    ["翹ㄑㄧㄠˋ", "翹ㄑㄧㄠˋ", "板ㄅㄢˇ"],
+  );
+  // A title character that also appears in the body keeps the body's reading.
+  for (const lesson of builtinLessons) {
+    const cells = lesson.exercise.lines.flat();
+    const titleCells = cells.slice(-Array.from(lesson.title).length);
+    const bodyReadings = new Map<string, Set<string>>();
+    for (const cell of cells.slice(0, -titleCells.length))
+      bodyReadings.set(
+        cell.character,
+        (bodyReadings.get(cell.character) ?? new Set()).add(cell.zhuyin),
+      );
+    for (const cell of titleCells) {
+      const readings = bodyReadings.get(cell.character);
+      if (readings?.size === 1 && !cell.zhuyin.startsWith("˙"))
+        assert.ok(readings.has(cell.zhuyin), `${lesson.title}：${cell.character} ${cell.zhuyin}`);
+    }
+  }
+});
+
+test("listening rounds ask single words, while saved sentence questions still open", () => {
+  const sentences = new Set(
+    [...legacyCircledVocabulary.slice(4), ...legacyReviewVocabulary]
+      .flat()
+      .filter((term) => term.syllables.length >= 5 || term.text.includes("和"))
+      .map((term) => term.text),
+  );
+  for (const terms of [...circledVocabulary, ...reviewVocabulary])
+    for (const term of terms) {
+      assert.ok(term.syllables.length <= 4, term.text);
+      assert.equal(sentences.has(term.text), false, term.text);
+    }
+  for (const lesson of builtinCatalog)
+    for (const question of buildListeningSession(lesson.index))
+      assert.ok(Array.from(question.audioText).length <= 4, question.audioText);
+  // Favorites saved before the split resolve from legacy-content.
+  assert.ok(findQuestionSeed(4, "words:奶奶想要魚乾"));
+  assert.ok(findQuestionSeed(-2, "words:姐姐上街買鞋"));
+  const kept = validatePracticeState({
+    savedQuestions: [
+      { lessonIndex: 4, questionId: "words:哥哥和小狗一起玩球", isFavorite: true },
+      { lessonIndex: -3, questionId: "words:蕃茄炒蛋", needsPractice: true },
+    ],
+  });
+  assert.equal(kept.savedQuestions.length, 2);
 });

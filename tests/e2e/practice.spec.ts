@@ -429,3 +429,80 @@ test("sound practice animates wrong retry and correct automatic progression", as
   await expect(page.getByRole("button", { name: "再練一次", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "換一組聲音", exact: true })).toBeVisible();
 });
+
+test("back gestures stay inside the app and pull-to-refresh is off", async ({ page }) => {
+  await page.goto("./");
+  expect(
+    await page.evaluate(() => getComputedStyle(document.documentElement).overscrollBehaviorY),
+  ).toBe("none");
+  await openLesson(page);
+  await page.goBack();
+  await expect(page.locator(".journey-card")).toHaveCount(12);
+  // A listening round in progress asks before the back gesture ends it.
+  await openLesson(page);
+  await page.getByRole("button", { name: /第二關 聽寫/ }).click();
+  await page.getByRole("button", { name: "開始聽", exact: true }).click();
+  await page.goBack();
+  await expect(page.getByRole("heading", { name: "要先離開聽寫嗎？", exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "繼續練習", exact: true }).click();
+  await expect(page.getByLabel("田字格手寫區", { exact: true })).toBeVisible();
+});
+
+test("the site can be added to the home screen as a full-screen app", async ({ page }) => {
+  await page.goto("./");
+  const href = await page.locator('link[rel="manifest"]').getAttribute("href");
+  const manifest = await (await page.request.get(new URL(href!, page.url()).href)).json();
+  expect(manifest.display).toBe("fullscreen");
+  // Writing flat on a desk, the installed app must not flip mid-stroke.
+  expect(manifest.orientation).toBe("portrait");
+  expect(manifest.start_url).toBe("./");
+  for (const icon of manifest.icons) {
+    const response = await page.request.get(new URL(icon.src, new URL(href!, page.url())).href);
+    expect(response.ok(), icon.src).toBe(true);
+  }
+});
+
+test("dictation writing uses the whole tablet screen", async ({ page }, testInfo) => {
+  test.skip(
+    !/^(android-tablet|ipad)/.test(testInfo.project.name),
+    "phones keep the single-column layout",
+  );
+  await page.goto("./");
+  await openLesson(page);
+  await page.getByRole("button", { name: /第一關 課文默寫/ }).click();
+  await page.getByRole("button", { name: /從第一格開始/ }).click();
+  const grid = page.locator(".fill-writing-grid");
+  await expect(grid).toBeVisible();
+  expect((await grid.boundingBox())!.width).toBeGreaterThan(560);
+  await expect(page.getByRole("button", { name: "完成這格", exact: true })).toBeInViewport();
+  expect(await page.evaluate(() => document.documentElement.scrollHeight <= innerHeight + 1)).toBe(
+    true,
+  );
+});
+
+test("an unfinished listening round continues after a reload", async ({ page }) => {
+  await page.goto("./");
+  await openLesson(page);
+  await page.getByRole("button", { name: /第二關 聽寫/ }).click();
+  await page.getByRole("button", { name: "開始聽", exact: true }).click();
+  const canvas = page.getByLabel("田字格手寫區", { exact: true });
+  await drawStroke(page, canvas);
+  await page.getByRole("button", { name: "下一題", exact: true }).click();
+  await expect(page.locator(".listening-focus-header")).toContainText("2 /");
+  await drawStroke(page, canvas);
+  await page.reload();
+  await expect(
+    page.getByRole("heading", { name: "要繼續上次的聽寫嗎？", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "繼續聽寫", exact: true }).click();
+  await expect(page.locator(".listening-focus-header")).toContainText("2 /");
+  await expect.poll(() => inkPixels(canvas)).toBeGreaterThan(20);
+  await page.getByRole("button", { name: "上一題", exact: true }).click();
+  await expect.poll(() => inkPixels(canvas)).toBeGreaterThan(20);
+  // Starting over clears the saved round, so the next reload opens the course list.
+  await page.reload();
+  await page.getByRole("button", { name: "重新開始", exact: true }).click();
+  await expect(page.getByRole("button", { name: "開始聽", exact: true })).toBeVisible();
+  await page.reload();
+  await expect(page.locator(".journey-card")).toHaveCount(12);
+});

@@ -978,6 +978,22 @@
       "review": "legacy; pronunciation not certified"
     },
     {
+      "text": "一二三",
+      "pronunciation": [
+        "ㄧ|ㄦˋ|ㄙㄢ"
+      ],
+      "observedReadings": [
+        "ㄧ|ㄦˋ|ㄙㄢ"
+      ],
+      "url": "/listening-audio/4e00-4e8c-4e09.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 1.022,
+      "bytes": 9875,
+      "sha256": "8e151178674c8f59e833f1e1adbbe68c7e148fa12344a1b68d3b0a0e700566e2",
+      "version": "8e151178674c",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
       "text": "一把尺",
       "pronunciation": [
         "ㄧˋ|ㄅㄚˇ|ㄔˇ"
@@ -1119,6 +1135,22 @@
       "review": "legacy; pronunciation not certified"
     },
     {
+      "text": "上街",
+      "pronunciation": [
+        "ㄕㄤˋ|ㄐㄧㄝ"
+      ],
+      "observedReadings": [
+        "ㄕㄤˋ|ㄐㄧㄝ"
+      ],
+      "url": "/listening-audio/4e0a-8857.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.882,
+      "bytes": 8943,
+      "sha256": "b79ff185a3d25b6fd6bf523c044f3da3847cb2b64aa5d2c5b082cedcbac6d2c2",
+      "version": "b79ff185a3d2",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
       "text": "上",
       "pronunciation": [
         "ㄕㄤˋ"
@@ -1151,6 +1183,22 @@
       "review": "legacy; pronunciation not certified"
     },
     {
+      "text": "不怕",
+      "pronunciation": [
+        "ㄅㄨˊ|ㄆㄚˋ"
+      ],
+      "observedReadings": [
+        "ㄅㄨˊ|ㄆㄚˋ"
+      ],
+      "url": "/listening-audio/4e0d-6015.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.697,
+      "bytes": 7603,
+      "sha256": "7422100b3bc054d2e1426c54661f904904bb66bceed9c1959f827966c270a162",
+      "version": "7422100b3bc0",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
       "text": "不",
       "pronunciation": [
         "ㄅㄨˊ"
@@ -1164,6 +1212,22 @@
       "bytes": 6282,
       "sha256": "e54d5dfddd3795db244df9a10b3cc794228e1f6e96e6abb9eacd4496285cb62e",
       "version": "e54d5dfddd37",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
+      "text": "中央",
+      "pronunciation": [
+        "ㄓㄨㄥ|ㄧㄤ"
+      ],
+      "observedReadings": [
+        "ㄓㄨㄥ|ㄧㄤ"
+      ],
+      "url": "/listening-audio/4e2d-592e.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.789,
+      "bytes": 8321,
+      "sha256": "159d2d29b8fad29fe01052f8026447727ff997187c29eb300147751c946cd847",
+      "version": "159d2d29b8fa",
       "review": "legacy; pronunciation not certified"
     },
     {
@@ -1447,6 +1511,22 @@
       "review": "legacy; pronunciation not certified"
     },
     {
+      "text": "做工",
+      "pronunciation": [
+        "ㄗㄨㄛˋ|ㄍㄨㄥ"
+      ],
+      "observedReadings": [
+        "ㄗㄨㄛˋ|ㄍㄨㄥ"
+      ],
+      "url": "/listening-audio/505a-5de5.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.789,
+      "bytes": 8495,
+      "sha256": "b3307b3fc49157580b31a942087c1c86c0ac8321bd1724b5e6b81b3b41f1fea3",
+      "version": "b3307b3fc491",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
       "text": "做",
       "pronunciation": [],
       "observedReadings": [],
@@ -1668,8 +1748,12 @@
     },
     {
       "text": "切",
-      "pronunciation": [],
-      "observedReadings": [],
+      "pronunciation": [
+        "ㄑㄧㄝ"
+      ],
+      "observedReadings": [
+        "ㄑㄧㄝ"
+      ],
       "url": "/listening-audio/5207.m4a",
       "source": "macOS Meijia (legacy synthesis)",
       "duration": 0.557,
@@ -1788,8 +1872,12 @@
     },
     {
       "text": "北",
-      "pronunciation": [],
-      "observedReadings": [],
+      "pronunciation": [
+        "ㄅㄟˇ"
+      ],
+      "observedReadings": [
+        "ㄅㄟˇ"
+      ],
       "url": "/listening-audio/5317.m4a",
       "source": "macOS Meijia (legacy synthesis)",
       "duration": 0.464,
@@ -1864,8 +1952,12 @@
     },
     {
       "text": "南",
-      "pronunciation": [],
-      "observedReadings": [],
+      "pronunciation": [
+        "ㄋㄢˊ"
+      ],
+      "observedReadings": [
+        "ㄋㄢˊ"
+      ],
       "url": "/listening-audio/5357.m4a",
       "source": "macOS Meijia (legacy synthesis)",
       "duration": 0.557,
@@ -1963,6 +2055,22 @@
       "review": "legacy; pronunciation not certified"
     },
     {
+      "text": "合唱",
+      "pronunciation": [
+        "ㄏㄜˊ|ㄔㄤˋ"
+      ],
+      "observedReadings": [
+        "ㄏㄜˊ|ㄔㄤˋ"
+      ],
+      "url": "/listening-audio/5408-5531.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.836,
+      "bytes": 9344,
+      "sha256": "815911dca41c8dbe1a34ec6264831a950fb94210c8d4ba40e9905781cb4260c4",
+      "version": "815911dca41c",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
       "text": "合",
       "pronunciation": [
         "ㄏㄜˊ"
@@ -1992,6 +2100,22 @@
       "bytes": 16158,
       "sha256": "b7500cd9c2c4723bbfeb8888414d395a2704a0e4dc05680322e632194e5abc7a",
       "version": "b7500cd9c2c4",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
+      "text": "吱吱喳喳",
+      "pronunciation": [
+        "ㄓ|ㄓ|ㄓㄚ|ㄓㄚ"
+      ],
+      "observedReadings": [
+        "ㄓ|ㄓ|ㄓㄚ|ㄓㄚ"
+      ],
+      "url": "/listening-audio/5431-5431-55b3-55b3.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 1.161,
+      "bytes": 10925,
+      "sha256": "a7525afab3655dd976bce1f14e8127d3c7a06437e22c77b616f5f5b45d336227",
+      "version": "a7525afab365",
       "review": "legacy; pronunciation not certified"
     },
     {
@@ -2143,6 +2267,22 @@
       "review": "legacy; pronunciation not certified"
     },
     {
+      "text": "哥哥",
+      "pronunciation": [
+        "ㄍㄜ|˙ㄍㄜ"
+      ],
+      "observedReadings": [
+        "ㄍㄜ|˙ㄍㄜ"
+      ],
+      "url": "/listening-audio/54e5-54e5.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.604,
+      "bytes": 7133,
+      "sha256": "2c3f5ef2142c0a604b2530e9d00230ea026106dfabf190a89eb0a1125f570f05",
+      "version": "2c3f5ef2142c",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
       "text": "哥",
       "pronunciation": [],
       "observedReadings": [],
@@ -2200,6 +2340,22 @@
       "bytes": 15632,
       "sha256": "1c98283c424cadd2186ecb0e57cb025d45b100718961d8469a02f4b62945d05d",
       "version": "1c98283c424c",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
+      "text": "哪個",
+      "pronunciation": [
+        "ㄋㄚˇ|˙ㄍㄜ"
+      ],
+      "observedReadings": [
+        "ㄋㄚˇ|˙ㄍㄜ"
+      ],
+      "url": "/listening-audio/54ea-500b.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.65,
+      "bytes": 7595,
+      "sha256": "6ae0a1492991a6ca193246cd6b45424e639ea768a1f75e1f613b26c8715a2fc2",
+      "version": "6ae0a1492991",
       "review": "legacy; pronunciation not certified"
     },
     {
@@ -2423,6 +2579,22 @@
       "review": "legacy; pronunciation not certified"
     },
     {
+      "text": "回家",
+      "pronunciation": [
+        "ㄏㄨㄟˊ|ㄐㄧㄚ"
+      ],
+      "observedReadings": [
+        "ㄏㄨㄟˊ|ㄐㄧㄚ"
+      ],
+      "url": "/listening-audio/56de-5bb6.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.836,
+      "bytes": 8982,
+      "sha256": "23aeee5cb8cef1721c0fb8b541c993c23d3caf807b471b0f80dc16fa67c674f7",
+      "version": "23aeee5cb8ce",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
       "text": "回",
       "pronunciation": [],
       "observedReadings": [],
@@ -2492,6 +2664,38 @@
       "bytes": 17135,
       "sha256": "7cb9b0f5809069556d7bdcd4ccf3d59abb8c5de9c16efa7069a00bd2c4ae3d44",
       "version": "7cb9b0f58090",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
+      "text": "圓圓",
+      "pronunciation": [
+        "ㄩㄢˊ|ㄩㄢˊ"
+      ],
+      "observedReadings": [
+        "ㄩㄢˊ|ㄩㄢˊ"
+      ],
+      "url": "/listening-audio/5713-5713.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.836,
+      "bytes": 8760,
+      "sha256": "5a882b6a0d2296bc8269bbc9ff00baaa64bc3caf125295352256f389cc18edf7",
+      "version": "5a882b6a0d22",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
+      "text": "圓盤",
+      "pronunciation": [
+        "ㄩㄢˊ|ㄆㄢˊ"
+      ],
+      "observedReadings": [
+        "ㄩㄢˊ|ㄆㄢˊ"
+      ],
+      "url": "/listening-audio/5713-76e4.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.882,
+      "bytes": 8775,
+      "sha256": "165631b682b4728647fb348c605f6e3dffc5d42c1c56bdb63fc7be9c0514ad53",
+      "version": "165631b682b4",
       "review": "legacy; pronunciation not certified"
     },
     {
@@ -2631,6 +2835,22 @@
       "review": "legacy; pronunciation not certified"
     },
     {
+      "text": "大家",
+      "pronunciation": [
+        "ㄉㄚˋ|ㄐㄧㄚ"
+      ],
+      "observedReadings": [
+        "ㄉㄚˋ|ㄐㄧㄚ"
+      ],
+      "url": "/listening-audio/5927-5bb6.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.743,
+      "bytes": 8462,
+      "sha256": "841e0a4a8df560db942f21c749d89eb9f5803e26426f488d69556c4135f026a4",
+      "version": "841e0a4a8df5",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
       "text": "大",
       "pronunciation": [
         "ㄉㄚˋ"
@@ -2684,6 +2904,22 @@
       "bytes": 14776,
       "sha256": "2ab1714be49e33a5d006826df01e75158fe862363ba4298f1cc8fab65e814221",
       "version": "2ab1714be49e",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
+      "text": "奶奶",
+      "pronunciation": [
+        "ㄋㄞˇ|˙ㄋㄞ"
+      ],
+      "observedReadings": [
+        "ㄋㄞˇ|˙ㄋㄞ"
+      ],
+      "url": "/listening-audio/5976-5976.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.789,
+      "bytes": 8113,
+      "sha256": "a50e472d7318ca61ff7f87c53ba454d9497b7f87ea6e3d786c08c19985632c40",
+      "version": "a50e472d7318",
       "review": "legacy; pronunciation not certified"
     },
     {
@@ -2763,6 +2999,22 @@
       "review": "legacy; pronunciation not certified"
     },
     {
+      "text": "好漢",
+      "pronunciation": [
+        "ㄏㄠˇ|ㄏㄢˋ"
+      ],
+      "observedReadings": [
+        "ㄏㄠˇ|ㄏㄢˋ"
+      ],
+      "url": "/listening-audio/597d-6f22.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.789,
+      "bytes": 8925,
+      "sha256": "27ad22c02878acb669fc9213fab2a7bf4348c9ba63ce65162deec5273058f861",
+      "version": "27ad22c02878",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
       "text": "好熱鬧",
       "pronunciation": [
         "ㄏㄠˇ|ㄖㄜˋ|ㄋㄠˋ"
@@ -2811,6 +3063,22 @@
       "review": "legacy; pronunciation not certified"
     },
     {
+      "text": "妹妹",
+      "pronunciation": [
+        "ㄇㄟˋ|˙ㄇㄟ"
+      ],
+      "observedReadings": [
+        "ㄇㄟˋ|˙ㄇㄟ"
+      ],
+      "url": "/listening-audio/59b9-59b9.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.697,
+      "bytes": 8058,
+      "sha256": "b006c2cec6ec7f32c4b16967a5beea797de29bd671410f09de23b92178989f70",
+      "version": "b006c2cec6ec",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
       "text": "妹",
       "pronunciation": [],
       "observedReadings": [],
@@ -2836,6 +3104,22 @@
       "bytes": 15323,
       "sha256": "e4649830fec30fdd6d642a466550b4ff310c07e0512169ad161ad7a49dbd3b94",
       "version": "e4649830fec3",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
+      "text": "姐姐",
+      "pronunciation": [
+        "ㄐㄧㄝˇ|˙ㄐㄧㄝ"
+      ],
+      "observedReadings": [
+        "ㄐㄧㄝˇ|˙ㄐㄧㄝ"
+      ],
+      "url": "/listening-audio/59d0-59d0.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.697,
+      "bytes": 8200,
+      "sha256": "9e2c2c418f04a1ad327cd52f74452f04021be527dd08d2cba63bcd0332335ebd",
+      "version": "9e2c2c418f04",
       "review": "legacy; pronunciation not certified"
     },
     {
@@ -2876,6 +3160,22 @@
       "bytes": 9223,
       "sha256": "aa3056336d2e9abec3ada0a7fd239632a5ac3c8eb5f5420ae0277bc1203883d9",
       "version": "aa3056336d2e",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
+      "text": "媽媽",
+      "pronunciation": [
+        "ㄇㄚ|˙ㄇㄚ"
+      ],
+      "observedReadings": [
+        "ㄇㄚ|˙ㄇㄚ"
+      ],
+      "url": "/listening-audio/5abd-5abd.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.697,
+      "bytes": 7818,
+      "sha256": "5f00d10783399a2463334af0d7e57070678f73e69898b30534cb0860094bd637",
+      "version": "5f00d1078339",
       "review": "legacy; pronunciation not certified"
     },
     {
@@ -3080,6 +3380,22 @@
       "review": "legacy; pronunciation not certified"
     },
     {
+      "text": "小橋",
+      "pronunciation": [
+        "ㄒㄧㄠˇ|ㄑㄧㄠˊ"
+      ],
+      "observedReadings": [
+        "ㄒㄧㄠˇ|ㄑㄧㄠˊ"
+      ],
+      "url": "/listening-audio/5c0f-6a4b.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.882,
+      "bytes": 9288,
+      "sha256": "6a7faed03e44bedf353c57d1c3a4fa06027d445b0d8eb1f89f760aa082a87f38",
+      "version": "6a7faed03e44",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
       "text": "小海豚",
       "pronunciation": [
         "ㄒㄧㄠˇ|ㄏㄞˇ|ㄊㄨㄣˊ"
@@ -3109,6 +3425,22 @@
       "bytes": 9491,
       "sha256": "ebdd87449fcad0de5436a4f20a4cb66713e6c033f18b031344197cff9d17c172",
       "version": "ebdd87449fca",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
+      "text": "小狗",
+      "pronunciation": [
+        "ㄒㄧㄠˇ|ㄍㄡˇ"
+      ],
+      "observedReadings": [
+        "ㄒㄧㄠˇ|ㄍㄡˇ"
+      ],
+      "url": "/listening-audio/5c0f-72d7.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.836,
+      "bytes": 8911,
+      "sha256": "496962876dc901a822a0460772e2e81a834a55e87e5df8f3db736cb73112f241",
+      "version": "496962876dc9",
       "review": "legacy; pronunciation not certified"
     },
     {
@@ -3176,6 +3508,22 @@
       "review": "legacy; pronunciation not certified"
     },
     {
+      "text": "小豬",
+      "pronunciation": [
+        "ㄒㄧㄠˇ|ㄓㄨ"
+      ],
+      "observedReadings": [
+        "ㄒㄧㄠˇ|ㄓㄨ"
+      ],
+      "url": "/listening-audio/5c0f-8c6c.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.836,
+      "bytes": 9071,
+      "sha256": "fff9380e22e3d74157535e618820bf95804d9cdf831f1ff9b8873b8b5fe15fe1",
+      "version": "fff9380e22e3",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
       "text": "小雞小鴨",
       "pronunciation": [
         "ㄒㄧㄠˇ|ㄐㄧ|ㄒㄧㄠˇ|ㄧㄚ"
@@ -3192,6 +3540,22 @@
       "review": "legacy; pronunciation not certified"
     },
     {
+      "text": "小雞",
+      "pronunciation": [
+        "ㄒㄧㄠˇ|ㄐㄧ"
+      ],
+      "observedReadings": [
+        "ㄒㄧㄠˇ|ㄐㄧ"
+      ],
+      "url": "/listening-audio/5c0f-96de.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.882,
+      "bytes": 9087,
+      "sha256": "da05225987c57c9144429e7d92485f36fd809c0a9533f5d4936c45390b1833cd",
+      "version": "da05225987c5",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
       "text": "小鳥",
       "pronunciation": [
         "ㄒㄧㄠˇ|ㄋㄧㄠˇ"
@@ -3205,6 +3569,22 @@
       "bytes": 9364,
       "sha256": "804a803ac0ad541b9defc45150462bf7e06121889c6d1cef02636fa4e1a240b3",
       "version": "804a803ac0ad",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
+      "text": "小鴨",
+      "pronunciation": [
+        "ㄒㄧㄠˇ|ㄧㄚ"
+      ],
+      "observedReadings": [
+        "ㄒㄧㄠˇ|ㄧㄚ"
+      ],
+      "url": "/listening-audio/5c0f-9d28.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.836,
+      "bytes": 8780,
+      "sha256": "46b32ca1f6aa760fc67b398c6ab5042c94ba827a624fa19693118f1fb1dc4867",
+      "version": "46b32ca1f6aa",
       "review": "legacy; pronunciation not certified"
     },
     {
@@ -3428,6 +3808,22 @@
       "review": "legacy; pronunciation not certified"
     },
     {
+      "text": "巨人",
+      "pronunciation": [
+        "ㄐㄩˋ|ㄖㄣˊ"
+      ],
+      "observedReadings": [
+        "ㄐㄩˋ|ㄖㄣˊ"
+      ],
+      "url": "/listening-audio/5de8-4eba.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.789,
+      "bytes": 8252,
+      "sha256": "c13ebc154337ba3de70f4eebeb7e1c06ade47d80773715f4b208b28b527e147e",
+      "version": "c13ebc154337",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
       "text": "巨",
       "pronunciation": [],
       "observedReadings": [],
@@ -3637,6 +4033,22 @@
       "review": "legacy; pronunciation not certified"
     },
     {
+      "text": "彎彎",
+      "pronunciation": [
+        "ㄨㄢ|ㄨㄢ"
+      ],
+      "observedReadings": [
+        "ㄨㄢ|ㄨㄢ"
+      ],
+      "url": "/listening-audio/5f4e-5f4e.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.836,
+      "bytes": 8944,
+      "sha256": "e19e9c0a9812fddfb51471cbeaa0a093632e2babf29087eb7b5b13f51fc53b3e",
+      "version": "e19e9c0a9812",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
       "text": "彎",
       "pronunciation": [],
       "observedReadings": [],
@@ -3662,6 +4074,22 @@
       "bytes": 7236,
       "sha256": "e5720ca3204628ccf869a5024b5da4f5304af6f55d74b06630ec4db6a2b2ac7e",
       "version": "e5720ca32046",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
+      "text": "後面",
+      "pronunciation": [
+        "ㄏㄡˋ|ㄇㄧㄢˋ"
+      ],
+      "observedReadings": [
+        "ㄏㄡˋ|ㄇㄧㄢˋ"
+      ],
+      "url": "/listening-audio/5f8c-9762.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.836,
+      "bytes": 8724,
+      "sha256": "55ead2d8ca533c93a3f620b7bc2621111b60a5825ce475525a215aa7945fe034",
+      "version": "55ead2d8ca53",
       "review": "legacy; pronunciation not certified"
     },
     {
@@ -3834,6 +4262,22 @@
       "review": "legacy; pronunciation not certified"
     },
     {
+      "text": "想要",
+      "pronunciation": [
+        "ㄒㄧㄤˇ|ㄧㄠˋ"
+      ],
+      "observedReadings": [
+        "ㄒㄧㄤˇ|ㄧㄠˋ"
+      ],
+      "url": "/listening-audio/60f3-8981.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.836,
+      "bytes": 8784,
+      "sha256": "c70a599e38081b573a89eb83e09acd972f7ed436ac40cc68f35c56ec01a0eee2",
+      "version": "c70a599e3808",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
       "text": "想",
       "pronunciation": [],
       "observedReadings": [],
@@ -3890,6 +4334,22 @@
       "review": "legacy; pronunciation not certified"
     },
     {
+      "text": "慢慢",
+      "pronunciation": [
+        "ㄇㄢˋ|ㄇㄢˋ"
+      ],
+      "observedReadings": [
+        "ㄇㄢˋ|ㄇㄢˋ"
+      ],
+      "url": "/listening-audio/6162-6162.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.697,
+      "bytes": 7900,
+      "sha256": "6ccd5c1aef76e79e94b1919ed6059a213798384dd1cde658662b8fd9f80aeab2",
+      "version": "6ccd5c1aef76",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
       "text": "慢",
       "pronunciation": [],
       "observedReadings": [],
@@ -3931,6 +4391,22 @@
       "bytes": 7392,
       "sha256": "1c99728dc7e91d58ebf3d5793c7210d6baaca1f0714388600f4d05a3704e1eb4",
       "version": "1c99728dc7e9",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
+      "text": "懶惰蟲",
+      "pronunciation": [
+        "ㄌㄢˇ|ㄉㄨㄛˋ|ㄔㄨㄥˊ"
+      ],
+      "observedReadings": [
+        "ㄌㄢˇ|ㄉㄨㄛˋ|ㄔㄨㄥˊ"
+      ],
+      "url": "/listening-audio/61f6-60f0-87f2.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 1.068,
+      "bytes": 10347,
+      "sha256": "a01b4b6ae655aeaf17398fbacecb05b8a370386255c85ed41a3299af1959a13c",
+      "version": "a01b4b6ae655",
       "review": "legacy; pronunciation not certified"
     },
     {
@@ -4182,6 +4658,22 @@
       "review": "legacy; pronunciation not certified"
     },
     {
+      "text": "拍手",
+      "pronunciation": [
+        "ㄆㄞ|ㄕㄡˇ"
+      ],
+      "observedReadings": [
+        "ㄆㄞ|ㄕㄡˇ"
+      ],
+      "url": "/listening-audio/62cd-624b.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.789,
+      "bytes": 8421,
+      "sha256": "bb58f271d0206928fc9f0579a4fce6cf6f061c570d880554d8558d96cd9d69ef",
+      "version": "bb58f271d020",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
       "text": "拍",
       "pronunciation": [],
       "observedReadings": [],
@@ -4239,6 +4731,22 @@
       "bytes": 6161,
       "sha256": "57619a55cb6db929212108bef1baa596e390e6b64201cd984465cef285b14d36",
       "version": "57619a55cb6d",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
+      "text": "捕魚",
+      "pronunciation": [
+        "ㄅㄨˇ|ㄩˊ"
+      ],
+      "observedReadings": [
+        "ㄅㄨˇ|ㄩˊ"
+      ],
+      "url": "/listening-audio/6355-9b5a.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.697,
+      "bytes": 7883,
+      "sha256": "4cece1e903f3e4d6fbf991af4f17b75b1ee2bb968a5a81a84757023c0000225d",
+      "version": "4cece1e903f3",
       "review": "legacy; pronunciation not certified"
     },
     {
@@ -4386,6 +4894,22 @@
       "review": "legacy; pronunciation not certified"
     },
     {
+      "text": "數一數",
+      "pronunciation": [
+        "ㄕㄨˇ|ㄧˋ|ㄕㄨˇ"
+      ],
+      "observedReadings": [
+        "ㄕㄨˇ|ㄧˋ|ㄕㄨˇ"
+      ],
+      "url": "/listening-audio/6578-4e00-6578.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 1.022,
+      "bytes": 10215,
+      "sha256": "d65f3c717f3c3e3fbe15e31df4699b85eeb9adfadc4aa34f33f3831ab07f057a",
+      "version": "d65f3c717f3c",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
       "text": "數",
       "pronunciation": [],
       "observedReadings": [],
@@ -4471,6 +4995,22 @@
       "bytes": 16460,
       "sha256": "394b664e1d9f8d4ef5d7431e8f8032f9adf4f700da3862dfc99dddc6282b69cb",
       "version": "394b664e1d9f",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
+      "text": "月亮",
+      "pronunciation": [
+        "ㄩㄝˋ|ㄌㄧㄤˋ"
+      ],
+      "observedReadings": [
+        "ㄩㄝˋ|ㄌㄧㄤˋ"
+      ],
+      "url": "/listening-audio/6708-4eae.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.743,
+      "bytes": 8198,
+      "sha256": "f2c43ad2b00d36f277ed67fdafce3ce29c0b216dff8352fe1a00115777058b27",
+      "version": "f2c43ad2b00d",
       "review": "legacy; pronunciation not certified"
     },
     {
@@ -4611,8 +5151,12 @@
     },
     {
       "text": "東",
-      "pronunciation": [],
-      "observedReadings": [],
+      "pronunciation": [
+        "ㄉㄨㄥ"
+      ],
+      "observedReadings": [
+        "ㄉㄨㄥ"
+      ],
       "url": "/listening-audio/6771.m4a",
       "source": "macOS Meijia (legacy synthesis)",
       "duration": 0.464,
@@ -4807,6 +5351,22 @@
       "bytes": 6690,
       "sha256": "8de57ea321dec45ff469b5f8935af728af401f4528883df48599385f05a216ae",
       "version": "8de57ea321de",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
+      "text": "樹上",
+      "pronunciation": [
+        "ㄕㄨˋ|ㄕㄤˋ"
+      ],
+      "observedReadings": [
+        "ㄕㄨˋ|ㄕㄤˋ"
+      ],
+      "url": "/listening-audio/6a39-4e0a.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.836,
+      "bytes": 9090,
+      "sha256": "823ab387fb86b1ae674c7203f086bed3ad672d59a2dc111a63d3cd3d74b74de6",
+      "version": "823ab387fb86",
       "review": "legacy; pronunciation not certified"
     },
     {
@@ -5254,6 +5814,22 @@
       "review": "legacy; pronunciation not certified"
     },
     {
+      "text": "泥巴",
+      "pronunciation": [
+        "ㄋㄧˊ|ㄅㄚ"
+      ],
+      "observedReadings": [
+        "ㄋㄧˊ|ㄅㄚ"
+      ],
+      "url": "/listening-audio/6ce5-5df4.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.697,
+      "bytes": 7679,
+      "sha256": "64c22a0bbafbddd2babd6df10a289e274b9896a1c5dbae916f1d3e76adcd51f2",
+      "version": "64c22a0bbafb",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
       "text": "泥",
       "pronunciation": [],
       "observedReadings": [],
@@ -5382,6 +5958,22 @@
       "review": "legacy; pronunciation not certified"
     },
     {
+      "text": "清蒸",
+      "pronunciation": [
+        "ㄑㄧㄥ|ㄓㄥ"
+      ],
+      "observedReadings": [
+        "ㄑㄧㄥ|ㄓㄥ"
+      ],
+      "url": "/listening-audio/6e05-84b8.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.836,
+      "bytes": 8794,
+      "sha256": "7d6d027447b76f7264e109a7215dd336f3b7cd67bf2a2b6a1e2ac724c7ac4c70",
+      "version": "7d6d027447b7",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
       "text": "清",
       "pronunciation": [],
       "observedReadings": [],
@@ -5470,6 +6062,22 @@
       "review": "legacy; pronunciation not certified"
     },
     {
+      "text": "漁夫",
+      "pronunciation": [
+        "ㄩˊ|ㄈㄨ"
+      ],
+      "observedReadings": [
+        "ㄩˊ|ㄈㄨ"
+      ],
+      "url": "/listening-audio/6f01-592b.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.743,
+      "bytes": 8185,
+      "sha256": "092e795645896daab00d7565b5c42e5d2cfca0b3a515d1a5842fd9689ededc79",
+      "version": "092e79564589",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
       "text": "漁",
       "pronunciation": [],
       "observedReadings": [],
@@ -5479,6 +6087,22 @@
       "bytes": 6839,
       "sha256": "ba98831e84e2e18e9807086c251aed86db289436160cf367f14d547a1906baf3",
       "version": "ba98831e84e2",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
+      "text": "漂亮",
+      "pronunciation": [
+        "ㄆㄧㄠˋ|ㄌㄧㄤˋ"
+      ],
+      "observedReadings": [
+        "ㄆㄧㄠˋ|ㄌㄧㄤˋ"
+      ],
+      "url": "/listening-audio/6f02-4eae.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.836,
+      "bytes": 8384,
+      "sha256": "3b3823584143271429f7dd468fb856f9816209e9c42752a69a86b6b38102ce83",
+      "version": "3b3823584143",
       "review": "legacy; pronunciation not certified"
     },
     {
@@ -5570,9 +6194,29 @@
       "review": "legacy; pronunciation not certified"
     },
     {
+      "text": "炒蛋",
+      "pronunciation": [
+        "ㄔㄠˇ|ㄉㄢˋ"
+      ],
+      "observedReadings": [
+        "ㄔㄠˇ|ㄉㄢˋ"
+      ],
+      "url": "/listening-audio/7092-86cb.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.836,
+      "bytes": 8713,
+      "sha256": "9535f3f5103f17165a9b1f142056cf2e0dc5c0582626a3e0e17020e86bba97ff",
+      "version": "9535f3f5103f",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
       "text": "炒",
-      "pronunciation": [],
-      "observedReadings": [],
+      "pronunciation": [
+        "ㄔㄠˇ"
+      ],
+      "observedReadings": [
+        "ㄔㄠˇ"
+      ],
       "url": "/listening-audio/7092.m4a",
       "source": "macOS Meijia (legacy synthesis)",
       "duration": 0.557,
@@ -5647,8 +6291,12 @@
     },
     {
       "text": "煮",
-      "pronunciation": [],
-      "observedReadings": [],
+      "pronunciation": [
+        "ㄓㄨˇ"
+      ],
+      "observedReadings": [
+        "ㄓㄨˇ"
+      ],
       "url": "/listening-audio/716e.m4a",
       "source": "macOS Meijia (legacy synthesis)",
       "duration": 0.418,
@@ -5990,6 +6638,22 @@
       "review": "legacy; pronunciation not certified"
     },
     {
+      "text": "玩球",
+      "pronunciation": [
+        "ㄨㄢˊ|ㄑㄧㄡˊ"
+      ],
+      "observedReadings": [
+        "ㄨㄢˊ|ㄑㄧㄡˊ"
+      ],
+      "url": "/listening-audio/73a9-7403.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.929,
+      "bytes": 9562,
+      "sha256": "bccd9fef2aacec71bd9bfabb71e732367a000f8d3c90a8dcab422c83df2452b7",
+      "version": "bccd9fef2aac",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
       "text": "玩",
       "pronunciation": [
         "ㄨㄢˊ"
@@ -6059,6 +6723,22 @@
       "bytes": 6627,
       "sha256": "35447e06eda3a5560477804e79f1733c2a951056523a9eeb24ba56dc1a5966de",
       "version": "35447e06eda3",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
+      "text": "球鞋",
+      "pronunciation": [
+        "ㄑㄧㄡˊ|ㄒㄧㄝˊ"
+      ],
+      "observedReadings": [
+        "ㄑㄧㄡˊ|ㄒㄧㄝˊ"
+      ],
+      "url": "/listening-audio/7403-978b.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.882,
+      "bytes": 9233,
+      "sha256": "10f3fa625e3cd6acc89addfa98410ed7b279526069b0cd4f9e3b23775c389d97",
+      "version": "10f3fa625e3c",
       "review": "legacy; pronunciation not certified"
     },
     {
@@ -6363,6 +7043,22 @@
       "bytes": 7317,
       "sha256": "060a8354f564bcb8ab7e0ebea079da82cb81e671beaec1a98fa50931cab9c889",
       "version": "060a8354f564",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
+      "text": "短裙",
+      "pronunciation": [
+        "ㄉㄨㄢˇ|ㄑㄩㄣˊ"
+      ],
+      "observedReadings": [
+        "ㄉㄨㄢˇ|ㄑㄩㄣˊ"
+      ],
+      "url": "/listening-audio/77ed-88d9.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.929,
+      "bytes": 9289,
+      "sha256": "bddcbaf684d10e60f7601f28b55f059f39f3578fea4a123f484ca93712ef39a4",
+      "version": "bddcbaf684d1",
       "review": "legacy; pronunciation not certified"
     },
     {
@@ -6742,6 +7438,22 @@
       "review": "legacy; pronunciation not certified"
     },
     {
+      "text": "精神",
+      "pronunciation": [
+        "ㄐㄧㄥ|ㄕㄣˊ"
+      ],
+      "observedReadings": [
+        "ㄐㄧㄥ|ㄕㄣˊ"
+      ],
+      "url": "/listening-audio/7cbe-795e.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.882,
+      "bytes": 8979,
+      "sha256": "06ecd0880c04569b4c5e17eedf7594fdaafb308f68cf6e45dfd5634f9607f2ca",
+      "version": "06ecd0880c04",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
       "text": "精",
       "pronunciation": [
         "ㄐㄧㄥ"
@@ -6771,6 +7483,22 @@
       "bytes": 12282,
       "sha256": "6dc0fe327349a886dd7ed5b6e707fd226a2935f06b35cd793dddfcf31ecf67b9",
       "version": "6dc0fe327349",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
+      "text": "紅燒",
+      "pronunciation": [
+        "ㄏㄨㄥˊ|ㄕㄠ"
+      ],
+      "observedReadings": [
+        "ㄏㄨㄥˊ|ㄕㄠ"
+      ],
+      "url": "/listening-audio/7d05-71d2.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.882,
+      "bytes": 9224,
+      "sha256": "7a1a3a0527c1b440666fae4b95465f737df0bad0dae5adfdf771bd01f5ab54d3",
+      "version": "7a1a3a0527c1",
       "review": "legacy; pronunciation not certified"
     },
     {
@@ -6930,6 +7658,22 @@
       "review": "legacy; pronunciation not certified"
     },
     {
+      "text": "美麗",
+      "pronunciation": [
+        "ㄇㄟˇ|ㄌㄧˋ"
+      ],
+      "observedReadings": [
+        "ㄇㄟˇ|ㄌㄧˋ"
+      ],
+      "url": "/listening-audio/7f8e-9e97.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.697,
+      "bytes": 8131,
+      "sha256": "89ff319e920bd61b5523b44faf05417965313048a7e6157f92b15129f420e23a",
+      "version": "89ff319e920b",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
       "text": "美",
       "pronunciation": [],
       "observedReadings": [],
@@ -6991,8 +7735,7 @@
         "ㄑㄧㄠˋ"
       ],
       "observedReadings": [
-        "ㄑㄧㄠˋ",
-        "ㄑㄧㄠ"
+        "ㄑㄧㄠˋ"
       ],
       "url": "/listening-audio/7ff9.m4a",
       "source": "macOS Meijia (legacy synthesis)",
@@ -7028,6 +7771,38 @@
       "bytes": 17983,
       "sha256": "58c5477071f901231b4105a906e103edcbb1eefe36a4cb4e8ff6cb856200d39d",
       "version": "58c5477071f9",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
+      "text": "老伯伯",
+      "pronunciation": [
+        "ㄌㄠˇ|ㄅㄛˊ|˙ㄅㄛ"
+      ],
+      "observedReadings": [
+        "ㄌㄠˇ|ㄅㄛˊ|˙ㄅㄛ"
+      ],
+      "url": "/listening-audio/8001-4f2f-4f2f.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 1.022,
+      "bytes": 10529,
+      "sha256": "eca4c9da0dd7606182424af1c34bcab23152ca7ce9be9734067432c86bc948f0",
+      "version": "eca4c9da0dd7",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
+      "text": "老婆婆",
+      "pronunciation": [
+        "ㄌㄠˇ|ㄆㄛˊ|˙ㄆㄛ"
+      ],
+      "observedReadings": [
+        "ㄌㄠˇ|ㄆㄛˊ|˙ㄆㄛ"
+      ],
+      "url": "/listening-audio/8001-5a46-5a46.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 1.115,
+      "bytes": 11145,
+      "sha256": "fc29d20b1433d14f52b8651127c8f46538a4728d590cdbd5639576c46ba87669",
+      "version": "fc29d20b1433",
       "review": "legacy; pronunciation not certified"
     },
     {
@@ -7271,6 +8046,22 @@
       "review": "legacy; pronunciation not certified"
     },
     {
+      "text": "英雄",
+      "pronunciation": [
+        "ㄧㄥ|ㄒㄩㄥˊ"
+      ],
+      "observedReadings": [
+        "ㄧㄥ|ㄒㄩㄥˊ"
+      ],
+      "url": "/listening-audio/82f1-96c4.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.836,
+      "bytes": 8863,
+      "sha256": "803f5bf588a44827f5f422581a61b6c204bd5318e5318e8bb68a1efbcf84d4e3",
+      "version": "803f5bf588a4",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
       "text": "英",
       "pronunciation": [],
       "observedReadings": [],
@@ -7475,6 +8266,22 @@
       "review": "legacy; pronunciation not certified"
     },
     {
+      "text": "蕃茄",
+      "pronunciation": [
+        "ㄈㄢ|ㄑㄧㄝˊ"
+      ],
+      "observedReadings": [
+        "ㄈㄢ|ㄑㄧㄝˊ"
+      ],
+      "url": "/listening-audio/8543-8304.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.929,
+      "bytes": 9385,
+      "sha256": "eef4ae8d0abc74f8a627278f952e68456e42006cbf031e05568c620c7dd0012e",
+      "version": "eef4ae8d0abc",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
       "text": "蕃",
       "pronunciation": [],
       "observedReadings": [],
@@ -7619,6 +8426,22 @@
       "review": "legacy; pronunciation not certified"
     },
     {
+      "text": "蝴蝶結",
+      "pronunciation": [
+        "ㄏㄨˊ|ㄉㄧㄝˊ|ㄐㄧㄝˊ"
+      ],
+      "observedReadings": [
+        "ㄏㄨˊ|ㄉㄧㄝˊ|ㄐㄧㄝˊ"
+      ],
+      "url": "/listening-audio/8774-8776-7d50.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 1.068,
+      "bytes": 10765,
+      "sha256": "51c4094322637995f58d24cfce53c1bcb1e083b1fa399ef73bcb129d64f2c240",
+      "version": "51c409432263",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
       "text": "蝴蝶飛",
       "pronunciation": [
         "ㄏㄨˊ|ㄉㄧㄝˊ|ㄈㄟ"
@@ -7632,6 +8455,22 @@
       "bytes": 10599,
       "sha256": "f043183f8ba7d9a36afe0e6390529290881833298f28bdbf1ad43e47c43fe9e1",
       "version": "f043183f8ba7",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
+      "text": "蝴蝶",
+      "pronunciation": [
+        "ㄏㄨˊ|ㄉㄧㄝˊ"
+      ],
+      "observedReadings": [
+        "ㄏㄨˊ|ㄉㄧㄝˊ"
+      ],
+      "url": "/listening-audio/8774-8776.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.836,
+      "bytes": 9008,
+      "sha256": "146397cb767012247537df0b58bc57e18b3e9eaa3e3eb11c318cabf1d6e1f349",
+      "version": "146397cb7670",
       "review": "legacy; pronunciation not certified"
     },
     {
@@ -7672,6 +8511,22 @@
       "bytes": 11791,
       "sha256": "7617c2bb431dc865be844dcdd09c34b2da92058702a8e3818f794acf773cead5",
       "version": "7617c2bb431d",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
+      "text": "蝸牛",
+      "pronunciation": [
+        "ㄍㄨㄚ|ㄋㄧㄡˊ"
+      ],
+      "observedReadings": [
+        "ㄍㄨㄚ|ㄋㄧㄡˊ"
+      ],
+      "url": "/listening-audio/8778-725b.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.836,
+      "bytes": 8648,
+      "sha256": "19c14974b5209a833584600cb860e247a25f42ca0af2bda804b172913449507b",
+      "version": "19c14974b520",
       "review": "legacy; pronunciation not certified"
     },
     {
@@ -7784,6 +8639,22 @@
       "bytes": 7019,
       "sha256": "279d56dbed65083c986add56fc0e98dd416a85e0d40656f3a82bb25a84b24300",
       "version": "279d56dbed65",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
+      "text": "街舞",
+      "pronunciation": [
+        "ㄐㄧㄝ|ㄨˇ"
+      ],
+      "observedReadings": [
+        "ㄐㄧㄝ|ㄨˇ"
+      ],
+      "url": "/listening-audio/8857-821e.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.697,
+      "bytes": 8076,
+      "sha256": "c838cd252448e6e8a090888f1d48fae388f42bfffa789c24f4c74897035eba34",
+      "version": "c838cd252448",
       "review": "legacy; pronunciation not certified"
     },
     {
@@ -7920,8 +8791,12 @@
     },
     {
       "text": "西",
-      "pronunciation": [],
-      "observedReadings": [],
+      "pronunciation": [
+        "ㄒㄧ"
+      ],
+      "observedReadings": [
+        "ㄒㄧ"
+      ],
       "url": "/listening-audio/897f.m4a",
       "source": "macOS Meijia (legacy synthesis)",
       "duration": 0.604,
@@ -8232,6 +9107,22 @@
       "review": "legacy; pronunciation not certified"
     },
     {
+      "text": "走路",
+      "pronunciation": [
+        "ㄗㄡˇ|ㄌㄨˋ"
+      ],
+      "observedReadings": [
+        "ㄗㄡˇ|ㄌㄨˋ"
+      ],
+      "url": "/listening-audio/8d70-8def.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.743,
+      "bytes": 8274,
+      "sha256": "9e5b29266fc4b1a81592512a3175c0fcc64c09feb8a7524271d92d6db7d50bb5",
+      "version": "9e5b29266fc4",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
       "text": "走",
       "pronunciation": [],
       "observedReadings": [],
@@ -8356,6 +9247,38 @@
       "review": "legacy; pronunciation not certified"
     },
     {
+      "text": "跳水",
+      "pronunciation": [
+        "ㄊㄧㄠˋ|ㄕㄨㄟˇ"
+      ],
+      "observedReadings": [
+        "ㄊㄧㄠˋ|ㄕㄨㄟˇ"
+      ],
+      "url": "/listening-audio/8df3-6c34.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.882,
+      "bytes": 9048,
+      "sha256": "88ce4d09dc174f305301c218e005ec865d618b1b339f69568d96826b64f0fbad",
+      "version": "88ce4d09dc17",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
+      "text": "跳繩",
+      "pronunciation": [
+        "ㄊㄧㄠˋ|ㄕㄥˊ"
+      ],
+      "observedReadings": [
+        "ㄊㄧㄠˋ|ㄕㄥˊ"
+      ],
+      "url": "/listening-audio/8df3-7e69.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.975,
+      "bytes": 9434,
+      "sha256": "e730ebeab27990cce385ad8c96e3da2eda8ef1a6b26f3790fa086c37f737c53b",
+      "version": "e730ebeab279",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
       "text": "跳街舞",
       "pronunciation": [
         "ㄊㄧㄠˋ|ㄐㄧㄝ|ㄨˇ"
@@ -8384,6 +9307,22 @@
       "review": "legacy; pronunciation not certified"
     },
     {
+      "text": "躲迷藏",
+      "pronunciation": [
+        "ㄉㄨㄛˇ|ㄇㄧˊ|ㄘㄤˊ"
+      ],
+      "observedReadings": [
+        "ㄉㄨㄛˇ|ㄇㄧˊ|ㄘㄤˊ"
+      ],
+      "url": "/listening-audio/8eb2-8ff7-85cf.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 1.022,
+      "bytes": 9821,
+      "sha256": "570c6969a5ae21c998976aee9d5f5fe8e6993fed2cbb1a31b412c407414f07b7",
+      "version": "570c6969a5ae",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
       "text": "躲",
       "pronunciation": [],
       "observedReadings": [],
@@ -8405,6 +9344,22 @@
       "bytes": 7014,
       "sha256": "481ce29714375c88dbbc67ab095a6255a35554259fd8c05c1890b225ec6d6895",
       "version": "481ce2971437",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
+      "text": "轉圈",
+      "pronunciation": [
+        "ㄓㄨㄢˋ|ㄑㄩㄢ"
+      ],
+      "observedReadings": [
+        "ㄓㄨㄢˋ|ㄑㄩㄢ"
+      ],
+      "url": "/listening-audio/8f49-5708.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.929,
+      "bytes": 9316,
+      "sha256": "c62cfd9a9eb23e0cb6d62632165fbe76d3eb85fbe8142ecee0840e7bf20f4484",
+      "version": "c62cfd9a9eb2",
       "review": "legacy; pronunciation not certified"
     },
     {
@@ -8541,6 +9496,22 @@
       "bytes": 7128,
       "sha256": "298a3de77d26583569c83817b76dbd1c6f2336ccb1fcaa860696edca83845b32",
       "version": "298a3de77d26",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
+      "text": "運動",
+      "pronunciation": [
+        "ㄩㄣˋ|ㄉㄨㄥˋ"
+      ],
+      "observedReadings": [
+        "ㄩㄣˋ|ㄉㄨㄥˋ"
+      ],
+      "url": "/listening-audio/904b-52d5.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.743,
+      "bytes": 8782,
+      "sha256": "7d77ac0885a984cb4d5d24bc85d0401fba2b89354873b2bc24d7bf1086343483",
+      "version": "7d77ac0885a9",
       "review": "legacy; pronunciation not certified"
     },
     {
@@ -8696,6 +9667,22 @@
       "review": "legacy; pronunciation not certified"
     },
     {
+      "text": "開車",
+      "pronunciation": [
+        "ㄎㄞ|ㄔㄜ"
+      ],
+      "observedReadings": [
+        "ㄎㄞ|ㄔㄜ"
+      ],
+      "url": "/listening-audio/958b-8eca.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.836,
+      "bytes": 8827,
+      "sha256": "1c720a30aa44f1fe6f011ba48ed357b4079d25f09afdb9777abc8cb039a2bb70",
+      "version": "1c720a30aa44",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
       "text": "開",
       "pronunciation": [
         "ㄎㄞ"
@@ -8809,6 +9796,22 @@
       "bytes": 10259,
       "sha256": "c40b88e3c29a4458698a1c5a1d469f652eed18fd37186fc7c82a11b7463cb43e",
       "version": "c40b88e3c29a",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
+      "text": "青蛙",
+      "pronunciation": [
+        "ㄑㄧㄥ|ㄨㄚ"
+      ],
+      "observedReadings": [
+        "ㄑㄧㄥ|ㄨㄚ"
+      ],
+      "url": "/listening-audio/9752-86d9.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.789,
+      "bytes": 8238,
+      "sha256": "c35376ab91d9208bf2c7cb92c724af16924b69af27cefa5b4022e1aa9fc36977",
+      "version": "c35376ab91d9",
       "review": "legacy; pronunciation not certified"
     },
     {
@@ -8980,6 +9983,22 @@
       "review": "legacy; pronunciation not certified"
     },
     {
+      "text": "飛到",
+      "pronunciation": [
+        "ㄈㄟ|ㄉㄠˋ"
+      ],
+      "observedReadings": [
+        "ㄈㄟ|ㄉㄠˋ"
+      ],
+      "url": "/listening-audio/98db-5230.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.789,
+      "bytes": 8526,
+      "sha256": "645d8dbd83ec5e746fe6f66c2dd3196d3735c4cd0d301b464fdaa3546916c250",
+      "version": "645d8dbd83ec",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
       "text": "飛",
       "pronunciation": [
         "ㄈㄟ"
@@ -9025,6 +10044,22 @@
       "bytes": 17099,
       "sha256": "c8b53b274ca2129bd1f16ed8c691877814015f5a116f7b0d55227b873f847ac9",
       "version": "c8b53b274ca2",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
+      "text": "香蕉",
+      "pronunciation": [
+        "ㄒㄧㄤ|ㄐㄧㄠ"
+      ],
+      "observedReadings": [
+        "ㄒㄧㄤ|ㄐㄧㄠ"
+      ],
+      "url": "/listening-audio/9999-8549.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.882,
+      "bytes": 9340,
+      "sha256": "d4f3fdb28d280d79516e0594a41c8fee7847075eb69677e5ffaa38316d88757b",
+      "version": "d4f3fdb28d28",
       "review": "legacy; pronunciation not certified"
     },
     {
@@ -9148,6 +10183,22 @@
       "review": "legacy; pronunciation not certified"
     },
     {
+      "text": "高高",
+      "pronunciation": [
+        "ㄍㄠ|ㄍㄠ"
+      ],
+      "observedReadings": [
+        "ㄍㄠ|ㄍㄠ"
+      ],
+      "url": "/listening-audio/9ad8-9ad8.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.743,
+      "bytes": 8164,
+      "sha256": "ceb3619c49b5e4c885ce3fc345efa5af2272954e35cc61b4eb827874eb60f927",
+      "version": "ceb3619c49b5",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
       "text": "高",
       "pronunciation": [
         "ㄍㄠ"
@@ -9224,6 +10275,38 @@
       "review": "legacy; pronunciation not certified"
     },
     {
+      "text": "魚乾",
+      "pronunciation": [
+        "ㄩˊ|ㄍㄢ"
+      ],
+      "observedReadings": [
+        "ㄩˊ|ㄍㄢ"
+      ],
+      "url": "/listening-audio/9b5a-4e7e.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.743,
+      "bytes": 8417,
+      "sha256": "54899b46d5aab6b06eb4f21c800cb0fd7c23be87ec2a39d923b2e635313c4158",
+      "version": "54899b46d5aa",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
+      "text": "魚缸",
+      "pronunciation": [
+        "ㄩˊ|ㄍㄤ"
+      ],
+      "observedReadings": [
+        "ㄩˊ|ㄍㄤ"
+      ],
+      "url": "/listening-audio/9b5a-7f38.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.743,
+      "bytes": 8641,
+      "sha256": "0f164b0f9db5ea0a4beaf2cddfe6cb32674c6ee16a94edce3a961f1b24c463da",
+      "version": "0f164b0f9db5",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
       "text": "魚",
       "pronunciation": [
         "ㄩˊ"
@@ -9253,6 +10336,22 @@
       "bytes": 10885,
       "sha256": "5be0962083fdaf7227228c55ca52906aca0bc95035a95394243ad70907737ae9",
       "version": "5be0962083fd",
+      "review": "legacy; pronunciation not certified"
+    },
+    {
+      "text": "鯉魚",
+      "pronunciation": [
+        "ㄌㄧˇ|ㄩˊ"
+      ],
+      "observedReadings": [
+        "ㄌㄧˇ|ㄩˊ"
+      ],
+      "url": "/listening-audio/9bc9-9b5a.m4a",
+      "source": "macOS Meijia (legacy synthesis)",
+      "duration": 0.697,
+      "bytes": 7920,
+      "sha256": "b68bb322a291c5a8f8bf35cd47f006d9867bc006cd873d24f7b4e537e34d7e37",
+      "version": "b68bb322a291",
       "review": "legacy; pronunciation not certified"
     },
     {

@@ -38,13 +38,13 @@ public/                    靜態部署素材與完整語音 registry
 
 ## 教材及保存
 
-課文與圈詞先改 `course-data.ts`／`circled-vocabulary.ts`，再檢查注音、IVS、語音並執行 `npm run assets:audio-registry`。題目 ID 維持 `類別:朗讀文字`；舊收藏可取用舊範圍（凍結在 `legacy-content.ts`，只增不改），但新整輪只抽教師指定範圍。九課之外的複習一／二／三分別涵蓋 1–3、4–6、7–9，只有聽寫。
+課文與圈詞先改 `course-data.ts`／`circled-vocabulary.ts`，再檢查注音、IVS、語音並執行 `npm run assets:audio-registry`。題目 ID 維持 `類別:朗讀文字`；舊收藏可取用舊範圍（凍結在 `legacy-content.ts`，只增不改），但新整輪只抽教師指定範圍。圈詞每題一個單詞：家長輸入的句子只是產生單詞的來源，拆出的詞沿用原句注音，原句移到 `legacy-content.ts`（課次為 `legacyCircledVocabulary`、複習為 `legacyReviewVocabulary`），以前收藏的句子題仍能開啟。新詞音檔用 `node scripts/generate-listening-audio.mjs`（macOS Meijia）產生後再跑 `npm run assets:audio-registry`；同一個詞只能有一種讀音，否則無法對應音檔。九課之外的複習一／二／三分別涵蓋 1–3、4–6、7–9，只有聽寫。
 
 課次 index 是永久身份（`lesson-identity.ts`）：內建 0–8、複習為負數、自訂從 9 起只增不減；第十課以後的內建課次使用 `builtinLessonIndex()`（≥ 1,000,000），不會佔用家長第一個自訂課次。判斷自訂課次一律用 `isCustomLessonIndex`，不要和 9 比較。
 
 教材改名、排序、封存保留 identity；修改內容建立新 index 並封存原版本，避免舊筆跡掛到新答案。目錄保留封存課次供紀錄查找。教材讀取失敗時不覆寫原值；寫入失敗保留記憶體操作並提示。自訂教材支援逐字注音的字詞，尚未提供整篇課文或照片匯入。
 
-默寫標題在畫面最右欄，但 storage 的舊正文索引不改，標題資料附加於正文之後。pending 與完成格分開；明確的空 pending 不回退到舊完成筆跡。默寫草稿可重新整理續寫，未完成整輪聽寫仍只存在記憶體。
+默寫標題在畫面最右欄，但 storage 的舊正文索引不改，標題資料附加於正文之後。pending 與完成格分開；明確的空 pending 不回退到舊完成筆跡。默寫草稿可重新整理續寫。整輪聽寫隨寫隨存在 `zhuyin-listening-round-v1`（題目順序、目前題號、每題筆跡、整輪檢查標記；同時只保留一輪）：12 小時內重新開啟會直接回到該課聽寫並詢問「繼續聽寫／重新開始」，更久的在進入該課聽寫時詢問；完成檢查、結束本輪或重新開始時清除。單題重練不保存。
 
 收藏與待補強是獨立旗標：取消收藏不清除補強；家長確認掌握才移出補強。舊版 v1／v2／v3 紀錄轉成 v4 時保留原 key。默寫收藏保持 v1；內建課文讀音更正時（例如「教」ㄐㄧㄠˋ→ㄐㄧㄠ），收藏跟著同位置的新讀音，不會被丟棄。打開已完成的格子再返回不會變成未完成。歷史保留最近 20 次真正完成的練習；開啟課文不算完成。
 
@@ -86,8 +86,8 @@ Loading 等待當頁必要字型，圖片獨立透過小圖預覽漸進清晰。
 
 ## 樣式及發布門檻
 
-CSS 維持原匯入順序。已刪除程式碼中完全沒有使用的 class 規則，以及被後面同 selector、同條件規則覆寫的宣告（保留 `!important`、同規則內 fallback 與新語法值前的舊值）。`00-reset.css` 是原 Tailwind preflight，放在 cascade layer，所有一般規則都優先；沒有 utility class。`styles/lazy/` 由功能的 `lazy()` 匯入一起載入，只放該功能專屬 selector。`00-foundation.css` 集中 UI／旁注音／音節／基本符號／結合韻字型與點擊尺寸。功能樣式在對應檔案修改，避免另建一套字型或任意覆寫根樣式。
+CSS 維持原匯入順序。已刪除程式碼中完全沒有使用的 class 規則，以及被後面同 selector、同條件規則覆寫的宣告（保留 `!important`、同規則內 fallback 與新語法值前的舊值）。`00-reset.css` 是原 Tailwind preflight，放在 cascade layer，所有一般規則都優先；沒有 utility class。`styles/lazy/` 由功能的 `lazy()` 匯入一起載入，只放該功能專屬 selector。`24-fill-tablet.css` 讓 600px 以上的默寫題目頁、書寫頁與檢查頁滿版：書寫格依畫面剩餘高度放大，橫向平板改成左欄說明與按鈕、右欄書寫格；手機版面不變。`00-foundation.css` 集中 UI／旁注音／音節／基本符號／結合韻字型與點擊尺寸。功能樣式在對應檔案修改，避免另建一套字型或任意覆寫根樣式。
 
 發布須通過 `npm run check`、`npm run format:check`、`npm run build`（含素材與子路徑檢查）及 Playwright 五個專案（Android 平板直／橫、iPad、Android 手機、桌面）。主要裝置是 Android 平板＋電容筆，先檢查 800／1280px 平板，再看 320／390px。檢查標題續寫、整輪往返／重聽／批次檢查、垂直語詞、辨音動畫、自訂資料備份及失敗重試。更新證據記在 `structure-improvements.md`；模擬 pointer 不能宣稱紅米真機／普通電容筆已驗證。發布後核對成功狀態與 source commit。
 
-維持免登入、無 DB／雲端同步／PWA，不變更教師課文範圍。依賴維護見 `security-maintenance.md`。
+維持免登入、無 DB／雲端同步、無 service worker／離線快取，不變更教師課文範圍。可加到主畫面全螢幕、固定直式開啟（`public/manifest.webmanifest`，圖示由 `scripts/build-app-icons.mjs` 產生）；`useBackGesture` 讓系統返回手勢回到 App 內上一頁，從主畫面開啟時在首頁按返回也不會關閉。根元素 `overscroll-behavior-y: none` 關閉下拉重新整理；即使頁面仍被重新整理，整輪聽寫也能從原題繼續。依賴維護見 `security-maintenance.md`。

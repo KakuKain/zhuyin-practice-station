@@ -12,6 +12,7 @@ import { AppHeader, LoadingOverlay, ResourceNotice } from "../../components/AppC
 import { ListeningBatchReview } from "./ListeningBatchReview";
 import { ListeningCanvas } from "./ListeningCanvas";
 import { ConfirmDialog } from "../../components/ConfirmDialog";
+import { answeredQuestions } from "./listening-round-storage";
 
 export function ListeningScreen({ app }: { app: AppController }) {
   const {
@@ -277,6 +278,20 @@ export function ListeningScreen({ app }: { app: AppController }) {
       </div>
       {(loadingMessage || audioLoading) && (
         <LoadingOverlay label={loadingMessage ?? "聲音準備中…"} />
+      )}
+      {app.resumeRound && (
+        <ConfirmDialog
+          id="listen-resume"
+          eyebrow="上次的聽寫"
+          title="要繼續上次的聽寫嗎？"
+          primaryLabel="繼續聽寫"
+          onPrimary={app.continueSavedRound}
+          secondaryLabel="重新開始"
+          onSecondary={app.discardSavedRound}
+        >
+          上次寫到第 {app.resumeRound.index + 1} 題，已寫 {answeredQuestions(app.resumeRound)} /{" "}
+          {app.resumeRound.questions.length} 題。重新開始會清除這些筆跡。
+        </ConfirmDialog>
       )}
       {listenExitOpen && (
         <ConfirmDialog

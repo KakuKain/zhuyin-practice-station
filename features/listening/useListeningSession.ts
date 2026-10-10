@@ -1,9 +1,10 @@
 import { useState } from "react";
 import type { InkStroke, ListenPhase, ListeningQuestion } from "../types";
 
-export function useListeningSession() {
+/** `initialQuestions` lets a saved round reopen on start-up with its own question order. */
+export function useListeningSession(initialQuestions: ListeningQuestion[] = []) {
   const [listenIndex, setListenIndex] = useState(0);
-  const [sessionQuestions, setSessionQuestions] = useState<ListeningQuestion[]>([]);
+  const [sessionQuestions, setSessionQuestions] = useState<ListeningQuestion[]>(initialQuestions);
   const [listenPhase, setListenPhase] = useState<ListenPhase>("ready");
   const [listenExitOpen, setListenExitOpen] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(30);
