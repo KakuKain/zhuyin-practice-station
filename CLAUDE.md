@@ -63,10 +63,12 @@ There is one build: a static Vite SPA. `index.html` → `app/main.tsx` → `crea
 - One `<audio>` element is mounted at the app root for every screen, so iOS keeps the playback a tap unlocked.
 - The system back gesture stays inside the app (`features/navigation/useBackGesture.ts`): one history guard entry absorbs each back and runs `goBack` in `usePracticeApp`, the same step as each screen's back button. On the home screen an installed app stays open; a browser tab leaves as usual.
 - Pull-to-refresh is off (`overscroll-behavior-y: none` on the root).
-- Auto-update without a service worker (`lib/loading/useAppUpdate.ts`).
-  - Each build compiles `__APP_BUILD__` (the commit SHA in CI) and publishes the same value as `version.json`; `check-build.mjs` verifies they match.
+- Auto-update without a service worker (`lib/loading/app-update.ts` holds the shared status; `useAppUpdate.ts` schedules the checks).
+  - Each build compiles `__APP_BUILD__` (the commit SHA in CI) and `__APP_BUILD_DATE__` (Taipei date), and publishes the same build as `version.json`; `check-build.mjs` verifies they match.
   - The app fetches `version.json` uncached on open, when it returns from the background, and every 30 minutes.
   - A newer build loads via `location.replace("?v=<build>")`, only on the course list. The query skips cached pages and prevents a reload loop.
+  - On other screens (not the 默寫 sheet or a listening round) `UpdateReminder` offers 現在更新. 更多 → 版本 shows the version, 版次 (build id and date), whether the app was opened from the home screen, and buttons to check and update.
+- The shown version is `package.json` `version`. When releasing user-visible changes, bump it and add a matching first entry to `siteReleaseNotes` in `features/courses/course-data.ts`; a unit test fails if they differ.
 - Confirmation modals use `components/ConfirmDialog`. Panels put a back button in the header with `HeaderBack`, which renders into the `HeaderBackSlot` context.
 
 Layout: `features/<feature>/` holds feature UI and logic, `components/` holds shared UI (`PageHeading`, `ShowMsg`, `ReviewActions`, `Zhuyin`, `InkTools`, `ConfirmDialog`), and `lib/` holds infrastructure (ink, audio, storage, loading).
@@ -131,9 +133,10 @@ Layout: `features/<feature>/` holds feature UI and logic, `components/` holds sh
 
 ### Styles
 
-- `app/globals.css` imports `styles/00-…css` through `styles/23-…css` in a fixed cascade order. Order matters.
+- `app/globals.css` imports `styles/00-…css` through `styles/25-…css` in a fixed cascade order. Order matters.
 - `00-reset.css` is the former Tailwind preflight, kept in cascade layers so every unlayered rule wins. There is no Tailwind and there are no utility classes.
 - `24-fill-tablet.css` makes dictation (sheet, writing cell, review) full width at ≥ 600px: the square grows to the space left by the header and controls, and landscape tablets put the heading and finish button beside it. Phones keep the 480px column.
+- `25-listen-tablet.css` does the same for listening at ≥ 600px: the single square fills the width, a word's squares stack top to bottom with their tools beside them (side by side, first character on the right, in landscape), and the batch check shows two cards per row.
 - `styles/lazy/` holds feature CSS loaded by the feature's `lazy()` import, after every eager stylesheet. Keep only selectors scoped to that feature there.
 - Put new rules in the matching feature file. Shared fonts, size tokens, and tap-target sizes live in `00-foundation.css`. Don't add a parallel font system or override root styles ad hoc.
 

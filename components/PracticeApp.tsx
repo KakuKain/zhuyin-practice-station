@@ -1,7 +1,14 @@
 import { ShowMsgProvider } from "./ShowMsg";
 import { lazy, Suspense, useState } from "react";
 import { usePracticeApp } from "../features/usePracticeApp";
-import { AppHeader, BottomNav, HeaderBackSlot, LoadingOverlay, ResourceNotice } from "./AppChrome";
+import {
+  AppHeader,
+  BottomNav,
+  HeaderBackSlot,
+  LoadingOverlay,
+  ResourceNotice,
+  UpdateReminder,
+} from "./AppChrome";
 import { FillDialogs } from "../features/fill/FillDialogs";
 import { CourseList } from "../features/courses/CourseList";
 import { MaterialSelector } from "../features/courses/MaterialSelector";
@@ -114,6 +121,8 @@ function PracticeContent({ app }: { app: ReturnType<typeof usePracticeApp> }) {
         />
         <main className="main-content">
           <ResourceNotice failed={resourceError} />
+          {/* Not while writing: the course list updates by itself, dictation stays undisturbed. */}
+          {view !== "courses" && view !== "fill" && <UpdateReminder />}
           <Suspense
             fallback={
               <p className="feature-loading" role="status">

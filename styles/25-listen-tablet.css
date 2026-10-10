@@ -1,0 +1,145 @@
+/*
+ * 聽寫滿版：on tablets the listening round, its ready screen and the batch check use the whole
+ * screen instead of the 480px phone column. Phones keep the layout above.
+ */
+@media (min-width: 600px) {
+  .focus-shell,
+  .phase-ready {
+    width: 100%;
+    max-width: none;
+  }
+
+  /* Ready screen: the phone-shaped watercolor scene covers the wider screen without stretching. */
+  .phase-ready {
+    background-position: center bottom;
+    background-size: cover;
+  }
+
+  .phase-ready .focus-content > :not(.visually-hidden) {
+    width: 100%;
+    max-width: 640px;
+    margin-inline: auto;
+  }
+
+  /*
+   * Writing square: what the screen leaves after the header, ink tools, toolbar and the
+   * question buttons (about 330px tall), so 下一題 never needs a scroll.
+   */
+  .focus-shell {
+    --listen-square: max(280px, min(100vw - 28px, 100dvh - 330px));
+  }
+
+  .focus-shell .canvas-zone:not(.is-word) {
+    width: var(--listen-square);
+  }
+
+  /*
+   * A word: one square per character, top to bottom like the children's notebooks, with its
+   * tools beside it so a two-character word fits without scrolling.
+   */
+  .focus-shell .canvas-zone.is-word {
+    --word-cell-size: max(
+      300px,
+      min(600px, 100vw - 170px, (100dvh - 310px) / var(--word-count, 1) - 12px)
+    );
+    width: calc(var(--word-cell-size) + 136px);
+    max-width: 100%;
+  }
+
+  .focus-shell .canvas-zone.is-word .word-canvas-row {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .focus-shell .canvas-zone.is-word .word-canvas-tools {
+    flex: 0 0 104px;
+    width: 104px;
+  }
+
+  .focus-shell .canvas-zone.is-word .word-canvas-tools .ink-tools {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* The watercolor starts partway down a tall screen; match its top so no seam shows. */
+  .focus-shell {
+    background-color: #fefdf7;
+  }
+
+  .focus-shell .focus-content > :not(.canvas-zone, .visually-hidden) {
+    width: 100%;
+    max-width: var(--listen-square);
+  }
+
+  /* Batch check: two answer cards per row. */
+  .listening-batch-review {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 16px;
+    align-items: start;
+  }
+
+  .listening-batch-review > :not(.listening-review-card) {
+    grid-column: 1 / -1;
+  }
+
+  .listening-batch-review > .listening-review-card {
+    margin: 0;
+  }
+}
+
+/* Landscape tablets: question buttons beside a square as tall as the screen. */
+@media (min-width: 900px) and (orientation: landscape) {
+  .focus-shell {
+    --listen-square: max(280px, min(100vw - 440px, 100dvh - 212px));
+  }
+
+  .focus-shell .focus-content:has(> .canvas-zone) {
+    display: grid;
+    grid-template-columns: minmax(240px, 320px) auto;
+    align-content: start;
+    justify-content: center;
+    column-gap: 28px;
+    row-gap: 12px;
+  }
+
+  .focus-shell .focus-content:has(> .canvas-zone) > :not(.visually-hidden) {
+    grid-column: 1;
+    max-width: none;
+  }
+
+  .focus-shell .focus-content:has(> .canvas-zone) > .canvas-zone {
+    grid-column: 2;
+    grid-row: 1 / span 12;
+  }
+
+  /* A word: characters side by side, the first on the right, wrapping after three. */
+  .focus-shell .canvas-zone.is-word {
+    --word-cell-size: max(
+      240px,
+      min((100vw - 476px) / var(--word-count, 1) - 12px, 100dvh - 264px)
+    );
+    width: min(100vw - 440px, var(--word-count, 1) * (var(--word-cell-size) + 12px) + 12px);
+  }
+
+  .focus-shell .canvas-zone.is-word .word-canvas-stack {
+    grid-template-columns: repeat(auto-fit, var(--word-cell-size));
+    justify-content: center;
+  }
+
+  .focus-shell .canvas-zone.is-word .word-canvas-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .focus-shell .canvas-zone.is-word .word-canvas-tools {
+    flex: none;
+    width: 100%;
+  }
+
+  .focus-shell .canvas-zone.is-word .word-canvas-tools .ink-tools {
+    grid-template-columns: 1.35fr 1fr 1fr;
+  }
+}

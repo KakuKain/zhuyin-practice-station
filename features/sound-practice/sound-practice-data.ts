@@ -6,22 +6,64 @@ export type SoundPair = {
 };
 const symbol = (label: string): SoundOption => ({ label, audioText: label });
 
-export const soundPairs: readonly SoundPair[] = [
-  { id: "zhi-chi", title: "ㄓ / ㄔ", sounds: [symbol("ㄓ"), symbol("ㄔ")] },
-  { id: "zhi-zi", title: "ㄓ / ㄗ", sounds: [symbol("ㄓ"), symbol("ㄗ")] },
-  { id: "chi-ci", title: "ㄔ / ㄘ", sounds: [symbol("ㄔ"), symbol("ㄘ")] },
-  { id: "an-ai", title: "ㄢ / ㄞ", sounds: [symbol("ㄢ"), symbol("ㄞ")] },
-  { id: "an-ang", title: "ㄢ / ㄤ", sounds: [symbol("ㄢ"), symbol("ㄤ")] },
-  { id: "ang-eng", title: "ㄤ / ㄥ", sounds: [symbol("ㄤ"), symbol("ㄥ")] },
+const symbols = (id: string, first: string, second: string): SoundPair => ({
+  id,
+  title: `${first} / ${second}`,
+  sounds: [symbol(first), symbol(second)],
+});
+
+export type SoundGroup = { title: string; pairs: readonly SoundPair[] };
+
+/** Pairs children often mix up, grouped so a parent can find one quickly. */
+export const soundGroups: readonly SoundGroup[] = [
   {
-    id: "tone-2-3",
-    title: "二聲 / 三聲",
-    sounds: [
-      { label: "ㄌㄧˊ", audioText: "狸", caption: "二聲 ˊ" },
-      { label: "ㄌㄧˇ", audioText: "裡", caption: "三聲 ˇ" },
+    title: "捲舌、不捲舌",
+    pairs: [
+      symbols("zhi-zi", "ㄓ", "ㄗ"),
+      symbols("chi-ci", "ㄔ", "ㄘ"),
+      symbols("shi-si", "ㄕ", "ㄙ"),
+      symbols("ri-le", "ㄖ", "ㄌ"),
+    ],
+  },
+  {
+    title: "其他聲母",
+    pairs: [
+      symbols("zhi-chi", "ㄓ", "ㄔ"),
+      symbols("fo-he", "ㄈ", "ㄏ"),
+      symbols("ne-le", "ㄋ", "ㄌ"),
+    ],
+  },
+  {
+    title: "鼻音韻母",
+    pairs: [
+      symbols("en-eng", "ㄣ", "ㄥ"),
+      symbols("an-ang", "ㄢ", "ㄤ"),
+      symbols("ang-eng", "ㄤ", "ㄥ"),
+      symbols("in-ing", "ㄧㄣ", "ㄧㄥ"),
+      symbols("ian-iang", "ㄧㄢ", "ㄧㄤ"),
+      symbols("uen-ueng", "ㄨㄣ", "ㄨㄥ"),
+    ],
+  },
+  {
+    title: "其他韻母",
+    pairs: [symbols("an-ai", "ㄢ", "ㄞ"), symbols("o-e", "ㄛ", "ㄜ"), symbols("i-yu", "ㄧ", "ㄩ")],
+  },
+  {
+    title: "聲調",
+    pairs: [
+      {
+        id: "tone-2-3",
+        title: "二聲 / 三聲",
+        sounds: [
+          { label: "ㄌㄧˊ", audioText: "狸", caption: "二聲 ˊ" },
+          { label: "ㄌㄧˇ", audioText: "裡", caption: "三聲 ˇ" },
+        ],
+      },
     ],
   },
 ];
+
+export const soundPairs: readonly SoundPair[] = soundGroups.flatMap((group) => group.pairs);
 
 export type SoundQuestion = { target: number; order: [number, number] };
 

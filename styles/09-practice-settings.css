@@ -277,3 +277,38 @@
   place-items: center;
   color: #526b7f;
 }
+
+/* 更多 → 版本: the running build, how the app was opened, and manual update. */
+.version-status {
+  margin-block: 8px 20px;
+  padding: 16px 18px 4px;
+  border-radius: 24px;
+  background: #f3faff;
+}
+
+.version-status dl {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.version-status dl > div {
+  display: grid;
+  grid-template-columns: 5em minmax(0, 1fr);
+  gap: 12px;
+}
+
+.version-status dt {
+  color: #61748d;
+  font-weight: 700;
+}
+
+.version-status dd {
+  margin: 0;
+  color: var(--ref-navy);
+  overflow-wrap: anywhere;
+}
+
+.version-status .backup-actions {
+  margin-block: 16px;
+}

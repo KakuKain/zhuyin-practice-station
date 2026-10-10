@@ -15,6 +15,29 @@ import {
   Question,
 } from "@phosphor-icons/react";
 import { siteReleaseNotes } from "../courses/course-data";
+import {
+  checkForUpdate,
+  loadLatestVersion,
+  runningBuild,
+  runningBuildDate,
+  useUpdateStatus,
+  type UpdateState,
+} from "../../lib/loading/app-update";
+import { isInstalledApp } from "../navigation/useBackGesture";
+
+const shortBuild = (build: string) => (/^[0-9a-f]{12}$/.test(build) ? build.slice(0, 7) : build);
+const time = (at: number | null) =>
+  at === null
+    ? ""
+    : new Date(at).toLocaleTimeString("zh-TW", { hour: "2-digit", minute: "2-digit" });
+function updateMessage({ status, latestBuild, checkedAt }: UpdateState) {
+  if (status === "checking") return "正在檢查…";
+  if (status === "available")
+    return `有新版本（版次 ${shortBuild(latestBuild ?? "")}），可按「更新到最新版」。`;
+  if (status === "current") return `已是最新版本（${time(checkedAt)} 檢查）。`;
+  if (status === "offline") return "目前無法連線檢查，請確認網路後再試。";
+  return "尚未檢查。";
+}
 const MaterialsPanel = lazy(() =>
   import("./MaterialsPanel").then((module) => ({ default: module.MaterialsPanel })),
 );
@@ -29,6 +52,54 @@ const CustomAudioPanel = lazy(() =>
 const DeviceBackupPanel = lazy(() =>
   import("./DeviceBackupPanel").then((module) => ({ default: module.DeviceBackupPanel })),
 );
+
+/** Which build is running, how the app was opened, and a manual way to get the newest one. */
+function VersionStatus() {
+  const update = useUpdateStatus();
+  const installed = isInstalledApp();
+  return (
+    <section className="version-status" aria-label="目前版本">
+      <dl>
+        <div>
+          <dt>版本</dt>
+          <dd>{siteReleaseNotes[0][0]}</dd>
+        </div>
+        <div>
+          <dt>版次</dt>
+          <dd>
+            {shortBuild(runningBuild)}
+            {runningBuildDate && ` · ${runningBuildDate}`}
+          </dd>
+        </div>
+        <div>
+          <dt>開啟方式</dt>
+          <dd>
+            {installed
+              ? "主畫面 App（全螢幕、固定直式）"
+              : "瀏覽器分頁：從主畫面的 App 圖示開啟才會全螢幕、固定直式"}
+          </dd>
+        </div>
+        <div>
+          <dt>更新</dt>
+          <dd role="status">{updateMessage(update)}</dd>
+        </div>
+      </dl>
+      <div className="backup-actions">
+        <button
+          type="button"
+          className="secondary-button"
+          disabled={update.status === "checking"}
+          onClick={() => void checkForUpdate()}
+        >
+          檢查更新
+        </button>
+        <button type="button" className="primary-button" onClick={loadLatestVersion}>
+          {update.status === "available" ? "更新到最新版" : "重新載入最新版"}
+        </button>
+      </div>
+    </section>
+  );
+}
 
 export function SettingsScreen({
   app,
@@ -61,6 +132,7 @@ export function SettingsScreen({
     settingsStorageError,
   } = app;
   const [saveRequested, setSaveRequested] = useState(false);
+  const { status: updateStatus } = useUpdateStatus();
   const updateSettings = (patch: Partial<ListeningSettings>) => {
     setListeningSettings((current) => ({ ...current, ...patch }));
     setSaveRequested(true);
@@ -152,7 +224,10 @@ export function SettingsScreen({
               </span>
               <span>
                 <strong>版本</strong>
-                <small>目前 {siteReleaseNotes[0][0]} · Beta 測試版</small>
+                <small>
+                  目前 {siteReleaseNotes[0][0]} · 版次 {shortBuild(runningBuild)}
+                  {updateStatus === "available" && " · 有新版本"}
+                </small>
               </span>
               <span className="more-arrow" aria-hidden="true">
                 <ArrowRight size={21} weight="bold" />
@@ -317,6 +392,7 @@ export function SettingsScreen({
       {morePanel === "versions" && (
         <div className="more-detail-content">
           <h1>版本</h1>
+          <VersionStatus />
           <p className="more-detail-intro">
             網站目前仍在 Beta 測試階段，版本號用來區分每次功能更新。開發過程中的細項更新可在{" "}
             <a
