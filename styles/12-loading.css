@@ -16,6 +16,23 @@
   letter-spacing: 0.04em;
 }
 
+/* Shown only when a clip is slow to start; until then it is hidden and touches pass through. */
+.loading-overlay.is-delayed {
+  visibility: hidden;
+  animation: loading-reveal 160ms ease-out 700ms forwards;
+}
+
+@keyframes loading-reveal {
+  from {
+    visibility: visible;
+    opacity: 0;
+  }
+  to {
+    visibility: visible;
+    opacity: 1;
+  }
+}
+
 .loading-orbit {
   position: relative;
   display: flex;

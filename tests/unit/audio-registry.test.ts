@@ -33,3 +33,16 @@ test("a known alternate tone never selects a shared file", () => {
   assert.equal(registeredAudioUrl("翹", "ㄑㄧㄠ"), null);
   assert.equal(registeredAudioUrl("教", "ㄐㄧㄠˋ"), null);
 });
+
+test("every playback identity resolves to a shipped file in its folder", () => {
+  const index = JSON.parse(readFileSync("lib/audio/audio-index.json", "utf8"));
+  for (const [text, [, , folder]] of Object.entries(index) as [
+    string,
+    [string[], string, string],
+  ][]) {
+    assert.ok(["", "gemini/rhymes/", "gemini/words/"].includes(folder), text);
+    const url = registeredAudioUrl(text)!;
+    assert.ok(url.startsWith(`listening-audio/${folder}`), text);
+    readFileSync(`public/${url.split("?")[0]}`);
+  }
+});

@@ -151,6 +151,12 @@ export class InkHistory {
     this.strokes = next;
     return true;
   }
+  /** Replace the current strokes without a new undo step (a stroke rejoined after a skip). */
+  amend(next: InkStroke[]) {
+    if (next === this.strokes) return false;
+    this.strokes = next;
+    return true;
+  }
   undo() {
     const previous = this.previous.pop();
     if (!previous) return false;

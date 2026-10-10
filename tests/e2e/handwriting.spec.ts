@@ -190,6 +190,37 @@ test("a touch size spike and pointer cancellation preserve the accepted part of 
   await expect.poll(async () => (await savedInk(page)).length).toBe(3);
 });
 
+test("a pen that loses the screen for a moment keeps writing one stroke", async ({ page }) => {
+  const canvas = await openFill(page);
+  await touch(canvas, [
+    { type: "pointerdown", x: 20, y: 20, time: 1000 },
+    { type: "pointermove", x: 30, y: 20, time: 1010 },
+    { type: "pointermove", x: 40, y: 20, time: 1020 },
+    { type: "pointerup", x: 40, y: 20, time: 1025 },
+  ]);
+  // Back 35 ms later, just ahead of where the pen was going.
+  await touch(canvas, [
+    { type: "pointerdown", id: 2, x: 45, y: 20, time: 1060 },
+    { type: "pointermove", id: 2, x: 60, y: 22, time: 1070 },
+    { type: "pointerup", id: 2, x: 60, y: 22, time: 1080 },
+  ]);
+  await expect.poll(async () => (await savedInk(page)).length).toBe(1);
+  const joined = (await savedInk(page))[0];
+  expect(joined[0]).toMatchObject({ x: 20, y: 20 });
+  expect(joined.at(-1)).toMatchObject({ x: 60, y: 22 });
+  // One undo removes the whole stroke, not just the part after the skip.
+  await page.getByRole("button", { name: "復原這格筆跡", exact: true }).click();
+  await expect.poll(async () => (await savedInk(page)).length).toBe(0);
+  // A pause before touching again is a new stroke, even nearby.
+  await touch(canvas, [
+    { type: "pointerdown", id: 3, x: 20, y: 60, time: 2000 },
+    { type: "pointerup", id: 3, x: 40, y: 60, time: 2030 },
+    { type: "pointerdown", id: 4, x: 42, y: 60, time: 2300 },
+    { type: "pointerup", id: 4, x: 60, y: 60, time: 2330 },
+  ]);
+  await expect.poll(async () => (await savedInk(page)).length).toBe(2);
+});
+
 test("capture failure and release outside the canvas never leave writing stuck", async ({
   page,
 }) => {

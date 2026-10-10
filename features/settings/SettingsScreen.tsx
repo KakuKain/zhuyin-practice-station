@@ -23,6 +23,7 @@ import {
   useUpdateStatus,
   type UpdateState,
 } from "../../lib/loading/app-update";
+import { useInkCounts, type InkCounts } from "../../lib/ink/ink-diagnostics";
 import { isInstalledApp } from "../navigation/useBackGesture";
 
 const shortBuild = (build: string) => (/^[0-9a-f]{12}$/.test(build) ? build.slice(0, 7) : build);
@@ -54,8 +55,13 @@ const DeviceBackupPanel = lazy(() =>
 );
 
 /** Which build is running, how the app was opened, and a manual way to get the newest one. */
+/** Since the app opened: how often the pen skipped and was joined back, and what else cut a line. */
+const inkMessage = (ink: InkCounts) =>
+  `這次開啟後：斷筆接回 ${ink.rejoined} 次、系統中斷 ${ink.cancelled} 次、手掌截斷 ${ink.palmCut} 次、忽略第二個觸點 ${ink.secondTouch} 次`;
+
 function VersionStatus() {
   const update = useUpdateStatus();
+  const ink = useInkCounts();
   const installed = isInstalledApp();
   return (
     <section className="version-status" aria-label="目前版本">
@@ -82,6 +88,10 @@ function VersionStatus() {
         <div>
           <dt>更新</dt>
           <dd role="status">{updateMessage(update)}</dd>
+        </div>
+        <div>
+          <dt>筆跡</dt>
+          <dd>{inkMessage(ink)}</dd>
         </div>
       </dl>
       <div className="backup-actions">

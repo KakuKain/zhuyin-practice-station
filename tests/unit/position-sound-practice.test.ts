@@ -105,7 +105,7 @@ test("every contrast uses existing clips; second/third tone retains the same syl
   assert.equal(new Set(soundPairs.map((p) => p.id)).size, soundPairs.length);
   for (const pair of soundPairs) assert.notEqual(pair.sounds[0].label, pair.sounds[1].label);
   // The nasal endings parents asked for, including the combined rhymes.
-  for (const id of ["en-eng", "in-ing", "uen-ueng", "shi-si"])
+  for (const id of ["en-eng", "in-ing", "uen-ueng", "shi-si", "o-ou"])
     assert.ok(
       soundPairs.find((p) => p.id === id),
       id,

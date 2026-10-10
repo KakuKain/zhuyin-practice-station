@@ -46,7 +46,12 @@ export const soundGroups: readonly SoundGroup[] = [
   },
   {
     title: "其他韻母",
-    pairs: [symbols("an-ai", "ㄢ", "ㄞ"), symbols("o-e", "ㄛ", "ㄜ"), symbols("i-yu", "ㄧ", "ㄩ")],
+    pairs: [
+      symbols("an-ai", "ㄢ", "ㄞ"),
+      symbols("o-e", "ㄛ", "ㄜ"),
+      symbols("o-ou", "ㄛ", "ㄡ"),
+      symbols("i-yu", "ㄧ", "ㄩ"),
+    ],
   },
   {
     title: "聲調",

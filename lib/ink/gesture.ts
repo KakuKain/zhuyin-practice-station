@@ -69,3 +69,43 @@ export function createPaintScheduler() {
     },
   };
 }
+
+/** Where a lifted contact was last seen and how fast it was moving, in CSS pixels. */
+export type ContactEnd = { x: number; y: number; time: number; speed: number };
+
+/**
+ * A passive capacitive pen can lose the screen for a few frames mid-stroke, which arrives
+ * as a lift and a new touch. Track recent speed so a touch that comes back right away, where
+ * the pen was heading, continues the same stroke instead of leaving a gap.
+ */
+export function createContactMotion() {
+  let last: { x: number; y: number; time: number } | null = null;
+  let speed = 0;
+  return {
+    add(x: number, y: number, time: number) {
+      if (last) {
+        const elapsed = time - last.time;
+        // Bursts of samples with near-identical timestamps say nothing about speed.
+        if (elapsed >= 4)
+          speed = speed * 0.5 + (Math.hypot(x - last.x, y - last.y) / elapsed) * 0.5;
+        if (elapsed < 0) return;
+      }
+      last = { x, y, time };
+    },
+    end(time: number): ContactEnd | null {
+      return last && { x: last.x, y: last.y, time, speed: Math.min(speed, 1.5) };
+    },
+  };
+}
+
+/** Only a gap no child would leave on purpose: under 0.12 s, close to where the pen was going. */
+export const rejoinWindowMs = 120;
+export function resumesContact(end: ContactEnd | null, x: number, y: number, time: number) {
+  if (!end) return false;
+  const elapsed = time - end.time;
+  return (
+    elapsed >= 0 &&
+    elapsed <= rejoinWindowMs &&
+    Math.hypot(x - end.x, y - end.y) <= 24 + end.speed * elapsed
+  );
+}
