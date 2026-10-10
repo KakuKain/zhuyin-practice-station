@@ -63,6 +63,10 @@ There is one build: a static Vite SPA. `index.html` → `app/main.tsx` → `crea
 - One `<audio>` element is mounted at the app root for every screen, so iOS keeps the playback a tap unlocked.
 - The system back gesture stays inside the app (`features/navigation/useBackGesture.ts`): one history guard entry absorbs each back and runs `goBack` in `usePracticeApp`, the same step as each screen's back button. On the home screen an installed app stays open; a browser tab leaves as usual.
 - Pull-to-refresh is off (`overscroll-behavior-y: none` on the root).
+- Auto-update without a service worker (`lib/loading/useAppUpdate.ts`).
+  - Each build compiles `__APP_BUILD__` (the commit SHA in CI) and publishes the same value as `version.json`; `check-build.mjs` verifies they match.
+  - The app fetches `version.json` uncached on open, when it returns from the background, and every 30 minutes.
+  - A newer build loads via `location.replace("?v=<build>")`, only on the course list. The query skips cached pages and prevents a reload loop.
 - Confirmation modals use `components/ConfirmDialog`. Panels put a back button in the header with `HeaderBack`, which renders into the `HeaderBackSlot` context.
 
 Layout: `features/<feature>/` holds feature UI and logic, `components/` holds shared UI (`PageHeading`, `ShowMsg`, `ReviewActions`, `Zhuyin`, `InkTools`, `ConfirmDialog`), and `lib/` holds infrastructure (ink, audio, storage, loading).

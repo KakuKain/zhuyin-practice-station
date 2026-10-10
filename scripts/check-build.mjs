@@ -35,6 +35,16 @@ for (const path of files(join(output, "assets"))) {
     assert(url.startsWith(base) || !url.startsWith("/"), `${path} has ${url} outside ${base}`);
 }
 
+// The open app compares its compiled build with version.json to load a newer deploy.
+const { build } = JSON.parse(readFileSync(join(output, "version.json"), "utf8"));
+assert(typeof build === "string" && build, "version.json must name the build");
+assert(
+  files(join(output, "assets")).some(
+    (path) => path.endsWith(".js") && readFileSync(path, "utf8").includes(build),
+  ),
+  "The bundle must carry the same build as version.json",
+);
+
 const publicFiles = files("public");
 for (const path of publicFiles) {
   const deployed = join(output, path.slice("public/".length));
