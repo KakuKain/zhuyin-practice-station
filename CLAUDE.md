@@ -38,6 +38,7 @@ Asset pipelines:
 - After adding or replacing any audio file, run `npm run assets:audio-registry`. It rewrites `public/listening-audio/registry.json` and `lib/audio/audio-index.json` with hashes, durations, and cache-busting URLs.
 - `npm run assets:artwork` generates lossless WebP files in `public/course-art/` from the PNG originals in `assets/artwork/`; `npm run assets:progressive` regenerates the blur-up previews in `components/artwork-previews.json`.
 - New words in `circled-vocabulary.ts` need clips: `node scripts/generate-listening-audio.mjs` (macOS, Meijia voice) creates missing ones, then run `npm run assets:audio-registry`. A word must have a single reading across all content, or no clip can serve it.
+- To re-voice a word with Gemini (`gemini-3.8-flash-tts`, voice Fola), run `GEMINI_API_KEY=… npx tsx scripts/generate-gemini-words.ts <words…>` (or `--from <folder>` with `<word>.wav` files saved from AI Studio; `--prompts` prints the prompts). It writes `public/listening-audio/gemini/words/`, removes the old Meijia clip, and records the prompt in `gemini/manifest.json`; then run `npm run assets:audio-registry`. The Meijia script skips words that have a Gemini clip.
 - `node scripts/build-app-icons.mjs` regenerates the home-screen icons in `public/icons/` from `public/favicon.svg`.
 - `python3 scripts/build-yo-fonts.py` rebuilds the lesson font subsets after you add characters or IVS glyphs. `scripts/build-fonts.py` rebuilds the full fonts. Both need fontTools and brotli.
 
@@ -118,13 +119,17 @@ Layout: `features/<feature>/` holds feature UI and logic, `components/` holds sh
 - New writing-cell strokes store a per-point `width` (same 0–100 units) from `lib/ink/ink-brush.ts`. Width comes from writing speed for touch and passive capacitive pens, and from real pressure for active pens. Old x/y-only ink stays valid.
 - The canvas and review thumbnails (`InkPreview`) draw the same `inkOutline`, and lasso erase interpolates widths.
 - If pointer capture fails, a window-level `pointerup` or `pointercancel` ends the stroke.
+- A passive pen that loses the screen for a moment arrives as a lift and a new touch. A touch within 120 ms, near where the pen was heading (`resumesContact` in `lib/ink/gesture.ts`), continues the same stroke in writing cells and on the free board; one undo removes the whole stroke (`InkHistory.amend`). A system `pointercancel`, an eraser lasso, a palm-cut stroke or a mouse never rejoins.
+- `lib/ink/ink-diagnostics.ts` counts rejoins, system cancels, palm cuts and ignored second touches since the app opened; 更多 → 版本 shows them so a parent can report what the real tablet does.
 - Long strokes are capped at about 1900 samples, and redraws are batched per animation frame.
 - The free board draws only new segments while writing, repaints fully when a stroke ends, and writes localStorage 600 ms after the last stroke and on `pagehide`/hidden.
 - An interruption (blur, hidden, rotation, lock) keeps the stroke in progress, but never completes an eraser lasso.
 
 ### Audio
 
-- The 37 basic symbols use Ministry of Education recordings at normal speed. The 22 combined rhymes and lesson readings use static Gemini audio. Most other characters and words use older synthesized files.
+- The 37 basic symbols use Ministry of Education recordings at normal speed. The 22 combined rhymes, lesson readings and words in `gemini/words/` use static Gemini audio. Most other characters and words use older synthesized files.
+- `lib/audio/audio-index.json` maps text to `[readings, version, folder]`; the folder is `""`, `"gemini/rhymes/"` or `"gemini/words/"`.
+- The listening "聲音準備中" overlay is delayed (`LoadingOverlay delayed`): hidden and click-through for 0.7 s, so a replay or cached clip never flashes over the page or blocks writing.
 - Reference audio with page-relative URLs (see Build and deploy).
 - Never borrow audio recorded with a different tone for a known reading.
 - A custom recording that is known to exist but fails to load is an error and must not fall back to another voice. If the recording database cannot be opened at all, lookups resolve to "none" (retried after 30 s), so official clips keep playing.

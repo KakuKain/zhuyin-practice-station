@@ -52,7 +52,7 @@ public/                    靜態部署素材與完整語音 registry
 
 ## 書寫與檢查
 
-主要裝置是 Android 平板＋電容筆；電容筆對瀏覽器來說就是 touch，無法用 pointerType 區分。默寫／聽寫共用 `useInkCanvas`，保存 0–100 座標路徑（取到 0.01）及每格最近 30 步復原。自由畫板保存彩色／擦除路徑（CSS 像素取到 0.1），共用 `PointerLease`、`appendSample`、`createPaintScheduler`、`pointerSamples`（合併瀏覽器 coalesced 事件，讓快速筆畫保持圓滑）。同時只有一個 pointer 畫線，第二個觸控不接續第一筆。`isPalmContact` 只依接觸面積判斷手掌（規則與門檻見 `lib/ink/gesture.ts`）：手掌大小的觸控不開始畫線；書寫格保留已寫入的筆跡、忽略之後手掌大小的取樣；自由畫板則捨棄擴大成手掌的那一筆。回報 1×1 的裝置不受影響。門檻尚未在紅米平板實機調整，手掌若以小面積先觸控仍可能成為書寫點。
+主要裝置是 Android 平板＋電容筆；電容筆對瀏覽器來說就是 touch，無法用 pointerType 區分。默寫／聽寫共用 `useInkCanvas`，保存 0–100 座標路徑（取到 0.01）及每格最近 30 步復原。自由畫板保存彩色／擦除路徑（CSS 像素取到 0.1），共用 `PointerLease`、`appendSample`、`createPaintScheduler`、`pointerSamples`（合併瀏覽器 coalesced 事件，讓快速筆畫保持圓滑）。同時只有一個 pointer 畫線，第二個觸控不接續第一筆。`isPalmContact` 只依接觸面積判斷手掌（規則與門檻見 `lib/ink/gesture.ts`）：手掌大小的觸控不開始畫線；書寫格保留已寫入的筆跡、忽略之後手掌大小的取樣；自由畫板則捨棄擴大成手掌的那一筆。回報 1×1 的裝置不受影響。門檻尚未在紅米平板實機調整，手掌若以小面積先觸控仍可能成為書寫點。被動電容筆短暫離開螢幕時，瀏覽器會送出抬筆與新的觸控：0.12 秒內、在筆原本前進方向附近的觸控（`resumesContact`）接回同一筆，書寫格與自由畫板都適用，復原一次移除整筆（`InkHistory.amend`）；系統取消、圈選擦除、被手掌截斷的筆畫與滑鼠不接回。`ink-diagnostics.ts` 記錄這次開啟後的斷筆接回、系統中斷、手掌截斷與被忽略的第二觸點次數，顯示在「更多 → 版本」，方便在實機回報。
 
 默寫／聽寫的新筆跡另保存各點 `width`（同為 0–100 座標單位），以書寫速度模擬電容筆／手指的粗細，提供有效壓力的主動筆則採用壓力。落筆立即畫點，零壓力仍可見；舊版只有 x/y 的筆跡保持相容。作答 Canvas 與檢查縮圖使用同一輪廓，圈選切割會插值保留筆寬。capture 失敗由視窗層抬筆／取消收尾，其他字格的事件不寫進原格。
 
@@ -68,9 +68,9 @@ public/                    靜態部署素材與完整語音 registry
 
 ## 語音與載入
 
-37 基本符號使用教育部錄音；22 結合韻與九課朗讀使用既有 Gemini Fola 靜態音檔。生字／語詞多數仍是舊 macOS Meijia 合成檔，未宣稱全部通過人耳校對。正式站不呼叫 AI API、不需要語音服務金鑰。
+37 基本符號使用教育部錄音；22 結合韻、九課朗讀與 `gemini/words/` 的語詞使用 Gemini Fola 靜態音檔（語詞以 `scripts/generate-gemini-words.ts` 產生，見 `gemini-readings.md`）。聽寫的「聲音準備中」遮罩延遲 0.7 秒才出現、之前可穿透點擊，重播或已快取的音檔不會閃過整頁或擋住書寫。生字／語詞多數仍是舊 macOS Meijia 合成檔，未宣稱全部通過人耳校對。正式站不呼叫 AI API、不需要語音服務金鑰。
 
-`public/listening-audio/registry.json` 記錄檔案來源、指定讀音、長度、SHA-256 與校對狀態；`lib/audio/audio-index.json` 是精簡的播放索引。更新任何音檔後執行 `npm run assets:audio-registry`，播放 URL 以檔案 hash 更新快取版本。已知文字與指定讀音不符時不借用另一聲調的音檔；可使用指定讀音的自訂錄音。未知自訂字詞仍保留瀏覽器合成備援。registry 的時間／hash 驗證不代表聽感與發音正確。
+`public/listening-audio/registry.json` 記錄檔案來源、指定讀音、長度、SHA-256 與校對狀態；`lib/audio/audio-index.json` 是精簡的播放索引（文字 → 讀音、版本、所在資料夾）。更新任何音檔後執行 `npm run assets:audio-registry`，播放 URL 以檔案 hash 更新快取版本。已知文字與指定讀音不符時不借用另一聲調的音檔；可使用指定讀音的自訂錄音。未知自訂字詞仍保留瀏覽器合成備援。registry 的時間／hash 驗證不代表聽感與發音正確。
 
 自訂錄音身份是完整文字＋注音（含聲調與 `|` 音節分隔），每段最多 20 秒／2 MB，以原始音訊位元組保存在 IndexedDB，播放時重建 Blob，並相容既有 Blob 紀錄。這避開 WebKit 的 Blob/File 儲存錯誤。裁切靜音後的錄音重新編碼為 22.05 kHz 單聲道 WAV（約每秒 44 KB）；未裁切的錄音保留原檔。播放只讀一次錄音 key（`getAllKeys`），不讀全部音訊；完整清單在開啟自訂讀音時才載入。近期錄音以最多 12 段的記憶體 LRU 共用讀取。新增、移除或重新載入會失效快取。已知存在的自訂錄音讀取或播放失敗時不替換成其他聲音；錄音資料庫整個無法開啟（封鎖網站資料、資料庫損壞）時視為沒有自訂錄音，官方音檔照常播放，30 秒後再試。
 

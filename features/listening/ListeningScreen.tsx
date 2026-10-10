@@ -276,8 +276,9 @@ export function ListeningScreen({ app }: { app: AppController }) {
           </div>
         )}
       </div>
+      {/* A replay or a cached clip starts at once: no flash, and the child keeps writing. */}
       {(loadingMessage || audioLoading) && (
-        <LoadingOverlay label={loadingMessage ?? "聲音準備中…"} />
+        <LoadingOverlay label={loadingMessage ?? "聲音準備中…"} delayed={!loadingMessage} />
       )}
       {app.resumeRound && (
         <ConfirmDialog

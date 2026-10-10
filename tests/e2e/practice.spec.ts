@@ -530,6 +530,30 @@ test("listening uses the whole tablet screen", async ({ page }, testInfo) => {
   expect(await fitsScreen()).toBe(true);
 });
 
+test("listening replays never cover the page; only a slow clip shows the wait", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    const slow = window as Window & { playDelay?: number };
+    slow.playDelay = 400;
+    HTMLMediaElement.prototype.play = function () {
+      return new Promise<void>((resolve) => setTimeout(resolve, slow.playDelay));
+    };
+  });
+  await page.goto("./");
+  await openLesson(page);
+  await page.getByRole("button", { name: /第二關 聽寫/ }).click();
+  await page.getByRole("button", { name: "開始聽", exact: true }).click();
+  const wait = page.locator(".loading-overlay.is-delayed");
+  await expect(wait).toHaveCount(1);
+  await expect(wait).toBeHidden();
+  await expect(wait).toHaveCount(0);
+  await page.evaluate(() => ((window as Window & { playDelay?: number }).playDelay = 3000));
+  await page.getByRole("button", { name: /再聽一次/ }).click();
+  await expect(wait).toBeVisible();
+  await expect(wait).toHaveCount(0, { timeout: 5000 });
+});
+
 test("an unfinished listening round continues after a reload", async ({ page }) => {
   await page.goto("./");
   await openLesson(page);
@@ -588,7 +612,7 @@ test("parents see the running version and can update from 更多 → 版本", as
   await page.getByRole("button", { name: "更多", exact: true }).click();
   await page.getByRole("button", { name: /版本/ }).click();
   const panel = page.getByRole("region", { name: "目前版本" });
-  await expect(panel).toContainText("0.2.0-beta.1");
+  await expect(panel).toContainText(JSON.parse(readFileSync("package.json", "utf8")).version);
   await expect(panel).toContainText(current.build.slice(0, 7));
   await expect(panel).toContainText("瀏覽器分頁");
   await expect(panel.getByRole("status")).toContainText("已是最新版本");

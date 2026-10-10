@@ -63,7 +63,7 @@ const standalone: Record<string, string> = {
   謝: "ㄒㄧㄝˋ",
 };
 const clips: Record<string, unknown>[] = [];
-const index: Record<string, [string[], string, boolean]> = {};
+const index: Record<string, [string[], string, string]> = {};
 const lessonIndex: Record<string, string> = {};
 function scan(dir: string) {
   for (const entry of readdirSync(dir)) {
@@ -76,6 +76,7 @@ function scan(dir: string) {
     const url = "/" + relative(join(root, "public"), path);
     const lesson = /gemini\/lessons\/(\d+)\.m4a$/.exec(url);
     const isRhyme = url.includes("/gemini/rhymes/");
+    const isGeminiWord = url.includes("/gemini/words/");
     const text = lesson
       ? builtinCatalog.find((l) => l.index === Number(lesson[1]) - 1)!.title
       : entry
@@ -91,7 +92,7 @@ function scan(dir: string) {
     const observedReadings = [...(readings.get(text) ?? [])];
     const pronunciation = standalone[text] ? [standalone[text]] : observedReadings;
     const source =
-      lesson || isRhyme
+      lesson || isRhyme || isGeminiWord
         ? "Gemini Fola"
         : /^[\u3105-\u3129]$/.test(text)
           ? "MOE CC BY 4.0"
@@ -108,18 +109,23 @@ function scan(dir: string) {
       version: hash.slice(0, 12),
       review: source.startsWith("MOE")
         ? "official source"
-        : lesson || isRhyme
+        : lesson || isRhyme || isGeminiWord
           ? "timing checked; human pronunciation review recommended"
           : "legacy; pronunciation not certified",
-      ...(isRhyme
+      ...(isRhyme || isGeminiWord
         ? {
-            voicedDuration: gemini.rhymes.find((r: { text: string }) => r.text === text)
-              ?.voicedDuration,
+            voicedDuration: (isRhyme ? gemini.rhymes : (gemini.words ?? [])).find(
+              (r: { text: string }) => r.text === text,
+            )?.voicedDuration,
           }
         : {}),
     });
     if (!lesson && (isRhyme || !combinedRhymeExamples.some((r) => r.rhyme === text)))
-      index[text] = [pronunciation, hash.slice(0, 12), isRhyme];
+      index[text] = [
+        pronunciation,
+        hash.slice(0, 12),
+        isRhyme ? "gemini/rhymes/" : isGeminiWord ? "gemini/words/" : "",
+      ];
   }
 }
 scan(audioDir);

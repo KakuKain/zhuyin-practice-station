@@ -144,9 +144,15 @@ export function SectionHeading({
   );
 }
 
-export function LoadingOverlay({ label }: { label: string }) {
+/** `delayed` stays invisible (and lets touches through) unless the wait is noticeable. */
+export function LoadingOverlay({ label, delayed = false }: { label: string; delayed?: boolean }) {
   return (
-    <div className="loading-overlay" role="status" aria-live="polite" aria-label={label}>
+    <div
+      className={`loading-overlay${delayed ? " is-delayed" : ""}`}
+      role="status"
+      aria-live="polite"
+      aria-label={label}
+    >
       <span className="loading-orbit" aria-hidden="true">
         <i />
         <i />

@@ -87,6 +87,8 @@ try {
     const filename = [...text].map((character) => character.codePointAt(0).toString(16)).join("-");
     const destination = join(output, `${filename}.m4a`);
     const officialIndex = officialSymbols.indexOf(text);
+    // Words re-voiced by Gemini (scripts/generate-gemini-words.ts) never get a Meijia clip again.
+    if (existsSync(join(output, "gemini/words", `${filename}.m4a`))) continue;
     if (
       existsSync(destination) &&
       statSync(destination).size > 1024 &&

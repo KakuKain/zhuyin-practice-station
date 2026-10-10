@@ -14,10 +14,14 @@ import type { PointerEvent } from "react";
 import {
   PointerLease,
   appendSample,
+  createContactMotion,
   createPaintScheduler,
   isPalmContact,
   pointerSamples,
+  resumesContact,
+  type ContactEnd,
 } from "../../lib/ink/gesture";
+import { countInk } from "../../lib/ink/ink-diagnostics";
 import {
   freeBoardKey,
   boardStep,
@@ -33,6 +37,11 @@ export function FreeDictation() {
   const redo = useRef<BoardStroke[]>([]);
   const active = useRef<BoardStroke | null>(null);
   const pointerLease = useRef(new PointerLease());
+  const motion = useRef(createContactMotion());
+  /** The last pen lift, so a contact that resumes right away continues that stroke. */
+  const lastLift = useRef<{ stroke: BoardStroke; end: ContactEnd } | null>(null);
+  /** The stroke as it was before this contact continued it, kept if the contact is a hand. */
+  const resumed = useRef<BoardStroke | null>(null);
   const viewport = useRef<HTMLDivElement>(null);
   const size = useRef({ width: 304, height: boardHeight });
   const [boardSize, setBoardSize] = useState({ width: 304, height: boardHeight });
@@ -139,16 +148,15 @@ export function FreeDictation() {
   const sample = (event: PointerEvent<HTMLCanvasElement>) => {
     if (!active.current) return;
     const rect = event.currentTarget.getBoundingClientRect();
-    for (const item of pointerSamples(event.nativeEvent))
-      appendSample(
-        active.current.points,
-        point(rect, item.clientX, item.clientY),
-        (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]),
-        1,
-      );
+    for (const item of pointerSamples(event.nativeEvent)) {
+      const next = point(rect, item.clientX, item.clientY);
+      motion.current.add(next[0], next[1], item.timeStamp);
+      appendSample(active.current.points, next, (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]), 1);
+    }
   };
   const stopStroke = (completed = false) => {
     const stroke = active.current;
+    lastLift.current = null;
     const pointerId = pointerLease.current.release();
     active.current = null;
     scheduler.cancel();
@@ -168,7 +176,20 @@ export function FreeDictation() {
   const finish = (event: PointerEvent<HTMLCanvasElement>) => {
     if (!pointerLease.current.owns(event.pointerId)) return;
     if (event.type === "pointerup" && active.current) sample(event);
+    if (event.type === "pointercancel") countInk("cancelled");
+    const stroke = active.current;
+    const end = motion.current.end(event.timeStamp);
     stopStroke(event.type === "pointerup");
+    // Only a pen that lifted (not a system cancel) may resume this stroke.
+    if (
+      stroke &&
+      end &&
+      !stroke.erase &&
+      event.type === "pointerup" &&
+      event.pointerType !== "mouse" &&
+      strokes.current.at(-1) === stroke
+    )
+      lastLift.current = { stroke, end };
   };
   const interruptStroke = useEffectEvent(() => stopStroke());
   const flushSave = useEffectEvent(() => {
@@ -354,24 +375,58 @@ export function FreeDictation() {
               )
                 return;
               event.preventDefault();
-              if (!pointerLease.current.acquire(event.pointerId)) return;
+              if (!pointerLease.current.acquire(event.pointerId)) {
+                if (event.pointerType !== "mouse") countInk("secondTouch");
+                return;
+              }
               event.currentTarget.setPointerCapture(event.pointerId);
-              active.current = {
-                color: tool === "red" ? "#d43838" : "#193458",
-                erase: tool === "erase",
-                points: [
-                  point(event.currentTarget.getBoundingClientRect(), event.clientX, event.clientY),
-                ],
-              };
-              drawnPoints.current = 0;
+              const first = point(
+                event.currentTarget.getBoundingClientRect(),
+                event.clientX,
+                event.clientY,
+              );
+              const color = tool === "red" ? "#d43838" : "#193458";
+              const erase = tool === "erase";
+              const lift = lastLift.current;
+              lastLift.current = null;
+              motion.current = createContactMotion();
+              motion.current.add(first[0], first[1], event.timeStamp);
+              if (
+                lift &&
+                !erase &&
+                event.pointerType !== "mouse" &&
+                lift.stroke.color === color &&
+                strokes.current.at(-1) === lift.stroke &&
+                resumesContact(lift.end, first[0], first[1], event.timeStamp)
+              ) {
+                // The pen skipped: continue the stroke already on the page.
+                countInk("rejoined");
+                strokes.current.pop();
+                resumed.current = { ...lift.stroke, points: [...lift.stroke.points] };
+                active.current = lift.stroke;
+                drawnPoints.current = lift.stroke.points.length;
+                appendSample(
+                  lift.stroke.points,
+                  first,
+                  (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]),
+                  1,
+                );
+              } else {
+                resumed.current = null;
+                active.current = { color, erase, points: [first] };
+                drawnPoints.current = 0;
+              }
               paintActive();
             }}
             onPointerMove={(event) => {
               if (!active.current || !pointerLease.current.owns(event.pointerId)) return;
               event.preventDefault();
               if (isPalmContact(event)) {
+                countInk("palmCut");
                 // A resting hand that spread out: drop it without keeping any ink.
                 active.current = null;
+                if (resumed.current) strokes.current.push(resumed.current);
+                resumed.current = null;
                 const pointerId = pointerLease.current.release();
                 if (pointerId !== null && event.currentTarget.hasPointerCapture(pointerId))
                   event.currentTarget.releasePointerCapture(pointerId);
