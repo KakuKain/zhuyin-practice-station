@@ -2900,10 +2900,10 @@
       ],
       "url": "/listening-audio/5976-5976-60f3-8981-9b5a-4e7e.m4a",
       "source": "macOS Meijia (legacy synthesis)",
-      "duration": 1.765,
-      "bytes": 14776,
-      "sha256": "2ab1714be49e33a5d006826df01e75158fe862363ba4298f1cc8fab65e814221",
-      "version": "2ab1714be49e",
+      "duration": 1.811,
+      "bytes": 14930,
+      "sha256": "fb046f3e7333fc5d98b5d8166a7816cc486af2a5f803e31e532701f030ac99f2",
+      "version": "fb046f3e7333",
       "review": "legacy; pronunciation not certified"
     },
     {
@@ -10284,10 +10284,10 @@
       ],
       "url": "/listening-audio/9b5a-4e7e.m4a",
       "source": "macOS Meijia (legacy synthesis)",
-      "duration": 0.743,
-      "bytes": 8417,
-      "sha256": "54899b46d5aab6b06eb4f21c800cb0fd7c23be87ec2a39d923b2e635313c4158",
-      "version": "54899b46d5aa",
+      "duration": 0.789,
+      "bytes": 8726,
+      "sha256": "090549face04dde4a2c553a76a37eacf57873426b70cd25e6512dde2d8cf03f7",
+      "version": "090549face04",
       "review": "legacy; pronunciation not certified"
     },
     {
