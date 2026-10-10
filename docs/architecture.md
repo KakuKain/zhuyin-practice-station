@@ -90,4 +90,4 @@ CSS 維持原匯入順序。已刪除程式碼中完全沒有使用的 class 規
 
 發布須通過 `npm run check`、`npm run format:check`、`npm run build`（含素材與子路徑檢查）及 Playwright 五個專案（Android 平板直／橫、iPad、Android 手機、桌面）。主要裝置是 Android 平板＋電容筆，先檢查 800／1280px 平板，再看 320／390px。檢查標題續寫、整輪往返／重聽／批次檢查、垂直語詞、辨音動畫、自訂資料備份及失敗重試。更新證據記在 `structure-improvements.md`；模擬 pointer 不能宣稱紅米真機／普通電容筆已驗證。發布後核對成功狀態與 source commit。
 
-維持免登入、無 DB／雲端同步、無 service worker／離線快取，不變更教師課文範圍。可加到主畫面全螢幕、固定直式開啟（`public/manifest.webmanifest`，圖示由 `scripts/build-app-icons.mjs` 產生）；`useBackGesture` 讓系統返回手勢回到 App 內上一頁，從主畫面開啟時在首頁按返回也不會關閉。根元素 `overscroll-behavior-y: none` 關閉下拉重新整理；即使頁面仍被重新整理，整輪聽寫也能從原題繼續。依賴維護見 `security-maintenance.md`。
+維持免登入、無 DB／雲端同步、無 service worker／離線快取，不變更教師課文範圍。可加到主畫面全螢幕、固定直式開啟（`public/manifest.webmanifest`，圖示由 `scripts/build-app-icons.mjs` 產生）；`useBackGesture` 讓系統返回手勢回到 App 內上一頁，從主畫面開啟時在首頁按返回也不會關閉。新版上線後由 `useAppUpdate` 自動更新：建置時把版本（CI 用 commit SHA）編進程式並輸出 `version.json`，App 開啟、切回前景與每 30 分鐘不經快取比對，有新版時只在課程列表以 `?v=<版本>` 重新載入（略過 Pages 的頁面快取，也避免重複載入），作答中不打斷。根元素 `overscroll-behavior-y: none` 關閉下拉重新整理；即使頁面仍被重新整理，整輪聽寫也能從原題繼續。依賴維護見 `security-maintenance.md`。

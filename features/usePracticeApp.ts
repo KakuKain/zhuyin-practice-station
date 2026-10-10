@@ -4,6 +4,7 @@ import { usePersistentState } from "../lib/storage/usePersistentState";
 import { useAudioPlayer } from "../lib/audio/useAudioPlayer";
 import { useCustomRecordings } from "../lib/audio/useCustomRecordings";
 import { usePageResources } from "../lib/loading/usePageResources";
+import { useAppUpdate } from "../lib/loading/useAppUpdate";
 import { readListeningSettings, validateListeningSettings } from "./settings/listening-settings";
 import { usePagePosition } from "./navigation/usePagePosition";
 import { useDialogKeyboard } from "./navigation/useDialogKeyboard";
@@ -209,6 +210,8 @@ export function usePracticeApp() {
     }
   };
   useBackGesture(view === "courses", goBack);
+  // A newer deployed version loads on the course list, never in the middle of writing.
+  useAppUpdate(view === "courses");
 
   usePagePosition(
     view,

@@ -506,3 +506,28 @@ test("an unfinished listening round continues after a reload", async ({ page }) 
   await page.reload();
   await expect(page.locator(".journey-card")).toHaveCount(12);
 });
+
+test("a newer deployed version loads on the course list, never mid-round", async ({ page }) => {
+  // Opening on the course list switches to the newer build once, without a reload loop.
+  await page.route("**/version.json*", (route) => route.fulfill({ json: { build: "newer" } }));
+  await page.goto("./");
+  await page.waitForURL(/\?v=newer$/);
+  await expect(page.locator(".journey-card")).toHaveCount(12);
+  await page.waitForTimeout(500);
+  expect(page.url()).toMatch(/\?v=newer$/);
+
+  // An update found while writing waits until the child is back on the course list.
+  await page.route("**/version.json*", (route) => route.fulfill({ json: { build: "newest" } }));
+  await openLesson(page);
+  await page.getByRole("button", { name: /第二關 聽寫/ }).click();
+  await page.getByRole("button", { name: "開始聽", exact: true }).click();
+  await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
+  await page.waitForTimeout(500);
+  expect(page.url()).toMatch(/\?v=newer$/);
+  await expect(page.getByLabel("田字格手寫區", { exact: true })).toBeVisible();
+  await page.locator(".listening-header-back").click();
+  await page.getByRole("button", { name: "結束本輪", exact: true }).click();
+  await page.getByRole("button", { name: "回到課程", exact: true }).click();
+  await page.waitForURL(/\?v=newest$/);
+  await expect(page.locator(".journey-card")).toHaveCount(12);
+});
