@@ -104,3 +104,10 @@ test("saved whole phrases remain available after the exam scope changes", () => 
   assert.equal(findQuestionSeed(5, "words:教我畫畫")?.answer, "ㄐㄧㄠ|ㄨㄛˇ|ㄏㄨㄚˋ|ㄏㄨㄚˋ");
   assert.ok(!buildListeningSession(5).some((q) => q.audioText === "教我畫畫"));
 });
+
+test("the shown version and the newest release note match package.json", async () => {
+  const { siteReleaseNotes } = await import("../../features/courses/course-data");
+  const pkg = JSON.parse(await readFile(new URL("../../package.json", import.meta.url), "utf8"));
+  assert.equal(siteReleaseNotes[0][0], pkg.version);
+  assert.equal(new Set(siteReleaseNotes.map(([version]) => version)).size, siteReleaseNotes.length);
+});

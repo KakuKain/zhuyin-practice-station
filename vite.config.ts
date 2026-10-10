@@ -9,10 +9,14 @@ if (!/^\/(?:[\w-]+\/)*$/.test(base)) throw new Error("Invalid GitHub Pages base 
 // One identity per build, compiled into the app and published as version.json, so an open
 // app can tell that a newer version is live (see lib/loading/useAppUpdate.ts).
 const build = process.env.GITHUB_SHA?.slice(0, 12) ?? `local-${Date.now().toString(36)}`;
+const buildDate = new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Taipei" }).format(new Date());
 
 export default defineConfig({
   base,
-  define: { __APP_BUILD__: JSON.stringify(build) },
+  define: {
+    __APP_BUILD__: JSON.stringify(build),
+    __APP_BUILD_DATE__: JSON.stringify(buildDate),
+  },
   plugins: [
     react(),
     {

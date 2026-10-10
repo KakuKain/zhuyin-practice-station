@@ -7,10 +7,19 @@ import { ZhuyinStack } from "../../components/Zhuyin";
 import type { AppController } from "../usePracticeApp";
 import {
   makeSoundRound,
-  soundPairs,
+  soundGroups,
   type SoundPair,
   type SoundQuestion,
 } from "./sound-practice-data";
+
+/** Combined rhymes such as ㄧㄣ use the symbol chart's stacked glyph; single symbols stay text. */
+function PairLabel({ text }: { text: string }) {
+  return /^[\u3105-\u3129]{2,}$/.test(text) ? (
+    <ZhuyinStack text={text} literalSymbol />
+  ) : (
+    <span>{text}</span>
+  );
+}
 
 type Audio = Pick<AppController, "speak" | "stopPlayback" | "audioLoading" | "audioError">;
 export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => void }) {
@@ -156,29 +165,37 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => 
             </div>
             <img src="course-art/sound-headphone-cat.webp" alt="" />
           </div>
-          <div className="sound-pair-list">
-            {soundPairs.map((item) => (
-              <button
-                type="button"
-                key={item.id}
-                aria-label={item.title}
-                className={item.id === "tone-2-3" ? "is-tone-pair" : undefined}
-                onClick={() => {
-                  cancel();
-                  setPair(item);
-                }}
-              >
-                <span className="sound-pair-label" aria-hidden="true">
-                  <span>{item.title.split(" / ")[0]}</span>
-                  <span className="sound-pair-connector">與</span>
-                  <span>{item.title.split(" / ")[1]}</span>
-                </span>
-                <span className="sound-pair-arrow" aria-hidden="true">
-                  <CaretRight size={22} weight="bold" aria-hidden="true" />
-                </span>
-              </button>
-            ))}
-          </div>
+          {soundGroups.map((group) => (
+            <section className="sound-pair-group" key={group.title} aria-label={group.title}>
+              <h3>{group.title}</h3>
+              <div className="sound-pair-list">
+                {group.pairs.map((item) => {
+                  const [first, second] = item.title.split(" / ");
+                  return (
+                    <button
+                      type="button"
+                      key={item.id}
+                      aria-label={item.title}
+                      className={item.id === "tone-2-3" ? "is-tone-pair" : undefined}
+                      onClick={() => {
+                        cancel();
+                        setPair(item);
+                      }}
+                    >
+                      <span className="sound-pair-label" aria-hidden="true">
+                        <PairLabel text={first} />
+                        <span className="sound-pair-connector">與</span>
+                        <PairLabel text={second} />
+                      </span>
+                      <span className="sound-pair-arrow" aria-hidden="true">
+                        <CaretRight size={22} weight="bold" aria-hidden="true" />
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+          ))}
         </>
       ) : finished ? (
         <div className="sound-practice-card sound-finished">

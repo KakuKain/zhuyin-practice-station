@@ -1,6 +1,7 @@
 import { ShowMsg } from "./ShowMsg";
 import { createContext, useContext, type ReactNode } from "react";
 import { createPortal } from "react-dom";
+import { loadLatestVersion, useUpdateStatus } from "../lib/loading/app-update";
 
 /** The header's back-button slot, so a panel deep in the page can put its back action there. */
 export const HeaderBackSlot = createContext<HTMLElement | null>(null);
@@ -154,6 +155,18 @@ export function LoadingOverlay({ label }: { label: string }) {
       <span>{label}</span>
     </div>
   );
+}
+
+/** A newer version is live: offer it now, or it loads on the next visit to the course list. */
+export function UpdateReminder() {
+  const { status } = useUpdateStatus();
+  return status === "available" ? (
+    <ShowMsg message="有新版本。回到課程列表時會自動更新，也可以現在更新。">
+      <button type="button" onClick={loadLatestVersion}>
+        現在更新
+      </button>
+    </ShowMsg>
+  ) : null;
 }
 
 export function ResourceNotice({ failed }: { failed: boolean }) {

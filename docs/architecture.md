@@ -64,7 +64,7 @@ public/                    靜態部署素材與完整語音 registry
 
 位置圖按住顯示標題與正文位置，只接受孩子筆跡與行長度，不接收答案；放開／取消／失焦即關閉，不卸載畫布。鍵盤 Space／Enter 按住查看，Escape 關閉。
 
-辨音獨立於練習紀錄分頁。先聽完兩個音再開始六題，答對跳綠色打勾動畫並自動換題，答錯顯示 X 再選。沒有第一下正確率文字，不將二選一視為手寫掌握，也不寫入正式紀錄。所有對照組都可使用；二、三聲用相同音節的既有音檔。
+辨音獨立於練習紀錄分頁。對照組依「捲舌、不捲舌／其他聲母／鼻音韻母（含ㄣ與ㄥ、ㄧㄣ與ㄧㄥ等結合韻）／其他韻母／聲調」分組，單一符號用教育部錄音，結合韻用既有結合韻音檔並以注音表的直排字形顯示。先聽完兩個音再開始六題，答對跳綠色打勾動畫並自動換題，答錯顯示 X 再選。沒有第一下正確率文字，不將二選一視為手寫掌握，也不寫入正式紀錄。所有對照組都可使用；二、三聲用相同音節的既有音檔。
 
 ## 語音與載入
 
@@ -86,8 +86,8 @@ Loading 等待當頁必要字型，圖片獨立透過小圖預覽漸進清晰。
 
 ## 樣式及發布門檻
 
-CSS 維持原匯入順序。已刪除程式碼中完全沒有使用的 class 規則，以及被後面同 selector、同條件規則覆寫的宣告（保留 `!important`、同規則內 fallback 與新語法值前的舊值）。`00-reset.css` 是原 Tailwind preflight，放在 cascade layer，所有一般規則都優先；沒有 utility class。`styles/lazy/` 由功能的 `lazy()` 匯入一起載入，只放該功能專屬 selector。`24-fill-tablet.css` 讓 600px 以上的默寫題目頁、書寫頁與檢查頁滿版：書寫格依畫面剩餘高度放大，橫向平板改成左欄說明與按鈕、右欄書寫格；手機版面不變。`00-foundation.css` 集中 UI／旁注音／音節／基本符號／結合韻字型與點擊尺寸。功能樣式在對應檔案修改，避免另建一套字型或任意覆寫根樣式。
+CSS 維持原匯入順序。已刪除程式碼中完全沒有使用的 class 規則，以及被後面同 selector、同條件規則覆寫的宣告（保留 `!important`、同規則內 fallback 與新語法值前的舊值）。`00-reset.css` 是原 Tailwind preflight，放在 cascade layer，所有一般規則都優先；沒有 utility class。`styles/lazy/` 由功能的 `lazy()` 匯入一起載入，只放該功能專屬 selector。`24-fill-tablet.css` 讓 600px 以上的默寫題目頁、書寫頁與檢查頁滿版：書寫格依畫面剩餘高度放大，橫向平板改成左欄說明與按鈕、右欄書寫格；手機版面不變。`25-listen-tablet.css` 讓 600px 以上的聽寫滿版：單格書寫區依剩餘高度放大，語詞每字一格由上而下排列、工具放在格子旁（橫向平板改為左右並排，第一字在右），整輪檢查兩張卡片一列。`00-foundation.css` 集中 UI／旁注音／音節／基本符號／結合韻字型與點擊尺寸。功能樣式在對應檔案修改，避免另建一套字型或任意覆寫根樣式。
 
 發布須通過 `npm run check`、`npm run format:check`、`npm run build`（含素材與子路徑檢查）及 Playwright 五個專案（Android 平板直／橫、iPad、Android 手機、桌面）。主要裝置是 Android 平板＋電容筆，先檢查 800／1280px 平板，再看 320／390px。檢查標題續寫、整輪往返／重聽／批次檢查、垂直語詞、辨音動畫、自訂資料備份及失敗重試。更新證據記在 `structure-improvements.md`；模擬 pointer 不能宣稱紅米真機／普通電容筆已驗證。發布後核對成功狀態與 source commit。
 
-維持免登入、無 DB／雲端同步、無 service worker／離線快取，不變更教師課文範圍。可加到主畫面全螢幕、固定直式開啟（`public/manifest.webmanifest`，圖示由 `scripts/build-app-icons.mjs` 產生）；`useBackGesture` 讓系統返回手勢回到 App 內上一頁，從主畫面開啟時在首頁按返回也不會關閉。新版上線後由 `useAppUpdate` 自動更新：建置時把版本（CI 用 commit SHA）編進程式並輸出 `version.json`，App 開啟、切回前景與每 30 分鐘不經快取比對，有新版時只在課程列表以 `?v=<版本>` 重新載入（略過 Pages 的頁面快取，也避免重複載入），作答中不打斷。根元素 `overscroll-behavior-y: none` 關閉下拉重新整理；即使頁面仍被重新整理，整輪聽寫也能從原題繼續。依賴維護見 `security-maintenance.md`。
+維持免登入、無 DB／雲端同步、無 service worker／離線快取，不變更教師課文範圍。可加到主畫面全螢幕、固定直式開啟（`public/manifest.webmanifest`，圖示由 `scripts/build-app-icons.mjs` 產生）；`useBackGesture` 讓系統返回手勢回到 App 內上一頁，從主畫面開啟時在首頁按返回也不會關閉。新版上線後由 `useAppUpdate` 自動更新：建置時把版本（CI 用 commit SHA）編進程式並輸出 `version.json`，App 開啟、切回前景與每 30 分鐘不經快取比對，有新版時只在課程列表以 `?v=<版本>` 重新載入（略過 Pages 的頁面快取，也避免重複載入），作答中不打斷；其他畫面（默寫與聽寫作答畫面除外）顯示「有新版本」提醒並可立即更新。「更多 → 版本」顯示版本、版次（commit 前 12 碼與台北建置日期）、開啟方式（主畫面 App 或瀏覽器分頁），並可檢查與更新。顯示的版本取自 `package.json`，最新一筆 `siteReleaseNotes` 必須同號（單元測試檢查）。根元素 `overscroll-behavior-y: none` 關閉下拉重新整理；即使頁面仍被重新整理，整輪聽寫也能從原題繼續。依賴維護見 `security-maintenance.md`。

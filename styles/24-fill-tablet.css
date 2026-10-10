@@ -28,6 +28,8 @@
   .fill-focus-shell {
     --fill-square: max(280px, min(100vw - 64px, 100dvh - 380px));
     width: 100%;
+    /* The watercolor starts partway down a tall screen; match its top so no seam shows. */
+    background-color: #fefdf7;
   }
 
   .fill-focus-shell .fill-writing-grid {

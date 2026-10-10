@@ -391,7 +391,7 @@ test("sound practice animates wrong retry and correct automatic progression", as
   await page.getByRole("button", { name: "練習", exact: true }).click();
   await page.getByRole("button", { name: "辨音練習", exact: true }).click();
   await expect(page.getByRole("heading", { name: "練習", exact: true })).toBeVisible();
-  await page.locator(".sound-pair-list button").first().click();
+  await page.getByRole("button", { name: "ㄓ / ㄔ", exact: true }).click();
   await expect(page.getByRole("heading", { name: "聽聽兩個音", exact: true })).toBeVisible();
   await page.getByRole("button", { name: "依序聽兩個音", exact: true }).click();
   await expect(page.locator(".sound-preview-symbol.is-speaking")).toHaveAttribute(
@@ -480,6 +480,56 @@ test("dictation writing uses the whole tablet screen", async ({ page }, testInfo
   );
 });
 
+test("listening uses the whole tablet screen", async ({ page }, testInfo) => {
+  test.skip(
+    !/^(android-tablet|ipad)/.test(testInfo.project.name),
+    "phones keep the single-column layout",
+  );
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      "zhuyin-practice-state-v4",
+      JSON.stringify({
+        savedQuestions: [
+          { lessonIndex: 0, questionId: "words:皮包", isFavorite: true, needsPractice: true },
+        ],
+        recentLesson: 0,
+        completedSessions: 0,
+        history: [],
+      }),
+    );
+  });
+  const fitsScreen = () =>
+    page.evaluate(
+      () =>
+        document.documentElement.scrollHeight <= innerHeight + 1 &&
+        document.documentElement.scrollWidth <= innerWidth + 1,
+    );
+  await page.goto("./");
+  await openLesson(page);
+  await page.getByRole("button", { name: /第二關 聽寫/ }).click();
+  await page.getByRole("button", { name: "開始聽", exact: true }).click();
+  const paper = page.locator(".canvas-paper");
+  await expect(paper).toBeVisible();
+  expect((await paper.boundingBox())!.width).toBeGreaterThan(560);
+  await expect(page.getByRole("button", { name: "下一題", exact: true })).toBeInViewport();
+  expect(await fitsScreen()).toBe(true);
+
+  // A two-character word: squares larger than the phone's 320px, all on screen with the button.
+  await page.evaluate(() => localStorage.removeItem("zhuyin-listening-round-v1"));
+  await page.goto("./");
+  await openRecords(page);
+  await page.getByRole("button", { name: "重練皮包（聽寫）", exact: true }).click();
+  await page.getByRole("button", { name: "開始聽", exact: true }).click();
+  const squares = page.locator(".word-paper");
+  await expect(squares).toHaveCount(2);
+  for (const square of await squares.all()) {
+    expect((await square.boundingBox())!.width).toBeGreaterThan(340);
+    await expect(square).toBeInViewport({ ratio: 1 });
+  }
+  await expect(page.getByRole("button", { name: "提早交卷", exact: true })).toBeInViewport();
+  expect(await fitsScreen()).toBe(true);
+});
+
 test("an unfinished listening round continues after a reload", async ({ page }) => {
   await page.goto("./");
   await openLesson(page);
@@ -530,4 +580,26 @@ test("a newer deployed version loads on the course list, never mid-round", async
   await page.getByRole("button", { name: "回到課程", exact: true }).click();
   await page.waitForURL(/\?v=newest$/);
   await expect(page.locator(".journey-card")).toHaveCount(12);
+});
+
+test("parents see the running version and can update from 更多 → 版本", async ({ page }) => {
+  await page.goto("./");
+  const current = await (await page.request.get(new URL("version.json", page.url()).href)).json();
+  await page.getByRole("button", { name: "更多", exact: true }).click();
+  await page.getByRole("button", { name: /版本/ }).click();
+  const panel = page.getByRole("region", { name: "目前版本" });
+  await expect(panel).toContainText("0.2.0-beta.1");
+  await expect(panel).toContainText(current.build.slice(0, 7));
+  await expect(panel).toContainText("瀏覽器分頁");
+  await expect(panel.getByRole("status")).toContainText("已是最新版本");
+
+  // A newer deploy: the reminder offers it outside the course list, and the panel can load it.
+  await page.route("**/version.json*", (route) => route.fulfill({ json: { build: "newer" } }));
+  await panel.getByRole("button", { name: "檢查更新", exact: true }).click();
+  await expect(panel.getByRole("status")).toContainText("有新版本");
+  await expect(
+    page.getByText("有新版本。回到課程列表時會自動更新", { exact: false }),
+  ).toBeVisible();
+  await panel.getByRole("button", { name: "更新到最新版", exact: true }).click();
+  await page.waitForURL(/\?v=newer$/);
 });

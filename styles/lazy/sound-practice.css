@@ -361,6 +361,15 @@
   height: 144px;
   object-fit: contain;
 }
+.sound-pair-group + .sound-pair-group {
+  margin-top: 24px;
+}
+.sound-pair-group h3 {
+  margin: 0 0 10px;
+  color: #3b5f80;
+  font-size: 17px;
+  font-weight: 800;
+}
 .sound-pair-list {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -414,6 +423,15 @@
   font-weight: 750;
   line-height: 1.2;
   white-space: nowrap;
+}
+/* A combined rhyme (ㄧㄣ) is one stacked glyph, drawn larger so each letter reads like a symbol. */
+.sound-pair-label .zhuyin-stack {
+  width: 1.1em;
+  height: 1.5em;
+  min-height: 0;
+}
+.sound-pair-label .zhuyin-glyph {
+  font-size: 1.5em;
 }
 .sound-pair-label .sound-pair-connector {
   color: #627b93;
