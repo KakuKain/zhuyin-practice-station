@@ -20,6 +20,7 @@ const add = (text: string, pronunciation: string) => {
 for (const lesson of builtinCatalog) {
   lesson.symbols.forEach((s) => add(s, s));
   lesson.terms.forEach((t) => add(t.text, t.syllables.join("|")));
+  (lesson.characters ?? []).forEach((t) => add(t.text, t.syllables[0]));
   lesson.exercise.lines.flat().forEach((c) => add(c.character, c.zhuyin));
   lesson.exercise.questions.forEach((q) => add(q.audioText, q.answer));
 }

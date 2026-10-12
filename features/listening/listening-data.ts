@@ -60,15 +60,19 @@ export function questionSeedsForLesson(
   const lesson = catalog.find((item) => item.index === lessonIndex);
   if (!lesson) return { symbols: [], characters: [], words: [] };
   const terms = lesson.terms;
-  const symbols: ListeningSeed[] = lesson.symbols.map((symbol) => ({
+  const symbolPool = lesson.listeningSymbols ?? lesson.symbols;
+  const symbols: ListeningSeed[] = symbolPool.map((symbol) => ({
     category: "symbols",
     answer: symbol,
     audioText: symbol,
-    distractors: lesson.symbols.filter((other) => other !== symbol).slice(0, 2),
+    distractors: symbolPool.filter((other) => other !== symbol).slice(0, 2),
   }));
-  // Only explicitly listed single characters become character questions; each word is
-  // one question and is never split further.
-  const singleTerms = terms.filter((term) => term.syllables.length === 1);
+  // Character questions: the teacher's single-character words, then the lesson's listed 生字
+  // (lesson-characters.ts). Words are never split on the fly.
+  const singleTerms = [
+    ...terms.filter((term) => term.syllables.length === 1),
+    ...(lesson.characters ?? []),
+  ].filter((term, index, all) => all.findIndex((other) => other.text === term.text) === index);
   const uniqueSounds = [...new Set(singleTerms.map((term) => term.syllables[0]))];
   const characters: ListeningSeed[] = singleTerms.map((term) => ({
     category: "characters",
@@ -118,21 +122,35 @@ export function customListeningSeed(term: CircledTerm): ListeningSeed {
   };
 }
 
+/** A round: 4 symbols or combined rhymes, 4 生字, then 2 words, all submitted together. */
+export const listeningRoundSize = { symbols: 4, characters: 4, words: 2 } as const;
+
 export function buildListeningSession(
   lessonIndex: number,
   catalog: readonly CatalogLesson[] = builtinCatalog,
 ): ListeningQuestion[] {
   const lesson = catalog.find((item) => item.index === lessonIndex);
   if (!lesson) return [];
-  const seeds = lesson.terms.map(customListeningSeed);
-  const symbols =
-    lesson.custom || lesson.listeningOnly
-      ? []
-      : shuffleItems(questionSeedsForLesson(lessonIndex, catalog).symbols).slice(0, 4);
+  if (lesson.custom) {
+    // A parent's own material tests every word they entered.
+    const seeds = lesson.terms.map(customListeningSeed);
+    return [
+      ...shuffleItems(seeds.filter((seed) => seed.category === "characters")),
+      ...shuffleItems(seeds.filter((seed) => seed.category === "words")),
+    ].map(makeQuestion);
+  }
+  const pools = questionSeedsForLesson(lessonIndex, catalog);
+  const words = shuffleItems(pools.words).slice(0, listeningRoundSize.words);
+  // Prefer 生字 that are not in this round's words, so one question never gives away another.
+  const inWords = new Set(words.flatMap((word) => [...word.audioText]));
+  const characters = [
+    ...shuffleItems(pools.characters.filter((seed) => !inWords.has(seed.audioText))),
+    ...shuffleItems(pools.characters.filter((seed) => inWords.has(seed.audioText))),
+  ].slice(0, listeningRoundSize.characters);
   return [
-    ...symbols,
-    ...shuffleItems(seeds.filter((seed) => seed.category === "characters")),
-    ...shuffleItems(seeds.filter((seed) => seed.category === "words")),
+    ...shuffleItems(pools.symbols).slice(0, listeningRoundSize.symbols),
+    ...characters,
+    ...words,
   ].map(makeQuestion);
 }
 
@@ -148,6 +166,11 @@ export function findQuestionSeed(
     );
     if (term) return customListeningSeed(term);
     if (lesson.listeningOnly && lessonIndex < 0) {
+      const pools = questionSeedsForLesson(lessonIndex, catalog);
+      const seed = [...pools.symbols, ...pools.characters].find(
+        (question) => questionId(question) === id,
+      );
+      if (seed) return seed;
       // Review sentences saved before they were split into words.
       const legacy = legacyReviewVocabulary[-lessonIndex - 1]?.find(
         (term) => id === `${term.syllables.length > 1 ? "words" : "characters"}:${term.text}`,
