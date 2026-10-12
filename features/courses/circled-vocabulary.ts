@@ -48,7 +48,7 @@ export const circledVocabulary: readonly (readonly CircledTerm[])[] = [
   [
     term("奶奶", "ㄋㄞˇ|˙ㄋㄞ"),
     term("想要", "ㄒㄧㄤˇ|ㄧㄠˋ"),
-    term("魚乾", "ㄩˊ|ㄍㄢ"),
+    term("魚竿", "ㄩˊ|ㄍㄢ"),
     term("爸爸", "ㄅㄚˋ|˙ㄅㄚ"),
     term("魚缸", "ㄩˊ|ㄍㄤ"),
     term("哥哥", "ㄍㄜ|˙ㄍㄜ"),

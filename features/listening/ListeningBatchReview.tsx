@@ -1,3 +1,4 @@
+import { PencilLine, SpeakerHigh } from "@phosphor-icons/react";
 import { isListeningAnswerComplete } from "./listening-policy";
 import type { AppController } from "../usePracticeApp";
 import { InkPreview } from "../../components/AppChrome";
@@ -22,9 +23,17 @@ export function ListeningBatchReview({ app }: { app: AppController }) {
         );
         return (
           <article className="listening-review-card" key={question.id}>
-            <h2>
-              第 {index + 1} 題 · {listeningSectionLabel(app.listeningQuestions, index)}
-            </h2>
+            <div className="listening-review-card-head">
+              <h2>
+                第 {index + 1} 題 · {listeningSectionLabel(app.listeningQuestions, index)}
+              </h2>
+              <FavoriteButton
+                saved={saved}
+                onToggle={() => app.toggleBatchFavorite(question.id)}
+                iconOnly
+                ariaLabel={`收藏第 ${index + 1} 題`}
+              />
+            </div>
             <div className="listening-review-comparison">
               <div className="listening-review-column">
                 <span className="listening-review-label">作答</span>
@@ -67,17 +76,13 @@ export function ListeningBatchReview({ app }: { app: AppController }) {
                 type="button"
                 onClick={() => app.speak(question.audioText, { pronunciation: question.answer })}
               >
+                <SpeakerHigh size={20} aria-hidden="true" />
                 重聽
               </button>
               <button type="button" onClick={() => app.goToListeningQuestion(index)}>
+                <PencilLine size={20} aria-hidden="true" />
                 修改作答
               </button>
-              <FavoriteButton
-                saved={saved}
-                onToggle={() => app.toggleBatchFavorite(question.id)}
-                iconOnly
-                ariaLabel={`收藏第 ${index + 1} 題`}
-              />
             </div>
           </article>
         );

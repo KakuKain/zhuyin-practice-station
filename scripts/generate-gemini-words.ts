@@ -2,8 +2,8 @@
  * Word clips voiced by Gemini (`gemini-3.8-flash-tts`, voice Fola), replacing the older
  * macOS Meijia clip for the same word. Each word must have one reading in the course data.
  *
- *   GEMINI_API_KEY=… npx tsx scripts/generate-gemini-words.ts 奶奶 想要 魚乾
- *   npx tsx scripts/generate-gemini-words.ts --from <folder> 奶奶 想要 魚乾
+ *   GEMINI_API_KEY=… npx tsx scripts/generate-gemini-words.ts 奶奶 想要 魚竿
+ *   npx tsx scripts/generate-gemini-words.ts --from <folder> 奶奶 想要 魚竿
  *
  * `--from` reads `<word>.wav` files saved from Google AI Studio instead of calling the API;
  * `--prompts` only prints the prompt to paste into AI Studio for each word.
@@ -29,7 +29,7 @@ const args = process.argv.slice(2).filter((arg) => arg !== "--prompts");
 const fromIndex = args.indexOf("--from");
 const fromDir = fromIndex >= 0 ? args[fromIndex + 1] : null;
 const words = fromIndex >= 0 ? args.filter((_, i) => i !== fromIndex && i !== fromIndex + 1) : args;
-if (!words.length) throw new Error("Name the words to voice, for example: 奶奶 想要 魚乾");
+if (!words.length) throw new Error("Name the words to voice, for example: 奶奶 想要 魚竿");
 const apiKey = process.env.GEMINI_API_KEY;
 if (!printOnly && !fromDir && !apiKey)
   throw new Error("Set GEMINI_API_KEY, or pass --from <folder of WAVs>.");

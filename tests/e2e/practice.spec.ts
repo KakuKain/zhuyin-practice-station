@@ -554,6 +554,37 @@ test("listening replays never cover the page; only a slow clip shows the wait", 
   await expect(wait).toHaveCount(0, { timeout: 5000 });
 });
 
+test("answers never show stand-in Han characters while the zhuyin font is missing", async ({
+  page,
+}) => {
+  // The answer font draws ㄆㄧˊ as the glyph of 皮; without it a browser would show 皮.
+  await page.route("**/fonts/KidLessonYoOnly.woff2*", (route) => route.abort());
+  await page.goto("./");
+  await openLesson(page);
+  await page.getByRole("button", { name: /第二關 聽寫/ }).click();
+  await page.getByRole("button", { name: "開始聽", exact: true }).click();
+  await page.getByRole("button", { name: "結束作答並檢查", exact: true }).click();
+  const answers = page.locator(".listening-answer-cell");
+  await expect(answers.first()).toBeVisible();
+  await expect(page.locator(".listening-answer-cell .is-literal").first()).toBeVisible();
+  expect(await answers.allInnerTexts()).not.toContainEqual(
+    expect.stringMatching(/[\u4e00-\u9fff]/),
+  );
+
+  await page.unroute("**/fonts/KidLessonYoOnly.woff2*");
+  await page.reload();
+  await page.evaluate(() => localStorage.removeItem("zhuyin-listening-round-v1"));
+  await page.goto("./");
+  await openLesson(page);
+  await page.getByRole("button", { name: /第二關 聽寫/ }).click();
+  await page.getByRole("button", { name: "開始聽", exact: true }).click();
+  await page.getByRole("button", { name: "結束作答並檢查", exact: true }).click();
+  // Once the font is in, words use its drawn syllables again.
+  await expect(
+    page.locator(".listening-answer-cell .zhuyin-glyph:not(.is-literal):not(.is-symbol)").first(),
+  ).toBeVisible();
+});
+
 test("an unfinished listening round continues after a reload", async ({ page }) => {
   await page.goto("./");
   await openLesson(page);
