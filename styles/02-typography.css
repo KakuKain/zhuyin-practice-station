@@ -79,10 +79,6 @@
   transform: translate(-50%, -50%) scaleX(0.68);
 }
 
-.zhuyin-glyph.is-neutral-di {
-  font-feature-settings: "ss01" 1;
-}
-
 /* Literal symbols share the symbol chart's upright forms in every activity. */
 .zhuyin-glyph.is-symbol {
   font-family: var(--font-symbol);
