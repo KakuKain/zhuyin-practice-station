@@ -10,7 +10,15 @@ import {
 } from "../../features/practice/practice-storage";
 import { validateFillDraft } from "../../features/fill/fill-storage";
 import { readBoardDraft } from "../ink/free-board";
-import { fillDraftKeyIndex, ownsStorageKey, storageKeys } from "./storage-keys";
+import {
+  childStorageKey,
+  fillDraftKeyIndex,
+  mainChildId,
+  ownsStorageKey,
+  splitChildKey,
+  storageKeys,
+} from "./storage-keys";
+import { validateChildProfiles } from "./child-profiles";
 import { customAudioStorage } from "../audio/custom-audio-storage";
 import {
   validateRecording,
@@ -33,6 +41,8 @@ export type PreparedBackup = {
   recordings: CustomRecording[];
   summary: {
     materials: number;
+    /** Children with their own records on this device. */
+    children: number;
     saved: number;
     drafts: number;
     strokes: number;
@@ -122,7 +132,12 @@ export function prepareDeviceBackup(raw: unknown): PreparedBackup {
     [storageKeys.practiceV2, 2],
     [storageKeys.practiceV1, 1],
   ] as const;
-  const activePracticeKey = practiceKeys.find(([key]) => storage[key] !== undefined)?.[0];
+  // Only the first child has pre-v4 practice keys; other children keep just their v4 copy.
+  const activePracticeKey = (childId: string) =>
+    childId === mainChildId
+      ? practiceKeys.find(([key]) => storage[key] !== undefined)?.[0]
+      : childStorageKey(storageKeys.practice, childId);
+  let children = 1;
   let saved = 0,
     drafts = 0,
     strokes = 0;
@@ -133,14 +148,19 @@ export function prepareDeviceBackup(raw: unknown): PreparedBackup {
       parsed && typeof parsed === "object" && !Array.isArray(parsed)
         ? (parsed as Record<string, unknown>)
         : null;
-    const practiceVersion = practiceKeys.find(([practiceKey]) => practiceKey === key)?.[1];
+    // A child's copy of a key is described like the shared one.
+    const { key: shared, childId } = splitChildKey(key);
+    const practiceVersion = practiceKeys.find(([practiceKey]) => practiceKey === shared)?.[1];
     const draftIndex = fillDraftKeyIndex(key);
-    if (practiceVersion) {
+    if (key === storageKeys.children) {
+      if (record) children = validateChildProfiles(record).children.length;
+      else unreadable++;
+    } else if (practiceVersion) {
       if (!record || !Array.isArray(record.savedQuestions)) unreadable++;
-      else if (key === activePracticeKey)
+      else if (key === activePracticeKey(childId))
         saved += validatePracticeState(record, practiceVersion, catalog, true).savedQuestions
           .length;
-    } else if (key === storageKeys.fillFavorites) {
+    } else if (shared === storageKeys.fillFavorites) {
       if (!Array.isArray(parsed)) unreadable++;
       else saved += validatedFillFavorites(parsed, catalog, true).length;
     } else if (key === storageKeys.listeningSettings) {
@@ -150,9 +170,9 @@ export function prepareDeviceBackup(raw: unknown): PreparedBackup {
       if (lesson && validateFillDraft(parsed, draftIndex, lesson.exercise.lines.flat().length))
         drafts++;
       else unreadable++;
-    } else if (key === storageKeys.freeBoard) {
+    } else if (shared === storageKeys.freeBoard) {
       const board = readBoardDraft(parsed, 304);
-      if (board) strokes = board.strokes.length;
+      if (board) strokes += board.strokes.length;
       else unreadable++;
     }
   }
@@ -188,6 +208,7 @@ export function prepareDeviceBackup(raw: unknown): PreparedBackup {
     recordings,
     summary: {
       materials: materials.materials.length,
+      children,
       saved,
       drafts,
       strokes,

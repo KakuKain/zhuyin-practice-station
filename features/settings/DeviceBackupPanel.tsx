@@ -90,6 +90,7 @@ export function DeviceBackupPanel() {
           <p>{new Date(pending.backup.createdAt).toLocaleString("zh-TW")}</p>
           <dl>
             {Object.entries({
+              孩子: pending.summary.children,
               自訂教材: pending.summary.materials,
               收藏與補強: pending.summary.saved,
               默寫草稿: pending.summary.drafts,

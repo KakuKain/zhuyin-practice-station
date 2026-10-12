@@ -22,6 +22,7 @@ import {
   type ContactEnd,
 } from "../../lib/ink/gesture";
 import { countInk } from "../../lib/ink/ink-diagnostics";
+import { childKey } from "../../lib/storage/child-profiles";
 import {
   freeBoardKey,
   boardStep,
@@ -32,6 +33,8 @@ import {
 } from "../../lib/ink/free-board";
 
 export function FreeDictation() {
+  // Each child has their own board; switching children remounts the app with theirs.
+  const [boardKey] = useState(() => childKey(freeBoardKey));
   const canvas = useRef<HTMLCanvasElement>(null);
   const strokes = useRef<BoardStroke[]>([]);
   const redo = useRef<BoardStroke[]>([]);
@@ -88,7 +91,7 @@ export function FreeDictation() {
     if (protectedRef.current) return;
     try {
       localStorage.setItem(
-        freeBoardKey,
+        boardKey,
         JSON.stringify({
           version: 2,
           ...size.current,
@@ -114,7 +117,7 @@ export function FreeDictation() {
     );
     size.current = { width, height: boardHeight };
     try {
-      const raw = localStorage.getItem(freeBoardKey);
+      const raw = localStorage.getItem(boardKey);
       if (raw) {
         const data = readBoardDraft(JSON.parse(raw), width);
         if (!data) throw new Error("invalid draft");
@@ -138,7 +141,7 @@ export function FreeDictation() {
       observer.disconnect();
       scheduler.cancel();
     };
-  }, [scheduler]);
+  }, [scheduler, boardKey]);
   // 0.1 px keeps the stroke exact while halving the stored size of a full page.
   const round = (value: number) => Math.round(value * 10) / 10;
   const point = (rect: DOMRect, clientX: number, clientY: number): [number, number] => [

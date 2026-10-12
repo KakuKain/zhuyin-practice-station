@@ -1,4 +1,5 @@
 import { ProgressiveImage } from "../../components/ProgressiveImage";
+import { ChildGreeting } from "../../components/ChildPicker";
 
 import { PageHeading } from "../../components/PageHeading";
 import type { AppController } from "../usePracticeApp";
@@ -33,6 +34,7 @@ export function CourseList({
         description="跟著注音，一步一步探索吧！"
         artwork="course-art/course-journey-hero-v2.webp"
       />
+      <ChildGreeting />
       {lessons.length === 0 && (
         <p className="material-note">
           這組教材目前沒有顯示中的課次。請到「更多 → 教材與題庫」加入字詞，或復原封存課次。

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { builtinCatalog, type CatalogLesson } from "../courses/materials";
 import { usePersistentState } from "../../lib/storage/usePersistentState";
+import { childKey } from "../../lib/storage/child-profiles";
 import type { FillFavorite, StateSetter, SyllableItem } from "../types";
 import {
   fillFavoriteKey,
@@ -23,7 +24,7 @@ export function useFillCollection(
   const [fillFavorites, setFillFavorites, favoritesStorageError] = usePersistentState<
     FillFavorite[]
   >(
-    fillFavoritesStorageKey,
+    childKey(fillFavoritesStorageKey),
     [],
     (storage) => readFillFavorites(storage, catalogRef.current, true),
     (raw) => validatedFillFavorites(raw, catalogRef.current, true),

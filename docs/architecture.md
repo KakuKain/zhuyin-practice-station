@@ -48,7 +48,9 @@ public/                    靜態部署素材與完整語音 registry
 
 收藏與待補強是獨立旗標：取消收藏不清除補強；家長確認掌握才移出補強。舊版 v1／v2／v3 紀錄轉成 v4 時保留原 key。默寫收藏保持 v1；內建課文讀音更正時（例如「教」ㄐㄧㄠˋ→ㄐㄧㄠ），收藏跟著同位置的新讀音，不會被丟棄。打開已完成的格子再返回不會變成未完成。歷史保留最近 20 次真正完成的練習；開啟課文不算完成。
 
-所有 storage key 列在 `lib/storage/storage-keys.ts`，完整備份由這份清單決定範圍；新增 key 必須加進清單。GitHub Pages 同一帳號的所有網站共用一個 origin 與 localStorage 配額，不讀取或清除不屬於本站的 key。
+所有 storage key 列在 `lib/storage/storage-keys.ts`，完整備份由這份清單決定範圍；新增 key 必須加進清單。
+
+多個孩子共用一台平板時，每個孩子有自己的待補強、收藏、默寫收藏與草稿、聽寫進度和自由畫板；每個孩子可以選自己的教材（記在孩子名單的 `materialId`，教材內容與家長建立的教材庫共用；`useMaterials` 依目前孩子套用），聽寫設定與自訂錄音全家共用（`lib/storage/child-profiles.ts`，名單存在 `zhuyin-children-v1`，在「更多 → 孩子」管理）。第一個孩子（`main`）沿用原本的 key，既有紀錄不必搬移，也只有它會讀 v1–v3 舊練習紀錄；其他孩子用 `<key>@<孩子 id>`。讀寫這些資料一律透過 `childKey()`／`activeChildId()`。有兩個以上孩子時，每次開啟 App 先問「現在是誰在練習？」（同一個分頁 session 重新整理不再問）；課程列表顯示目前的孩子與「換人」。換人時整個 App 以該孩子重新掛載。刪除孩子只刪他自己的 key；完整備份包含所有孩子。不需要登入。GitHub Pages 同一帳號的所有網站共用一個 origin 與 localStorage 配額，不讀取或清除不屬於本站的 key。
 
 ## 書寫與檢查
 
