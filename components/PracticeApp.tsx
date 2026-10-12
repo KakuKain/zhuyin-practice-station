@@ -32,8 +32,30 @@ const SymbolChart = lazy(() =>
 );
 
 import { MaterialContext } from "../features/courses/MaterialContext";
+import { ChildPicker } from "./ChildPicker";
+import { chooseChild, needsChildChoice, useChildProfiles } from "../lib/storage/child-profiles";
 
+/**
+ * With several children on one tablet, a session starts by asking who is practising. Each
+ * child's records live under their own keys, so choosing someone else remounts every screen
+ * and store with theirs.
+ */
 export function PracticeApp() {
+  const profiles = useChildProfiles();
+  const [choosing, setChoosing] = useState(needsChildChoice);
+  if (choosing)
+    return (
+      <ChildPicker
+        onChoose={(id) => {
+          chooseChild(id);
+          setChoosing(false);
+        }}
+      />
+    );
+  return <PracticeSession key={profiles.activeId} />;
+}
+
+function PracticeSession() {
   const app = usePracticeApp();
   const { catalog, playbackRef, finishPlayback } = app;
   return (

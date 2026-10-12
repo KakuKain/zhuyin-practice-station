@@ -1,5 +1,6 @@
 import type { InkStroke, ListenCategory, ListeningQuestion } from "../types";
 import { storageKeys } from "../../lib/storage/storage-keys";
+import { childKey } from "../../lib/storage/child-profiles";
 import { validInkStrokes } from "../fill/fill-storage";
 
 /** An unfinished whole-lesson round: the drawn question order, position and every answer. */
@@ -87,7 +88,7 @@ export function validateListeningRound(raw: unknown): SavedListeningRound | null
 
 export function readListeningRound(): SavedListeningRound | null {
   try {
-    const raw = window.localStorage.getItem(storageKeys.listeningRound);
+    const raw = window.localStorage.getItem(childKey(storageKeys.listeningRound));
     return raw ? validateListeningRound(JSON.parse(raw)) : null;
   } catch {
     return null;
@@ -103,7 +104,7 @@ export function startupListeningRound(now = Date.now()): SavedListeningRound | n
 
 export function writeListeningRound(round: SavedListeningRound) {
   try {
-    window.localStorage.setItem(storageKeys.listeningRound, JSON.stringify(round));
+    window.localStorage.setItem(childKey(storageKeys.listeningRound), JSON.stringify(round));
     return true;
   } catch {
     return false;
@@ -112,7 +113,7 @@ export function writeListeningRound(round: SavedListeningRound) {
 
 export function clearListeningRound() {
   try {
-    window.localStorage.removeItem(storageKeys.listeningRound);
+    window.localStorage.removeItem(childKey(storageKeys.listeningRound));
   } catch {
     // Nothing to protect: the round simply cannot be resumed.
   }

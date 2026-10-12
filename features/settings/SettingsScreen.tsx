@@ -1,4 +1,7 @@
 import { ShowMsg } from "../../components/ShowMsg";
+import { ChildrenPanel } from "./ChildrenPanel";
+import { childLabel } from "../../components/ChildPicker";
+import { useChildProfiles } from "../../lib/storage/child-profiles";
 import { HeaderBack } from "../../components/AppChrome";
 
 import { PageHeading } from "../../components/PageHeading";
@@ -13,6 +16,7 @@ import {
   Microphone,
   MusicNotes,
   Question,
+  UsersThree,
 } from "@phosphor-icons/react";
 import { siteReleaseNotes } from "../courses/course-data";
 import {
@@ -117,6 +121,7 @@ export function SettingsScreen({
   app: Pick<
     AppController,
     | "materialsState"
+    | "familyMaterialId"
     | "setMaterialsState"
     | "materialsStorageError"
     | "catalog"
@@ -143,6 +148,7 @@ export function SettingsScreen({
   } = app;
   const [saveRequested, setSaveRequested] = useState(false);
   const { status: updateStatus } = useUpdateStatus();
+  const children = useChildProfiles();
   const updateSettings = (patch: Partial<ListeningSettings>) => {
     setListeningSettings((current) => ({ ...current, ...patch }));
     setSaveRequested(true);
@@ -155,6 +161,22 @@ export function SettingsScreen({
         <div className="more-group">
           <h2>練習設定</h2>
           <div className="more-settings-list">
+            <button type="button" onClick={() => setMorePanel("children")}>
+              <span className="more-row-icon orange">
+                <UsersThree size={21} aria-hidden="true" />
+              </span>
+              <span>
+                <strong>孩子</strong>
+                <small>
+                  {children.children.length > 1
+                    ? children.children.map((child) => childLabel(child, children)).join("、")
+                    : "新增孩子，每個人的紀錄分開"}
+                </small>
+              </span>
+              <span className="more-arrow" aria-hidden="true">
+                <ArrowRight size={21} weight="bold" />
+              </span>
+            </button>
             <button type="button" onClick={() => setMorePanel("materials")}>
               <span className="more-row-icon green">
                 <BookOpenText size={21} aria-hidden="true" />
@@ -273,6 +295,9 @@ export function SettingsScreen({
             audioError={app.audioError}
           />
         </Suspense>
+      )}
+      {morePanel === "children" && (
+        <ChildrenPanel materials={app.materialsState} familyMaterialId={app.familyMaterialId} />
       )}
       {morePanel === "backup" && (
         <Suspense fallback={<p role="status">正在準備備份…</p>}>

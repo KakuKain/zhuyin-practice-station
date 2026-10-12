@@ -52,7 +52,7 @@ There is one build: a static Vite SPA. `index.html` → `app/main.tsx` → `crea
 
 ## Architecture
 
-**There are no routes; this is a single-page state machine.** The entry renders only `<PracticeApp />`. The screen is selected by the `View` union in `features/types.ts`.
+**There are no routes; this is a single-page state machine.** The entry renders only `<PracticeApp />`. The screen is selected by the `View` union in `features/types.ts`. `PracticeApp` first asks 現在是誰在練習？ when two or more children share the device and this app session has not chosen yet (`components/ChildPicker.tsx`). It then renders the app keyed by the active child, so switching children remounts every screen and store with that child's records.
 
 - `features/usePracticeApp.ts` is a thin coordinator. It owns the view and lesson, the shared stores, audio, and the course-review queue. It spreads each flow's API into one flat controller object, which components read through `Pick<AppController, …>`.
 - **Each flow owns its own state and actions:**
@@ -95,6 +95,13 @@ Layout: `features/<feature>/` holds feature UI and logic, `components/` holds sh
 
 - All user data lives in browser `localStorage` behind `lib/storage/persistent-store.ts` (an external store read with `useSyncExternalStore`, not mirrored into React state). Older versions (for example `practice-state` v1–v3) are migrated forward on read, and their original keys are preserved.
 - **Every key is listed in `lib/storage/storage-keys.ts`**, the single registry that device backup (`ownsStorageKey`) is derived from. A new key must be added there, or backup will silently skip it; a unit test checks the known keys.
+- **Children** (`lib/storage/child-profiles.ts`, key `zhuyin-children-v1`; managed in 更多 → 孩子) have separate records:
+  - Child-scoped keys (`childScopedKeys`) are practice state, fill favorites, the listening round, the free board and fill drafts. Everything else (materials, listening settings, recordings) is shared.
+  - Which material is open belongs to each child: `ChildProfile.materialId`, applied by `withChildMaterial` in `useMaterials`. Choosing a material records it on the child; only the first child's choice also moves the family default that children without a choice follow.
+  - The first child, id `main`, uses the original keys, so existing records need no migration and only `main` reads the pre-v4 practice keys. Every other child uses `<key>@<id>`.
+  - Read and write them through `childKey()` or `activeChildId()`, never the bare constant.
+  - Removing a child deletes only `childRecordKeys(id)`. Device backup includes every child.
+  - A session-storage flag (`childChosenSessionKey`) stops a reload in the same session from asking again.
 - GitHub Pages gives all of the owner's sites one origin, so never read or clear keys you don't own. The localStorage quota is shared too.
 - Read paths are lenient: they migrate old shapes, and a corrected built-in reading moves a fill favorite to the new zhuyin rather than dropping it.
 - Device backup restores the saved text exactly; validators only describe the file in the preview, including a count of values this version cannot read. Restore rejects only unknown keys, non-string or oversized values, and invalid recordings. Its UI makes downloading the current data a separate step before restore reloads the page.
@@ -140,7 +147,7 @@ Layout: `features/<feature>/` holds feature UI and logic, `components/` holds sh
 
 ### Styles
 
-- `app/globals.css` imports `styles/00-…css` through `styles/25-…css` in a fixed cascade order. Order matters.
+- `app/globals.css` imports `styles/00-…css` through `styles/26-…css` in a fixed cascade order. Order matters. `26-children.css` styles the child picker, the course-list greeting and 更多 → 孩子.
 - `00-reset.css` is the former Tailwind preflight, kept in cascade layers so every unlayered rule wins. There is no Tailwind and there are no utility classes.
 - `24-fill-tablet.css` makes dictation (sheet, writing cell, review) full width at ≥ 600px: the square grows to the space left by the header and controls, and landscape tablets put the heading and finish button beside it. Phones keep the 480px column.
 - `25-listen-tablet.css` does the same for listening at ≥ 600px: the single square fills the width, a word's squares stack top to bottom with their tools beside them (side by side, first character on the right, in landscape), and the batch check shows two cards per row.

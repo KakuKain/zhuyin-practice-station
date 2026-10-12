@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { builtinCatalog, type CatalogLesson } from "../courses/materials";
 import { usePersistentState } from "../../lib/storage/usePersistentState";
+import { childKey } from "../../lib/storage/child-profiles";
 import {
   initialPracticeState,
   practiceStorageKey,
@@ -19,7 +20,7 @@ export function usePracticeCollection(
     catalogRef.current = catalog;
   }, [catalog]);
   const [practiceState, setPracticeState, practiceStorageError] = usePersistentState(
-    practiceStorageKey,
+    childKey(practiceStorageKey),
     initialPracticeState,
     (storage) => readPracticeState(storage, catalogRef.current, true),
     (raw) => validatePracticeState(raw, 4, catalogRef.current, true),

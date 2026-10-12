@@ -1,4 +1,5 @@
 import type { FillFavorite, PracticeSession, PracticeState, SavedQuestion } from "../types";
+import { activeChildId, childStorageKey, mainChildId } from "../../lib/storage/child-profiles";
 import { storageKeys } from "../../lib/storage/storage-keys";
 import { findQuestionSeed, questionId } from "../listening/listening-data";
 import { legacySavedQuestionIndexes } from "../courses/legacy-content";
@@ -144,13 +145,19 @@ export function readPracticeState(
   storage: Storage,
   catalog = storedCatalog(),
   preserveUnavailableLessons = false,
+  childId = activeChildId(),
 ): PracticeState {
-  for (const [key, version] of [
-    [practiceStorageKey, 4],
-    [thirdPracticeStorageKey, 3],
-    [previousPracticeStorageKey, 2],
-    [firstPracticeStorageKey, 1],
-  ] as const) {
+  // Only the first child's records predate v4; every other child has just their own copy.
+  const keys =
+    childId === mainChildId
+      ? ([
+          [practiceStorageKey, 4],
+          [thirdPracticeStorageKey, 3],
+          [previousPracticeStorageKey, 2],
+          [firstPracticeStorageKey, 1],
+        ] as const)
+      : ([[childStorageKey(practiceStorageKey, childId), 4]] as const);
+  for (const [key, version] of keys) {
     const stored = storage.getItem(key);
     if (stored !== null)
       return validatePracticeState(
@@ -167,8 +174,9 @@ export function readFillFavorites(
   storage: Storage,
   catalog = storedCatalog(),
   preserveUnavailableLessons = false,
+  childId = activeChildId(),
 ): FillFavorite[] {
-  const stored = storage.getItem(fillFavoritesStorageKey);
+  const stored = storage.getItem(childStorageKey(fillFavoritesStorageKey, childId));
   return stored
     ? validatedFillFavorites(JSON.parse(stored), catalog, preserveUnavailableLessons)
     : [];

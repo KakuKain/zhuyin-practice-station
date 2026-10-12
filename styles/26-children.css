@@ -1,0 +1,273 @@
+/* 孩子：who is practising (the picker and the course-list greeting) and 更多 → 孩子. */
+
+.child-avatar {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #fff4dc;
+  font-size: 32px;
+  line-height: 1;
+}
+.child-avatar:is(.is-dog, .is-bear, .is-monkey) {
+  background: #fdebd8;
+}
+.child-avatar:is(.is-rabbit, .is-koala, .is-penguin) {
+  background: #eef3ff;
+}
+.child-avatar:is(.is-panda, .is-frog) {
+  background: #eaf7e4;
+}
+.child-avatar:is(.is-fox, .is-tiger, .is-chick) {
+  background: #fff0de;
+}
+
+/* 現在是誰在練習？ */
+.child-picker-page {
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  padding: 24px 16px;
+  background: linear-gradient(180deg, #eaf6ff 0%, #fffdf6 70%);
+}
+.child-picker {
+  width: min(100%, 640px);
+  text-align: center;
+}
+.child-picker-art {
+  display: block;
+  width: min(70%, 320px);
+  height: auto;
+  margin: 0 auto 12px;
+}
+.child-picker h1 {
+  margin: 0 0 24px;
+  color: #18375d;
+  font-size: clamp(26px, 6vw, 36px);
+}
+.child-picker-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+}
+.child-picker-list button {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  min-height: 160px;
+  padding: 20px 12px;
+  border: 2px solid #c7dce8;
+  border-radius: 24px;
+  background: #fff;
+  color: #18375d;
+  font: inherit;
+  font-size: 20px;
+  cursor: pointer;
+}
+.child-picker-list .child-avatar {
+  width: 88px;
+  height: 88px;
+  font-size: 50px;
+}
+.child-picker-list button.is-current {
+  border-color: #3478d5;
+  box-shadow: 0 0 0 3px rgba(52, 120, 213, 0.18);
+}
+.child-picker-backdrop {
+  position: fixed;
+  z-index: 200;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(16, 40, 64, 0.38);
+}
+.child-picker-backdrop .child-picker {
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  padding: 28px 20px 20px;
+  border-radius: 28px;
+  background: #fff;
+}
+.child-picker-cancel {
+  min-height: 48px;
+  margin-top: 18px;
+  padding: 0 28px;
+  border: 1px solid #c7dce8;
+  border-radius: 14px;
+  background: #fff;
+  color: #264d74;
+  font: inherit;
+}
+
+/* Course list: who is practising, and 換人. */
+.child-greeting {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 18px;
+  padding: 10px 12px;
+  border: 1px solid #d6e4ec;
+  border-radius: 20px;
+  background: #fff;
+}
+.child-greeting .child-avatar {
+  width: 48px;
+  height: 48px;
+  font-size: 28px;
+}
+.child-greeting p {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  color: #18375d;
+  font-size: 18px;
+}
+.child-greeting > button {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid #c7dce8;
+  border-radius: 14px;
+  background: #f3faff;
+  color: #264d74;
+  font: inherit;
+  font-weight: 700;
+}
+
+/* 更多 → 孩子 */
+.child-list {
+  display: grid;
+  gap: 10px;
+  margin: 16px 0;
+  padding: 0;
+  list-style: none;
+}
+.child-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid #d6e4ec;
+  border-radius: 18px;
+  background: #fff;
+}
+.child-row-avatar {
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+}
+.child-row-name {
+  flex: 1;
+  min-width: 120px;
+}
+:is(.child-row-name, .child-add label) input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid #c7dce8;
+  border-radius: 12px;
+  font: inherit;
+  font-size: 18px;
+}
+.child-row-current {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #e7f6ec;
+  color: #24704a;
+  font-size: 14px;
+  font-weight: 700;
+}
+.child-row-remove {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid #f0c9c4;
+  border-radius: 12px;
+  background: #fff;
+  color: #b1443a;
+}
+.child-material {
+  display: flex;
+  flex-basis: 100%;
+  align-items: center;
+  gap: 8px;
+  color: #5b6f86;
+  font-size: 15px;
+}
+.child-material select {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 1px solid #c7dce8;
+  border-radius: 12px;
+  background: #fff;
+  color: #18375d;
+  font: inherit;
+  font-size: 16px;
+}
+.child-add .child-material {
+  display: flex;
+}
+.child-row .child-avatar-choices {
+  flex-basis: 100%;
+}
+.child-avatar-choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+  gap: 8px;
+}
+.child-avatar-choices button {
+  height: 52px;
+  border: 2px solid transparent;
+  border-radius: 14px;
+  background: #f3faff;
+  font-size: 30px;
+}
+.child-avatar-choices button[aria-checked="true"] {
+  border-color: #3478d5;
+  background: #e6f1ff;
+}
+.child-add {
+  display: grid;
+  gap: 12px;
+  margin-top: 20px;
+  padding: 16px;
+  border: 1px solid #d6e4ec;
+  border-radius: 20px;
+  background: #fff;
+}
+.child-add h2 {
+  margin: 0;
+  font-size: 18px;
+}
+.child-add label {
+  display: grid;
+  gap: 6px;
+}
+.child-add .primary-button {
+  display: inline-flex;
+  justify-self: start;
+  align-items: center;
+  gap: 6px;
+}
+.children-hint {
+  margin: 4px 0;
+  color: #5b6f86;
+  font-size: 15px;
+}
+
+@media (max-width: 420px) {
+  .child-greeting p {
+    font-size: 16px;
+  }
+}

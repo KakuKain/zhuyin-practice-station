@@ -585,6 +585,90 @@ test("answers never show stand-in Han characters while the zhuyin font is missin
   ).toBeVisible();
 });
 
+test("siblings keep their own records and each session asks who is practising", async ({
+  page,
+}) => {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("./");
+  await page.evaluate(() => {
+    localStorage.setItem(
+      "zhuyin-practice-state-v4",
+      JSON.stringify({
+        savedQuestions: [
+          { lessonIndex: 0, questionId: "words:皮包", isFavorite: true, needsPractice: true },
+        ],
+        recentLesson: 0,
+        completedSessions: 0,
+        history: [],
+      }),
+    );
+    // A material the parent made for the younger child.
+    localStorage.setItem(
+      "zhuyin-materials-v1",
+      JSON.stringify({
+        version: 1,
+        activeId: "kang-hsuan-grade1-semester1",
+        nextIndex: 10,
+        materials: [
+          {
+            id: "little",
+            name: "妹妹的教材",
+            publisher: "",
+            grade: "",
+            semester: "",
+            lessons: [
+              {
+                index: 9,
+                title: "動物",
+                terms: [{ text: "小狗", syllables: ["ㄒㄧㄠˇ", "ㄍㄡˇ"] }],
+              },
+            ],
+          },
+        ],
+      }),
+    );
+  });
+  await page.reload();
+  const nav = page.getByRole("navigation", { name: "主要導覽" });
+  await nav.getByRole("button", { name: "更多", exact: true }).click();
+  await page.getByRole("button", { name: /^孩子/ }).click();
+  // The records already on the tablet become the first child's.
+  const first = page.locator(".child-row-name input").first();
+  await first.fill("哥哥");
+  await first.press("Enter");
+  await page.getByLabel("名字或暱稱").fill("妹妹");
+  await page.getByRole("radio", { name: "兔子" }).click();
+  await page.getByRole("button", { name: "新增", exact: true }).click();
+  await expect(page.locator(".child-row")).toHaveCount(2);
+  // Each child opens their own material.
+  await page.getByLabel("妹妹的教材").selectOption("little");
+
+  // A new app session starts by asking, and 妹妹 starts with no records.
+  await page.evaluate(() => sessionStorage.clear());
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "現在是誰在練習？" })).toBeVisible();
+  await page.getByRole("button", { name: "妹妹", exact: true }).click();
+  await expect(page.locator(".child-greeting")).toContainText("妹妹");
+  await expect(page.locator(".journey-card")).toHaveCount(1);
+  await openRecords(page);
+  await expect(page.getByRole("button", { name: "重練皮包（聽寫）", exact: true })).toHaveCount(0);
+
+  // 換人 from the course list brings back 哥哥's records.
+  await nav.getByRole("button", { name: "課程", exact: true }).click();
+  await page.getByRole("button", { name: "換人", exact: true }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "哥哥", exact: true }).click();
+  await expect(page.locator(".child-greeting")).toContainText("哥哥");
+  await expect(page.locator(".journey-card")).toHaveCount(12);
+  await openRecords(page);
+  await expect(page.getByRole("button", { name: "重練皮包（聽寫）", exact: true })).toBeVisible();
+  // A reload in the same session does not ask again.
+  await page.reload();
+  await expect(page.locator(".journey-card").first()).toBeVisible();
+  await expect(page.getByRole("heading", { name: "現在是誰在練習？" })).toHaveCount(0);
+  expect(errors).toEqual([]);
+});
+
 test("an unfinished listening round continues after a reload", async ({ page }) => {
   await page.goto("./");
   await openLesson(page);

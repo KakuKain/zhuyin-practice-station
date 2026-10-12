@@ -1,5 +1,6 @@
 import type { FillDraft, InkStroke } from "../types";
 import { fillDraftStorageKey } from "../../lib/storage/storage-keys";
+import { activeChildId } from "../../lib/storage/child-profiles";
 
 export { fillDraftStorageKey };
 
@@ -46,7 +47,7 @@ export const validInkStrokes = (value: unknown): value is InkStroke[] =>
 
 export function readFillDraft(lessonIndex: number, cellCount: number): FillDraft | null {
   try {
-    const raw = window.localStorage.getItem(fillDraftStorageKey(lessonIndex));
+    const raw = window.localStorage.getItem(fillDraftStorageKey(lessonIndex, activeChildId()));
     if (!raw) return null;
     return validateFillDraft(JSON.parse(raw), lessonIndex, cellCount);
   } catch {
@@ -120,9 +121,12 @@ export function validateFillDraft(
 }
 
 export function writeFillDraft(draft: FillDraft) {
-  window.localStorage.setItem(fillDraftStorageKey(draft.lessonIndex), JSON.stringify(draft));
+  window.localStorage.setItem(
+    fillDraftStorageKey(draft.lessonIndex, activeChildId()),
+    JSON.stringify(draft),
+  );
 }
 
 export function clearFillDraft(lessonIndex: number) {
-  window.localStorage.removeItem(fillDraftStorageKey(lessonIndex));
+  window.localStorage.removeItem(fillDraftStorageKey(lessonIndex, activeChildId()));
 }
