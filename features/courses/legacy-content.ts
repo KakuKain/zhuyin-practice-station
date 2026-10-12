@@ -251,6 +251,8 @@ export const legacyCircledVocabulary: readonly (readonly CircledTerm[])[] = [
     term("奶奶想要魚乾", "ㄋㄞˇ|˙ㄋㄞ|ㄒㄧㄤˇ|ㄧㄠˋ|ㄩˊ|ㄍㄢ"),
     term("爸爸買了魚缸", "ㄅㄚˋ|˙ㄅㄚ|ㄇㄞˇ|˙ㄌㄜ|ㄩˊ|ㄍㄤ"),
     term("哥哥和小狗一起玩球", "ㄍㄜ|˙ㄍㄜ|ㄏㄢˋ|ㄒㄧㄠˇ|ㄍㄡˇ|ㄧˋ|ㄑㄧˇ|ㄨㄢˊ|ㄑㄧㄡˊ"),
+    // 2026-10-12: a typo for 魚竿, corrected in circled-vocabulary.ts.
+    term("魚乾", "ㄩˊ|ㄍㄢ"),
   ],
   [
     term("也", "ㄧㄝˇ"),

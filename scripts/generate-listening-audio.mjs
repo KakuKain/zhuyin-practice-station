@@ -70,7 +70,7 @@ const spokenTextOverrides = new Map([
   ["ㄩㄝ", "約"],
   ["ㄩㄣ", "暈"],
   ["翹", "俏"],
-  // The voice reads 乾 in 魚乾 as ㄍㄢˋ; 竿 has only ㄍㄢ.
+  // 魚乾 (a typo for 魚竿, kept for old records): the voice reads 乾 as ㄍㄢˋ; 竿 has only ㄍㄢ.
   ["魚乾", "魚竿"],
   ["奶奶想要魚乾", "奶奶想要魚竿"],
   ["覺", "叫"],

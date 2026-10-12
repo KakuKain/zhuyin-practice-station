@@ -10,6 +10,7 @@ const combinedGlyphs = Object.fromEntries(
 );
 
 import { syllableGlyphs } from "../features/lesson/zhuyin-glyphs";
+import { useAnswerFontReady } from "../lib/loading/font-ready";
 
 export function ZhuyinStack({
   text,
@@ -18,10 +19,12 @@ export function ZhuyinStack({
   text: string;
   literalSymbol?: boolean;
 }) {
-  const useLiteral = !literalSymbol && !syllableGlyphs[text];
+  const fontReady = useAnswerFontReady();
+  const isSymbol = literalSymbol && /^[\u3105-\u3129]+$/.test(text);
+  // Spell the syllable out until the answer font has loaded, never a stand-in Han character.
+  const useLiteral = !isSymbol && (!syllableGlyphs[text] || !fontReady);
   const tone = text.match(/[˙ˊˇˋ]/)?.[0];
   const letters = Array.from(text.replace(/[˙ˊˇˋ]/g, ""));
-  const isSymbol = literalSymbol && /^[\u3105-\u3129]+$/.test(text);
   return (
     <span className="zhuyin-stack" aria-label={text}>
       <span
