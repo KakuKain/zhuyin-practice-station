@@ -159,6 +159,13 @@ export function usePracticeApp() {
     advanceReviewQueue();
   };
 
+  // Math lessons are their own list; the open one lives here like the open 注音 lesson.
+  const [mathLessonId, setMathLessonId] = useState(1);
+  const openMathLesson = (id: number) => {
+    setMathLessonId(id);
+    setView("math");
+  };
+
   const openLesson = (index: number) => {
     const nextLesson = catalog.find((item) => item.index === index);
     setSelectedLesson(index);
@@ -205,6 +212,8 @@ export function usePracticeApp() {
         return navigate(lesson.listeningOnly ? "courses" : "lesson");
       case "more":
         return morePanel === "home" ? navigate("courses") : setMorePanel("home");
+      case "math":
+        return navigate("courses");
       default:
         return navigate("courses");
     }
@@ -259,6 +268,8 @@ export function usePracticeApp() {
     navigate,
     leaveFill,
     isFocusMode: view === "listen",
+    mathLessonId,
+    openMathLesson,
     morePanel,
     setMorePanel,
     selectedLesson,

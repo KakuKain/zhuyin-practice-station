@@ -28,7 +28,7 @@ export function ZhuyinStack({
   return (
     <span className="zhuyin-stack" aria-label={text}>
       <span
-        className={`zhuyin-glyph ${useLiteral ? "is-literal" : ""} ${text === "˙ㄉㄧ" ? "is-neutral-di" : ""} ${isSymbol ? "is-symbol" : ""} ${isSymbol && text.length > 1 ? "is-symbol-combination" : ""}`}
+        className={`zhuyin-glyph ${useLiteral ? "is-literal" : ""} ${isSymbol ? "is-symbol" : ""} ${isSymbol && text.length > 1 ? "is-symbol-combination" : ""}`}
         aria-hidden="true"
       >
         {useLiteral ? (

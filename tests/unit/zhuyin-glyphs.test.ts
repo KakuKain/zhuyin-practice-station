@@ -10,8 +10,6 @@ const shown: Record<string, string> = JSON.parse(
 
 test("every answer glyph is in the font subset and shows its own reading", () => {
   for (const [syllable, glyph] of Object.entries(syllableGlyphs)) {
-    // 弟 switches to its neutral-tone annotation with the font's ss01 feature (is-neutral-di).
-    if (syllable === "˙ㄉㄧ") continue;
     assert.ok(
       glyph in shown,
       `${syllable} → ${glyph} is missing from KidLessonYoOnly; run python3 scripts/build-yo-fonts.py`,
