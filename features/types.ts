@@ -7,7 +7,8 @@ export type View =
   | "fill"
   | "fill-practice"
   | "listen"
-  | "result";
+  | "result"
+  | "math";
 
 export type ListenPhase =
   | "ready"

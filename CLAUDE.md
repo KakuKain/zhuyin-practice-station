@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-A login-free Zhuyin (注音) practice site for Taiwanese first graders and their parents: lessons 1–9 plus three review sets, a symbol chart, handwriting dictation, listening dictation, and sound discrimination. UI copy and all docs are in Traditional Chinese (zh-Hant). `docs/architecture.md` is the detailed reference for feature boundaries and invariants. Read it before changing state, storage, audio, or ink behavior.
+A login-free Zhuyin (注音) practice site for Taiwanese first graders and their parents: lessons 1–9 plus three review sets, a symbol chart, handwriting dictation, listening dictation, and sound discrimination. It also has 數學 (康軒 115, first grade): lesson 1 (認識 1～10) is built; lessons 2 and 3 are listed as 製作中. UI copy and all docs are in Traditional Chinese (zh-Hant). `docs/architecture.md` is the detailed reference for feature boundaries and invariants. Read it before changing state, storage, audio, or ink behavior.
 
 Hard product constraints: no login, no DB, no cloud sync, no service worker or offline cache, no runtime AI or speech API calls, and no changes to the teacher-defined lesson scope. A web app manifest so the site can be added to the home screen (full screen, portrait-locked, no browser UI) is fine.
 
@@ -40,6 +40,7 @@ Asset pipelines:
 - New words in `circled-vocabulary.ts` need clips: `node scripts/generate-listening-audio.mjs` (macOS, Meijia voice) creates missing ones, then run `npm run assets:audio-registry`. A word must have a single reading across all content, or no clip can serve it.
 - To re-voice a word with Gemini (`gemini-3.8-flash-tts`, voice Fola), run `GEMINI_API_KEY=… npx tsx scripts/generate-gemini-words.ts <words…>` (or `--from <folder>` with `<word>.wav` files saved from AI Studio; `--prompts` prints the prompts). It writes `public/listening-audio/gemini/words/`, removes the old Meijia clip, and records the prompt in `gemini/manifest.json`; then run `npm run assets:audio-registry`. The Meijia script skips words that have a Gemini clip.
 - `node scripts/build-app-icons.mjs` regenerates the home-screen icons in `public/icons/` from `public/favicon.svg`.
+- `npx tsx scripts/generate-math-audio.ts [--refresh]` voices every math instruction in `features/math/math-audio.ts` into `public/math-audio/` (macOS Meijia). First graders cannot read yet, so every math question is spoken; a unit test checks each prompt has a clip.
 - `python3 scripts/build-yo-fonts.py` rebuilds the lesson font subsets after you add characters or IVS glyphs, and writes `assets/font-sources/KidLessonYoOnly-readings.json` (what each character and variation sequence shows). `scripts/build-fonts.py` rebuilds the full fonts. Both need fontTools and brotli. Bump the `?v=` on the fonts in `styles/02-typography.css` when they change.
 
 ## Build and deploy
@@ -60,6 +61,10 @@ There is one build: a static Vite SPA. `index.html` → `app/main.tsx` → `crea
   - `features/fill/useFillFlow.ts`: handwriting dictation (默寫), whole lesson and single-cell practice. It composes `useFillSession`, `useFillCanvas`, `useFillDraft` and `useFillProgress`.
   - `fillLayout(lesson)` maps the title column (shown rightmost) to stored cell order.
 - Flows receive `clearNotices`, `continueReview` and `stopReview` from the coordinator instead of reaching into each other.
+- `features/math/` is self-contained.
+  - The course list's 國語｜數學 switch (not 注音, which would clash with the 注音 symbol-chart tab) is remembered per child (`ChildProfile.subject`). `openMathLesson` sets `mathLessonId` and the `math` view, and `MathScreen` runs the round.
+  - Lesson 1 asks 4 數一數 (tap pictures to mark them, write the number) and then 4 畫圈圈 (each stroke is numbered as it is drawn), all spoken aloud.
+  - The parent checks it at the end. The round persists per child in `kid-math-round-v1`, and finished rounds go to `kid-math-records-v1`.
 - `PracticeList`, `SettingsScreen`, `SymbolChart`, and their heavy sub-panels are `React.lazy` chunks. Keep them out of the initial bundle.
 - One `<audio>` element is mounted at the app root for every screen, so iOS keeps the playback a tap unlocked.
 - Answer zhuyin (`ZhuyinStack`) is drawn by the `KidLessonYoOnly` font, which puts each syllable on a Han character (`syllableGlyphs` in `features/lesson/zhuyin-glyphs.ts`; ㄏㄨˊ is 蝴). Until that font has loaded (`lib/loading/font-ready.ts`), the syllable is spelled out in the UI font so a stand-in character never shows. A polyphone needs its variation selector there (`"奶\u{E01E1}"` for ˙ㄋㄞ); `tests/unit/zhuyin-glyphs.test.ts` fails if a glyph is missing from the subset or shows another reading.
@@ -147,7 +152,7 @@ Layout: `features/<feature>/` holds feature UI and logic, `components/` holds sh
 
 ### Styles
 
-- `app/globals.css` imports `styles/00-…css` through `styles/26-…css` in a fixed cascade order. Order matters. `26-children.css` styles the child picker, the course-list greeting and 更多 → 孩子.
+- `app/globals.css` imports `styles/00-…css` through `styles/27-…css` in a fixed cascade order. Order matters. `26-children.css` styles the child picker, the course-list greeting and 更多 → 孩子; `27-math.css` the subject switch and the math screen (landscape tablets put the square on the right).
 - `00-reset.css` is the former Tailwind preflight, kept in cascade layers so every unlayered rule wins. There is no Tailwind and there are no utility classes.
 - `24-fill-tablet.css` makes dictation (sheet, writing cell, review) full width at ≥ 600px: the square grows to the space left by the header and controls, and landscape tablets put the heading and finish button beside it. Phones keep the 480px column.
 - `25-listen-tablet.css` does the same for listening at ≥ 600px: the single square fills the width, a word's squares stack top to bottom with their tools beside them (side by side, first character on the right, in landscape), and the batch check shows two cards per row.

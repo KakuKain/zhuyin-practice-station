@@ -20,6 +20,10 @@ export const storageKeys = {
   freeBoard: "kid-free-dictation-v1",
   /** Who practises on this device and who is practising now (child-profiles.ts). */
   children: "zhuyin-children-v1",
+  /** The unfinished math round, so a reload or a closed app can continue it. */
+  mathRound: "kid-math-round-v1",
+  /** Finished math rounds and what the parent marked to practise again. */
+  mathRecords: "kid-math-records-v1",
 } as const;
 
 /**
@@ -33,6 +37,8 @@ export const childScopedKeys: ReadonlySet<string> = new Set([
   storageKeys.fillFavorites,
   storageKeys.listeningRound,
   storageKeys.freeBoard,
+  storageKeys.mathRound,
+  storageKeys.mathRecords,
 ]);
 const childSuffixPattern = /@([a-z0-9]{1,12})$/;
 export const isChildId = (value: unknown): value is string =>

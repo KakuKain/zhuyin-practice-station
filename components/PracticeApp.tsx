@@ -27,6 +27,7 @@ const SettingsScreen = lazy(() =>
 );
 import { ListeningResult } from "../features/listening/ListeningResult";
 import { ListeningScreen } from "../features/listening/ListeningScreen";
+import { MathScreen } from "../features/math/MathScreen";
 const SymbolChart = lazy(() =>
   import("../features/symbols/SymbolChart").then((module) => ({ default: module.SymbolChart })),
 );
@@ -107,6 +108,7 @@ function PracticeContent({ app }: { app: ReturnType<typeof usePracticeApp> }) {
     }
   };
 
+  if (view === "math") return <MathScreen app={app} />;
   if (isFocusMode) return <ListeningScreen app={app} />;
   if (view === "fill-practice") return <FillPractice app={app} />;
   if (view === "fill" && activeFillCell !== null)
