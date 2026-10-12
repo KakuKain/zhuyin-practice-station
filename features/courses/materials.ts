@@ -1,5 +1,6 @@
 import { lessons, exercises, courseArtwork, lessonNumerals } from "./course-data";
 import { circledVocabulary, reviewVocabulary, type CircledTerm } from "./circled-vocabulary";
+import { lessonCharacters, reviewCharacters } from "./lesson-characters";
 import type { LessonExercise, SyllableItem } from "../types";
 import { createZhuyinExercise, type LessonContent } from "./lesson-content";
 import { storageKeys } from "../../lib/storage/storage-keys";
@@ -36,6 +37,10 @@ export type CatalogLesson = {
   lines: readonly string[];
   symbols: readonly string[];
   terms: readonly CircledTerm[];
+  /** 生字 for listening: single characters from the circled words (lesson-characters.ts). */
+  characters?: readonly CircledTerm[];
+  /** Symbols a review's listening round draws from: those of the lessons it covers. */
+  listeningSymbols?: readonly string[];
   exercise: LessonExercise;
   artwork?: string;
   materialName: string;
@@ -69,6 +74,7 @@ export const builtinLessons: CatalogLesson[] = lessons.map((lesson, index) => ({
   index: builtinLessonIndex(index),
   number: lessonNumerals[index],
   terms: circledVocabulary[index],
+  characters: lessonCharacters[index] ?? [],
   content: {
     textLines: lesson.lines,
     readingLines: exercises[index].lines,
@@ -104,7 +110,11 @@ export const builtinReviews: CatalogLesson[] = reviewVocabulary.map((terms, inde
     title: `複習${number}`,
     lines: [],
     symbols: [],
+    listeningSymbols: [
+      ...new Set(lessons.slice(index * 3, index * 3 + 3).flatMap((l) => l.symbols)),
+    ],
     terms,
+    characters: reviewCharacters[index] ?? [],
     content,
     exercise: createZhuyinExercise(content),
     materialName: builtinMaterialName,
