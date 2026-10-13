@@ -115,7 +115,13 @@ test("every contrast uses existing clips; second/third tone retains the same syl
 test("short practice opens with pair choice, no timer, canvas or automatic answer", () => {
   const html = renderToStaticMarkup(
     createElement(SoundPractice, {
-      audio: { speak() {}, stopPlayback() {}, audioError: false, audioLoading: false },
+      audio: {
+        speak() {},
+        stopPlayback() {},
+        awardStamp() {},
+        audioError: false,
+        audioLoading: false,
+      },
       onBack() {},
     }),
   );

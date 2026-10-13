@@ -24,6 +24,10 @@ export const storageKeys = {
   mathRound: "kid-math-round-v1",
   /** Finished math rounds and what the parent marked to practise again. */
   mathRecords: "kid-math-records-v1",
+  /** 集章卡: each child's stamps, the log of what earned them and the rewards chosen. */
+  stamps: "kid-stamps-v1",
+  /** 集章卡 settings the family shares: on or off, card size, daily stamps and rewards. */
+  rewardSettings: "kid-reward-settings-v1",
 } as const;
 
 /**
@@ -39,6 +43,7 @@ export const childScopedKeys: ReadonlySet<string> = new Set([
   storageKeys.freeBoard,
   storageKeys.mathRound,
   storageKeys.mathRecords,
+  storageKeys.stamps,
 ]);
 const childSuffixPattern = /@([a-z0-9]{1,12})$/;
 export const isChildId = (value: unknown): value is string =>

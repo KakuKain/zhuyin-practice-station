@@ -21,7 +21,10 @@ function PairLabel({ text }: { text: string }) {
   );
 }
 
-type Audio = Pick<AppController, "speak" | "stopPlayback" | "audioLoading" | "audioError">;
+type Audio = Pick<
+  AppController,
+  "speak" | "stopPlayback" | "audioLoading" | "audioError" | "awardStamp"
+>;
 export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => void }) {
   const stopPlayback = audio.stopPlayback;
   const [pair, setPair] = useState<SoundPair | null>(null);
@@ -329,6 +332,12 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => 
                         const next = index + 1;
                         setIndex(next);
                         if (next < round.length) playQuestion(round, next);
+                        else
+                          audio.awardStamp({
+                            kind: "practice",
+                            subject: "zhuyin",
+                            detail: `辨音 ${pair.title}`,
+                          });
                       }, 1200);
                     } else {
                       setFeedback("retry");

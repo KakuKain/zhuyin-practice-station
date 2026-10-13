@@ -1,0 +1,505 @@
+/* 集章卡: the course-list chip, the card, the stamp toast and 更多 → 集章卡. */
+
+.more-row-icon.pink {
+  background: #ffeef3;
+  color: #d0466f;
+}
+
+.stamp-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 52px;
+  margin: 0 0 18px;
+  padding: 8px 16px;
+  border: 1px solid #f3c9d6;
+  border-radius: 20px;
+  background: #fff7fa;
+  color: #8c2f4e;
+  font: inherit;
+  font-size: 17px;
+  font-weight: 700;
+  text-align: left;
+}
+.stamp-chip span {
+  flex: 1;
+}
+.stamp-chip strong {
+  color: #d0466f;
+  font-size: 18px;
+}
+.stamp-chip.is-full {
+  border-color: #e8b21f;
+  background: #fff8e1;
+  animation: stamp-glow 1.6s ease-in-out infinite alternate;
+}
+
+/* The card: five stamps to a row, like a paper stamp card. */
+.stamp-slots {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.stamp-slots li {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border: 2px dashed #d6dfe6;
+  border-radius: 50%;
+  color: #a7b5c0;
+  font-size: 15px;
+  font-weight: 700;
+}
+.stamp-slots li.is-filled {
+  border: 0;
+  color: #fff;
+  animation: stamp-press 0.35s ease-out both;
+}
+.stamp-slots li.is-practice {
+  background: #2f9a55;
+}
+.stamp-slots li.is-fix {
+  background: #e8a21f;
+}
+.stamp-slots li.is-cheer {
+  background: #e0567a;
+}
+.stamp-legend .is-practice svg,
+.reward-log .is-practice > svg {
+  color: #2f9a55;
+}
+.stamp-legend .is-fix svg,
+.reward-log .is-fix > svg {
+  color: #e8a21f;
+}
+.stamp-legend .is-cheer svg,
+.reward-log .is-cheer > svg {
+  color: #e0567a;
+}
+
+.stamp-dialog {
+  display: grid;
+  gap: 16px;
+  width: min(100%, 460px);
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
+  padding: 20px;
+  border-radius: 25px;
+  background: #fff;
+  color: #18375d;
+  box-shadow: 0 18px 50px rgba(24, 55, 93, 0.22);
+}
+.stamp-dialog header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.stamp-dialog h2 {
+  margin: 0;
+  font-size: 22px;
+}
+.stamp-close {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: #f1f6f7;
+  color: #355e75;
+}
+.stamp-hint {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+}
+.stamp-rewards {
+  display: grid;
+  gap: 10px;
+}
+.stamp-rewards > div {
+  display: grid;
+  gap: 8px;
+}
+.stamp-rewards button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0 16px;
+  border: 1px solid #f3c9d6;
+  border-radius: 16px;
+  background: #fff7fa;
+  color: #8c2f4e;
+  font: inherit;
+  font-size: 18px;
+  font-weight: 700;
+  text-align: left;
+}
+.stamp-confirm,
+.stamp-done {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  text-align: center;
+}
+.stamp-confirm p,
+.stamp-done p {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.6;
+}
+.stamp-done svg {
+  color: #e0567a;
+}
+.stamp-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 16px;
+  margin: 0;
+  padding: 0;
+  color: #5b6f86;
+  font-size: 14px;
+  list-style: none;
+}
+.stamp-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.stamp-history {
+  margin: 0;
+  color: #5b6f86;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* The toast: above every screen, out of the way of writing, gone after a few seconds. */
+.stamp-toast-layer {
+  position: fixed;
+  z-index: 200;
+  right: 0;
+  bottom: calc(env(safe-area-inset-bottom) + 92px);
+  left: 0;
+  display: flex;
+  justify-content: center;
+  padding: 0 16px;
+  pointer-events: none;
+}
+.stamp-toast {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: 420px;
+  padding: 12px 20px 12px 12px;
+  border: 0;
+  border-radius: 28px;
+  background: #fff;
+  color: #18375d;
+  font: inherit;
+  text-align: left;
+  box-shadow: 0 12px 34px rgba(24, 55, 93, 0.24);
+  pointer-events: auto;
+  animation: stamp-toast-in 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+.stamp-toast > span:last-child {
+  display: grid;
+  gap: 2px;
+}
+.stamp-toast strong {
+  font-size: 20px;
+}
+.stamp-toast small {
+  color: #5b6f86;
+  font-size: 15px;
+}
+.stamp-toast-mark {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #2f9a55;
+  color: #fff;
+  animation: stamp-press 0.5s 0.15s ease-out both;
+}
+.stamp-toast.is-fix .stamp-toast-mark {
+  background: #e8a21f;
+}
+.stamp-toast.is-cheer .stamp-toast-mark {
+  background: #e0567a;
+}
+.stamp-toast.is-rest {
+  padding-left: 20px;
+}
+
+/* 更多 → 集章卡 */
+.rewards-panel section {
+  display: grid;
+  gap: 12px;
+  margin-top: 22px;
+}
+.rewards-panel h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 19px;
+}
+.rewards-panel h3 {
+  margin: 8px 0 0;
+  font-size: 16px;
+}
+.rewards-panel p {
+  margin: 0;
+  color: #4d6680;
+}
+.reward-card-section .stamp-slots {
+  max-width: 420px;
+}
+.reward-steps {
+  display: flex;
+  gap: 8px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.reward-steps li {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: 14px;
+  background: #f1f6f7;
+  color: #5b6f86;
+  font-weight: 700;
+}
+.reward-steps li span {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #fff;
+}
+.reward-steps li[aria-current="step"] {
+  background: #e6f1ff;
+  color: #1f5fae;
+}
+.reward-children {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.reward-children li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px 6px 6px;
+  border: 1px solid #d6e4ec;
+  border-radius: 999px;
+  background: #fff;
+  font-weight: 700;
+}
+.reward-choices ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.reward-choices label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 12px;
+  border: 1px solid #d6e4ec;
+  border-radius: 14px;
+  background: #fff;
+}
+.reward-choices input[type="checkbox"] {
+  width: 22px;
+  height: 22px;
+}
+.reward-add {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.reward-add input {
+  flex: 1;
+  min-width: 0;
+  min-height: 48px;
+  padding: 0 12px;
+  border: 1px solid #c7dce8;
+  border-radius: 14px;
+  font: inherit;
+}
+.reward-add button {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  min-height: 48px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 14px;
+  background: #3474d7;
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+}
+.reward-add button:disabled {
+  opacity: 0.45;
+}
+.reward-choice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.reward-choice > span {
+  min-width: 6em;
+  font-weight: 700;
+}
+.reward-choice button {
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid #c7dce8;
+  border-radius: 12px;
+  background: #fff;
+  color: #264d74;
+  font: inherit;
+}
+.reward-choice button[aria-checked="true"] {
+  border-color: #3474d7;
+  background: #e6f1ff;
+  color: #1f5fae;
+  font-weight: 700;
+}
+.reward-rules {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 1.3em;
+  color: #18375d;
+  line-height: 1.6;
+}
+.reward-nav {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+.reward-log {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.reward-log li {
+  display: grid;
+  grid-template-columns: 7.5em 24px minmax(0, 1fr);
+  align-items: start;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid #e3edf3;
+  border-radius: 14px;
+  background: #fff;
+}
+.reward-log time {
+  color: #5b6f86;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+.reward-log li > span {
+  display: grid;
+  gap: 2px;
+}
+.reward-log small {
+  color: #5b6f86;
+}
+.reward-log li.is-rest {
+  opacity: 0.7;
+}
+.reward-log li.is-reward > svg {
+  color: #d0466f;
+}
+.reward-summary,
+.reward-sent,
+.reward-empty,
+.reward-note {
+  font-size: 15px;
+}
+.reward-off {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: 6px;
+}
+
+@keyframes stamp-press {
+  0% {
+    opacity: 0;
+    transform: scale(1.6) rotate(-14deg);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(0.92) rotate(3deg);
+  }
+  100% {
+    transform: scale(1) rotate(0);
+  }
+}
+@keyframes stamp-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes stamp-glow {
+  from {
+    box-shadow: 0 0 0 0 rgba(232, 178, 31, 0.35);
+  }
+  to {
+    box-shadow: 0 0 0 8px rgba(232, 178, 31, 0);
+  }
+}
+@media (max-width: 420px) {
+  .reward-log li {
+    grid-template-columns: 24px minmax(0, 1fr);
+  }
+  .reward-log time {
+    grid-column: 1 / -1;
+  }
+  .reward-steps li {
+    padding: 6px;
+    font-size: 14px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stamp-chip.is-full,
+  .stamp-slots li.is-filled,
+  .stamp-toast,
+  .stamp-toast-mark {
+    animation: none;
+  }
+}
