@@ -1,37 +1,111 @@
-/* 集章卡: the course-list chip, the card, the stamp toast and 更多 → 集章卡. */
+/*
+ * 集章卡: the course-list chip, the card, the stamp toast and 更多 → 集章卡. Drawn like the course
+ * cards: a pastel wash, the paper texture and a watercolor picture; stamps look like ink pressed
+ * on paper, each a little crooked.
+ */
+
+:root {
+  --stamp-practice: #4c9f7a;
+  --stamp-fix: #eea43a;
+  --stamp-cheer: #e9786a;
+  --stamp-task: #5b97d1;
+}
 
 .more-row-icon.pink {
-  background: #ffeef3;
-  color: #d0466f;
+  background: #ffeef0;
+  color: #d4675a;
 }
 
+/* Paper texture, as on the course cards. */
+.stamp-chip::before,
+.today-tasks::before,
+.stamp-dialog::before,
+.stamp-toast::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  border-radius: inherit;
+  background: url("/course-art/course-card-paper-v1.webp") center / 210px repeat;
+  mix-blend-mode: multiply;
+  opacity: 0.24;
+  pointer-events: none;
+}
+.stamp-chip > *,
+.today-tasks > *,
+.stamp-dialog > *,
+.stamp-toast > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* On the course list, like a course card in a warm wash. */
 .stamp-chip {
-  display: flex;
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   width: 100%;
-  min-height: 52px;
-  margin: 0 0 18px;
-  padding: 8px 16px;
-  border: 1px solid #f3c9d6;
-  border-radius: 20px;
-  background: #fff7fa;
-  color: #8c2f4e;
+  min-height: 84px;
+  margin: 0 0 14px;
+  padding: 8px 18px 8px 10px;
+  border: 0;
+  border-radius: 24px;
+  background: linear-gradient(110deg, #fff9f2 0%, #ffeee4 72%, #fff6ef 100%);
+  color: var(--ink);
   font: inherit;
-  font-size: 22px;
-  font-weight: 700;
   text-align: left;
 }
-.stamp-chip span {
-  flex: 1;
+.stamp-chip-art {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
 }
-.stamp-chip strong {
-  color: #d0466f;
+.stamp-chip-copy {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.stamp-chip-title {
+  color: #8a4b3c;
   font-size: 22px;
 }
+.stamp-chip-dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.stamp-chip-dots i {
+  width: 14px;
+  height: 14px;
+  border: 1.5px dashed #d9c3b1;
+  border-radius: 50%;
+}
+.stamp-chip-dots i[class] {
+  border: 0;
+  background:
+    radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.45), transparent 55%),
+    var(--stamp-practice);
+}
+.stamp-chip-dots i.is-fix {
+  background-color: var(--stamp-fix);
+}
+.stamp-chip-dots i.is-cheer {
+  background-color: var(--stamp-cheer);
+}
+.stamp-chip-dots i.is-task {
+  background-color: var(--stamp-task);
+}
+.stamp-chip-count {
+  color: #c25f4a;
+  font-size: 24px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
 .stamp-chip.is-full {
-  border-color: #e8b21f;
-  background: #fff8e1;
+  background: linear-gradient(110deg, #fffbea 0%, #fff0c8 72%, #fff8e2 100%);
   animation: stamp-glow 1.6s ease-in-out infinite alternate;
 }
 
@@ -39,7 +113,7 @@
 .stamp-slots {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 8px;
+  gap: 10px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -48,121 +122,165 @@
   display: grid;
   place-items: center;
   aspect-ratio: 1;
-  border: 2px dashed #d6dfe6;
+  border: 2px dashed #dccbb8;
   border-radius: 50%;
-  color: #a7b5c0;
+  background: rgba(255, 252, 245, 0.7);
+  color: #b9a48f;
   font-size: 15px;
   font-weight: 700;
 }
+/* Ink pressed on paper: a soft edge, a lighter middle, and never quite straight. */
 .stamp-slots li.is-filled {
   border: 0;
+  background:
+    radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.5), transparent 52%),
+    radial-gradient(circle, transparent 58%, rgba(0, 0, 0, 0.1) 100%), var(--stamp-color);
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.55) inset,
+    0 2px 0 rgba(90, 60, 30, 0.12);
   color: #fff;
+  transform: rotate(var(--tilt, -6deg));
   animation: stamp-press 0.35s ease-out both;
 }
+.stamp-slots li:nth-child(3n + 1) {
+  --tilt: 5deg;
+}
+.stamp-slots li:nth-child(3n + 2) {
+  --tilt: -3deg;
+}
 .stamp-slots li.is-practice {
-  background: #2f9a55;
+  --stamp-color: var(--stamp-practice);
 }
 .stamp-slots li.is-fix {
-  background: #e8a21f;
+  --stamp-color: var(--stamp-fix);
 }
 .stamp-slots li.is-cheer {
-  background: #e0567a;
+  --stamp-color: var(--stamp-cheer);
 }
 .stamp-slots li.is-task {
-  background: #7b62d6;
+  --stamp-color: var(--stamp-task);
 }
-.stamp-legend .is-task svg,
-.reward-log .is-task > svg {
-  color: #7b62d6;
+.stamp-slots li.is-filled svg {
+  width: 52%;
+  height: 52%;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.12));
 }
 .stamp-legend .is-practice svg,
 .reward-log .is-practice > svg {
-  color: #2f9a55;
+  color: var(--stamp-practice);
 }
 .stamp-legend .is-fix svg,
 .reward-log .is-fix > svg {
-  color: #e8a21f;
+  color: var(--stamp-fix);
 }
 .stamp-legend .is-cheer svg,
 .reward-log .is-cheer > svg {
-  color: #e0567a;
+  color: var(--stamp-cheer);
+}
+.stamp-legend .is-task svg,
+.reward-log .is-task > svg {
+  color: var(--stamp-task);
 }
 
 .stamp-dialog {
+  position: relative;
+  isolation: isolate;
   display: grid;
   gap: 16px;
-  width: min(100%, 460px);
+  width: min(100%, 480px);
   max-height: calc(100dvh - 40px);
   overflow-y: auto;
-  padding: 20px;
-  border-radius: 25px;
-  background: #fff;
-  color: #18375d;
-  box-shadow: 0 18px 50px rgba(24, 55, 93, 0.22);
+  padding: 22px 22px 20px;
+  border-radius: 28px;
+  background: #fffaf2;
+  color: var(--ink);
+  box-shadow: 0 18px 50px rgba(60, 50, 30, 0.22);
 }
 .stamp-dialog header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
 }
+/* The title sits on a soft pink wash, like the lesson headings. */
 .stamp-dialog h2 {
   margin: 0;
+  padding: 2px 18px 4px 6px;
+  background: url("/course-art/review-line-pink-wash-v3.webp") left center / 100% 80% no-repeat;
+  color: #6b3b31;
   font-size: 26px;
 }
 .stamp-close {
   display: grid;
+  flex: none;
   place-items: center;
   width: 44px;
   height: 44px;
   border: 0;
   border-radius: 50%;
-  background: #f1f6f7;
-  color: #355e75;
+  background: rgba(255, 255, 255, 0.8);
+  color: #8a6a55;
+  box-shadow: 0 1px 0 rgba(90, 60, 30, 0.1);
 }
 .stamp-hint {
   margin: 0;
+  color: #6b4b3c;
   font-size: 22px;
-  font-weight: 700;
   text-align: center;
 }
 .stamp-rewards {
   display: grid;
+  justify-items: center;
   gap: 10px;
+}
+.stamp-rewards-art {
+  width: 96px;
+  height: 96px;
+  margin: -4px 0 -8px;
+  object-fit: contain;
 }
 .stamp-rewards > div {
   display: grid;
   gap: 8px;
+  width: 100%;
 }
 .stamp-rewards button {
   display: flex;
   align-items: center;
   gap: 10px;
-  min-height: 52px;
-  padding: 0 16px;
-  border: 1px solid #f3c9d6;
-  border-radius: 16px;
-  background: #fff7fa;
-  color: #8c2f4e;
+  min-height: 56px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 18px;
+  background: linear-gradient(110deg, #fff5f0 0%, #ffe6dd 100%);
+  color: #7a3f32;
   font: inherit;
   font-size: 22px;
-  font-weight: 700;
   text-align: left;
+  box-shadow: 0 2px 0 rgba(200, 120, 90, 0.18);
+}
+.stamp-rewards button svg {
+  flex: none;
+  color: var(--stamp-cheer);
 }
 .stamp-confirm,
 .stamp-done {
   display: grid;
   justify-items: center;
-  gap: 12px;
+  gap: 14px;
   text-align: center;
 }
 .stamp-confirm p,
 .stamp-done p {
   margin: 0;
+  color: #5b3b30;
   font-size: 24px;
   line-height: 1.6;
 }
-.stamp-done svg {
-  color: #e0567a;
+.stamp-done img {
+  width: 150px;
+  height: 150px;
+  object-fit: contain;
 }
 .stamp-legend {
   display: flex;
@@ -170,8 +288,9 @@
   justify-content: center;
   gap: 6px 16px;
   margin: 0;
-  padding: 0;
-  color: #5b6f86;
+  padding: 10px 0 0;
+  border-top: 1px dashed #e6d6c4;
+  color: #7a6656;
   font-size: 18px;
   list-style: none;
 }
@@ -182,12 +301,12 @@
 }
 .stamp-history {
   margin: 0;
-  color: #5b6f86;
+  color: #7a6656;
   font-size: 18px;
   text-align: center;
 }
 
-/* The toast: above every screen, out of the way of writing, gone after a few seconds. */
+/* The toast: a paper note above every screen, out of the way of writing, gone after a moment. */
 .stamp-toast-layer {
   position: fixed;
   z-index: 200;
@@ -200,18 +319,20 @@
   pointer-events: none;
 }
 .stamp-toast {
+  position: relative;
+  isolation: isolate;
   display: flex;
   align-items: center;
   gap: 14px;
-  max-width: 420px;
-  padding: 12px 20px 12px 12px;
+  max-width: 440px;
+  padding: 12px 22px 12px 12px;
   border: 0;
   border-radius: 28px;
-  background: #fff;
-  color: #18375d;
+  background: linear-gradient(110deg, #fffaf2 0%, #fff1e6 100%);
+  color: var(--ink);
   font: inherit;
   text-align: left;
-  box-shadow: 0 12px 34px rgba(24, 55, 93, 0.24);
+  box-shadow: 0 14px 36px rgba(60, 50, 30, 0.22);
   pointer-events: auto;
   animation: stamp-toast-in 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
 }
@@ -220,50 +341,66 @@
   gap: 2px;
 }
 .stamp-toast strong {
+  color: #5b3b30;
   font-size: 24px;
   font-weight: 400;
 }
 .stamp-toast small {
-  color: #5b6f86;
+  color: #7a6656;
   font-size: 19px;
 }
 .stamp-toast-mark {
   display: grid;
+  flex: none;
   place-items: center;
-  width: 64px;
-  height: 64px;
+  width: 66px;
+  height: 66px;
   border-radius: 50%;
-  background: #2f9a55;
+  background:
+    radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.5), transparent 52%),
+    radial-gradient(circle, transparent 58%, rgba(0, 0, 0, 0.1) 100%), var(--stamp-practice);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.55) inset;
   color: #fff;
+  transform: rotate(-6deg);
   animation: stamp-press 0.5s 0.15s ease-out both;
 }
 .stamp-toast.is-fix .stamp-toast-mark {
-  background: #e8a21f;
+  background-color: var(--stamp-fix);
 }
 .stamp-toast.is-cheer .stamp-toast-mark {
-  background: #e0567a;
+  background-color: var(--stamp-cheer);
 }
 .stamp-toast.is-task .stamp-toast-mark {
-  background: #7b62d6;
+  background-color: var(--stamp-task);
+}
+.stamp-toast.is-rest {
+  padding-left: 22px;
 }
 
-/* 今天的任務 on the course list, in 國字注音. */
+/* 今天的任務 on the course list, in 國字注音: a card in a sky wash with the little flag. */
 .today-tasks {
+  position: relative;
+  isolation: isolate;
   display: grid;
-  gap: 8px;
+  gap: 10px;
   margin: 0 0 18px;
-  padding: 12px 14px;
-  border: 1px solid #d9cff5;
-  border-radius: 20px;
-  background: #f7f4ff;
+  padding: 12px 14px 14px;
+  border-radius: 24px;
+  background: linear-gradient(110deg, #f3faff 0%, #e6f3ff 72%, #eff8ff 100%);
 }
 .today-tasks h2 {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   margin: 0;
-  color: #4f3aa8;
-  font-size: 22px;
+  color: #2f5f8a;
+  font-size: 23px;
+  font-weight: 400;
+}
+.today-tasks h2 img {
+  width: 30px;
+  height: 44px;
+  object-fit: contain;
 }
 .today-tasks ul {
   display: grid;
@@ -276,15 +413,16 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  min-height: 56px;
-  padding: 6px 8px 6px 14px;
-  border-radius: 16px;
-  background: #fff;
+  min-height: 60px;
+  padding: 6px 8px 6px 16px;
+  border-radius: 18px;
+  background: rgba(255, 254, 251, 0.86);
+  box-shadow: 0 1px 0 rgba(47, 95, 138, 0.08);
 }
 .today-task-name {
   flex: 1;
   min-width: 0;
-  color: #18375d;
+  color: var(--ink);
   font-size: 24px;
 }
 .today-tasks li button {
@@ -293,27 +431,28 @@
   align-items: center;
   gap: 6px;
   min-height: 48px;
-  padding: 0 14px;
+  padding: 0 16px;
   border: 0;
-  border-radius: 14px;
-  background: #7b62d6;
+  border-radius: 999px;
+  background: var(--coral);
   color: #fff;
   font: inherit;
   font-size: 20px;
+  box-shadow: 0 2px 0 var(--coral-dark);
 }
 .today-task-done {
   display: inline-flex;
   flex: none;
   align-items: center;
   gap: 4px;
-  color: #2f9a55;
+  color: #2f8f63;
   font-size: 20px;
 }
-.today-tasks li.is-done .today-task-name {
-  color: #5b6f86;
+.today-tasks li.is-done {
+  background: rgba(240, 250, 244, 0.86);
 }
-.stamp-toast.is-rest {
-  padding-left: 20px;
+.today-tasks li.is-done .today-task-name {
+  color: #6d8a7e;
 }
 
 /* 更多 → 集章卡 */
@@ -596,14 +735,14 @@
 @keyframes stamp-press {
   0% {
     opacity: 0;
-    transform: scale(1.6) rotate(-14deg);
+    transform: scale(1.6) rotate(calc(var(--tilt, -6deg) - 14deg));
   }
   70% {
     opacity: 1;
-    transform: scale(0.92) rotate(3deg);
+    transform: scale(0.92) rotate(calc(var(--tilt, -6deg) + 3deg));
   }
   100% {
-    transform: scale(1) rotate(0);
+    transform: scale(1) rotate(var(--tilt, -6deg));
   }
 }
 @keyframes stamp-toast-in {

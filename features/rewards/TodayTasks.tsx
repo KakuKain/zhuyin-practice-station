@@ -1,4 +1,4 @@
-import { ArrowRight, CheckCircle, Medal } from "@phosphor-icons/react";
+import { ArrowRight, CheckCircle } from "@phosphor-icons/react";
 import { AnnotatedText } from "../../components/AnnotatedText";
 import type { DailyTask } from "./stamp-book";
 
@@ -17,7 +17,7 @@ export function TodayTasks({
   return (
     <section className="today-tasks" aria-labelledby="today-tasks-title">
       <h2 id="today-tasks-title">
-        <Medal size={24} weight="fill" aria-hidden="true" />
+        <img src="course-art/course-flag-grass-v1.webp" alt="" />
         <AnnotatedText text="今天的任務" />
       </h2>
       <ul>

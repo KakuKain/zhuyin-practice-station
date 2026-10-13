@@ -230,7 +230,7 @@
   color: #4d6680;
   font-size: 20px;
 }
-/* 十格框: two rows of five cells, one circle in each. */
+/* 十格框: two rows of five cells, one circle in each, on the same paper as dictation. */
 .math-frame-tools {
   grid-template-columns: repeat(2, 48px);
   justify-content: end;
@@ -240,18 +240,42 @@
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 3px;
   padding: 3px;
-  border-radius: 14px;
-  background: #8fb4cf;
+  border-radius: 18px;
+  background: var(--mint-deep);
+  box-shadow: 0 2px 0 rgba(47, 110, 90, 0.12);
 }
 .math-frame-cell {
   position: relative;
+  isolation: isolate;
   aspect-ratio: 1;
   overflow: hidden;
-  border-radius: 9px;
-  background: #fffefb;
+  border-radius: 4px;
+  background: var(--white);
+}
+.math-frame-cell::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background: url("/course-art/course-card-paper-v1.webp") center / 180px repeat;
+  mix-blend-mode: multiply;
+  opacity: 0.3;
+  pointer-events: none;
+}
+.math-frame-cell:nth-child(1) {
+  border-top-left-radius: 15px;
+}
+.math-frame-cell:nth-child(5) {
+  border-top-right-radius: 15px;
+}
+.math-frame-cell:nth-child(6) {
+  border-bottom-left-radius: 15px;
+}
+.math-frame-cell:nth-child(10) {
+  border-bottom-right-radius: 15px;
 }
 .math-frame-cell.is-used {
-  background: #f3f8ff;
+  background: #f3faf6;
 }
 .math-frame-cell canvas {
   position: absolute;
@@ -265,18 +289,19 @@
 .math-frame-number {
   position: absolute;
   z-index: 3;
-  top: 4px;
-  left: 4px;
+  top: 5px;
+  left: 5px;
   display: grid;
   place-items: center;
   min-width: 22px;
   height: 22px;
   padding: 0 5px;
   border-radius: 11px;
-  background: #3474d7;
+  background: var(--coral);
   color: #fff;
   font-size: 13px;
   font-weight: 700;
+  box-shadow: 0 1px 0 var(--coral-dark);
   pointer-events: none;
 }
 .math-frame.is-preview {
@@ -284,9 +309,10 @@
   gap: 1px;
   padding: 1px;
   border-radius: 6px;
+  box-shadow: none;
 }
 .math-frame.is-preview .math-frame-cell {
-  border-radius: 2px;
+  border-radius: 1px;
 }
 .math-frame.is-preview .ink-preview {
   display: block;

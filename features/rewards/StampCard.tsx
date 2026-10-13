@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Gift, Heart, Medal, SealCheck, Star, Stamp, X, type Icon } from "@phosphor-icons/react";
+import { Gift, Heart, Medal, SealCheck, Star, X, type Icon } from "@phosphor-icons/react";
 import { AnnotatedText } from "../../components/AnnotatedText";
 import { readingVariants } from "../lesson/reading-variants";
 import type { CardProgress, RewardSettings, StampBook, StampKind } from "./stamp-book";
@@ -64,11 +64,33 @@ export function StampChip({ progress, onOpen }: { progress: CardProgress; onOpen
       onClick={onOpen}
       aria-label={`集章卡，${progress.full ? "集滿了，可以選獎勵" : `${progress.filled} / ${progress.size}`}`}
     >
-      <Stamp size={26} weight="fill" aria-hidden="true" />
-      <span>
-        <Say word="card" />
+      <img
+        className="stamp-chip-art"
+        src={
+          progress.full
+            ? "course-art/festival-watercolor.webp"
+            : "course-art/sound-complete-cat.webp"
+        }
+        alt=""
+      />
+      <span className="stamp-chip-copy">
+        <span className="stamp-chip-title">
+          <Say word="card" />
+        </span>
+        <span className="stamp-chip-dots" aria-hidden="true">
+          {Array.from({ length: progress.size }, (_, index) => (
+            <i
+              key={index}
+              className={
+                index < progress.filled
+                  ? `is-${progress.slots[index]?.kind ?? "practice"}`
+                  : undefined
+              }
+            />
+          ))}
+        </span>
       </span>
-      <strong>
+      <strong className="stamp-chip-count">
         {progress.full ? <Say word="full" /> : `${progress.filled} / ${progress.size}`}
       </strong>
     </button>
@@ -114,7 +136,7 @@ export function StampCardDialog({
         </header>
         {done ? (
           <div className="stamp-done">
-            <Gift size={64} weight="fill" aria-hidden="true" />
+            <img src="course-art/festival-watercolor.webp" alt="" />
             <p>
               <Say word="picked" />「
               <strong>
@@ -170,6 +192,7 @@ export function StampCardDialog({
               </div>
             ) : (
               <div className="stamp-rewards">
+                <img className="stamp-rewards-art" src="course-art/happy-watercolor.webp" alt="" />
                 <p className="stamp-hint">
                   <Say word="choose" />
                 </p>
