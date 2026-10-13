@@ -101,6 +101,87 @@ test("第一課 reads each question aloud, keeps the round and ends with the par
   expect(errors).toEqual([]);
 });
 
+test("畫圈圈 shows clearly when there are more circles than asked, here and on the parent's check", async ({
+  page,
+}) => {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("./");
+  // A saved round: 畫出 2 個圈圈, with exactly two circles drawn.
+  await page.evaluate(() => {
+    const circle = Array.from({ length: 13 }, (_, step) => ({
+      x: 50 + 30 * Math.cos((step / 12) * Math.PI * 2),
+      y: 50 + 30 * Math.sin((step / 12) * Math.PI * 2),
+    }));
+    const cells = Array.from({ length: 10 }, (_, index) => (index < 2 ? [circle] : []));
+    localStorage.setItem(
+      "kid-math-round-v1",
+      JSON.stringify({
+        version: 1,
+        lessonId: 1,
+        questions: [{ kind: "draw", target: 2 }],
+        ink: {},
+        work: { 0: cells },
+        index: 0,
+        phase: "active",
+        needsPractice: [],
+        createdAt: 1,
+        savedAt: Date.now(),
+      }),
+    );
+  });
+  await page.reload();
+  await page.getByRole("button", { name: "數學", exact: true }).click();
+  await page.getByRole("button", { name: /數學第一課/ }).click();
+  await page.getByRole("button", { name: "繼續上次的練習" }).click();
+
+  const frame = page.locator(".math-draw .math-frame");
+  const cells = frame.locator("canvas");
+  const status = page.locator(".math-frame-over");
+  // What the status says, without the 國字注音 glyphs drawn beside it for sighted readers.
+  const said = () =>
+    expect.poll(() =>
+      status.evaluate((element) => {
+        const copy = element.cloneNode(true) as HTMLElement;
+        copy.querySelectorAll("[aria-hidden=true]").forEach((hidden) => hidden.remove());
+        return copy.textContent?.replace(/\s+/g, " ").trim();
+      }),
+    );
+  const undo = page.getByRole("button", { name: /^復原畫出/ });
+  await expect(frame).not.toHaveClass(/is-over/);
+  await said().toBe("");
+
+  // Extra circles are counted in reading order, like the numbers on the cells.
+  await stroke(page, cells.nth(7), circle(50, 50));
+  await expect(frame).toHaveClass(/is-over/);
+  await said().toBe("多畫了 1 個");
+  await expect(undo).toHaveClass(/is-hint/);
+  await stroke(page, cells.nth(2), circle(50, 50));
+  await said().toBe("多畫了 2 個");
+  await expect(frame.locator(".math-frame-cell.is-extra")).toHaveCount(2);
+
+  // 復原 takes back the latest circle; one extra is still shown.
+  await undo.click();
+  await said().toBe("多畫了 1 個");
+  await expect(frame.locator(".math-frame-cell").nth(7)).toHaveClass(/is-extra/);
+
+  // The parent sees the extra cell and how many too many, with every circle visible.
+  await page.getByRole("button", { name: "寫完了，請家長檢查" }).click();
+  const card = page.locator(".math-check-card").first();
+  await expect(card).toContainText("畫了 3 格，多畫 1 格");
+  await expect(card.locator(".math-frame-cell.is-extra")).toHaveCount(1);
+  const drawn = card.locator(".math-frame.is-preview .ink-preview");
+  await expect(drawn).toHaveCount(3);
+  for (const preview of await drawn.all()) {
+    const [inner, cell] = await Promise.all([
+      preview.boundingBox(),
+      preview.locator("xpath=..").boundingBox(),
+    ]);
+    expect(Math.abs(inner!.height - cell!.height)).toBeLessThan(2);
+  }
+  expect(errors).toEqual([]);
+});
+
 test("第二課 has things lined up before comparing, lets a wrong tap be tried again and records it", async ({
   page,
 }) => {

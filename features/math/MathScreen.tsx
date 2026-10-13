@@ -46,6 +46,16 @@ const questionName = (question: MathQuestion) =>
     ? question.parts.join("＋")
     : `${sectionLabels[question.kind]} ${question.target}`;
 
+/** 「畫了 6 格」 for the parent, and how many too many in coral. */
+function DrawnCount({ drawn, target }: { drawn: number; target: number }) {
+  return (
+    <>
+      畫了 {drawn} 格
+      {drawn > target && <strong className="math-check-over">，多畫 {drawn - target} 格</strong>}
+    </>
+  );
+}
+
 export function MathScreen({ app }: { app: MathApp }) {
   const lesson = mathLessons.find((item) => item.id === app.mathLessonId) ?? mathLessons[0];
   if (lesson.id === 2)
@@ -167,9 +177,17 @@ function WritingLesson({ app, lesson }: { app: MathApp; lesson: MathLesson }) {
                         <div className="math-check-circles">
                           {question.parts.map((count, side) => (
                             <figure key={side}>
-                              <FramePreview cells={circles} start={side * frameCells} />
+                              <FramePreview
+                                cells={circles}
+                                start={side * frameCells}
+                                target={count}
+                              />
                               <figcaption>
-                                {count} 個，畫了 {filledCells(circles, side * frameCells)} 格
+                                {count} 個，
+                                <DrawnCount
+                                  drawn={filledCells(circles, side * frameCells)}
+                                  target={count}
+                                />
                               </figcaption>
                             </figure>
                           ))}
@@ -185,8 +203,10 @@ function WritingLesson({ app, lesson }: { app: MathApp; lesson: MathLesson }) {
                     </span>
                     {question.kind === "draw" && circles.length ? (
                       <>
-                        <FramePreview cells={circles} />
-                        <small>畫了 {filledCells(circles)} 格</small>
+                        <FramePreview cells={circles} target={question.target} />
+                        <small>
+                          <DrawnCount drawn={filledCells(circles)} target={question.target} />
+                        </small>
                       </>
                     ) : (
                       <>

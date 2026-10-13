@@ -1,10 +1,23 @@
 import { useRef, type ReactNode } from "react";
-import { ArrowUUpLeft, Trash } from "@phosphor-icons/react";
+import { ArrowUUpLeft, Trash, WarningCircle } from "@phosphor-icons/react";
 import type { InkStroke } from "../types";
 import { useInkCanvas } from "../../lib/ink/useInkCanvas";
 import { InkStatus, InkTools } from "../../components/InkTools";
 import { InkPreview } from "../../components/AppChrome";
 import { filledCells, frameCells } from "./math-round";
+import { MathWords } from "./MathChrome";
+
+/**
+ * Which cells of a frame hold more circles than asked for: counted in reading order, like the
+ * numbers on the cells, so the cells after the target are the extra ones.
+ */
+const extraCells = (cells: InkStroke[][], start: number, target: number) => {
+  const extra = new Set<number>();
+  let count = 0;
+  for (let offset = 0; offset < frameCells; offset++)
+    if ((cells[start + offset]?.length ?? 0) > 0 && ++count > target) extra.add(offset);
+  return extra;
+};
 
 /** One square to write or draw in, with the same pen, eraser and undo as dictation. */
 export function InkSquare({
@@ -96,13 +109,15 @@ function useFrameOrder(initial: (index: number) => InkStroke[], count: number) {
 /**
  * 十格框: two rows of five cells, one circle in each. Every cell is its own square canvas, so a
  * circle is never stretched, and the frame shows at a glance how many there are. Filled cells
- * are numbered in reading order.
+ * are numbered in reading order. Circles past the target turn the frame coral, mark the extra
+ * cells, say 多畫了 in the tool bar (so the frame never moves) and point at 復原.
  */
 function TenFrame({
   ink,
   canvases,
   start,
   cells,
+  target,
   label,
   onUndo,
   onClear,
@@ -111,11 +126,13 @@ function TenFrame({
   canvases: React.RefObject<(HTMLCanvasElement | null)[]>;
   start: number;
   cells: InkStroke[][];
+  target: number;
   label: string;
   onUndo: () => void;
   onClear: () => void;
 }) {
   const filled = filledCells(cells, start);
+  const extra = extraCells(cells, start, target);
   const hasInk = Array.from({ length: frameCells }, (_, offset) => ink.ink[start + offset]).some(
     Boolean,
   );
@@ -127,13 +144,21 @@ function TenFrame({
   return (
     <div className="math-ink math-frame-ink">
       <div
-        className="ink-tools is-compact math-frame-tools"
+        className={`ink-tools is-compact math-frame-tools${extra.size ? " is-over" : ""}`}
         role="group"
         aria-label={`${label}筆跡工具`}
       >
+        <span className="math-frame-over" role="status">
+          {extra.size > 0 && (
+            <>
+              <WarningCircle size={22} weight="fill" aria-hidden="true" />
+              <MathWords text="多畫了" /> {extra.size} <MathWords text="個" />
+            </>
+          )}
+        </span>
         <button
           type="button"
-          className="ink-tool ink-undo"
+          className={`ink-tool ink-undo${extra.size ? " is-hint" : ""}`}
           aria-label={`復原${label}`}
           title="復原上一個圈圈"
           disabled={!canUndo}
@@ -152,13 +177,16 @@ function TenFrame({
           <Trash size={19} aria-hidden="true" />
         </button>
       </div>
-      <div className="math-frame" role="group" aria-label={label}>
+      <div className={`math-frame${extra.size ? " is-over" : ""}`} role="group" aria-label={label}>
         {Array.from({ length: frameCells }, (_, offset) => {
           const index = start + offset;
           const used = (cells[index]?.length ?? 0) > 0;
           if (used) number++;
           return (
-            <div className={`math-frame-cell${used ? " is-used" : ""}`} key={offset}>
+            <div
+              className={`math-frame-cell${used ? " is-used" : ""}${extra.has(offset) ? " is-extra" : ""}`}
+              key={offset}
+            >
               <canvas
                 ref={(element) => {
                   canvases.current[index] = element;
@@ -220,6 +248,7 @@ export function DrawFrame({
         canvases={canvases}
         start={0}
         cells={cells}
+        target={target}
         label={`畫出 ${target} 個圈圈`}
         onUndo={() => order.undo(ink, 0)}
         onClear={() => order.clear(ink, 0)}
@@ -277,6 +306,7 @@ export function AdditionWork({
         canvases={canvases}
         start={side * frameCells}
         cells={cells}
+        target={parts[side]}
         label={`${side ? "右邊" : "左邊"}畫 ${parts[side]} 個圈圈`}
         onUndo={() => order.undo(ink, side * frameCells)}
         onClear={() => order.clear(ink, side * frameCells)}
@@ -335,12 +365,21 @@ export function AdditionWork({
   );
 }
 
-/** For the parent's check: the frame in miniature, each cell as it was drawn. */
-export function FramePreview({ cells, start = 0 }: { cells: InkStroke[][]; start?: number }) {
+/** For the parent's check: the frame in miniature, each cell as it was drawn, extras marked. */
+export function FramePreview({
+  cells,
+  start = 0,
+  target,
+}: {
+  cells: InkStroke[][];
+  start?: number;
+  target: number;
+}) {
+  const extra = extraCells(cells, start, target);
   return (
-    <div className="math-frame is-preview" aria-hidden="true">
+    <div className={`math-frame is-preview${extra.size ? " is-over" : ""}`} aria-hidden="true">
       {Array.from({ length: frameCells }, (_, offset) => (
-        <div className="math-frame-cell" key={offset}>
+        <div className={`math-frame-cell${extra.has(offset) ? " is-extra" : ""}`} key={offset}>
           {(cells[start + offset]?.length ?? 0) > 0 && (
             <InkPreview strokes={cells[start + offset]} />
           )}

@@ -329,11 +329,11 @@ test("each math lesson keeps its own unfinished round, for every child", () => {
   ]);
 });
 
-test("the math course cards and lesson pages show every word in 國字注音", () => {
+test("the math course cards, lesson pages and practice screens show every word in 國字注音", () => {
   const shown = [
     "數學",
     ...mathLessons.flatMap((lesson) => [lesson.number, lesson.title, ...lesson.parts]),
-    ...["這一課", "開始", "開始練習", "從頭開始", "繼續", "繼續練習", "第", "題"],
+    ...["這一課", "開始", "開始練習", "從頭開始", "繼續", "繼續練習", "第", "題", "多畫了", "個"],
   ];
   for (const text of shown) {
     assert.ok(mathWordReadings[text], `${text} needs its readings`);

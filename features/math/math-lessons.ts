@@ -45,8 +45,8 @@ export const mathLessons: MathLesson[] = [
 ];
 
 /**
- * Every word on the math course cards and lesson pages, with one reading per Han character, so
- * they show in 國字注音. A unit test checks the font shows exactly these readings.
+ * Every word on the math course cards, lesson pages and practice screens, with one reading per
+ * Han character, so they show in 國字注音. A unit test checks the font shows exactly these readings.
  */
 export const mathWordReadings: Record<string, string> = {
   數學: "ㄕㄨˋ ㄒㄩㄝˊ",
@@ -73,6 +73,8 @@ export const mathWordReadings: Record<string, string> = {
   第: "ㄉㄧˋ",
   從頭開始: "ㄘㄨㄥˊ ㄊㄡˊ ㄎㄞ ㄕˇ",
   題: "ㄊㄧˊ",
+  多畫了: "ㄉㄨㄛ ㄏㄨㄚˋ ˙ㄌㄜ",
+  個: "ㄍㄜˋ",
 };
 
 /** A math word with the selectors that make it show its reading. */

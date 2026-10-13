@@ -1,12 +1,7 @@
 import { ArrowRight } from "@phosphor-icons/react";
-import { AnnotatedText } from "../../components/AnnotatedText";
 import { ProgressiveImage } from "../../components/ProgressiveImage";
-import { mathLessons, mathWord } from "./math-lessons";
-
-function Words({ text }: { text: string }) {
-  const word = mathWord(text);
-  return <AnnotatedText text={word.text} variants={word.variants} />;
-}
+import { mathLessons } from "./math-lessons";
+import { MathWords as Words } from "./MathChrome";
 
 /** 數學 lessons, drawn like the 注音 journey: number and title in 國字注音 beside a picture. */
 export function MathCourseList({ onOpen }: { onOpen: (id: number) => void }) {

@@ -1,16 +1,10 @@
 import { useState } from "react";
 import { ArrowRight, Play, PlayCircle } from "@phosphor-icons/react";
 import type { AppController } from "../usePracticeApp";
-import { AnnotatedText } from "../../components/AnnotatedText";
 import { ProgressiveImage } from "../../components/ProgressiveImage";
-import { mathLessons, mathWord } from "./math-lessons";
+import { mathLessons } from "./math-lessons";
+import { MathWords as Words } from "./MathChrome";
 import { readMathRound } from "./math-round";
-
-/** A math word in 國字注音. */
-function Words({ text }: { text: string }) {
-  const word = mathWord(text);
-  return <AnnotatedText text={word.text} variants={word.variants} />;
-}
 
 /**
  * A math lesson's page, drawn like a 注音 lesson's: its number and title over the watercolor

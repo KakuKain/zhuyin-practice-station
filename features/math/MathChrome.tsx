@@ -1,6 +1,13 @@
 import { ArrowLeft, SpeakerHigh } from "@phosphor-icons/react";
 import { AnnotatedText } from "../../components/AnnotatedText";
 import { mathPromptVariants, mathPrompts } from "./math-audio";
+import { mathWord } from "./math-lessons";
+
+/** A math word in 國字注音, with the reading listed in `mathWordReadings`. */
+export function MathWords({ text }: { text: string }) {
+  const word = mathWord(text);
+  return <AnnotatedText text={word.text} variants={word.variants} />;
+}
 
 /** The header every math screen shows, like 聽寫's: 返回 to the lesson page, then where the child is. */
 export function MathHeader({
