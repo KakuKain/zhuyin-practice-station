@@ -224,3 +224,96 @@ test("第二課 has things lined up before comparing, lets a wrong tap be tried 
   expect(records.rounds[0].needsPractice[0]).toEqual({ kind: "比長短（先對齊）" });
   expect(errors).toEqual([]);
 });
+
+test("第三課 adds with pictures and circles, keeps 第一課's round and ends with the parent's check", async ({
+  page,
+}) => {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("./");
+  await page.getByRole("button", { name: "數學", exact: true }).click();
+
+  // An unfinished 第一課 round stays saved while 第三課 is practised.
+  await page.getByRole("button", { name: /數學第一課/ }).click();
+  await page.getByRole("button", { name: "開始練習" }).click();
+  await stroke(page, page.getByLabel("寫數字"), [
+    [30, 30],
+    [60, 70],
+  ]);
+  await page.getByRole("button", { name: "返回" }).click();
+
+  await page.getByRole("button", { name: /數學第三課/ }).click();
+  await page.getByRole("button", { name: "開始練習" }).click();
+  const header = page.locator(".math-header");
+  const audio = page.locator("audio");
+
+  // 合在一起: the pictures can be marked, and the total is written.
+  await expect(header).toContainText("合在一起");
+  await expect(header).toContainText("第 1 題 / 8");
+  await expect(audio).toHaveAttribute("src", /math-audio\/join-\d-\d\.m4a/);
+  await expect(audio).toHaveAttribute("data-clip-text", /^左邊有.個，右邊有.個，合在一起有幾個？$/);
+  const picture = page.locator(".math-join-group button").first();
+  await picture.click();
+  await expect(picture).toHaveAttribute("aria-pressed", "true");
+  await stroke(page, page.getByLabel("寫答案"), [
+    [40, 20],
+    [55, 80],
+  ]);
+  for (let i = 0; i < 4; i++)
+    await page.getByRole("button", { name: "下一題", exact: true }).click();
+
+  // 畫圈圈算加法: each side numbers its own circles; the answer has its own square.
+  await expect(header).toContainText("畫圈圈算加法");
+  await expect(audio).toHaveAttribute("data-clip-text", /^.加.等於多少？先畫圈圈，再寫答案。$/);
+  const sides = page.locator(".math-add-side .canvas-paper");
+  await stroke(page, page.locator("canvas[data-word-index='0']"), circle(25, 25));
+  await stroke(page, page.locator("canvas[data-word-index='0']"), circle(65, 60));
+  await stroke(page, page.locator("canvas[data-word-index='1']"), circle(40, 40));
+  await stroke(page, page.locator("canvas[data-word-index='2']"), [
+    [30, 25],
+    [70, 25],
+    [40, 80],
+  ]);
+  const numbers = (side: number) =>
+    sides.nth(side).locator(".math-stroke-numbers > span:not(.visually-hidden)");
+  await expect(numbers(0)).toHaveText(["1", "2"]);
+  await expect(numbers(1)).toHaveText(["1"]);
+
+  // A reload continues 第三課 with its circles.
+  await page.reload();
+  await page.getByRole("button", { name: /數學第三課/ }).click();
+  await page.getByRole("button", { name: "繼續上次的練習" }).click();
+  await expect(header).toContainText("第 5 題 / 8");
+  await expect(numbers(0)).toHaveCount(2);
+  await expect(numbers(1)).toHaveCount(1);
+
+  for (let i = 0; i < 3; i++)
+    await page.getByRole("button", { name: "下一題", exact: true }).click();
+  await page.getByRole("button", { name: "寫完了，請家長檢查" }).click();
+  const cards = page.locator(".math-check-card");
+  await expect(cards).toHaveCount(8);
+  await expect(cards.nth(0).locator(".math-check-toggle")).toHaveAttribute("aria-pressed", "false");
+  await expect(cards.nth(1).locator(".math-check-toggle")).toHaveAttribute("aria-pressed", "true");
+  await expect(cards.nth(4).locator(".math-check-toggle")).toHaveAttribute("aria-pressed", "false");
+  await expect(cards.nth(4).locator("figcaption")).toHaveText([/畫了 2 筆/, /畫了 1 筆/]);
+  await page.getByRole("button", { name: "檢查完成" }).click();
+  await expect(page.getByRole("heading", { name: "練習完成！" })).toBeVisible();
+  await expect(page.locator(".math-result")).toContainText("＋");
+
+  const stored = await page.evaluate(() => ({
+    records: JSON.parse(localStorage.getItem("kid-math-records-v1") ?? "{}"),
+    lesson1: localStorage.getItem("kid-math-round-v1"),
+    lesson3: localStorage.getItem("kid-math-round-v1-3"),
+  }));
+  expect(stored.records.rounds).toHaveLength(1);
+  expect(stored.records.rounds[0]).toMatchObject({ lessonId: 3, total: 8 });
+  expect(stored.records.rounds[0].needsPractice).toHaveLength(6);
+  expect(stored.records.rounds[0].needsPractice[0].parts).toHaveLength(2);
+  expect(stored.lesson3).toBeNull();
+  expect(JSON.parse(stored.lesson1!).lessonId).toBe(1);
+
+  await page.getByRole("button", { name: "回到課程" }).click();
+  await page.getByRole("button", { name: /數學第一課/ }).click();
+  await expect(page.getByRole("button", { name: "繼續上次的練習" })).toBeVisible();
+  expect(errors).toEqual([]);
+});

@@ -20,7 +20,7 @@ export const storageKeys = {
   freeBoard: "kid-free-dictation-v1",
   /** Who practises on this device and who is practising now (child-profiles.ts). */
   children: "zhuyin-children-v1",
-  /** The unfinished math round, so a reload or a closed app can continue it. */
+  /** 第一課's unfinished math round, so a reload or a closed app can continue it. */
   mathRound: "kid-math-round-v1",
   /** Finished math rounds and what the parent marked to practise again. */
   mathRecords: "kid-math-records-v1",
@@ -70,12 +70,22 @@ export function fillDraftKeyIndex(key: string): number | null {
   return match ? Number(match[1]) : null;
 }
 
+/** One unfinished round per math lesson and child; 第一課 keeps the original key. */
+export const mathRoundStorageKey = (lessonId: number) =>
+  lessonId === 1 ? storageKeys.mathRound : `${storageKeys.mathRound}-${lessonId}`;
+const mathRoundKeyPattern = /^kid-math-round-v1-\d+$/;
+
+/** Keys made per lesson (fill drafts, math rounds), for any child. */
+export const isLessonRecordKey = (key: string) => {
+  const shared = splitChildKey(key).key;
+  return fillDraftKeyIndex(shared) !== null || mathRoundKeyPattern.test(shared);
+};
+
 const fixedKeys: ReadonlySet<string> = new Set(Object.values(storageKeys));
 export function ownsStorageKey(key: string) {
   const { key: shared, childId } = splitChildKey(key);
-  if (childId !== mainChildId)
-    return childScopedKeys.has(shared) || fillDraftKeyIndex(shared) !== null;
-  return fixedKeys.has(key) || fillDraftKeyIndex(key) !== null;
+  if (childId !== mainChildId) return childScopedKeys.has(shared) || isLessonRecordKey(shared);
+  return fixedKeys.has(key) || isLessonRecordKey(key);
 }
 
 /** IndexedDB database for custom recordings; included in device backup. */

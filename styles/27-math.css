@@ -155,7 +155,8 @@
   border-radius: 20px;
   background: #fff;
 }
-.math-pictures button {
+.math-pictures button,
+.math-join-group button {
   position: relative;
   display: grid;
   place-items: center;
@@ -164,7 +165,8 @@
   border-radius: 16px;
   background: #fbfdff;
 }
-.math-pictures button.is-marked {
+.math-pictures button.is-marked,
+.math-join-group button.is-marked {
   border-color: #73b98a;
   background: #eef9f1;
 }
@@ -353,6 +355,135 @@
   margin-bottom: 24px;
 }
 
+/* 第三課 加法 */
+.math-sign {
+  align-self: center;
+  color: #3474d7;
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1;
+}
+.math-join-pictures {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.math-join-group {
+  --picture: 48px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  /* Three pictures to a row, so both groups fit side by side. */
+  max-width: calc(var(--picture) * 3 + 36px);
+  padding: 10px;
+  border: 2px dashed #b9d3e6;
+  border-radius: 20px;
+  background: #fff;
+}
+.math-join-group button {
+  width: var(--picture);
+}
+.math-join-group button svg {
+  width: 80%;
+  height: 80%;
+}
+@media (max-width: 420px) {
+  .math-join-group {
+    --picture: 40px;
+  }
+}
+.math-join-pictures.is-small {
+  gap: 4px;
+}
+.math-join-pictures.is-small .math-join-group {
+  gap: 2px;
+  max-width: 76px;
+  padding: 4px;
+  border-width: 1px;
+  border-radius: 10px;
+}
+.math-join-pictures.is-small .math-sign {
+  font-size: 18px;
+}
+
+/* 畫圈圈算加法: circles for each number, then the answer, in one row (two rows on phones). */
+.math-add {
+  display: grid;
+  gap: 8px;
+}
+.math-add-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 10px;
+}
+.math-add-terms,
+.math-add-result {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.math-add-terms {
+  flex: 2 1 260px;
+}
+.math-add-result {
+  flex: 1 1 130px;
+}
+@media (max-width: 599px) {
+  .math-add-result {
+    max-width: 240px;
+  }
+}
+/* Two squares and their tools do not fit side by side on the narrowest phones. */
+@media (max-width: 359px) {
+  .math-add-terms {
+    flex-direction: column;
+  }
+  .math-add-terms .math-add-side {
+    width: min(100%, 240px);
+  }
+}
+.math-add-side {
+  display: grid;
+  flex: 1 1 0;
+  justify-items: center;
+  gap: 6px;
+  min-width: 0;
+  max-width: 300px;
+}
+.math-add-number {
+  color: #18375d;
+  font-size: 40px;
+  line-height: 1;
+}
+.math-add .math-ink {
+  width: 100%;
+  margin: 0;
+}
+.math-check-add {
+  display: grid;
+  gap: 6px;
+}
+.math-check-circles {
+  display: flex;
+  gap: 8px;
+}
+.math-check-circles figure {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  margin: 0;
+  color: #5b6f86;
+  font-size: 12px;
+}
+.math-check-ink.is-small {
+  width: 64px;
+  height: 64px;
+}
+
 /* Landscape tablets: the question, pictures and buttons on the left, the square on the right. */
 @media (min-width: 900px) and (orientation: landscape) {
   .math-question {
@@ -375,9 +506,22 @@
   .math-draw .math-ink {
     grid-column: 2;
     grid-row: 1 / span 4;
-    width: min(calc(100dvh - 190px), calc(100vw - 520px));
+    width: min(calc(100dvh - 200px), calc(100vw - 520px));
   }
   .math-draw-target {
     justify-content: flex-start;
+  }
+  /* 畫圈圈算加法 keeps its three squares in one row across the screen. */
+  .math-question.is-add {
+    grid-template-columns: minmax(0, 1fr);
+    width: min(100%, 1100px);
+  }
+  .math-question.is-add .math-ink {
+    grid-column: auto;
+    grid-row: auto;
+    width: 100%;
+  }
+  .math-question.is-add .math-add-side {
+    max-width: calc(100dvh - 380px);
   }
 }
