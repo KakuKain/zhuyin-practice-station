@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-A login-free Zhuyin (注音) practice site for Taiwanese first graders and their parents: lessons 1–9 plus three review sets, a symbol chart, handwriting dictation, listening dictation, and sound discrimination. It also has 數學 (康軒 115, first grade): lessons 1 (認識 1～10), 2 (比一比), 3 (加法) and 4 (分與合) are built. An optional 集章卡 (stamp card) rewards finished practice; it stays on the device and needs no login. UI copy and all docs are in Traditional Chinese (zh-Hant). `docs/architecture.md` is the detailed reference for feature boundaries and invariants. Read it before changing state, storage, audio, or ink behavior.
+A login-free Zhuyin (注音) practice site for Taiwanese first graders and their parents: lessons 1–9 plus three review sets, a symbol chart, handwriting dictation, listening dictation, and sound discrimination. It also has 數學 (康軒 115, first grade): lessons 1 (認識 1～10), 2 (比長短), 3 (排順序、比多少) and 4 (分與合, which includes 加法) are built. An optional 集章卡 (stamp card) rewards finished practice; it stays on the device and needs no login. UI copy and all docs are in Traditional Chinese (zh-Hant). `docs/architecture.md` is the detailed reference for feature boundaries and invariants. Read it before changing state, storage, audio, or ink behavior.
 
 Hard product constraints: no login, no DB, no cloud sync, no service worker or offline cache, no runtime AI or speech API calls, and no changes to the teacher-defined lesson scope. A web app manifest so the site can be added to the home screen (full screen, portrait-locked, no browser UI) is fine.
 
@@ -44,7 +44,7 @@ Asset pipelines:
   - The sheet was painted with ChatGPT; Claude cannot generate raster images.
   - The output is 192 px, lossy WebP at quality 88.
   - The originals live in `assets/artwork/avatars/`, a subfolder that `optimize-artwork.mjs` skips.
-- `npx tsx scripts/generate-math-audio.ts [--refresh]` voices every math instruction in `features/math/math-audio.ts` into `public/math-audio/` (macOS Meijia). First graders cannot read yet, so every math question is spoken; a unit test checks each prompt has a clip. Meijia reads 和 as ㄏㄜˊ, but the lessons read it ㄏㄢˋ, so `mathPromptSpeech` voices it as the homophone 漢.
+- `npx tsx scripts/generate-math-audio.ts [--refresh]` voices every math instruction in `features/math/math-audio.ts` into `public/math-audio/` (macOS Meijia). First graders cannot read yet, so every math question is spoken; a unit test checks each prompt has a clip. Meijia misreads some words, found by comparing her recordings: she says 和 as ㄏㄜˊ where the lessons read ㄏㄢˋ, and 「從左邊數」 with ㄕㄨˋ. `mathPromptSpeech` voices them as the homophones 漢 and 鼠; the screen still shows the prompt as written.
 - `python3 scripts/build-yo-fonts.py` rebuilds the lesson font subsets after you add characters or IVS glyphs, and writes `assets/font-sources/KidLessonYoOnly-readings.json` and `KidLessonYoSans-readings.json` (what each character and variation sequence shows). `scripts/build-fonts.py` rebuilds the full fonts. Both need fontTools and brotli. Bump the `?v=` on the fonts in `styles/02-typography.css` when they change.
 
 ## Build and deploy
@@ -93,6 +93,10 @@ There is one build: a static Vite SPA. `index.html` → `app/main.tsx` → `crea
   - Google sign-in and cloud sync were discussed but are not built. They would change the hard constraints above.
 - `features/math/` is self-contained.
   - The course list's 國語｜數學 switch (not 注音, which would clash with the 注音 symbol-chart tab) is remembered per child (`ChildProfile.subject`).
+  - Lessons are listed in `mathLessons` (`math-lessons.ts`) in the order the class teaches them. A lesson's `id` is permanent: saved rounds, records and tasks name it. The child sees the list position and `number`.
+    - Id 3 was 加法 until 加法 became part of 分與合, so it is now 第四課 分與合, and old 加法 rounds, records and tasks carry on there.
+    - 第三課 排順序、比多少 came later as id 4. The course card's station shows the list position, not the id.
+    - `practice: "tap"` lessons (2 and 3) run in `CompareLesson`; `"write"` lessons (1 and 4) in `WritingLesson`.
   - Math is drawn like 國語 so the two subjects feel like one site:
     - `MathCourseList` uses the 注音 journey cards, with each lesson's watercolor picture (`MathLesson.art`).
     - `openMathLesson` sets `mathLessonId` and opens the `math-lesson` view. `MathLessonPage` is a 國語 lesson page inside the app shell: the heading over the picture, a 開始練習 mode card (plus 繼續上次的練習 when a round is saved, which turns the other card into 從頭開始), and 這一課's parts.
@@ -109,18 +113,20 @@ There is one build: a static Vite SPA. `index.html` → `app/main.tsx` → `crea
       - While drawing, each extra circle gets a red box, the tool bar says 多畫了 N 個 in 國字注音 on its left (so the frame never moves), and 復原 glows.
       - Too few is not shown to the child; the parent chose that. The parent's check shows extra circles in red boxes and missing ones as red dashed circles in the next empty cells, and says 多畫/少畫 N 格.
     - The cells are saved in `MathRound.work`. Free drawings saved before the frame are dropped, and old ink still shows on the parent's check.
-  - Lesson 3 asks 4 合在一起 and then 4 畫圈圈算加法:
-    - 合在一起 shows two groups of up to 5 markable pictures; the child writes the total.
-    - 畫圈圈算加法 has a 十格框 for each number (cells 0–9 and 10–19), then an answer square (canvas 20). Each frame numbers its own circles; counting them together is the child's part. Tablets put the two frames side by side with ＝ and the answer below, landscape tablets in one row, and phones stack them.
-    - Each sum has its own clip (`join-a-b`, `add-a-b`). Counting says 兩個, but a sum says 二加三.
-  - Lesson 4 (分與合) reads a 分合圖 (`MathBond.tsx`): the total on top, joined by two lines to its parts.
-    - A round has 4 分一分 (total 3–10 and one part given; write the other), 2 合一合 (parts up to 5 given; write the total on top), then 2 分分看 (total 4–10; write any two numbers that make it).
+  - Lesson 4 (分與合, id 3) reads a 分合圖 (`MathBond.tsx`), the total on top joined by two lines to its parts, then adds.
+    - A round has 10 questions in textbook order:
+      - 3 分一分: the total (3–10) and one part are given; write the other.
+      - 2 合一合: both parts (up to 5) are given; write the total on top.
+      - 1 分分看: only the total (4–10) is given; write any two numbers that make it.
+      - 2 合在一起: two groups of up to 5 markable pictures; write the total.
+      - 2 畫圈圈算加法: a 十格框 for each number (cells 0–9 and 10–19), then an answer square (canvas 20). Each frame numbers its own circles; counting them together is the child's part. Tablets put the two frames side by side with ＝ and the answer below, landscape tablets in one row, and phones stack them.
     - Given numbers sit on washed cards. Each number to write is a square with its own ink tools, placed away from the lines: above the total, below a part.
     - One answer is kept in the question's ink. 分分看's two numbers are its two `work` cells, and it counts as answered only with both.
     - Markable pictures beside the 分合圖 help the child split or join.
     - The parent's check shows a small 分合圖 with what the child wrote. For 分分看, any two numbers that make the total are right.
+    - Each question has its own clip (`split-…`, `combine-…`, `ways-…`, `join-a-b`, `add-a-b`). Counting says 兩個, but a sum says 二加三.
     - Questions say 和 (ㄏㄢˋ) and 合在一起, never 合起來: 來 there needs ˙ㄌㄞ, which the font lacks.
-  - Lessons 1, 3 and 4 share `WritingLesson` in `MathScreen.tsx`. The ink pieces live in `MathInk.tsx` and the pictures in `MathPictures.tsx`.
+  - Lessons 1 and 4 share `WritingLesson` in `MathScreen.tsx`. The ink pieces live in `MathInk.tsx` and the pictures in `MathPictures.tsx`.
   - The parent checks the round at the end.
     - Each lesson's unfinished round persists per child: lesson 1 in `kid-math-round-v1`, others in `kid-math-round-v1-<lesson>` (`mathRoundStorageKey`). Starting one lesson never replaces another's.
     - The circles live in `MathRound.work`. Finished rounds go to `kid-math-records-v1`.
@@ -128,12 +134,19 @@ There is one build: a static Vite SPA. `index.html` → `app/main.tsx` → `crea
     - `mathPromptReadings` in `math-audio.ts` gives one syllable per character. The polyphones the font would misread (數一數, 箱子／兔子, 曲線, 蘿蔔, and 和 as ㄏㄢˋ) get `\u{E01E1}` from `alternateReadings` in `features/lesson/reading-variants.ts`, the one table every 國字注音 sentence written for children uses.
     - A unit test checks every character against `KidLessonYoSans-readings.json`.
     - A sentence the font cannot annotate correctly is reworded: 寫下來 needs ˙ㄌㄞ, so the prompt says 用筆寫出數字.
-  - Lesson 2 (比一比) is a lazy chunk: `CompareLesson.tsx` with `styles/lazy/math-compare.css`. `compare-round.ts` builds the round and holds the rules.
-    - A round has 8 questions in textbook order: 比長短 lined up, then out of line; 比高矮 on the ground, then one child on a box; 排順序 by length and by height; 直線和曲線; 哪條路最近.
+  - Lessons 2 and 3 are tapped, in one lazy chunk: `CompareLesson.tsx` with `styles/lazy/math-compare.css`.
     - Answers are taps, checked at once and retried until right, like 辨音.
+    - A round is not saved mid-round. What took more than one try goes to `kid-math-records-v1` and the result screen.
+  - Lesson 2 (比長短): `compare-round.ts` builds the round and holds the rules.
+    - A round has 6 questions in textbook order: 比長短 lined up, then out of line; 比高矮 on the ground, then one child on a box; 直線和曲線; 哪條路最近. 排順序 belongs to 第三課, with numbers.
     - Things out of line must be dragged to the start line or the ground first (a tap slides them there). Only then is the question asked.
     - Out of line, the shorter one always looks longer or taller, so skipping the lining-up step gives the wrong answer.
-    - It is not saved mid-round. What took more than one try goes to `kid-math-records-v1` and the result screen.
+  - Lesson 3 (排順序、比多少, id 4): `sequence-round.ts` builds the round, and `SequenceViews.tsx` draws it.
+    - A round has 8 questions in this order:
+      - 第幾個, from the left and then the right: tap the picture at that place in a row of 6 or 7. The end to count from is marked, and the first and last places are never asked.
+      - 數的順序: tap the number missing from the middle of five in order (up or down); the other cards are numbers not on show. Then tap five numbers from the smallest up; each tap takes its place in a row below.
+      - 比多少, more then fewer: two rows matched one to one, plus 一樣多, which comes up about every other round.
+      - 比大小: the larger, then the smaller of two numbers.
 - `PracticeList`, `SettingsScreen`, `SymbolChart`, and their heavy sub-panels are `React.lazy` chunks. Keep them out of the initial bundle.
 - One `<audio>` element is mounted at the app root for every screen, so iOS keeps the playback a tap unlocked.
 - Answer zhuyin (`ZhuyinStack`) is drawn by the `KidLessonYoOnly` font, which puts each syllable on a Han character (`syllableGlyphs` in `features/lesson/zhuyin-glyphs.ts`; ㄏㄨˊ is 蝴). Until that font has loaded (`lib/loading/font-ready.ts`), the syllable is spelled out in the UI font so a stand-in character never shows. A polyphone needs its variation selector there (`"奶\u{E01E1}"` for ˙ㄋㄞ); `tests/unit/zhuyin-glyphs.test.ts` fails if a glyph is missing from the subset or shows another reading.

@@ -15,6 +15,16 @@ import { taskKeys } from "../rewards/stamp-book";
 import type { MathLesson } from "./math-lessons";
 import { recordMathResult } from "./math-round";
 import {
+  buildSequenceRound,
+  isSequenceQuestion,
+  sequenceAnswer,
+  sequencePromptId,
+  sequenceSection,
+  sequenceTopic,
+  type SequenceQuestion,
+} from "./sequence-round";
+import { SequenceStage, choiceState, type Feedback } from "./SequenceViews";
+import {
   answerOf,
   buildCompareRound,
   comparePromptIds,
@@ -31,33 +41,51 @@ import {
 } from "./compare-round";
 
 type CompareApp = Pick<AppController, "speak" | "stopPlayback" | "navigate" | "awardStamp">;
-type BarQuestion = Extract<CompareQuestion, { kind: "compare" | "order" }>;
-type Feedback = { kind: "correct" | "retry"; pick: number } | null;
+type BarQuestion = Extract<CompareQuestion, { kind: "compare" }>;
+/** A question answered by tapping: 第二課 比長短's, or 第三課 排順序、比多少's. */
+type TapQuestion = CompareQuestion | SequenceQuestion;
+
+/** Each tapped lesson's round, by lesson id. */
+const tapRounds: Record<number, () => TapQuestion[]> = {
+  2: buildCompareRound,
+  4: buildSequenceRound,
+};
 
 const correctDelay = 1300;
 const retryDelay = 900;
 
-const sectionOf = (question: CompareQuestion) =>
-  question.kind === "compare"
-    ? question.measure === "length"
-      ? "比長短"
-      : "比高矮"
-    : question.kind === "order"
-      ? "排順序"
+const sectionOf = (question: TapQuestion) =>
+  isSequenceQuestion(question)
+    ? sequenceSection(question)
+    : question.kind === "compare"
+      ? question.measure === "length"
+        ? "比長短"
+        : "比高矮"
       : question.kind === "line"
         ? "直線和曲線"
         : "哪條路最近";
 
-const firstPrompt = (question: CompareQuestion) => {
-  const ids = comparePromptIds(question);
+const topicOf = (question: TapQuestion) =>
+  isSequenceQuestion(question) ? sequenceTopic(question) : compareTopic(question);
+
+/** The instructions read aloud: first how to line things up (比長短 only), then what to answer. */
+const promptsOf = (question: TapQuestion): { lineUp?: string; ask: string } =>
+  isSequenceQuestion(question) ? { ask: sequencePromptId(question) } : comparePromptIds(question);
+
+const firstPrompt = (question: TapQuestion) => {
+  const ids = promptsOf(question);
   return ids.lineUp ?? ids.ask;
 };
 
-/** 第二課 比一比: tap to answer, checked at once and tried again until right. */
+/**
+ * The lessons answered by tapping, 第二課 比長短 and 第三課 排順序、比多少: checked at once and
+ * tried again until right.
+ */
 export function CompareLesson({ app, lesson }: { app: CompareApp; lesson: MathLesson }) {
-  const [round, setRound] = useState<{ id: number; questions: CompareQuestion[] } | null>(() => ({
+  const buildRound = tapRounds[lesson.id] ?? buildCompareRound;
+  const [round, setRound] = useState<{ id: number; questions: TapQuestion[] } | null>(() => ({
     id: Date.now(),
-    questions: buildCompareRound(),
+    questions: buildRound(),
   }));
   const [index, setIndex] = useState(0);
   const [finished, setFinished] = useState<{ total: number; topics: string[] } | null>(null);
@@ -82,7 +110,7 @@ export function CompareLesson({ app, lesson }: { app: CompareApp; lesson: MathLe
     app.navigate("math-lesson");
   };
   const again = () => {
-    const questions = buildCompareRound();
+    const questions = buildRound();
     missed.current = new Set();
     setFinished(null);
     setIndex(0);
@@ -117,7 +145,7 @@ export function CompareLesson({ app, lesson }: { app: CompareApp; lesson: MathLe
     }
     const topics = [...missed.current]
       .sort((a, b) => a - b)
-      .map((item) => compareTopic(round.questions[item]));
+      .map((item) => topicOf(round.questions[item]));
     recordMathResult({
       lessonId: lesson.id,
       total: round.questions.length,
@@ -157,13 +185,15 @@ function QuestionView({
   onMiss,
   onDone,
 }: {
-  question: CompareQuestion;
+  question: TapQuestion;
   say: (id: string) => void;
   onMiss: () => void;
   onDone: () => void;
 }) {
-  const ids = comparePromptIds(question);
-  const [lining, setLining] = useState(() => needsLining(question));
+  const ids = promptsOf(question);
+  const [lining, setLining] = useState(
+    () => !isSequenceQuestion(question) && needsLining(question),
+  );
   const [picks, setPicks] = useState<number[]>([]);
   const [feedback, setFeedback] = useState<Feedback>(null);
   const timer = useRef<number | null>(null);
@@ -174,7 +204,7 @@ function QuestionView({
     [],
   );
   const promptId = lining && ids.lineUp ? ids.lineUp : ids.ask;
-  const answer = answerOf(question);
+  const answer = isSequenceQuestion(question) ? sequenceAnswer(question) : answerOf(question);
 
   const pick = (choice: number) => {
     if (feedback || lining || picks.includes(choice)) return;
@@ -197,7 +227,9 @@ function QuestionView({
   return (
     <section className={`compare-question is-${question.kind}`}>
       <MathPrompt id={promptId} onPlay={() => say(promptId)} />
-      {question.kind === "compare" || question.kind === "order" ? (
+      {isSequenceQuestion(question) ? (
+        <SequenceStage question={question} picks={picks} feedback={feedback} onPick={pick} />
+      ) : question.kind === "compare" ? (
         <BarStage
           question={question}
           lining={lining}
@@ -231,13 +263,6 @@ function QuestionView({
     </section>
   );
 }
-
-const choiceState = (index: number, picks: number[], feedback: Feedback) =>
-  feedback?.pick === index
-    ? ` is-${feedback.kind === "correct" ? "correct" : "wrong"}`
-    : picks.includes(index)
-      ? " is-picked"
-      : "";
 
 function Pencil({ color }: { color: string }) {
   return (
@@ -375,8 +400,8 @@ function BarStage({
     }
   };
 
-  const rows = bars.length === 2 ? [30, 70] : [20, 50, 80];
-  const slots = bars.length === 2 ? [32, 68] : [20, 50, 80];
+  const rows = [30, 70];
+  const slots = [32, 68];
   const hintIndex = lining && !touched && dragging === null ? offsets.findIndex((o) => o > 0) : -1;
   const hint =
     hintIndex < 0
@@ -396,10 +421,7 @@ function BarStage({
           };
 
   return (
-    <div
-      ref={stageRef}
-      className={`compare-stage is-${measure}${bars.length === 3 ? " is-three" : ""}`}
-    >
+    <div ref={stageRef} className={`compare-stage is-${measure}`}>
       {length ? (
         <div className="compare-start-line" style={{ left: `${startLine}%` }}>
           <span>起點</span>
@@ -425,7 +447,6 @@ function BarStage({
       )}
       {bars.map((bar, index) => {
         const { color, name } = palette[bar.color];
-        const order = picks.indexOf(index);
         const movable = lining && offsets[index] > 0;
         const lined = bar.offset > 0 && offsets[index] === 0;
         return (
@@ -455,11 +476,6 @@ function BarStage({
             onClick={() => click(index)}
           >
             {length ? <Pencil color={color} /> : <Child color={color} />}
-            {question.kind === "order" && order >= 0 && (
-              <span className="compare-pick-number" aria-hidden="true">
-                {order + 1}
-              </span>
-            )}
           </button>
         );
       })}

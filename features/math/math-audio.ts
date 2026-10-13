@@ -20,6 +20,8 @@ const addPairs = range(1, 9).flatMap((a) =>
     .filter((b) => a + b >= 3 && a + b <= 10)
     .map((b) => [a, b] as const),
 );
+/** 第三課 第幾個: rows of six or seven, never asking for the first or the last. */
+const positionPlaces = range(2, 6);
 /** 第四課: 分一分 splits 3 to 10 any way; 合一合 has up to 5 on each side; 分分看 is 4 to 10. */
 const splitPairs = addPairs;
 const combinePairs = joinPairs.filter(([a, b]) => a + b >= 3);
@@ -32,15 +34,13 @@ export const mathPrompts: Record<string, string> = {
       .slice(1)
       .map((_, index) => [`draw-${index + 1}`, `畫出${chineseNumber(index + 1)}個圈圈。`]),
   ),
-  // 第二課 比一比
+  // 第二課 比長短
   "length-more": "哪一枝鉛筆比較長？點一下。",
   "length-less": "哪一枝鉛筆比較短？點一下。",
   "height-more": "哪一個小朋友比較高？點一下。",
   "height-less": "哪一個小朋友比較矮？點一下。",
   "align-length": "鉛筆沒有對齊。先把每一枝鉛筆拉到紅線。",
   "align-height": "有人站在箱子上。先把小朋友拉到地上。",
-  "order-length": "先點最短的，再點中間的，最後點最長的。",
-  "order-height": "先點最矮的，再點中間的，最後點最高的。",
   "line-straight": "哪一條是直線？點一下。",
   "line-curve": "哪一條是曲線？點一下。",
   route: "小兔子要去拿紅蘿蔔。哪一條路最近？點一下。",
@@ -59,6 +59,21 @@ export const mathPrompts: Record<string, string> = {
       `${sumNumerals[a]}加${sumNumerals[b]}等於多少？先畫圈圈，再寫答案。`,
     ]),
   ),
+  // 第三課 排順序、比多少: places and numbers are said 第二, 二, not 兩.
+  ...Object.fromEntries(
+    positionPlaces.flatMap((place) =>
+      (["left", "right"] as const).map((from) => [
+        `position-${from}-${place}`,
+        `從${from === "left" ? "左" : "右"}邊數，第${sumNumerals[place]}個是哪一個？點一下。`,
+      ]),
+    ),
+  ),
+  missing: "中間少了哪一個數？點一下。",
+  sequence: "從小到大，依順序點數字。",
+  "rows-more": "哪一排比較多？如果一樣多，就點一樣多。",
+  "rows-less": "哪一排比較少？如果一樣多，就點一樣多。",
+  "numbers-more": "哪一個數比較大？點一下。",
+  "numbers-less": "哪一個數比較小？點一下。",
   // 第四課 分與合: numbers are said as in a sum (二, not 兩), and 和 is ㄏㄢˋ as in the lessons.
   ...Object.fromEntries(
     splitPairs.map(([a, b]) => [
@@ -102,10 +117,6 @@ export const mathPromptReadings: Record<string, string> = {
     "ㄑㄧㄢ ㄅㄧˇ ㄇㄟˊ ㄧㄡˇ ㄉㄨㄟˋ ㄑㄧˊ ㄒㄧㄢ ㄅㄚˇ ㄇㄟˇ ㄧ ㄓ ㄑㄧㄢ ㄅㄧˇ ㄌㄚ ㄉㄠˋ ㄏㄨㄥˊ ㄒㄧㄢˋ",
   "align-height":
     "ㄧㄡˇ ㄖㄣˊ ㄓㄢˋ ㄗㄞˋ ㄒㄧㄤ ˙ㄗ ㄕㄤˋ ㄒㄧㄢ ㄅㄚˇ ㄒㄧㄠˇ ㄆㄥˊ ㄧㄡˇ ㄌㄚ ㄉㄠˋ ㄉㄧˋ ㄕㄤˋ",
-  "order-length":
-    "ㄒㄧㄢ ㄉㄧㄢˇ ㄗㄨㄟˋ ㄉㄨㄢˇ ˙ㄉㄜ ㄗㄞˋ ㄉㄧㄢˇ ㄓㄨㄥ ㄐㄧㄢ ˙ㄉㄜ ㄗㄨㄟˋ ㄏㄡˋ ㄉㄧㄢˇ ㄗㄨㄟˋ ㄔㄤˊ ˙ㄉㄜ",
-  "order-height":
-    "ㄒㄧㄢ ㄉㄧㄢˇ ㄗㄨㄟˋ ㄞˇ ˙ㄉㄜ ㄗㄞˋ ㄉㄧㄢˇ ㄓㄨㄥ ㄐㄧㄢ ˙ㄉㄜ ㄗㄨㄟˋ ㄏㄡˋ ㄉㄧㄢˇ ㄗㄨㄟˋ ㄍㄠ ˙ㄉㄜ",
   "line-straight": "ㄋㄚˇ ㄧ ㄊㄧㄠˊ ㄕˋ ㄓˊ ㄒㄧㄢˋ ㄉㄧㄢˇ ㄧ ㄒㄧㄚˋ",
   "line-curve": "ㄋㄚˇ ㄧ ㄊㄧㄠˊ ㄕˋ ㄑㄩ ㄒㄧㄢˋ ㄉㄧㄢˇ ㄧ ㄒㄧㄚˋ",
   route:
@@ -124,6 +135,22 @@ export const mathPromptReadings: Record<string, string> = {
       `${sumReadings[a]} ㄐㄧㄚ ${sumReadings[b]} ㄉㄥˇ ㄩˊ ㄉㄨㄛ ㄕㄠˇ ㄒㄧㄢ ㄏㄨㄚˋ ㄑㄩㄢ ㄑㄩㄢ ㄗㄞˋ ㄒㄧㄝˇ ㄉㄚˊ ㄢˋ`,
     ]),
   ),
+  ...Object.fromEntries(
+    positionPlaces.flatMap((place) =>
+      (["left", "right"] as const).map((from) => [
+        `position-${from}-${place}`,
+        `ㄘㄨㄥˊ ${from === "left" ? "ㄗㄨㄛˇ" : "ㄧㄡˋ"} ㄅㄧㄢ ㄕㄨˇ ㄉㄧˋ ${sumReadings[place]} ㄍㄜˋ ㄕˋ ㄋㄚˇ ㄧ ㄍㄜˋ ㄉㄧㄢˇ ㄧ ㄒㄧㄚˋ`,
+      ]),
+    ),
+  ),
+  missing: "ㄓㄨㄥ ㄐㄧㄢ ㄕㄠˇ ˙ㄌㄜ ㄋㄚˇ ㄧ ㄍㄜˋ ㄕㄨˋ ㄉㄧㄢˇ ㄧ ㄒㄧㄚˋ",
+  sequence: "ㄘㄨㄥˊ ㄒㄧㄠˇ ㄉㄠˋ ㄉㄚˋ ㄧ ㄕㄨㄣˋ ㄒㄩˋ ㄉㄧㄢˇ ㄕㄨˋ ㄗˋ",
+  "rows-more":
+    "ㄋㄚˇ ㄧ ㄆㄞˊ ㄅㄧˇ ㄐㄧㄠˋ ㄉㄨㄛ ㄖㄨˊ ㄍㄨㄛˇ ㄧ ㄧㄤˋ ㄉㄨㄛ ㄐㄧㄡˋ ㄉㄧㄢˇ ㄧ ㄧㄤˋ ㄉㄨㄛ",
+  "rows-less":
+    "ㄋㄚˇ ㄧ ㄆㄞˊ ㄅㄧˇ ㄐㄧㄠˋ ㄕㄠˇ ㄖㄨˊ ㄍㄨㄛˇ ㄧ ㄧㄤˋ ㄉㄨㄛ ㄐㄧㄡˋ ㄉㄧㄢˇ ㄧ ㄧㄤˋ ㄉㄨㄛ",
+  "numbers-more": "ㄋㄚˇ ㄧ ㄍㄜˋ ㄕㄨˋ ㄅㄧˇ ㄐㄧㄠˋ ㄉㄚˋ ㄉㄧㄢˇ ㄧ ㄒㄧㄚˋ",
+  "numbers-less": "ㄋㄚˇ ㄧ ㄍㄜˋ ㄕㄨˋ ㄅㄧˇ ㄐㄧㄠˋ ㄒㄧㄠˇ ㄉㄧㄢˇ ㄧ ㄒㄧㄚˋ",
   ...Object.fromEntries(
     splitPairs.map(([a, b]) => [
       `split-${a}-${b}`,
@@ -145,10 +172,18 @@ export const mathPromptReadings: Record<string, string> = {
 };
 
 /**
- * What Meijia is given to say. She reads 和 as ㄏㄜˊ, but the lessons and the 國字注音 beside
- * the prompt read it ㄏㄢˋ, so it is voiced as the homophone 漢.
+ * Homophones for what Meijia misreads, checked by comparing her recordings: she says 和 as ㄏㄜˊ
+ * where the lessons read ㄏㄢˋ, and 「從左邊數」 as ㄕㄨˋ (as in 樹) instead of ㄕㄨˇ. 數一數 she
+ * reads right.
  */
-export const mathPromptSpeech = (id: string) => (mathPrompts[id] ?? "").replaceAll("和", "漢");
+const spokenFixes: [RegExp, string][] = [
+  [/和/g, "漢"],
+  [/邊數，/g, "邊鼠，"],
+];
+
+/** What Meijia is given to say; the screen still shows the prompt as written. */
+export const mathPromptSpeech = (id: string) =>
+  spokenFixes.reduce((text, [pattern, fix]) => text.replace(pattern, fix), mathPrompts[id] ?? "");
 
 export { isHan };
 

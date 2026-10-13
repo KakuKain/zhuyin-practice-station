@@ -71,7 +71,7 @@ function DrawnCount({ drawn, target }: { drawn: number; target: number }) {
 
 export function MathScreen({ app }: { app: MathApp }) {
   const lesson = mathLessons.find((item) => item.id === app.mathLessonId) ?? mathLessons[0];
-  if (lesson.id === 2)
+  if (lesson.practice === "tap")
     return (
       <Suspense
         fallback={

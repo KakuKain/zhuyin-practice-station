@@ -2,10 +2,17 @@ import { readingVariants } from "../lesson/reading-variants";
 
 /** 康軒 115 一年級上 數學, in the order the class teaches it. */
 export type MathLesson = {
+  /**
+   * Permanent: saved rounds, records and tasks name a lesson by id. What the child sees is the
+   * list's order and `number`. Id 3 was 加法 until 加法 became part of 分與合, so its saved rounds
+   * and tasks carry on there; 排順序、比多少 came later as id 4.
+   */
   id: number;
   number: string;
   title: string;
   ready: boolean;
+  /** Tapped and checked at once (no parent check, not saved mid-round), or written and checked. */
+  practice: "tap" | "write";
   /** The watercolor picture on its course card and page. */
   art: string;
   /** Questions in one round. */
@@ -20,6 +27,7 @@ export const mathLessons: MathLesson[] = [
     number: "第一課",
     title: "認識 1～10",
     ready: true,
+    practice: "write",
     art: "goose-watercolor",
     questions: 8,
     parts: ["數一數", "畫圈圈"],
@@ -27,29 +35,32 @@ export const mathLessons: MathLesson[] = [
   {
     id: 2,
     number: "第二課",
-    title: "比一比",
+    title: "比長短",
     ready: true,
+    practice: "tap",
     art: "blue-watercolor-pencil-v2",
-    questions: 8,
-    parts: ["比長短", "比高矮", "排順序", "直線、曲線", "哪條路最近"],
-  },
-  {
-    id: 3,
-    number: "第三課",
-    title: "加法",
-    ready: true,
-    art: "sound-complete-cat",
-    questions: 8,
-    parts: ["合在一起", "畫圈圈算加法"],
+    questions: 6,
+    parts: ["比長短", "比高矮", "直線、曲線", "哪條路最近"],
   },
   {
     id: 4,
+    number: "第三課",
+    title: "排順序、比多少",
+    ready: true,
+    practice: "tap",
+    art: "race-watercolor",
+    questions: 8,
+    parts: ["第幾個", "數的順序", "比多少", "比大小"],
+  },
+  {
+    id: 3,
     number: "第四課",
     title: "分與合",
     ready: true,
+    practice: "write",
     art: "seesaw-watercolor",
-    questions: 8,
-    parts: ["分一分", "合一合", "分分看"],
+    questions: 10,
+    parts: ["分一分", "合一合", "分分看", "合在一起", "畫圈圈算加法"],
   },
 ];
 
@@ -64,14 +75,19 @@ export const mathWordReadings: Record<string, string> = {
   第三課: "ㄉㄧˋ ㄙㄢ ㄎㄜˋ",
   第四課: "ㄉㄧˋ ㄙˋ ㄎㄜˋ",
   "認識 1～10": "ㄖㄣˋ ㄕˋ",
-  比一比: "ㄅㄧˇ ㄧ ㄅㄧˇ",
-  加法: "ㄐㄧㄚ ㄈㄚˇ",
+  比長短: "ㄅㄧˇ ㄔㄤˊ ㄉㄨㄢˇ",
+  "排順序、比多少": "ㄆㄞˊ ㄕㄨㄣˋ ㄒㄩˋ ㄅㄧˇ ㄉㄨㄛ ㄕㄠˇ",
   分與合: "ㄈㄣ ㄩˇ ㄏㄜˊ",
   數一數: "ㄕㄨˇ ㄧ ㄕㄨˇ",
   畫圈圈: "ㄏㄨㄚˋ ㄑㄩㄢ ㄑㄩㄢ",
-  比長短: "ㄅㄧˇ ㄔㄤˊ ㄉㄨㄢˇ",
   比高矮: "ㄅㄧˇ ㄍㄠ ㄞˇ",
-  排順序: "ㄆㄞˊ ㄕㄨㄣˋ ㄒㄩˋ",
+  第幾個: "ㄉㄧˋ ㄐㄧˇ ㄍㄜˋ",
+  數的順序: "ㄕㄨˋ ˙ㄉㄜ ㄕㄨㄣˋ ㄒㄩˋ",
+  比多少: "ㄅㄧˇ ㄉㄨㄛ ㄕㄠˇ",
+  比大小: "ㄅㄧˇ ㄉㄚˋ ㄒㄧㄠˇ",
+  一樣多: "ㄧ ㄧㄤˋ ㄉㄨㄛ",
+  左邊: "ㄗㄨㄛˇ ㄅㄧㄢ",
+  右邊: "ㄧㄡˋ ㄅㄧㄢ",
   "直線、曲線": "ㄓˊ ㄒㄧㄢˋ ㄑㄩ ㄒㄧㄢˋ",
   哪條路最近: "ㄋㄚˇ ㄊㄧㄠˊ ㄌㄨˋ ㄗㄨㄟˋ ㄐㄧㄣˋ",
   合在一起: "ㄏㄜˊ ㄗㄞˋ ㄧ ㄑㄧˇ",

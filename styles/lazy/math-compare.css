@@ -24,16 +24,10 @@
   user-select: none;
   -webkit-user-select: none;
 }
-.compare-stage.is-length.is-three {
-  --stage-ratio: 1.25;
-}
 /* Wide screens are short: pencils lie in a longer, lower picture. */
 @media (orientation: landscape) {
   .compare-stage {
     --stage-ratio: 2.2;
-  }
-  .compare-stage.is-length.is-three {
-    --stage-ratio: 1.7;
   }
 }
 .compare-stage.is-height {
@@ -161,7 +155,7 @@
   height: 100%;
 }
 
-/* 排順序: each tap shows its place in the order. */
+/* 從小到大: each tap shows its place in the order. */
 .compare-pick-number {
   position: absolute;
   top: 0;
@@ -364,6 +358,169 @@
     opacity: 1;
     transform: scale(1);
   }
+}
+
+/* 第三課 排順序、比多少: pictures and number cards on paper, like the rest of the lesson. */
+.sequence-row,
+.sequence-missing,
+.sequence-sort,
+.sequence-rows {
+  display: grid;
+  gap: 14px;
+  width: min(100%, 760px);
+  margin: 0 auto;
+}
+.sequence-items,
+.sequence-matched {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  border: 2px solid #c6dfe7;
+  border-radius: 22px;
+  background: #fffefa;
+}
+.sequence-items {
+  grid-template-columns: repeat(var(--count), minmax(0, 1fr));
+}
+.sequence-item {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 16px;
+  background: #fbfdff;
+}
+.sequence-item svg {
+  width: 74%;
+  height: 74%;
+}
+/* The end to count from is marked, with an arrow pointing along the row. */
+.sequence-ends {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 4px;
+  color: #8a9aa8;
+  font-size: clamp(20px, 3vw, 26px);
+}
+.sequence-ends .is-start {
+  color: #c0322a;
+  font-weight: 800;
+}
+.is-from-left .sequence-ends .is-start::after {
+  content: " →";
+}
+.is-from-right .sequence-ends .is-start::before {
+  content: "← ";
+}
+.sequence-numbers {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  width: min(100%, 640px);
+  margin: 0 auto;
+}
+.sequence-card {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 3px solid #a9d1c1;
+  border-radius: 18px;
+  background: linear-gradient(110deg, #f3faff 0%, #e6f3ff 72%, #eff8ff 100%);
+  color: var(--ref-navy);
+  font: inherit;
+  font-size: clamp(30px, 7vw, 54px);
+  font-weight: 800;
+  line-height: 1;
+}
+.sequence-card.is-gap {
+  border-style: dashed;
+  border-color: #d9a441;
+  background: #fffaf0;
+  color: #c98a1a;
+}
+.sequence-card.is-gap.is-filled {
+  border-style: solid;
+  border-color: #6cc28e;
+  background: #eef9f1;
+  color: var(--ref-navy);
+}
+.sequence-numbers.is-tray .sequence-card {
+  font-size: clamp(24px, 5.5vw, 42px);
+}
+/* Cards share one row, however narrow the screen. */
+.sequence-choices {
+  display: flex;
+  justify-content: center;
+  gap: clamp(6px, 2vw, 12px);
+}
+.sequence-card.is-choice {
+  flex: 0 1 120px;
+  min-width: 0;
+  border-color: #c6dfe7;
+  background: #fffefa;
+  box-shadow: 0 3px 0 #d7e6ee;
+  cursor: pointer;
+}
+.sequence-card.is-big {
+  flex-basis: 210px;
+  font-size: clamp(60px, 15vw, 116px);
+}
+.sequence-matched {
+  grid-template-columns: repeat(var(--columns), minmax(0, 64px));
+  justify-content: start;
+  width: 100%;
+  font: inherit;
+}
+.sequence-matched svg {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+}
+.sequence-same {
+  justify-self: center;
+  min-height: clamp(56px, 7vw, 68px);
+  padding: 6px clamp(30px, 5vw, 44px);
+  border: 2px solid #c6dfe7;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ref-navy);
+  font: inherit;
+  font-size: clamp(24px, 3.4vw, 30px);
+  font-weight: 800;
+  box-shadow: 0 3px 0 #d7e6ee;
+}
+/* Phones: the row of six or seven pictures keeps them as large as it can. */
+@media (max-width: 480px) {
+  .sequence-items {
+    gap: 2px;
+    padding: 8px;
+  }
+  .sequence-item svg {
+    width: 90%;
+    height: 90%;
+  }
+}
+.sequence-item.is-picked,
+.sequence-card.is-picked {
+  border-color: #9cc0e8;
+  background: #eef5fd;
+}
+.sequence-item.is-correct,
+.sequence-card.is-correct,
+.sequence-matched.is-correct,
+.sequence-same.is-correct {
+  border-color: #6cc28e;
+  background: #eef9f1;
+}
+.sequence-item.is-wrong,
+.sequence-card.is-wrong,
+.sequence-matched.is-wrong,
+.sequence-same.is-wrong {
+  border-color: #e5b46b;
+  background: #fff6e8;
 }
 
 @media (prefers-reduced-motion: reduce) {

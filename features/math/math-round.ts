@@ -71,8 +71,7 @@ export const workCells = (question: MathQuestion) =>
       : question.kind === "ways"
         ? 2
         : 0;
-export const additionRoundSize = { join: 4, add: 4 } as const;
-export const bondRoundSize = { split: 4, combine: 2, ways: 2 } as const;
+export const bondRoundSize = { split: 3, combine: 2, ways: 1, join: 2, add: 2 } as const;
 export const maxCount = 10;
 
 const shuffle = <T>(items: readonly T[], random: () => number) => {
@@ -117,30 +116,10 @@ function pickPairs(
 }
 
 /**
- * 第三課 加法：4 合在一起 with pictures (up to 5 on each side), then 4 畫圈圈算加法 (sums up to
- * 10, at least 3).
- */
-export function buildAdditionRound(random = Math.random): MathQuestion[] {
-  const icons = shuffle(joinIcons, random);
-  const drawn = pairs(maxCount).filter(([a, b]) => a + b >= 3);
-  return [
-    ...pickPairs(pairs(5), additionRoundSize.join, random).map((parts, index) => ({
-      kind: "join" as const,
-      target: parts[0] + parts[1],
-      parts,
-      icon: icons[index],
-    })),
-    ...pickPairs(drawn, additionRoundSize.add, random).map((parts) => ({
-      kind: "add" as const,
-      target: parts[0] + parts[1],
-      parts,
-    })),
-  ];
-}
-
-/**
- * 第四課 分與合, read from a 分合圖: 4 分一分 (totals 3 to 10, each different), 2 合一合 (up to 5
- * on each side, different totals), then 2 分分看 (totals 4 to 10), in the textbook's order.
+ * 第四課 分與合 (lesson id 3), in the textbook's order: the 分合圖 first, 3 分一分 (totals 3 to
+ * 10), 2 合一合 (up to 5 on each side) and 1 分分看 (4 to 10); then 加法, 2 合在一起 with
+ * pictures (up to 5 on each side) and 2 畫圈圈算加法 (sums 3 to 10). Each part uses different
+ * totals.
  */
 export function buildBondRound(random = Math.random): MathQuestion[] {
   const pictures = shuffle(countIcons, random);
@@ -158,6 +137,7 @@ export function buildBondRound(random = Math.random): MathQuestion[] {
     numbers.filter((total) => total >= 4),
     random,
   ).slice(0, bondRoundSize.ways);
+  const small = pairs(5).filter(([a, b]) => a + b >= 3);
   return [
     ...splits.map((parts, index) => ({
       kind: "split" as const,
@@ -165,11 +145,7 @@ export function buildBondRound(random = Math.random): MathQuestion[] {
       parts,
       icon: pictures[index],
     })),
-    ...pickPairs(
-      pairs(5).filter(([a, b]) => a + b >= 3),
-      bondRoundSize.combine,
-      random,
-    ).map((parts, index) => ({
+    ...pickPairs(small, bondRoundSize.combine, random).map((parts, index) => ({
       kind: "combine" as const,
       target: parts[0] + parts[1],
       parts,
@@ -180,12 +156,22 @@ export function buildBondRound(random = Math.random): MathQuestion[] {
       target,
       icon: pictures[bondRoundSize.split + index],
     })),
+    ...pickPairs(pairs(5), bondRoundSize.join, random).map((parts, index) => ({
+      kind: "join" as const,
+      target: parts[0] + parts[1],
+      parts,
+      icon: joined[bondRoundSize.combine + index],
+    })),
+    ...pickPairs(
+      pairs(maxCount).filter(([a, b]) => a + b >= 3),
+      bondRoundSize.add,
+      random,
+    ).map((parts) => ({ kind: "add" as const, target: parts[0] + parts[1], parts })),
   ];
 }
 
 const roundBuilders: Record<number, (random?: () => number) => MathQuestion[]> = {
-  3: buildAdditionRound,
-  4: buildBondRound,
+  3: buildBondRound,
 };
 
 export function newMathRound(lessonId: number, now = Date.now()): MathRound {

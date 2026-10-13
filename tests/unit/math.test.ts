@@ -2,9 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { existsSync, readFileSync } from "node:fs";
 import {
-  additionRoundSize,
   bondRoundSize,
-  buildAdditionRound,
   buildBondRound,
   buildCountingRound,
   countIcons,
@@ -27,6 +25,13 @@ import {
   mathPrompts,
 } from "../../features/math/math-audio";
 import { mathLessons, mathWord, mathWordReadings } from "../../features/math/math-lessons";
+import {
+  buildSequenceRound,
+  sameChoice,
+  sequenceAnswer,
+  sequencePromptId,
+  sequenceRoundSize,
+} from "../../features/math/sequence-round";
 import {
   answerOf,
   buildCompareRound,
@@ -105,14 +110,14 @@ test("math records belong to each child and are included in device backup", () =
 });
 
 const rounds = Array.from({ length: 200 }, () => buildCompareRound());
-type BarQuestion = Extract<CompareQuestion, { kind: "compare" | "order" }>;
+type BarQuestion = Extract<CompareQuestion, { kind: "compare" }>;
 
-test("a 第二課 round walks 比長短, 比高矮, 排順序, 直線和曲線 and 哪條路最近 in order", () => {
+test("a 第二課 比長短 round walks 比長短, 比高矮, 直線和曲線 and 哪條路最近 in order", () => {
   for (const round of rounds) {
     assert.equal(round.length, compareRoundSize);
     assert.deepEqual(
       round.map((question) =>
-        question.kind === "compare" || question.kind === "order"
+        question.kind === "compare"
           ? `${question.kind}-${question.measure}-${needsLining(question) ? "apart" : "lined"}`
           : question.kind,
       ),
@@ -121,8 +126,6 @@ test("a 第二課 round walks 比長短, 比高矮, 排順序, 直線和曲線 a
         "compare-length-apart",
         "compare-height-lined",
         "compare-height-apart",
-        "order-length-lined",
-        "order-height-lined",
         "line",
         "route",
       ],
@@ -132,7 +135,7 @@ test("a 第二課 round walks 比長短, 比高矮, 排順序, 直線和曲線 a
 
 test("things out of line mislead a child who skips lining them up, and all fit the picture", () => {
   for (const round of rounds) {
-    for (const question of round.slice(0, 6) as BarQuestion[]) {
+    for (const question of round.slice(0, 4) as BarQuestion[]) {
       const sizes = question.bars.map((bar) => bar.size);
       assert.equal(new Set(sizes).size, sizes.length);
       for (const bar of question.bars) {
@@ -163,13 +166,6 @@ test("each 第二課 answer is the one a child should tap", () => {
         const sizes = question.bars.map((bar) => bar.size);
         const pick = sizes[answer[0]];
         assert.equal(pick, question.ask === "more" ? Math.max(...sizes) : Math.min(...sizes));
-      } else if (question.kind === "order") {
-        const sizes = answer.map((index) => question.bars[index].size);
-        assert.deepEqual(
-          sizes,
-          [...sizes].sort((a, b) => a - b),
-        );
-        assert.equal(new Set(answer).size, 3);
       } else if (question.kind === "line") {
         assert.equal(question.lines.length, 4);
         const matching = question.lines.filter(
@@ -235,44 +231,14 @@ test("every math instruction shows the right zhuyin beside each character", () =
   assert.deepEqual(mathPromptVariants("count"), { 0: "\u{E01E1}", 2: "\u{E01E1}" });
 });
 
-test("a 第三課 round asks 4 合在一起, then 4 畫圈圈算加法, each with a different total", () => {
-  for (let run = 0; run < 200; run++) {
-    const round = buildAdditionRound();
-    assert.deepEqual(
-      round.map((question) => question.kind),
-      [...Array(additionRoundSize.join).fill("join"), ...Array(additionRoundSize.add).fill("add")],
-    );
-    for (const kind of ["join", "add"]) {
-      const part = round.filter((question) => question.kind === kind);
-      const totals = part.map((question) => question.target);
-      assert.equal(new Set(totals).size, totals.length);
-    }
-    for (const question of round) {
-      if (question.kind !== "join" && question.kind !== "add") assert.fail(question.kind);
-      const [a, b] = question.parts;
-      assert.equal(a + b, question.target);
-      assert.ok(a >= 1 && b >= 1 && question.target <= 10);
-      if (question.kind === "join") {
-        assert.ok(a <= 5 && b <= 5);
-        assert.ok(joinIcons.includes(question.icon));
-      } else assert.ok(question.target >= 3);
-      // Each sum is spoken from its own clip and shown in 國字注音.
-      const id = mathPromptId(question);
-      assert.ok(mathPrompts[id] && mathPromptReadings[id], id);
-      assert.ok(existsSync(`public/${mathPromptUrl(id).split("?")[0]}`), id);
-    }
-    const icons = round.flatMap((question) => (question.kind === "join" ? [question.icon] : []));
-    assert.equal(new Set(icons).size, icons.length);
-  }
-  // 兩個 when counting things, 二 in a sum.
-  assert.equal(mathPrompts["join-2-3"], "左邊有兩個，右邊有三個，合在一起有幾個？");
-  assert.equal(mathPrompts["add-2-3"], "二加三等於多少？先畫圈圈，再寫答案。");
-  assert.equal(newMathRound(3).questions[0].kind, "join");
-  assert.equal(newMathRound(1).questions[0].kind, "count");
-});
-
-test("a saved 第三課 round keeps the circles in each number's 十格框", () => {
-  const round = { ...newMathRound(3, 100), ink: { 4: [[{ x: 50, y: 50 }]] } };
+test("a saved 分與合 round keeps the circles in each number's 十格框", () => {
+  const fresh = newMathRound(3, 100);
+  const add = fresh.questions.findIndex((question) => question.kind === "add");
+  assert.equal(add, 8);
+  // The round's 畫圈圈算加法 is moved to position 4 here, as 加法 rounds saved it.
+  const questions = [...fresh.questions];
+  [questions[4], questions[add]] = [questions[add], questions[4]];
+  const round = { ...fresh, questions, ink: { 4: [[{ x: 50, y: 50 }]] } };
   // Cells 0–9 are the first number's frame, 10–19 the second's.
   const cells = Array.from({ length: 20 }, () => [] as { x: number; y: number }[][]);
   cells[0] = [[{ x: 10, y: 10 }]];
@@ -337,6 +303,7 @@ test("the math course cards, lesson pages and practice screens show every word i
     "數學",
     ...mathLessons.flatMap((lesson) => [lesson.number, lesson.title, ...lesson.parts]),
     ...["這一課", "開始", "開始練習", "從頭開始", "繼續", "繼續練習", "第", "題", "多畫了", "個"],
+    ...["一樣多", "左邊", "右邊"],
   ];
   for (const text of shown) {
     assert.ok(mathWordReadings[text], `${text} needs its readings`);
@@ -353,7 +320,8 @@ test("the math course cards, lesson pages and practice screens show every word i
     });
   }
   // Each lesson page says how many questions a round has.
-  const sizes = [mathRoundSize, compareRoundSize, additionRoundSize, bondRoundSize].map((size) =>
+  // Listed in the order the class teaches them: 第三課 is id 4, 第四課 is id 3.
+  const sizes = [mathRoundSize, compareRoundSize, sequenceRoundSize, bondRoundSize].map((size) =>
     typeof size === "number" ? size : Object.values(size).reduce((sum, n) => sum + n, 0),
   );
   assert.deepEqual(
@@ -362,7 +330,7 @@ test("the math course cards, lesson pages and practice screens show every word i
   );
 });
 
-test("a 第四課 round reads 分合圖: 4 分一分, 2 合一合 and 2 分分看, with different totals", () => {
+test("a 分與合 round reads 分合圖 (分一分, 合一合, 分分看), then adds (合在一起, 畫圈圈算加法)", () => {
   for (let run = 0; run < 200; run++) {
     const round = buildBondRound();
     assert.deepEqual(
@@ -371,9 +339,11 @@ test("a 第四課 round reads 分合圖: 4 分一分, 2 合一合 and 2 分分�
         ...Array(bondRoundSize.split).fill("split"),
         ...Array(bondRoundSize.combine).fill("combine"),
         ...Array(bondRoundSize.ways).fill("ways"),
+        ...Array(bondRoundSize.join).fill("join"),
+        ...Array(bondRoundSize.add).fill("add"),
       ],
     );
-    for (const kind of ["split", "combine", "ways"]) {
+    for (const kind of ["split", "combine", "ways", "join", "add"]) {
       const totals = round.filter((question) => question.kind === kind).map((q) => q.target);
       assert.equal(new Set(totals).size, totals.length, kind);
     }
@@ -387,6 +357,14 @@ test("a 第四課 round reads 分合圖: 4 分一分, 2 合一合 and 2 分分�
         assert.ok(a <= 5 && b <= 5 && a + b === question.target && question.target >= 3);
       } else if (question.kind === "ways") {
         assert.ok(question.target >= 4 && question.target <= 10);
+      } else if (question.kind === "join") {
+        const [a, b] = question.parts;
+        assert.ok(a <= 5 && b <= 5 && a + b === question.target);
+        assert.ok(joinIcons.includes(question.icon));
+      } else if (question.kind === "add") {
+        const [a, b] = question.parts;
+        assert.ok(a >= 1 && b >= 1 && a + b === question.target);
+        assert.ok(question.target >= 3 && question.target <= 10);
       } else assert.fail(question.kind);
       // Every question is spoken from its own clip and shown in 國字注音.
       const id = mathPromptId(question);
@@ -394,14 +372,23 @@ test("a 第四課 round reads 分合圖: 4 分一分, 2 合一合 and 2 分分�
       assert.ok(existsSync(`public/${mathPromptUrl(id).split("?")[0]}`), id);
     }
   }
+  const pictures = buildBondRound().flatMap((question) =>
+    question.kind === "combine" || question.kind === "join" ? [question.icon] : [],
+  );
+  assert.equal(new Set(pictures).size, pictures.length);
+  // 兩個 when counting things, 二 in a sum.
+  assert.equal(mathPrompts["join-2-3"], "左邊有兩個，右邊有三個，合在一起有幾個？");
+  assert.equal(mathPrompts["add-2-3"], "二加三等於多少？先畫圈圈，再寫答案。");
+  assert.equal(newMathRound(3).questions[0].kind, "split");
+  assert.equal(newMathRound(1).questions[0].kind, "count");
   // 和 reads ㄏㄢˋ beside the prompt, so Meijia is given the homophone 漢.
   assert.equal(mathPrompts["split-3-4"], "七可以分成三和幾？");
   assert.equal(mathPromptSpeech("split-3-4"), "七可以分成三漢幾？");
   assert.equal(mathPromptSpeech("count"), mathPrompts.count);
 });
 
-test("a saved 第四課 round keeps 分分看's two numbers, and needs both to count as answered", () => {
-  const round = newMathRound(4);
+test("a saved 分與合 round keeps 分分看's two numbers, and needs both to count as answered", () => {
+  const round = newMathRound(3);
   const ways = round.questions.findIndex((question) => question.kind === "ways");
   const stroke = [[{ x: 10, y: 10 }]];
   const both = validateMathRound(
@@ -418,4 +405,74 @@ test("a saved 第四課 round keeps 分分看's two numbers, and needs both to c
   // A 分一分 whose parts do not make its total is not restored.
   const broken = { ...round.questions[0], parts: [1, 1] };
   assert.equal(validateMathRound({ ...round, questions: [broken] }), null);
+});
+
+test("a 第三課 round walks 第幾個, 數的順序, 比多少 and 比大小, and each answer is the right tap", () => {
+  let same = 0;
+  for (let run = 0; run < 300; run++) {
+    const round = buildSequenceRound();
+    assert.equal(round.length, sequenceRoundSize);
+    assert.deepEqual(
+      round.map((question) => question.kind),
+      ["position", "position", "missing", "sequence", "rows", "rows", "numbers", "numbers"],
+    );
+    for (const question of round) {
+      const answer = sequenceAnswer(question);
+      // Every instruction has its clip and its 國字注音.
+      const id = sequencePromptId(question);
+      assert.ok(mathPrompts[id] && mathPromptReadings[id], id);
+      assert.ok(existsSync(`public/${mathPromptUrl(id).split("?")[0]}`), id);
+      if (question.kind === "position") {
+        const count = question.icons.length;
+        assert.ok(count >= 6 && count <= 7 && new Set(question.icons).size === count);
+        assert.ok(question.place >= 2 && question.place < count);
+        const fromLeft = answer[0] + 1;
+        assert.equal(question.from === "left" ? fromLeft : count - answer[0], question.place);
+      } else if (question.kind === "missing") {
+        const steps = question.numbers
+          .slice(1)
+          .map((value, index) => value - question.numbers[index]);
+        assert.ok(steps.every((step) => step === steps[0] && Math.abs(step) === 1));
+        assert.ok(question.numbers.every((value) => value >= 1 && value <= 10));
+        assert.ok(question.gap >= 1 && question.gap <= 3);
+        assert.equal(new Set(question.choices).size, 3);
+        assert.equal(question.choices[answer[0]], question.numbers[question.gap]);
+        // The other cards are numbers not on show.
+        for (const value of question.choices)
+          if (value !== question.numbers[question.gap])
+            assert.ok(!question.numbers.includes(value));
+      } else if (question.kind === "sequence") {
+        assert.equal(new Set(question.numbers).size, 5);
+        const values = answer.map((index) => question.numbers[index]);
+        assert.deepEqual(
+          values,
+          [...question.numbers].sort((a, b) => a - b),
+        );
+      } else if (question.kind === "rows") {
+        const [top, bottom] = question.counts;
+        assert.ok(top >= 2 && top <= 8 && bottom >= 2 && bottom <= 8);
+        assert.ok(Math.abs(top - bottom) <= 3);
+        if (top === bottom) {
+          same++;
+          assert.deepEqual(answer, [sameChoice]);
+        } else {
+          const picked = question.counts[answer[0]];
+          const other = question.counts[1 - answer[0]];
+          assert.ok(question.ask === "more" ? picked > other : picked < other);
+        }
+      } else {
+        const [a, b] = question.numbers;
+        assert.notEqual(a, b);
+        const picked = question.numbers[answer[0]];
+        assert.equal(picked, question.ask === "more" ? Math.max(a, b) : Math.min(a, b));
+      }
+    }
+    assert.equal(round[0].kind === "position" && round[0].from, "left");
+    assert.equal(round[1].kind === "position" && round[1].from, "right");
+  }
+  // 一樣多 comes up in some rounds, not all.
+  assert.ok(same > 50 && same < 250, String(same));
+  // 「從左邊數」 is voiced with 鼠 so Meijia says ㄕㄨˇ; the screen shows 數.
+  assert.equal(mathPrompts["position-left-3"], "從左邊數，第三個是哪一個？點一下。");
+  assert.equal(mathPromptSpeech("position-left-3"), "從左邊鼠，第三個是哪一個？點一下。");
 });

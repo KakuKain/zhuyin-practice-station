@@ -17,7 +17,8 @@ export function MathCourseList({ onOpen }: { onOpen: (id: number) => void }) {
                 alt=""
               />
             )}
-            {lesson.id}
+            {/* Its place in the list, which is not always its id. */}
+            {index + 1}
           </span>
           <button
             className={`journey-card${lesson.ready ? "" : " is-coming"}`}
