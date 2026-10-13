@@ -189,10 +189,16 @@ export function usePracticeApp() {
     advanceReviewQueue();
   };
 
-  // Math lessons are their own list; the open one lives here like the open 注音 lesson.
+  // Math lessons are their own list; the open one lives here like the open 注音 lesson. A lesson
+  // opens on its page, like a 注音 lesson, and its practice starts from there.
   const [mathLessonId, setMathLessonId] = useState(1);
+  const [mathStart, setMathStart] = useState<"new" | "continue">("new");
   const openMathLesson = (id: number) => {
     setMathLessonId(id);
+    setView("math-lesson");
+  };
+  const startMathPractice = (start: "new" | "continue") => {
+    setMathStart(start);
     setView("math");
   };
 
@@ -243,6 +249,8 @@ export function usePracticeApp() {
       case "more":
         return morePanel === "home" ? navigate("courses") : setMorePanel("home");
       case "math":
+        return navigate("math-lesson");
+      case "math-lesson":
         return navigate("courses");
       default:
         return navigate("courses");
@@ -301,6 +309,8 @@ export function usePracticeApp() {
     leaveFill,
     isFocusMode: view === "listen",
     mathLessonId,
+    mathStart,
+    startMathPractice,
     openMathLesson,
     morePanel,
     setMorePanel,

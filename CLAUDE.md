@@ -40,6 +40,10 @@ Asset pipelines:
 - New words in `circled-vocabulary.ts` need clips: `node scripts/generate-listening-audio.mjs` (macOS, Meijia voice) creates missing ones, then run `npm run assets:audio-registry`. A word must have a single reading across all content, or no clip can serve it.
 - To re-voice a word with Gemini (`gemini-3.8-flash-tts`, voice Fola), run `GEMINI_API_KEY=… npx tsx scripts/generate-gemini-words.ts <words…>` (or `--from <folder>` with `<word>.wav` files saved from AI Studio; `--prompts` prints the prompts). It writes `public/listening-audio/gemini/words/`, removes the old Meijia clip, and records the prompt in `gemini/manifest.json`; then run `npm run assets:audio-registry`. The Meijia script skips words that have a Gemini clip.
 - `node scripts/build-app-icons.mjs` regenerates the home-screen icons in `public/icons/` from `public/favicon.svg`.
+- `python3 scripts/slice-avatars.py assets/artwork/avatars/sheet.png` cuts the 12 watercolor child avatars from one 4 × 3 sheet into round, transparent `public/course-art/avatar-<name>.webp` files.
+  - The sheet was painted with ChatGPT; Claude cannot generate raster images.
+  - The output is 192 px, lossy WebP at quality 88.
+  - The originals live in `assets/artwork/avatars/`, a subfolder that `optimize-artwork.mjs` skips.
 - `npx tsx scripts/generate-math-audio.ts [--refresh]` voices every math instruction in `features/math/math-audio.ts` into `public/math-audio/` (macOS Meijia). First graders cannot read yet, so every math question is spoken; a unit test checks each prompt has a clip.
 - `python3 scripts/build-yo-fonts.py` rebuilds the lesson font subsets after you add characters or IVS glyphs, and writes `assets/font-sources/KidLessonYoOnly-readings.json` and `KidLessonYoSans-readings.json` (what each character and variation sequence shows). `scripts/build-fonts.py` rebuilds the full fonts. Both need fontTools and brotli. Bump the `?v=` on the fonts in `styles/02-typography.css` when they change.
 
@@ -54,6 +58,9 @@ There is one build: a static Vite SPA. `index.html` → `app/main.tsx` → `crea
 ## Architecture
 
 **There are no routes; this is a single-page state machine.** The entry renders only `<PracticeApp />`. The screen is selected by the `View` union in `features/types.ts`. `PracticeApp` first asks 現在是誰在練習？ when two or more children share the device and this app session has not chosen yet (`components/ChildPicker.tsx`). It then renders the app keyed by the active child, so switching children remounts every screen and store with that child's records.
+
+- Children are shown by watercolor animal avatars (`ChildAvatar`, `avatarImage`).
+- 更多 → 孩子 is a card per child (picture, name, 正在練習, material, remove) plus a 新增孩子 card, with no explanatory text: the user found it self-evident.
 
 - `features/usePracticeApp.ts` is a thin coordinator. It owns the view and lesson, the shared stores, audio, and the course-review queue. It spreads each flow's API into one flat controller object, which components read through `Pick<AppController, …>`.
 - **Each flow owns its own state and actions:**
@@ -72,25 +79,46 @@ There is one build: a static Vite SPA. `index.html` → `app/main.tsx` → `crea
     - 今天的任務: a parent sets up to 3 tasks for a child, either suggested from recent practice with questions marked 需要補強, or chosen from a list.
       - Choices are each lesson's 聽寫 or 默寫 (reviews only 聽寫), 辨音, 改對一題待補強, or a math lesson.
       - The practice whose `taskKey` (`taskKeys`) matches a task finishes it and earns a 任務章, which the daily cap never stops. A finished task stays visible until the end of the day.
-      - The child sees the tasks in 國字注音 on the course list (`TodayTasks`), with 去做 leading to the lesson. `daily-tasks.ts` builds the options; a unit test checks the zhuyin of every task word.
+      - The child sees the tasks in 國字注音 in a sheet (`TasksDialog`), with 去做 leading to the lesson. `daily-tasks.ts` builds the options; a unit test checks the zhuyin of every task word.
   - `useStampBook` lives in the coordinator.
     - `awardLessonStamp` names the lesson for the log; flows receive it like `recordSession`.
     - 辨音 and math call `awardStamp` directly.
-    - `StampNewsToast` shows at the app root; `StampChip`, `TodayTasks` and `StampCardDialog` are on the course list; `RewardsPanel` holds the guide, 今天的任務, 鼓勵章, log and settings.
+    - Everything the child reads on the card, chip and toast is 國字注音 from `stamp-words.ts`, one reading per character. The suggested rewards are annotated too; a parent's own reward or child's name is shown as typed. A unit test checks each character against the font.
+    - `StampNewsToast` shows at the app root. It says what was earned but not how full the card is; the card is the only place that shows that.
+    - On the course list, one floating watercolor button (`RewardDock`) takes no room from the lessons.
+      - It opens a menu with 今天的任務 and 集章卡, each opening its own sheet. A coral dot marks a waiting task or a full card.
+      - It can be dragged. On release it settles against the nearer side, and the place is remembered per device in `kid-reward-dock-v1`.
+      - Its picture is `draggable={false}`, since a native image drag would cancel the pointer.
+    - `RewardsPanel` holds the guide, 今天的任務, 鼓勵章, log and settings.
   - Google sign-in and cloud sync were discussed but are not built. They would change the hard constraints above.
 - `features/math/` is self-contained.
-  - The course list's 國語｜數學 switch (not 注音, which would clash with the 注音 symbol-chart tab) is remembered per child (`ChildProfile.subject`). `openMathLesson` sets `mathLessonId` and the `math` view, and `MathScreen` runs the round.
-  - Lesson 1 asks 4 數一數 (tap pictures to mark them, write the number) and then 4 畫圈圈 (each stroke is numbered as it is drawn), all spoken aloud.
+  - The course list's 國語｜數學 switch (not 注音, which would clash with the 注音 symbol-chart tab) is remembered per child (`ChildProfile.subject`).
+  - Math is drawn like 國語 so the two subjects feel like one site:
+    - `MathCourseList` uses the 注音 journey cards, with each lesson's watercolor picture (`MathLesson.art`).
+    - `openMathLesson` sets `mathLessonId` and opens the `math-lesson` view. `MathLessonPage` is a 國語 lesson page inside the app shell: the heading over the picture, a 開始練習 mode card (plus 繼續上次的練習 when a round is saved, which turns the other card into 從頭開始), and 這一課's parts.
+    - `startMathPractice` records `mathStart` and opens the full-screen `math` view; the round starts at once and reads its first question. 返回 and the back gesture go to the lesson page.
+    - The practice screens use 聽寫's watercolor paper and header (`MathHeader`), the prompt sits on a washed card, and a round ends on `MathResult`, drawn like 辨音's finished card.
+    - Every word on the cards and the lesson page is 國字注音 from `mathWordReadings` in `math-lessons.ts`; a unit test checks it against the font.
+  - Lesson 1 asks 4 數一數 (tap pictures to mark them, write the number) and then 4 畫圈圈, all spoken aloud.
+  - Circles are always drawn in a 十格框 (5 × 2 cells, one circle each, `DrawFrame`/`TenFrame` in `MathInk.tsx`):
+    - Every cell is its own square canvas, because a non-square canvas would stretch the strokes. One `useInkCanvas` serves them all, so only one pen draws at a time.
+    - Filled cells are numbered in reading order. Each frame has its own tools:
+      - The eraser takes away the one circle tapped next, then the pen is back; tapping an empty cell just draws. 復原 brings an erased circle back first.
+      - 復原 takes back the latest circle in that frame, and 清空 clears it.
+    - Circles are compared with the number asked in reading order (`frameMarks`).
+      - While drawing, each extra circle gets a red box, the tool bar says 多畫了 N 個 in 國字注音 on its left (so the frame never moves), and 復原 glows.
+      - Too few is not shown to the child; the parent chose that. The parent's check shows extra circles in red boxes and missing ones as red dashed circles in the next empty cells, and says 多畫/少畫 N 格.
+    - The cells are saved in `MathRound.work`. Free drawings saved before the frame are dropped, and old ink still shows on the parent's check.
   - Lesson 3 asks 4 合在一起 and then 4 畫圈圈算加法:
     - 合在一起 shows two groups of up to 5 markable pictures; the child writes the total.
-    - 畫圈圈算加法 has three squares: circles for each number, then the answer. They share one `useInkCanvas`, so one pen writes at a time. Each side numbers its own circles; counting them together is the child's part.
+    - 畫圈圈算加法 has a 十格框 for each number (cells 0–9 and 10–19), then an answer square (canvas 20). Each frame numbers its own circles; counting them together is the child's part. Tablets put the two frames side by side with ＝ and the answer below, landscape tablets in one row, and phones stack them.
     - Each sum has its own clip (`join-a-b`, `add-a-b`). Counting says 兩個, but a sum says 二加三.
   - Lessons 1 and 3 share `WritingLesson` in `MathScreen.tsx`. The ink pieces live in `MathInk.tsx` and the pictures in `MathPictures.tsx`.
   - The parent checks the round at the end.
     - Each lesson's unfinished round persists per child: lesson 1 in `kid-math-round-v1`, others in `kid-math-round-v1-<lesson>` (`mathRoundStorageKey`). Starting one lesson never replaces another's.
     - The circles live in `MathRound.work`. Finished rounds go to `kid-math-records-v1`.
   - Every instruction is spoken and shown in 國字注音 (`MathPrompt` in `MathChrome.tsx`: an icon-only replay button and `AnnotatedText`).
-    - `mathPromptReadings` in `math-audio.ts` gives one syllable per character. The four polyphones the font would misread (數一數, 箱子／兔子, 曲線, 蘿蔔) get `\u{E01E1}` from `alternateReadings`.
+    - `mathPromptReadings` in `math-audio.ts` gives one syllable per character. The four polyphones the font would misread (數一數, 箱子／兔子, 曲線, 蘿蔔) get `\u{E01E1}` from `alternateReadings` in `features/lesson/reading-variants.ts`, the one table every 國字注音 sentence written for children uses.
     - A unit test checks every character against `KidLessonYoSans-readings.json`.
     - A sentence the font cannot annotate correctly is reworded: 寫下來 needs ˙ㄌㄞ, so the prompt says 用筆寫出數字.
   - Lesson 2 (比一比) is a lazy chunk: `CompareLesson.tsx` with `styles/lazy/math-compare.css`. `compare-round.ts` builds the round and holds the rules.
@@ -135,7 +163,7 @@ Layout: `features/<feature>/` holds feature UI and logic, `components/` holds sh
 - All user data lives in browser `localStorage` behind `lib/storage/persistent-store.ts` (an external store read with `useSyncExternalStore`, not mirrored into React state). Older versions (for example `practice-state` v1–v3) are migrated forward on read, and their original keys are preserved.
 - **Every key is listed in `lib/storage/storage-keys.ts`**, the single registry that device backup (`ownsStorageKey`) is derived from. A new key must be added there, or backup will silently skip it; a unit test checks the known keys.
 - **Children** (`lib/storage/child-profiles.ts`, key `zhuyin-children-v1`; managed in 更多 → 孩子) have separate records:
-  - Child-scoped keys (`childScopedKeys`) are practice state, fill favorites, the listening round, the free board, the math rounds and records, the stamp book (`kid-stamps-v1`) and fill drafts. Everything else (materials, listening settings, recordings, 集章卡 settings `kid-reward-settings-v1`) is shared.
+  - Child-scoped keys (`childScopedKeys`) are practice state, fill favorites, the listening round, the free board, the math rounds and records, the stamp book (`kid-stamps-v1`) and fill drafts. Everything else (materials, listening settings, recordings, 集章卡 settings `kid-reward-settings-v1`, the floating button's place `kid-reward-dock-v1`) is shared.
   - Per-lesson keys (fill drafts, math rounds after lesson 1) are recognized by `isLessonRecordKey`. Both backup and removing a child use it.
   - Which material is open belongs to each child: `ChildProfile.materialId`, applied by `withChildMaterial` in `useMaterials`. Choosing a material records it on the child; only the first child's choice also moves the family default that children without a choice follow.
   - The first child, id `main`, uses the original keys, so existing records need no migration and only `main` reads the pre-v4 practice keys. Every other child uses `<key>@<id>`.
@@ -187,7 +215,7 @@ Layout: `features/<feature>/` holds feature UI and logic, `components/` holds sh
 
 ### Styles
 
-- `app/globals.css` imports `styles/00-…css` through `styles/28-…css` in a fixed cascade order. Order matters. `26-children.css` styles the child picker, the course-list greeting and 更多 → 孩子; `27-math.css` the subject switch and the math screen (landscape tablets put the square on the right; 畫圈圈算加法 keeps its three squares in one row, and phones wrap the answer below); `28-rewards.css` the 集章卡 chip, card, toast and settings.
+- `app/globals.css` imports `styles/00-…css` through `styles/28-…css` in a fixed cascade order. Order matters. `26-children.css` styles the child picker, the course-list greeting and 更多 → 孩子; `27-math.css` the subject switch, the math lesson page and the math screen (landscape tablets put the square on the right; 畫圈圈算加法 keeps its three squares in one row, and phones wrap the answer below); `28-rewards.css` the 集章卡 chip, card, toast and settings.
 - `00-reset.css` is the former Tailwind preflight, kept in cascade layers so every unlayered rule wins. There is no Tailwind and there are no utility classes.
 - `24-fill-tablet.css` makes dictation (sheet, writing cell, review) full width at ≥ 600px: the square grows to the space left by the header and controls, and landscape tablets put the heading and finish button beside it. Phones keep the 480px column.
 - `25-listen-tablet.css` does the same for listening at ≥ 600px: the single square fills the width, a word's squares stack top to bottom with their tools beside them (side by side, first character on the right, in landscape), and the batch check shows two cards per row.

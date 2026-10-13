@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Plus, Trash } from "@phosphor-icons/react";
+import { BookOpenText, Plus, Trash } from "@phosphor-icons/react";
 import { ConfirmDialog } from "../../components/ConfirmDialog";
-import { ChildAvatar, childLabel } from "../../components/ChildPicker";
+import { ChildAvatar, avatarImage, childLabel } from "../../components/ChildPicker";
 import { builtinMaterialId, builtinMaterialName, type MaterialsState } from "../courses/materials";
 import { withChildMaterial } from "../courses/useMaterials";
 import {
@@ -31,6 +31,7 @@ const avatarNames: Record<Avatar, string> = {
   koala: "無尾熊",
 };
 
+/** The twelve watercolor animals, as pictures to tap. */
 function AvatarChoices({ value, onChange }: { value: Avatar; onChange: (avatar: Avatar) => void }) {
   return (
     <div className="child-avatar-choices" role="radiogroup" aria-label="頭像">
@@ -43,7 +44,7 @@ function AvatarChoices({ value, onChange }: { value: Avatar; onChange: (avatar: 
           aria-label={avatarNames[avatar]}
           onClick={() => onChange(avatar)}
         >
-          {childAvatars[avatar]}
+          <img src={avatarImage(avatar)} alt="" draggable={false} />
         </button>
       ))}
     </div>
@@ -63,7 +64,7 @@ function MaterialChoice({
 }) {
   return (
     <label className="child-material">
-      <span>教材</span>
+      <BookOpenText size={20} aria-hidden="true" />
       <select aria-label={label} value={value} onChange={(event) => onChange(event.target.value)}>
         <option value={builtinMaterialId}>{builtinMaterialName}</option>
         {materials.materials
@@ -78,7 +79,8 @@ function MaterialChoice({
   );
 }
 
-function ChildRow({
+/** One child: their picture (tap to change), name, material, and removing them. */
+function ChildCard({
   child,
   canRemove,
   materials,
@@ -93,20 +95,22 @@ function ChildRow({
   const [editingAvatar, setEditingAvatar] = useState(false);
   const [confirmRemove, setConfirmRemove] = useState(false);
   const label = childLabel(child, profiles);
+  const current = child.id === profiles.activeId;
   return (
-    <li className="child-row">
+    <li className={`child-card${current ? " is-current" : ""}`}>
       <button
         type="button"
-        className="child-row-avatar"
+        className="child-card-avatar"
         aria-label={`更換${label}的頭像`}
         aria-expanded={editingAvatar}
         onClick={() => setEditingAvatar((open) => !open)}
       >
         <ChildAvatar child={child} />
       </button>
-      <label className="child-row-name">
-        <span className="visually-hidden">名字</span>
+      <div className="child-card-main">
         <input
+          className="child-card-name"
+          aria-label={`${label}的名字`}
           defaultValue={child.name}
           maxLength={maxChildNameLength}
           placeholder={label}
@@ -115,29 +119,29 @@ function ChildRow({
             if (event.key === "Enter") event.currentTarget.blur();
           }}
         />
-      </label>
-      {child.id === profiles.activeId && <span className="child-row-current">正在練習</span>}
+        {current && <span className="child-card-badge">正在練習</span>}
+        <MaterialChoice
+          materials={materials}
+          label={`${label}的教材`}
+          value={
+            withChildMaterial(
+              { ...materials, activeId: familyMaterialId },
+              current ? materials.activeId : child.materialId,
+            ).activeId
+          }
+          onChange={(materialId) => updateChild(child.id, { materialId })}
+        />
+      </div>
       {canRemove && (
         <button
           type="button"
-          className="child-row-remove"
+          className="child-card-remove"
           aria-label={`刪除${label}`}
           onClick={() => setConfirmRemove(true)}
         >
           <Trash size={20} aria-hidden="true" />
         </button>
       )}
-      <MaterialChoice
-        materials={materials}
-        label={`${label}的教材`}
-        value={
-          withChildMaterial(
-            { ...materials, activeId: familyMaterialId },
-            child.id === profiles.activeId ? materials.activeId : child.materialId,
-          ).activeId
-        }
-        onChange={(materialId) => updateChild(child.id, { materialId })}
-      />
       {editingAvatar && (
         <AvatarChoices
           value={child.avatar}
@@ -151,7 +155,7 @@ function ChildRow({
         <ConfirmDialog
           id={`remove-child-${child.id}`}
           eyebrow="刪除孩子"
-          title={`刪除「${label}」的紀錄？`}
+          title={`刪除「${label}」？`}
           primaryLabel="刪除"
           onPrimary={() => {
             setConfirmRemove(false);
@@ -160,11 +164,56 @@ function ChildRow({
           secondaryLabel="取消"
           onSecondary={() => setConfirmRemove(false)}
         >
-          {label}
-          的待補強、收藏、默寫草稿、聽寫進度和畫板都會刪除，無法復原。需要的話，請先到「裝置備份」下載備份。
+          {label}的練習紀錄會一起刪除，無法復原。
         </ConfirmDialog>
       )}
     </li>
+  );
+}
+
+/** A new child: a picture, a name and a material; nothing else to read. */
+function AddChildCard({ materials, onDone }: { materials: MaterialsState; onDone: () => void }) {
+  const [name, setName] = useState("");
+  const [avatar, setAvatar] = useState<Avatar>("dog");
+  const [materialId, setMaterialId] = useState(materials.activeId);
+  return (
+    <form
+      className="child-card is-new"
+      onSubmit={(event) => {
+        event.preventDefault();
+        if (!name.trim()) return;
+        addChild(name, avatar, materialId);
+        onDone();
+      }}
+    >
+      <img className="child-avatar" src={avatarImage(avatar)} alt="" />
+      <div className="child-card-main">
+        <input
+          className="child-card-name"
+          aria-label="新孩子的名字"
+          value={name}
+          maxLength={maxChildNameLength}
+          placeholder="名字"
+          autoFocus
+          onChange={(event) => setName(event.currentTarget.value)}
+        />
+        <MaterialChoice
+          materials={materials}
+          label="新孩子的教材"
+          value={materialId}
+          onChange={setMaterialId}
+        />
+      </div>
+      <AvatarChoices value={avatar} onChange={setAvatar} />
+      <div className="child-card-actions">
+        <button type="button" className="secondary-button" onClick={onDone}>
+          取消
+        </button>
+        <button type="submit" className="primary-button" disabled={!name.trim()}>
+          新增
+        </button>
+      </div>
+    </form>
   );
 }
 
@@ -176,21 +225,14 @@ export function ChildrenPanel({
   familyMaterialId: string;
 }) {
   const profiles = useChildProfiles();
-  const [name, setName] = useState("");
-  const [avatar, setAvatar] = useState<Avatar>("dog");
-  const [materialId, setMaterialId] = useState(materials.activeId);
-  const [notice, setNotice] = useState("");
+  const [adding, setAdding] = useState(false);
   const full = profiles.children.length >= maxChildren;
   return (
     <div className="more-detail-content children-panel">
       <h1>孩子</h1>
-      <p className="more-detail-intro">
-        每個孩子可以選自己的教材，也有自己的待補強、收藏、默寫草稿、聽寫進度和畫板；家長建立的教材、聽寫設定和自訂讀音全家共用。有兩個以上的孩子時，打開
-        App 會先問「現在是誰在練習？」。資料只存在這台裝置，不需要登入。
-      </p>
-      <ul className="child-list">
+      <ul className="child-cards">
         {profiles.children.map((child) => (
-          <ChildRow
+          <ChildCard
             key={child.id}
             child={child}
             canRemove={profiles.children.length > 1}
@@ -199,48 +241,16 @@ export function ChildrenPanel({
           />
         ))}
       </ul>
-      {profiles.children.length === 1 && !profiles.children[0].name && (
-        <p className="children-hint">
-          目前的練習紀錄屬於「孩子 1」。新增第二個孩子之前，可以先幫他取名字。
-        </p>
+      {adding ? (
+        <AddChildCard materials={materials} onDone={() => setAdding(false)} />
+      ) : (
+        !full && (
+          <button type="button" className="child-card-add" onClick={() => setAdding(true)}>
+            <Plus size={24} weight="bold" aria-hidden="true" />
+            新增孩子
+          </button>
+        )
       )}
-      <form
-        className="child-add"
-        onSubmit={(event) => {
-          event.preventDefault();
-          if (!name.trim() || full) return;
-          addChild(name, avatar, materialId);
-          setNotice(`已新增「${name.trim()}」。下次打開 App 時可以選擇是誰在練習。`);
-          setName("");
-        }}
-      >
-        <h2>新增孩子</h2>
-        <label>
-          <span>名字或暱稱</span>
-          <input
-            value={name}
-            maxLength={maxChildNameLength}
-            placeholder="例如：哥哥、小美"
-            onChange={(event) => setName(event.currentTarget.value)}
-            disabled={full}
-          />
-        </label>
-        <AvatarChoices value={avatar} onChange={setAvatar} />
-        <MaterialChoice
-          materials={materials}
-          label="新孩子的教材"
-          value={materialId}
-          onChange={setMaterialId}
-        />
-        <button type="submit" className="primary-button" disabled={!name.trim() || full}>
-          <Plus size={20} weight="bold" aria-hidden="true" />
-          新增
-        </button>
-        {full && <p className="children-hint">最多 {maxChildren} 位孩子。</p>}
-        <p role="status" className="children-hint">
-          {notice}
-        </p>
-      </form>
     </div>
   );
 }

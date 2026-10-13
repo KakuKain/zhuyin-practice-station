@@ -1,11 +1,13 @@
-import { lazy, Suspense, useEffect, useState } from "react";
-import { Play } from "@phosphor-icons/react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import type { AppController } from "../usePracticeApp";
 import type { InkStroke } from "../types";
 import { InkPreview } from "../../components/AppChrome";
 import {
   clearMathRound,
+  filledCells,
+  frameCells,
   isAnswered,
+  workCells,
   newMathRound,
   readMathRound,
   recordMathRound,
@@ -16,13 +18,13 @@ import {
 import { chineseNumber, mathPromptId, mathPromptUrl, mathPrompts } from "./math-audio";
 import { taskKeys } from "../rewards/stamp-book";
 import { mathLessons, type MathLesson } from "./math-lessons";
-import { MathHeader, MathPrompt, MathStartButton } from "./MathChrome";
+import { MathHeader, MathPrompt, MathResult } from "./MathChrome";
 import { CountPictures, JoinPictures } from "./MathPictures";
-import { AdditionWork, InkSquare, StrokeNumbers } from "./MathInk";
+import { AdditionWork, DrawFrame, FramePreview, InkSquare } from "./MathInk";
 
 type MathApp = Pick<
   AppController,
-  "speak" | "stopPlayback" | "navigate" | "mathLessonId" | "awardStamp"
+  "speak" | "stopPlayback" | "navigate" | "mathLessonId" | "mathStart" | "awardStamp"
 >;
 
 const CompareLesson = lazy(() =>
@@ -43,6 +45,20 @@ const questionName = (question: MathQuestion) =>
   "parts" in question
     ? question.parts.join("＋")
     : `${sectionLabels[question.kind]} ${question.target}`;
+
+/** 「畫了 6 格」 for the parent, and in red how many too many or too few. */
+function DrawnCount({ drawn, target }: { drawn: number; target: number }) {
+  return (
+    <>
+      畫了 {drawn} 格
+      {drawn !== target && (
+        <strong className="math-check-over">
+          ，{drawn > target ? "多" : "少"}畫 {Math.abs(drawn - target)} 格
+        </strong>
+      )}
+    </>
+  );
+}
 
 export function MathScreen({ app }: { app: MathApp }) {
   const lesson = mathLessons.find((item) => item.id === app.mathLessonId) ?? mathLessons[0];
@@ -68,8 +84,10 @@ export function MathScreen({ app }: { app: MathApp }) {
  * round. Each lesson keeps its own unfinished round.
  */
 function WritingLesson({ app, lesson }: { app: MathApp; lesson: MathLesson }) {
-  const [saved] = useState(() => readMathRound(lesson.id));
-  const [round, setRound] = useState<MathRound | null>(null);
+  // The lesson page chose to continue the saved round or start a new one.
+  const [round, setRound] = useState<MathRound | null>(
+    () => (app.mathStart === "continue" && readMathRound(lesson.id)) || newMathRound(lesson.id),
+  );
   const [marked, setMarked] = useState<ReadonlySet<number>>(new Set());
   const [finished, setFinished] = useState<MathRound | null>(null);
   const { speak, stopPlayback } = app;
@@ -83,85 +101,50 @@ function WritingLesson({ app, lesson }: { app: MathApp; lesson: MathLesson }) {
   const play = (question: MathQuestion) =>
     speak(mathPrompts[mathPromptId(question)], { url: mathPromptUrl(mathPromptId(question)) });
 
+  // The first question is read out as the round opens, as tapping 開始練習 unlocked audio.
+  const opened = useRef(false);
+  useEffect(() => {
+    if (opened.current || !round || round.phase === "check") return;
+    opened.current = true;
+    play(round.questions[round.index]);
+  });
+
   const goTo = (current: MathRound, index: number) => {
     setMarked(new Set());
     setRound({ ...current, index });
     play(current.questions[index]);
   };
-  const start = (next: MathRound) => {
-    setFinished(null);
-    if (next.phase === "check") return setRound(next);
-    goTo(next, next.index);
-  };
   const leave = () => {
     stopPlayback();
-    app.navigate("courses");
+    app.navigate("math-lesson");
   };
 
   const header = (title: string, detail?: string) => (
     <MathHeader title={title} detail={detail} onLeave={leave} />
   );
 
-  if (finished) {
-    const needs = finished.needsPractice.map((index) => finished.questions[index]);
+  if (finished || !round) {
+    const done = finished ?? newMathRound(lesson.id);
+    const needs = done.needsPractice.map((index) => done.questions[index]);
     return (
-      <main className="math-shell">
-        {header(`${lesson.number} · ${lesson.title}`)}
-        <section className="math-result">
-          <h1>練習完成！</h1>
-          <p>
-            {finished.questions.length} 題都寫完了
-            {needs.length
-              ? `，有 ${needs.length} 題要再練習：${needs.map(questionName).join("、")}。`
-              : "，全部都會了！"}
-          </p>
-          <div className="math-actions">
-            <button
-              type="button"
-              className="primary-button"
-              onClick={() => start(newMathRound(lesson.id))}
-            >
-              再練一次
-            </button>
-            <button type="button" className="secondary-button" onClick={leave}>
-              回到課程
-            </button>
-          </div>
-        </section>
+      <main className="math-shell is-result">
+        {header(`數學${lesson.number} · ${lesson.title}`)}
+        <MathResult
+          title="這一課練完了！"
+          note={
+            needs.length
+              ? `有 ${needs.length} 題要再練習：${needs.map(questionName).join("、")}`
+              : `${done.questions.length} 題全部都會了！`
+          }
+          onAgain={() => {
+            setFinished(null);
+            goTo(newMathRound(lesson.id), 0);
+          }}
+          onLeave={leave}
+        />
       </main>
     );
   }
-
-  if (!round)
-    return (
-      <main className="math-shell">
-        {header(`${lesson.number} · ${lesson.title}`)}
-        <section className="math-ready">
-          <h1>{lesson.title}</h1>
-          <p>{lesson.round}</p>
-          {saved ? (
-            <div className="math-actions">
-              <button type="button" className="primary-button" onClick={() => start(saved)}>
-                <Play size={22} weight="fill" aria-hidden="true" />
-                繼續上次的練習
-              </button>
-              <button
-                type="button"
-                className="secondary-button"
-                onClick={() => {
-                  clearMathRound(lesson.id);
-                  start(newMathRound(lesson.id));
-                }}
-              >
-                重新開始
-              </button>
-            </div>
-          ) : (
-            <MathStartButton onStart={() => start(newMathRound(lesson.id))} />
-          )}
-        </section>
-      </main>
-    );
 
   if (round.phase === "check") {
     const toggle = (index: number) =>
@@ -175,7 +158,7 @@ function WritingLesson({ app, lesson }: { app: MathApp; lesson: MathLesson }) {
       <main className="math-shell is-check">
         {header(`${lesson.number} · 家長檢查`)}
         <section className="math-check">
-          <h1>請家長一起檢查</h1>
+          <h2>請家長一起檢查</h2>
           <p>對照答案，把還不會的題目標成「需要補強」。也可以看看孩子哪些數字還不熟。</p>
           {round.questions.map((question, index) => {
             const strokes = round.ink[index] ?? [];
@@ -198,15 +181,17 @@ function WritingLesson({ app, lesson }: { app: MathApp; lesson: MathLesson }) {
                         <div className="math-check-circles">
                           {question.parts.map((count, side) => (
                             <figure key={side}>
-                              <div className="math-check-ink is-small">
-                                {circles[side]?.length ? (
-                                  <InkPreview strokes={circles[side]} />
-                                ) : (
-                                  <span>沒有畫</span>
-                                )}
-                              </div>
+                              <FramePreview
+                                cells={circles}
+                                start={side * frameCells}
+                                target={count}
+                              />
                               <figcaption>
-                                {count} 個，畫了 {circles[side]?.length ?? 0} 筆
+                                {count} 個，
+                                <DrawnCount
+                                  drawn={filledCells(circles, side * frameCells)}
+                                  target={count}
+                                />
                               </figcaption>
                             </figure>
                           ))}
@@ -217,12 +202,30 @@ function WritingLesson({ app, lesson }: { app: MathApp; lesson: MathLesson }) {
                     )}
                   </div>
                   <div className="math-check-answer">
-                    <span className="math-check-label">孩子寫的</span>
-                    <div className="math-check-ink">
-                      {strokes.length ? <InkPreview strokes={strokes} /> : <span>沒有作答</span>}
-                    </div>
-                    {question.kind === "draw" && strokes.length > 0 && (
-                      <small>畫了 {strokes.length} 筆</small>
+                    <span className="math-check-label">
+                      {question.kind === "draw" ? "孩子畫的" : "孩子寫的"}
+                    </span>
+                    {question.kind === "draw" && circles.length ? (
+                      <>
+                        <FramePreview cells={circles} target={question.target} />
+                        <small>
+                          <DrawnCount drawn={filledCells(circles)} target={question.target} />
+                        </small>
+                      </>
+                    ) : (
+                      <>
+                        {/* 畫圈圈 drawn before 十格框 shows as it was drawn. */}
+                        <div className="math-check-ink">
+                          {strokes.length ? (
+                            <InkPreview strokes={strokes} />
+                          ) : (
+                            <span>沒有作答</span>
+                          )}
+                        </div>
+                        {question.kind === "draw" && strokes.length > 0 && (
+                          <small>畫了 {strokes.length} 筆</small>
+                        )}
+                      </>
                     )}
                   </div>
                   <div className="math-check-key">
@@ -272,12 +275,16 @@ function WritingLesson({ app, lesson }: { app: MathApp; lesson: MathLesson }) {
     setRound((current) =>
       current ? { ...current, ink: { ...current.ink, [current.index]: next } } : current,
     );
-  const setCircles = (side: number, next: InkStroke[]) =>
+  const setWorkCell = (cell: number, next: InkStroke[]) =>
     setRound((current) => {
       if (!current) return current;
-      const areas = [...(current.work[current.index] ?? [[], []])];
-      areas[side] = next;
-      return { ...current, work: { ...current.work, [current.index]: areas } };
+      const size = workCells(current.questions[current.index]);
+      const cells = Array.from(
+        { length: size },
+        (_, index) => current.work[current.index]?.[index] ?? [],
+      );
+      cells[cell] = next;
+      return { ...current, work: { ...current.work, [current.index]: cells } };
     });
   const toggleMark = (index: number) =>
     setMarked((current) => {
@@ -309,9 +316,9 @@ function WritingLesson({ app, lesson }: { app: MathApp; lesson: MathLesson }) {
           <AdditionWork
             scope={scope}
             parts={question.parts}
-            circles={round.work[round.index] ?? []}
+            cells={round.work[round.index] ?? []}
             answer={strokes}
-            onCircles={setCircles}
+            onCell={setWorkCell}
             onAnswer={setInk}
           />
         ) : (
@@ -320,15 +327,12 @@ function WritingLesson({ app, lesson }: { app: MathApp; lesson: MathLesson }) {
               <strong>{question.target}</strong>
               <span>畫出{chineseNumber(question.target)}個</span>
             </div>
-            <InkSquare
+            <DrawFrame
               scope={scope}
-              initial={strokes}
-              onChange={setInk}
-              label={`畫出 ${question.target} 個圈圈`}
-              plain
-            >
-              <StrokeNumbers strokes={strokes} />
-            </InkSquare>
+              target={question.target}
+              cells={round.work[round.index] ?? []}
+              onCell={setWorkCell}
+            />
           </div>
         )}
         <nav className="math-nav" aria-label="題目">

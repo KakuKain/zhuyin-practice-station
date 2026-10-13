@@ -1,27 +1,37 @@
-/* 孩子：who is practising (the picker and the course-list greeting) and 更多 → 孩子. */
+/*
+ * 孩子：who is practising (the picker and the course-list greeting) and 更多 → 孩子. Watercolor
+ * animal faces on cards drawn like the course cards: a pastel wash and the paper texture.
+ */
 
 .child-avatar {
-  display: inline-grid;
+  display: block;
   flex: none;
-  place-items: center;
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: #fff4dc;
-  font-size: 32px;
-  line-height: 1;
+  object-fit: cover;
+  box-shadow: 0 2px 0 rgba(90, 60, 30, 0.1);
 }
-.child-avatar:is(.is-dog, .is-bear, .is-monkey) {
-  background: #fdebd8;
+
+/* Paper texture, as on the course cards. */
+.child-picker-list button::before,
+.child-greeting::before,
+.child-card::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  border-radius: inherit;
+  background: url("/course-art/course-card-paper-v1.webp") center / 210px repeat;
+  mix-blend-mode: multiply;
+  opacity: 0.24;
+  pointer-events: none;
 }
-.child-avatar:is(.is-rabbit, .is-koala, .is-penguin) {
-  background: #eef3ff;
-}
-.child-avatar:is(.is-panda, .is-frog) {
-  background: #eaf7e4;
-}
-.child-avatar:is(.is-fox, .is-tiger, .is-chick) {
-  background: #fff0de;
+.child-picker-list button > *,
+.child-greeting > *,
+.child-card > :not(.fill-dialog-backdrop) {
+  position: relative;
+  z-index: 1;
 }
 
 /* 現在是誰在練習？ */
@@ -30,7 +40,8 @@
   place-items: center;
   min-height: 100dvh;
   padding: 24px 16px;
-  background: linear-gradient(180deg, #eaf6ff 0%, #fffdf6 70%);
+  background: #fffaf3 url("/course-art/lesson-watercolor-paper.webp") center bottom / cover
+    no-repeat;
 }
 .child-picker {
   width: min(100%, 640px);
@@ -44,36 +55,42 @@
 }
 .child-picker h1 {
   margin: 0 0 24px;
-  color: #18375d;
+  color: var(--ink);
   font-size: clamp(26px, 6vw, 36px);
 }
 .child-picker-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 16px;
 }
 .child-picker-list button {
+  position: relative;
+  isolation: isolate;
   display: grid;
   justify-items: center;
   gap: 10px;
-  min-height: 160px;
-  padding: 20px 12px;
-  border: 2px solid #c7dce8;
+  padding: 20px 12px 18px;
+  border: 0;
   border-radius: 24px;
-  background: #fff;
-  color: #18375d;
+  background: linear-gradient(110deg, #f3faff 0%, #e6f3ff 72%, #eff8ff 100%);
+  color: var(--ink);
   font: inherit;
-  font-size: 20px;
+  font-size: 22px;
   cursor: pointer;
+  box-shadow: 0 2px 0 rgba(47, 95, 138, 0.1);
+}
+.child-picker-list button:nth-child(3n + 2) {
+  background: linear-gradient(110deg, #f4fcf7 0%, #e5f6eb 72%, #effbf3 100%);
+}
+.child-picker-list button:nth-child(3n) {
+  background: linear-gradient(110deg, #fffdf5 0%, #fff4dc 72%, #fff9ea 100%);
 }
 .child-picker-list .child-avatar {
-  width: 88px;
-  height: 88px;
-  font-size: 50px;
+  width: 104px;
+  height: 104px;
 }
 .child-picker-list button.is-current {
-  border-color: #3478d5;
-  box-shadow: 0 0 0 3px rgba(52, 120, 213, 0.18);
+  box-shadow: 0 0 0 3px rgba(237, 132, 92, 0.55);
 }
 .child-picker-backdrop {
   position: fixed;
@@ -82,47 +99,49 @@
   display: grid;
   place-items: center;
   padding: 16px;
-  background: rgba(16, 40, 64, 0.38);
+  background: rgba(40, 50, 40, 0.38);
 }
 .child-picker-backdrop .child-picker {
   max-height: calc(100dvh - 32px);
   overflow: auto;
   padding: 28px 20px 20px;
   border-radius: 28px;
-  background: #fff;
+  background: #fffaf2;
+  box-shadow: 0 18px 50px rgba(60, 50, 30, 0.22);
 }
 .child-picker-cancel {
   min-height: 48px;
   margin-top: 18px;
   padding: 0 28px;
-  border: 1px solid #c7dce8;
-  border-radius: 14px;
-  background: #fff;
-  color: #264d74;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--ink-soft);
   font: inherit;
+  box-shadow: 0 1px 0 rgba(90, 60, 30, 0.12);
 }
 
 /* Course list: who is practising, and 換人. */
 .child-greeting {
+  position: relative;
+  isolation: isolate;
   display: flex;
   align-items: center;
   gap: 12px;
-  margin: 0 0 18px;
+  margin: 0 0 14px;
   padding: 10px 12px;
-  border: 1px solid #d6e4ec;
-  border-radius: 20px;
-  background: #fff;
+  border-radius: 24px;
+  background: linear-gradient(110deg, #f4fcf7 0%, #e5f6eb 72%, #effbf3 100%);
 }
 .child-greeting .child-avatar {
-  width: 48px;
-  height: 48px;
-  font-size: 28px;
+  width: 56px;
+  height: 56px;
 }
 .child-greeting p {
   flex: 1;
   min-width: 0;
   margin: 0;
-  color: #18375d;
+  color: var(--ink);
   font-size: 18px;
 }
 .child-greeting > button {
@@ -131,142 +150,195 @@
   align-items: center;
   gap: 6px;
   min-height: 44px;
-  padding: 0 14px;
-  border: 1px solid #c7dce8;
-  border-radius: 14px;
-  background: #f3faff;
-  color: #264d74;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.85);
+  color: #2f6b55;
   font: inherit;
   font-weight: 700;
+  box-shadow: 0 1px 0 rgba(47, 107, 85, 0.15);
 }
 
-/* 更多 → 孩子 */
-.child-list {
+/* 更多 → 孩子: a card for each child, and one to add another. */
+.child-cards {
   display: grid;
-  gap: 10px;
-  margin: 16px 0;
+  gap: 14px;
+  margin: 18px 0 14px;
   padding: 0;
   list-style: none;
 }
-.child-row {
-  display: flex;
-  flex-wrap: wrap;
+.child-card {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  border: 1px solid #d6e4ec;
-  border-radius: 18px;
-  background: #fff;
+  gap: 12px 16px;
+  padding: 16px 52px 16px 14px;
+  border-radius: 24px;
+  background: linear-gradient(110deg, #f3faff 0%, #e6f3ff 72%, #eff8ff 100%);
 }
-.child-row-avatar {
+.child-cards .child-card:nth-child(3n + 2) {
+  background: linear-gradient(110deg, #f4fcf7 0%, #e5f6eb 72%, #effbf3 100%);
+}
+.child-cards .child-card:nth-child(3n) {
+  background: linear-gradient(110deg, #fffdf5 0%, #fff4dc 72%, #fff9ea 100%);
+}
+.child-card.is-current {
+  box-shadow: 0 0 0 3px rgba(237, 132, 92, 0.45);
+}
+.child-card.is-new {
+  padding-right: 16px;
+  background: linear-gradient(110deg, #fff9f2 0%, #ffeee4 72%, #fff6ef 100%);
+}
+.child-card .child-avatar {
+  width: 88px;
+  height: 88px;
+}
+.child-card-avatar {
   padding: 0;
   border: 0;
   border-radius: 50%;
   background: none;
 }
-.child-row-name {
-  flex: 1;
-  min-width: 120px;
+.child-card-main {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+  min-width: 0;
 }
-:is(.child-row-name, .child-add label) input {
+.child-card-name {
   width: 100%;
   min-height: 44px;
-  padding: 0 12px;
-  border: 1px solid #c7dce8;
-  border-radius: 12px;
+  padding: 0 2px;
+  border: 0;
+  border-bottom: 2px dashed transparent;
+  background: transparent;
+  color: var(--ink);
   font: inherit;
-  font-size: 18px;
+  font-size: 24px;
+  font-weight: 700;
 }
-.child-row-current {
-  padding: 4px 10px;
+.child-card-name:hover,
+.child-card-name:focus {
+  border-bottom-color: #c9b8a6;
+  outline: none;
+}
+.child-card-name::placeholder {
+  color: #9aa9a2;
+}
+.child-card-badge {
+  padding: 3px 12px;
   border-radius: 999px;
-  background: #e7f6ec;
-  color: #24704a;
+  background: rgba(255, 255, 255, 0.85);
+  color: #2f8f63;
   font-size: 14px;
   font-weight: 700;
 }
-.child-row-remove {
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  border: 1px solid #f0c9c4;
-  border-radius: 12px;
-  background: #fff;
-  color: #b1443a;
-}
 .child-material {
   display: flex;
-  flex-basis: 100%;
   align-items: center;
-  gap: 8px;
-  color: #5b6f86;
-  font-size: 15px;
+  gap: 6px;
+  max-width: 100%;
+  padding: 0 8px 0 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--ink-soft);
 }
 .child-material select {
-  flex: 1;
   min-width: 0;
-  min-height: 44px;
-  padding: 0 10px;
-  border: 1px solid #c7dce8;
-  border-radius: 12px;
-  background: #fff;
-  color: #18375d;
+  max-width: 100%;
+  min-height: 40px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
   font: inherit;
   font-size: 16px;
 }
-.child-add .child-material {
+.child-card-remove {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.75);
+  color: #9a7b6a;
+}
+.child-card .child-avatar-choices,
+.child-card-actions {
+  grid-column: 1 / -1;
+}
+.child-card-actions {
   display: flex;
+  justify-content: flex-end;
+  gap: 10px;
 }
-.child-row .child-avatar-choices {
-  flex-basis: 100%;
-}
-.child-avatar-choices {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
-  gap: 8px;
-}
-.child-avatar-choices button {
-  height: 52px;
-  border: 2px solid transparent;
-  border-radius: 14px;
-  background: #f3faff;
-  font-size: 30px;
-}
-.child-avatar-choices button[aria-checked="true"] {
-  border-color: #3478d5;
-  background: #e6f1ff;
-}
-.child-add {
-  display: grid;
-  gap: 12px;
-  margin-top: 20px;
-  padding: 16px;
-  border: 1px solid #d6e4ec;
-  border-radius: 20px;
-  background: #fff;
-}
-.child-add h2 {
-  margin: 0;
-  font-size: 18px;
-}
-.child-add label {
-  display: grid;
-  gap: 6px;
-}
-.child-add .primary-button {
-  display: inline-flex;
-  justify-self: start;
+.child-card-add {
+  display: flex;
   align-items: center;
-  gap: 6px;
-}
-.children-hint {
-  margin: 4px 0;
-  color: #5b6f86;
-  font-size: 15px;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 72px;
+  border: 2px dashed #d9c3b1;
+  border-radius: 24px;
+  background: rgba(255, 250, 242, 0.7);
+  color: #8a5a45;
+  font: inherit;
+  font-size: 20px;
+  font-weight: 700;
 }
 
+/* The twelve animals to choose from. */
+.child-avatar-choices {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+  padding: 10px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.75);
+}
+.child-avatar-choices button {
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+}
+.child-avatar-choices img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+.child-avatar-choices button[aria-checked="true"] {
+  box-shadow: 0 0 0 3px var(--coral);
+}
+
+@media (min-width: 760px) {
+  .child-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
 @media (max-width: 420px) {
+  .child-card {
+    grid-template-columns: 68px minmax(0, 1fr);
+  }
+  .child-card .child-avatar {
+    width: 68px;
+    height: 68px;
+  }
+  .child-card-name {
+    font-size: 21px;
+  }
+  .child-avatar-choices {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
   .child-greeting p {
     font-size: 16px;
   }

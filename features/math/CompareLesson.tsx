@@ -9,7 +9,7 @@ import {
 import { Carrot, CheckCircle, HandPointing, Rabbit, XCircle } from "@phosphor-icons/react";
 import type { AppController } from "../usePracticeApp";
 import { isPalmContact } from "../../lib/ink/gesture";
-import { MathHeader, MathPrompt, MathStartButton } from "./MathChrome";
+import { MathHeader, MathPrompt, MathResult } from "./MathChrome";
 import { mathPromptUrl, mathPrompts } from "./math-audio";
 import { taskKeys } from "../rewards/stamp-book";
 import type { MathLesson } from "./math-lessons";
@@ -55,7 +55,10 @@ const firstPrompt = (question: CompareQuestion) => {
 
 /** 第二課 比一比: tap to answer, checked at once and tried again until right. */
 export function CompareLesson({ app, lesson }: { app: CompareApp; lesson: MathLesson }) {
-  const [round, setRound] = useState<{ id: number; questions: CompareQuestion[] } | null>(null);
+  const [round, setRound] = useState<{ id: number; questions: CompareQuestion[] } | null>(() => ({
+    id: Date.now(),
+    questions: buildCompareRound(),
+  }));
   const [index, setIndex] = useState(0);
   const [finished, setFinished] = useState<{ total: number; topics: string[] } | null>(null);
   const missed = useRef(new Set<number>());
@@ -66,12 +69,19 @@ export function CompareLesson({ app, lesson }: { app: CompareApp; lesson: MathLe
     (id: string) => speak(mathPrompts[id], { url: mathPromptUrl(id) }),
     [speak],
   );
+  // The first instruction plays as the round opens, right after the tap on 開始練習.
+  const opened = useRef(false);
+  useEffect(() => {
+    if (opened.current || !round) return;
+    opened.current = true;
+    say(firstPrompt(round.questions[0]));
+  }, [round, say]);
+
   const leave = () => {
     stopPlayback();
-    app.navigate("courses");
+    app.navigate("math-lesson");
   };
-  // Started from a tap, so the first instruction plays even where audio needs a gesture.
-  const start = () => {
+  const again = () => {
     const questions = buildCompareRound();
     missed.current = new Set();
     setFinished(null);
@@ -79,44 +89,21 @@ export function CompareLesson({ app, lesson }: { app: CompareApp; lesson: MathLe
     setRound({ id: Date.now(), questions });
     say(firstPrompt(questions[0]));
   };
-  const title = `${lesson.number} · ${lesson.title}`;
 
-  if (finished)
+  if (finished || !round)
     return (
-      <main className="math-shell">
-        <MathHeader title={title} onLeave={leave} />
-        <section className="math-result">
-          <h1>練習完成！</h1>
-          <p>
-            {finished.total} 題都完成了
-            {finished.topics.length ? "。" : "，每一題第一次就答對了！"}
-          </p>
-          {finished.topics.length > 0 && (
-            <p className="compare-result-topics">
-              這幾題多試了一次才答對，可以再練習看看：{finished.topics.join("、")}
-            </p>
-          )}
-          <div className="math-actions">
-            <button type="button" className="primary-button" onClick={start}>
-              再練一次
-            </button>
-            <button type="button" className="secondary-button" onClick={leave}>
-              回到課程
-            </button>
-          </div>
-        </section>
-      </main>
-    );
-
-  if (!round)
-    return (
-      <main className="math-shell">
-        <MathHeader title={title} onLeave={leave} />
-        <section className="math-ready">
-          <h1>{lesson.title}</h1>
-          <p>{lesson.round}</p>
-          <MathStartButton onStart={start} />
-        </section>
+      <main className="math-shell is-result">
+        <MathHeader title={`數學${lesson.number} · ${lesson.title}`} onLeave={leave} />
+        <MathResult
+          title="這一課練完了！"
+          note={
+            finished?.topics.length
+              ? `這幾題多試了一次才答對，可以再練習看看：${finished.topics.join("、")}`
+              : `${finished?.total ?? 0} 題都完成了，每一題第一次就答對了！`
+          }
+          onAgain={again}
+          onLeave={leave}
+        />
       </main>
     );
 

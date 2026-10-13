@@ -28,6 +28,8 @@ export const storageKeys = {
   stamps: "kid-stamps-v1",
   /** 集章卡 settings the family shares: on or off, card size, daily stamps and rewards. */
   rewardSettings: "kid-reward-settings-v1",
+  /** Where the floating 集章卡 button was dragged to on this device. */
+  rewardDock: "kid-reward-dock-v1",
 } as const;
 
 /**

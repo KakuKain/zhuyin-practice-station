@@ -634,13 +634,14 @@ test("siblings keep their own records and each session asks who is practising", 
   await nav.getByRole("button", { name: "更多", exact: true }).click();
   await page.getByRole("button", { name: /^孩子/ }).click();
   // The records already on the tablet become the first child's.
-  const first = page.locator(".child-row-name input").first();
+  const first = page.locator(".child-card-name").first();
   await first.fill("哥哥");
   await first.press("Enter");
-  await page.getByLabel("名字或暱稱").fill("妹妹");
+  await page.getByRole("button", { name: "新增孩子" }).click();
+  await page.getByLabel("新孩子的名字").fill("妹妹");
   await page.getByRole("radio", { name: "兔子" }).click();
   await page.getByRole("button", { name: "新增", exact: true }).click();
-  await expect(page.locator(".child-row")).toHaveCount(2);
+  await expect(page.locator(".child-cards .child-card")).toHaveCount(2);
   // Each child opens their own material.
   await page.getByLabel("妹妹的教材").selectOption("little");
 

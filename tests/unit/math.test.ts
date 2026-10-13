@@ -6,7 +6,11 @@ import {
   buildAdditionRound,
   buildCountingRound,
   countIcons,
+  filledCells,
+  frameCells,
+  isAnswered,
   joinIcons,
+  workCells,
   mathRoundSize,
   newMathRound,
   validateMathRound,
@@ -19,6 +23,7 @@ import {
   mathPromptVariants,
   mathPrompts,
 } from "../../features/math/math-audio";
+import { mathLessons, mathWord, mathWordReadings } from "../../features/math/math-lessons";
 import {
   answerOf,
   buildCompareRound,
@@ -263,19 +268,42 @@ test("a 第三課 round asks 4 合在一起, then 4 畫圈圈算加法, each wit
   assert.equal(newMathRound(1).questions[0].kind, "count");
 });
 
-test("a saved 第三課 round keeps the circles drawn for each number", () => {
+test("a saved 第三課 round keeps the circles in each number's 十格框", () => {
   const round = { ...newMathRound(3, 100), ink: { 4: [[{ x: 50, y: 50 }]] } };
-  const work = { 4: [[[{ x: 10, y: 10 }]], [[{ x: 20, y: 20 }], [{ x: 30, y: 30 }]]] };
+  // Cells 0–9 are the first number's frame, 10–19 the second's.
+  const cells = Array.from({ length: 20 }, () => [] as { x: number; y: number }[][]);
+  cells[0] = [[{ x: 10, y: 10 }]];
+  cells[12] = [[{ x: 20, y: 20 }], [{ x: 30, y: 30 }]];
+  const work = { 4: cells };
   const restored = validateMathRound(JSON.parse(JSON.stringify({ ...round, work })))!;
   assert.deepEqual(restored.work, work);
+  assert.equal(filledCells(restored.work[4], 0), 1);
+  assert.equal(filledCells(restored.work[4], frameCells), 1);
   assert.deepEqual(restored.questions, round.questions);
-  // A damaged drawing is dropped; a round saved before 第三課 has none.
+  // A damaged drawing is dropped, and so are circles drawn freely before 十格框 (two areas).
   assert.deepEqual(validateMathRound({ ...round, work: { 4: [[{ x: "bad" }]] } })!.work, {});
+  const freeDrawing = { 4: [[[{ x: 10, y: 10 }]], [[{ x: 20, y: 20 }]]] };
+  assert.deepEqual(validateMathRound({ ...round, work: freeDrawing })!.work, {});
   const older: Partial<typeof round> = { ...round };
   delete older.work;
   assert.deepEqual(validateMathRound(older)!.work, {});
   const wrongSum = { ...round.questions[0], parts: [1, 1], target: 5 };
   assert.equal(validateMathRound({ ...round, questions: [wrongSum] }), null);
+});
+
+test("畫圈圈 draws one circle in each cell of a 十格框", () => {
+  const round = newMathRound(1, 100);
+  const draw = round.questions.findIndex((question) => question.kind === "draw");
+  assert.equal(workCells(round.questions[draw]), frameCells);
+  assert.equal(frameCells, 10);
+  const cells = Array.from({ length: 10 }, (_, cell) => (cell < 3 ? [[{ x: 50, y: 50 }]] : []));
+  const restored = validateMathRound({ ...round, work: { [draw]: cells } })!;
+  assert.equal(filledCells(restored.work[draw]), 3);
+  // A circle in the frame answers the question; an empty frame does not.
+  assert.ok(isAnswered(restored, draw));
+  assert.ok(!isAnswered({ ...restored, work: {} }, draw));
+  // Ink drawn before the frame still counts, and is still shown to the parent.
+  assert.ok(isAnswered({ ...restored, work: {}, ink: { [draw]: [[{ x: 1, y: 1 }]] } }, draw));
 });
 
 test("each math lesson keeps its own unfinished round, for every child", () => {
@@ -299,4 +327,34 @@ test("each math lesson keeps its own unfinished round, for every child", () => {
     "kid-math-round-v1-3@k2",
     "kid-math-round-v1@k2",
   ]);
+});
+
+test("the math course cards, lesson pages and practice screens show every word in 國字注音", () => {
+  const shown = [
+    "數學",
+    ...mathLessons.flatMap((lesson) => [lesson.number, lesson.title, ...lesson.parts]),
+    ...["這一課", "開始", "開始練習", "從頭開始", "繼續", "繼續練習", "第", "題", "多畫了", "個"],
+  ];
+  for (const text of shown) {
+    assert.ok(mathWordReadings[text], `${text} needs its readings`);
+    const readings = mathWordReadings[text].split(" ");
+    const characters = Array.from(text);
+    assert.equal(readings.length, characters.filter(isHan).length, `${text}: one per character`);
+    const { variants } = mathWord(text);
+    let syllable = 0;
+    characters.forEach((character, index) => {
+      if (!isHan(character)) return;
+      const glyph = character + (variants[index] ?? "");
+      assert.ok(glyph in annotated, `${text}: ${character} is missing from the font`);
+      assert.equal(annotated[glyph], readings[syllable++], `${text}: ${character}`);
+    });
+  }
+  // Each lesson page says how many questions a round has.
+  const sizes = [mathRoundSize, compareRoundSize, additionRoundSize].map((size) =>
+    typeof size === "number" ? size : Object.values(size).reduce((sum, n) => sum + n, 0),
+  );
+  assert.deepEqual(
+    mathLessons.map((lesson) => lesson.questions),
+    sizes,
+  );
 });
