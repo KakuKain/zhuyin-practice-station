@@ -1,14 +1,16 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import {
+  additionRoundSize,
+  buildAdditionRound,
   buildCountingRound,
   countIcons,
+  joinIcons,
   mathRoundSize,
   newMathRound,
   validateMathRound,
 } from "../../features/math/math-round";
-import { readFileSync } from "node:fs";
 import {
   isHan,
   mathPromptId,
@@ -30,7 +32,8 @@ import {
   startLine,
   type CompareQuestion,
 } from "../../features/math/compare-round";
-import { ownsStorageKey, storageKeys } from "../../lib/storage/storage-keys";
+import { mathRoundStorageKey, ownsStorageKey, storageKeys } from "../../lib/storage/storage-keys";
+import { childRecordKeys } from "../../lib/storage/child-profiles";
 
 test("a 第一課 round counts 4 numbers and draws 4, each from 1 to 10 without repeats", () => {
   for (let run = 0; run < 50; run++) {
@@ -222,4 +225,78 @@ test("every math instruction shows the right zhuyin beside each character", () =
   }
   // 數一數 counts (ㄕㄨˇ), 數字 is a number (ㄕㄨˋ).
   assert.deepEqual(mathPromptVariants("count"), { 0: "\u{E01E1}", 2: "\u{E01E1}" });
+});
+
+test("a 第三課 round asks 4 合在一起, then 4 畫圈圈算加法, each with a different total", () => {
+  for (let run = 0; run < 200; run++) {
+    const round = buildAdditionRound();
+    assert.deepEqual(
+      round.map((question) => question.kind),
+      [...Array(additionRoundSize.join).fill("join"), ...Array(additionRoundSize.add).fill("add")],
+    );
+    for (const kind of ["join", "add"]) {
+      const part = round.filter((question) => question.kind === kind);
+      const totals = part.map((question) => question.target);
+      assert.equal(new Set(totals).size, totals.length);
+    }
+    for (const question of round) {
+      if (question.kind !== "join" && question.kind !== "add") assert.fail(question.kind);
+      const [a, b] = question.parts;
+      assert.equal(a + b, question.target);
+      assert.ok(a >= 1 && b >= 1 && question.target <= 10);
+      if (question.kind === "join") {
+        assert.ok(a <= 5 && b <= 5);
+        assert.ok(joinIcons.includes(question.icon));
+      } else assert.ok(question.target >= 3);
+      // Each sum is spoken from its own clip and shown in 國字注音.
+      const id = mathPromptId(question);
+      assert.ok(mathPrompts[id] && mathPromptReadings[id], id);
+      assert.ok(existsSync(`public/${mathPromptUrl(id).split("?")[0]}`), id);
+    }
+    const icons = round.flatMap((question) => (question.kind === "join" ? [question.icon] : []));
+    assert.equal(new Set(icons).size, icons.length);
+  }
+  // 兩個 when counting things, 二 in a sum.
+  assert.equal(mathPrompts["join-2-3"], "左邊有兩個，右邊有三個，合在一起有幾個？");
+  assert.equal(mathPrompts["add-2-3"], "二加三等於多少？先畫圈圈，再寫答案。");
+  assert.equal(newMathRound(3).questions[0].kind, "join");
+  assert.equal(newMathRound(1).questions[0].kind, "count");
+});
+
+test("a saved 第三課 round keeps the circles drawn for each number", () => {
+  const round = { ...newMathRound(3, 100), ink: { 4: [[{ x: 50, y: 50 }]] } };
+  const work = { 4: [[[{ x: 10, y: 10 }]], [[{ x: 20, y: 20 }], [{ x: 30, y: 30 }]]] };
+  const restored = validateMathRound(JSON.parse(JSON.stringify({ ...round, work })))!;
+  assert.deepEqual(restored.work, work);
+  assert.deepEqual(restored.questions, round.questions);
+  // A damaged drawing is dropped; a round saved before 第三課 has none.
+  assert.deepEqual(validateMathRound({ ...round, work: { 4: [[{ x: "bad" }]] } })!.work, {});
+  const older: Partial<typeof round> = { ...round };
+  delete older.work;
+  assert.deepEqual(validateMathRound(older)!.work, {});
+  const wrongSum = { ...round.questions[0], parts: [1, 1], target: 5 };
+  assert.equal(validateMathRound({ ...round, questions: [wrongSum] }), null);
+});
+
+test("each math lesson keeps its own unfinished round, for every child", () => {
+  assert.equal(mathRoundStorageKey(1), storageKeys.mathRound);
+  assert.equal(mathRoundStorageKey(3), "kid-math-round-v1-3");
+  for (const key of ["kid-math-round-v1-3", "kid-math-round-v1-3@k2"])
+    assert.ok(ownsStorageKey(key));
+  assert.ok(!ownsStorageKey("kid-math-round-v1-x"));
+  const items = new Map([
+    ["kid-math-round-v1-3@k2", "{}"],
+    ["kid-math-round-v1@k2", "{}"],
+    ["kid-math-round-v1-3", "{}"],
+  ]);
+  const storage = {
+    get length() {
+      return items.size;
+    },
+    key: (index: number) => [...items.keys()][index] ?? null,
+  } as Storage;
+  assert.deepEqual(childRecordKeys("k2", storage).sort(), [
+    "kid-math-round-v1-3@k2",
+    "kid-math-round-v1@k2",
+  ]);
 });

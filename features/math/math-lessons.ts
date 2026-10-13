@@ -23,5 +23,11 @@ export const mathLessons: MathLesson[] = [
     round: "8 題：比長短、比高矮、排順序、直線和曲線、哪條路最近。點一點就知道對不對。",
     ready: true,
   },
-  { id: 3, number: "第三課", title: "加法", round: "用圈圈學加法。", ready: false },
+  {
+    id: 3,
+    number: "第三課",
+    title: "加法",
+    round: "8 題：先看圖合在一起，再畫圈圈算加法。寫完請家長一起檢查。",
+    ready: true,
+  },
 ];

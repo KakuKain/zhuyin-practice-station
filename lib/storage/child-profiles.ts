@@ -3,8 +3,8 @@ import {
   childChosenSessionKey,
   childScopedKeys,
   childStorageKey,
-  fillDraftKeyIndex,
   isChildId,
+  isLessonRecordKey,
   mainChildId,
   splitChildKey,
   storageKeys,
@@ -202,8 +202,7 @@ export function childRecordKeys(id: string, storage: Storage = window.localStora
       [storageKeys.practiceV3, storageKeys.practiceV2, storageKeys.practiceV1].includes(
         key as typeof storageKeys.practiceV1,
       );
-    if (childScopedKeys.has(shared) || fillDraftKeyIndex(key) !== null || legacyPractice)
-      keys.push(key);
+    if (childScopedKeys.has(shared) || isLessonRecordKey(key) || legacyPractice) keys.push(key);
   }
   return keys;
 }

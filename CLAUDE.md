@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-A login-free Zhuyin (注音) practice site for Taiwanese first graders and their parents: lessons 1–9 plus three review sets, a symbol chart, handwriting dictation, listening dictation, and sound discrimination. It also has 數學 (康軒 115, first grade): lessons 1 (認識 1～10) and 2 (比一比) are built; lesson 3 (加法) is listed as 製作中. UI copy and all docs are in Traditional Chinese (zh-Hant). `docs/architecture.md` is the detailed reference for feature boundaries and invariants. Read it before changing state, storage, audio, or ink behavior.
+A login-free Zhuyin (注音) practice site for Taiwanese first graders and their parents: lessons 1–9 plus three review sets, a symbol chart, handwriting dictation, listening dictation, and sound discrimination. It also has 數學 (康軒 115, first grade): lessons 1 (認識 1～10), 2 (比一比) and 3 (加法) are built. UI copy and all docs are in Traditional Chinese (zh-Hant). `docs/architecture.md` is the detailed reference for feature boundaries and invariants. Read it before changing state, storage, audio, or ink behavior.
 
 Hard product constraints: no login, no DB, no cloud sync, no service worker or offline cache, no runtime AI or speech API calls, and no changes to the teacher-defined lesson scope. A web app manifest so the site can be added to the home screen (full screen, portrait-locked, no browser UI) is fine.
 
@@ -64,7 +64,14 @@ There is one build: a static Vite SPA. `index.html` → `app/main.tsx` → `crea
 - `features/math/` is self-contained.
   - The course list's 國語｜數學 switch (not 注音, which would clash with the 注音 symbol-chart tab) is remembered per child (`ChildProfile.subject`). `openMathLesson` sets `mathLessonId` and the `math` view, and `MathScreen` runs the round.
   - Lesson 1 asks 4 數一數 (tap pictures to mark them, write the number) and then 4 畫圈圈 (each stroke is numbered as it is drawn), all spoken aloud.
-  - The parent checks it at the end. The round persists per child in `kid-math-round-v1`, and finished rounds go to `kid-math-records-v1`.
+  - Lesson 3 asks 4 合在一起 and then 4 畫圈圈算加法:
+    - 合在一起 shows two groups of up to 5 markable pictures; the child writes the total.
+    - 畫圈圈算加法 has three squares: circles for each number, then the answer. They share one `useInkCanvas`, so one pen writes at a time. Each side numbers its own circles; counting them together is the child's part.
+    - Each sum has its own clip (`join-a-b`, `add-a-b`). Counting says 兩個, but a sum says 二加三.
+  - Lessons 1 and 3 share `WritingLesson` in `MathScreen.tsx`. The ink pieces live in `MathInk.tsx` and the pictures in `MathPictures.tsx`.
+  - The parent checks the round at the end.
+    - Each lesson's unfinished round persists per child: lesson 1 in `kid-math-round-v1`, others in `kid-math-round-v1-<lesson>` (`mathRoundStorageKey`). Starting one lesson never replaces another's.
+    - The circles live in `MathRound.work`. Finished rounds go to `kid-math-records-v1`.
   - Every instruction is spoken and shown in 國字注音 (`MathPrompt` in `MathChrome.tsx`: an icon-only replay button and `AnnotatedText`).
     - `mathPromptReadings` in `math-audio.ts` gives one syllable per character. The four polyphones the font would misread (數一數, 箱子／兔子, 曲線, 蘿蔔) get `\u{E01E1}` from `alternateReadings`.
     - A unit test checks every character against `KidLessonYoSans-readings.json`.
@@ -74,7 +81,7 @@ There is one build: a static Vite SPA. `index.html` → `app/main.tsx` → `crea
     - Answers are taps, checked at once and retried until right, like 辨音.
     - Things out of line must be dragged to the start line or the ground first (a tap slides them there). Only then is the question asked.
     - Out of line, the shorter one always looks longer or taller, so skipping the lining-up step gives the wrong answer.
-    - It is not saved mid-round, so it never replaces a saved lesson 1 round. What took more than one try goes to `kid-math-records-v1` and the result screen.
+    - It is not saved mid-round. What took more than one try goes to `kid-math-records-v1` and the result screen.
 - `PracticeList`, `SettingsScreen`, `SymbolChart`, and their heavy sub-panels are `React.lazy` chunks. Keep them out of the initial bundle.
 - One `<audio>` element is mounted at the app root for every screen, so iOS keeps the playback a tap unlocked.
 - Answer zhuyin (`ZhuyinStack`) is drawn by the `KidLessonYoOnly` font, which puts each syllable on a Han character (`syllableGlyphs` in `features/lesson/zhuyin-glyphs.ts`; ㄏㄨˊ is 蝴). Until that font has loaded (`lib/loading/font-ready.ts`), the syllable is spelled out in the UI font so a stand-in character never shows. A polyphone needs its variation selector there (`"奶\u{E01E1}"` for ˙ㄋㄞ); `tests/unit/zhuyin-glyphs.test.ts` fails if a glyph is missing from the subset or shows another reading.
@@ -111,7 +118,8 @@ Layout: `features/<feature>/` holds feature UI and logic, `components/` holds sh
 - All user data lives in browser `localStorage` behind `lib/storage/persistent-store.ts` (an external store read with `useSyncExternalStore`, not mirrored into React state). Older versions (for example `practice-state` v1–v3) are migrated forward on read, and their original keys are preserved.
 - **Every key is listed in `lib/storage/storage-keys.ts`**, the single registry that device backup (`ownsStorageKey`) is derived from. A new key must be added there, or backup will silently skip it; a unit test checks the known keys.
 - **Children** (`lib/storage/child-profiles.ts`, key `zhuyin-children-v1`; managed in 更多 → 孩子) have separate records:
-  - Child-scoped keys (`childScopedKeys`) are practice state, fill favorites, the listening round, the free board and fill drafts. Everything else (materials, listening settings, recordings) is shared.
+  - Child-scoped keys (`childScopedKeys`) are practice state, fill favorites, the listening round, the free board, the math rounds and records, and fill drafts. Everything else (materials, listening settings, recordings) is shared.
+  - Per-lesson keys (fill drafts, math rounds after lesson 1) are recognized by `isLessonRecordKey`. Both backup and removing a child use it.
   - Which material is open belongs to each child: `ChildProfile.materialId`, applied by `withChildMaterial` in `useMaterials`. Choosing a material records it on the child; only the first child's choice also moves the family default that children without a choice follow.
   - The first child, id `main`, uses the original keys, so existing records need no migration and only `main` reads the pre-v4 practice keys. Every other child uses `<key>@<id>`.
   - Read and write them through `childKey()` or `activeChildId()`, never the bare constant.
@@ -162,7 +170,7 @@ Layout: `features/<feature>/` holds feature UI and logic, `components/` holds sh
 
 ### Styles
 
-- `app/globals.css` imports `styles/00-…css` through `styles/27-…css` in a fixed cascade order. Order matters. `26-children.css` styles the child picker, the course-list greeting and 更多 → 孩子; `27-math.css` the subject switch and the math screen (landscape tablets put the square on the right).
+- `app/globals.css` imports `styles/00-…css` through `styles/27-…css` in a fixed cascade order. Order matters. `26-children.css` styles the child picker, the course-list greeting and 更多 → 孩子; `27-math.css` the subject switch and the math screen (landscape tablets put the square on the right; 畫圈圈算加法 keeps its three squares in one row, and phones wrap the answer below).
 - `00-reset.css` is the former Tailwind preflight, kept in cascade layers so every unlayered rule wins. There is no Tailwind and there are no utility classes.
 - `24-fill-tablet.css` makes dictation (sheet, writing cell, review) full width at ≥ 600px: the square grows to the space left by the header and controls, and landscape tablets put the heading and finish button beside it. Phones keep the 480px column.
 - `25-listen-tablet.css` does the same for listening at ≥ 600px: the single square fills the width, a word's squares stack top to bottom with their tools beside them (side by side, first character on the right, in landscape), and the batch check shows two cards per row.
