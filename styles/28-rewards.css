@@ -258,33 +258,55 @@
   color: var(--stamp-task);
 }
 
+/*
+ * 今天的任務 and the card share one sheet: a sky wash with clouds, a picture beside a large title
+ * with what to do next under it, and washed cards below.
+ */
 .stamp-dialog {
   position: relative;
   isolation: isolate;
   display: grid;
-  gap: 16px;
-  width: min(100%, 480px);
+  /* An unbroken title must not push the cards past the edge on a phone. */
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  width: min(100%, 620px);
   max-height: calc(100dvh - 40px);
   overflow-y: auto;
-  padding: 22px 22px 20px;
+  padding: 24px 24px 22px;
   border-radius: 28px;
-  background: #fffaf2;
+  background:
+    url("/course-art/sound-comparison-clouds-watercolor-v1.webp") right -150px top 54px / 380px auto
+      no-repeat,
+    linear-gradient(180deg, #eef7ff 0%, #fbfdff 46%, #ffffff 100%);
   color: var(--ink);
   box-shadow: 0 18px 50px rgba(60, 50, 30, 0.22);
 }
 .stamp-dialog header {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  align-items: flex-start;
+  gap: 10px;
 }
-/* The title sits on a soft pink wash, like the lesson headings. */
+.stamp-dialog header > div {
+  flex: 1;
+  min-width: 0;
+}
+.stamp-sheet-art {
+  flex: none;
+  width: 72px;
+  height: 84px;
+  object-fit: contain;
+}
 .stamp-dialog h2 {
   margin: 0;
-  padding: 2px 18px 4px 6px;
-  background: url("/course-art/review-line-pink-wash-v3.webp") left center / 100% 80% no-repeat;
-  color: #6b3b31;
-  font-size: 26px;
+  padding: 0;
+  color: #1f4f86;
+  font-size: 40px;
+  font-weight: 400;
+}
+.stamp-dialog header p {
+  margin: 2px 0 0;
+  color: #4f6b86;
+  font-size: 19px;
 }
 .stamp-close {
   display: grid;
@@ -298,58 +320,86 @@
   color: #8a6a55;
   box-shadow: 0 1px 0 rgba(90, 60, 30, 0.1);
 }
-.stamp-hint {
-  margin: 0;
-  color: #6b4b3c;
-  font-size: 22px;
-  text-align: center;
+/* The stamps sit on a warm washed card, like a task. */
+.stamp-board {
+  padding: 16px;
+  border: 1.5px solid rgba(238, 164, 58, 0.26);
+  border-radius: 24px;
+  background: linear-gradient(110deg, rgba(255, 255, 255, 0.92) 0%, #fff4dc 100%);
+  box-shadow: 0 2px 8px rgba(138, 90, 20, 0.08);
 }
+/* A full card: each reward is a card the child taps, with the same round arrow as a task. */
 .stamp-rewards {
   display: grid;
-  justify-items: center;
-  gap: 10px;
-}
-.stamp-rewards-art {
-  width: 96px;
-  height: 96px;
-  margin: -4px 0 -8px;
-  object-fit: contain;
-}
-.stamp-rewards > div {
-  display: grid;
-  gap: 8px;
-  width: 100%;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 .stamp-rewards button {
   display: flex;
   align-items: center;
-  gap: 10px;
-  min-height: 56px;
-  padding: 0 18px;
-  border: 0;
-  border-radius: 18px;
-  background: linear-gradient(110deg, #fff5f0 0%, #ffe6dd 100%);
-  color: #7a3f32;
+  gap: 14px;
+  width: 100%;
+  min-height: 92px;
+  padding: 10px 16px 10px 12px;
+  border: 1.5px solid rgba(233, 120, 106, 0.24);
+  border-radius: 24px;
+  background: linear-gradient(110deg, rgba(255, 255, 255, 0.92) 0%, #fff0ee 100%);
+  color: #1f3550;
   font: inherit;
-  font-size: 22px;
   text-align: left;
-  box-shadow: 0 2px 0 rgba(200, 120, 90, 0.18);
+  box-shadow: 0 2px 8px rgba(154, 68, 56, 0.08);
 }
-.stamp-rewards button svg {
+.stamp-reward-icon {
+  display: grid;
   flex: none;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #ffe0dc;
   color: var(--stamp-cheer);
+}
+.stamp-reward-name {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 28px;
+  line-height: 1.3;
+}
+.stamp-reward-go {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #f59a6c 0%, var(--coral) 100%);
+  color: #fff;
+  box-shadow:
+    0 3px 0 var(--coral-dark),
+    0 6px 14px rgba(201, 106, 72, 0.28);
+}
+.stamp-rewards button:active .stamp-reward-go {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--coral-dark);
 }
 .stamp-confirm,
 .stamp-done {
   display: grid;
   justify-items: center;
   gap: 14px;
+  padding: 18px 16px;
+  border: 1.5px solid rgba(233, 120, 106, 0.24);
+  border-radius: 24px;
+  background: linear-gradient(110deg, rgba(255, 255, 255, 0.92) 0%, #fff0ee 100%);
   text-align: center;
 }
 .stamp-confirm p,
 .stamp-done p {
   margin: 0;
-  color: #5b3b30;
+  color: #1f3550;
   font-size: 24px;
   line-height: 1.6;
 }
@@ -358,15 +408,47 @@
   height: 150px;
   object-fit: contain;
 }
+.stamp-dialog .math-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+/* The sheet's own buttons: a coral pill to go ahead, a white one to think again. */
+.stamp-dialog .primary-button,
+.stamp-dialog .secondary-button {
+  min-height: 56px;
+  padding: 0 26px;
+  border-radius: 999px;
+  font-size: 22px;
+  font-weight: 400;
+}
+.stamp-dialog .primary-button {
+  background: linear-gradient(180deg, #f59a6c 0%, var(--coral) 100%);
+  box-shadow:
+    0 3px 0 var(--coral-dark),
+    0 6px 14px rgba(201, 106, 72, 0.28);
+}
+/* The site's button arrow style must not reach the 國字注音 inside. */
+.stamp-dialog .primary-button span {
+  margin: 0;
+  color: inherit;
+  font-size: inherit;
+  transform: none;
+}
+.stamp-dialog .secondary-button {
+  border: 1.5px solid rgba(91, 151, 209, 0.3);
+  color: #2f5f8a;
+}
+/* What each stamp means: small chips under the card. */
 .stamp-legend {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 6px 16px;
+  gap: 8px;
   margin: 0;
-  padding: 10px 0 0;
-  border-top: 1px dashed #e6d6c4;
-  color: #7a6656;
+  padding: 0;
+  color: #4f6b86;
   font-size: 18px;
   list-style: none;
 }
@@ -374,10 +456,14 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  padding: 4px 12px 4px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 1px 0 rgba(47, 95, 138, 0.1);
 }
 .stamp-history {
   margin: 0;
-  color: #7a6656;
+  color: #4f6b86;
   font-size: 18px;
   text-align: center;
 }
@@ -454,47 +540,11 @@
 }
 
 /*
- * 今天的任務, opened from the floating button: a sky wash with clouds, the flag beside a large
- * title, and one washed card per task with its picture, the lesson as a tag and an arrow button.
+ * 今天的任務, opened from the floating button: one washed card per task with its picture, the
+ * lesson as a tag and a round arrow button.
  */
-.stamp-dialog.today-tasks {
-  /* The unbroken title must not push the cards past the edge on a phone. */
-  grid-template-columns: minmax(0, 1fr);
-  gap: 14px;
-  width: min(100%, 620px);
-  padding: 24px 24px 22px;
-  background:
-    url("/course-art/sound-comparison-clouds-watercolor-v1.webp") right -150px top 54px / 380px auto
-      no-repeat,
-    linear-gradient(180deg, #eef7ff 0%, #fbfdff 46%, #ffffff 100%);
-}
-.today-tasks header {
-  align-items: flex-start;
-  gap: 10px;
-}
-.today-tasks header > div {
-  flex: 1;
-  min-width: 0;
-}
-.today-tasks-flag {
-  flex: none;
-  width: 64px;
-  height: 84px;
-  object-fit: contain;
-}
 .today-tasks h2 {
-  margin: 0;
-  padding: 0;
-  background: none;
-  color: #1f4f86;
-  font-size: 40px;
-  font-weight: 400;
   white-space: nowrap;
-}
-.today-tasks header p {
-  margin: 2px 0 0;
-  color: #4f6b86;
-  font-size: 19px;
 }
 .today-tasks ul {
   display: grid;
@@ -918,17 +968,42 @@
   }
 }
 @media (max-width: 520px) {
-  .stamp-dialog.today-tasks {
+  .stamp-dialog {
     padding: 18px 14px 16px;
   }
-  .today-tasks-flag {
-    width: 44px;
+  .stamp-sheet-art {
+    width: 48px;
     height: 60px;
   }
-  .today-tasks h2 {
+  .stamp-dialog h2 {
     font-size: 28px;
   }
-  .today-tasks header p {
+  .stamp-dialog header p {
+    font-size: 16px;
+  }
+  .stamp-board {
+    padding: 12px;
+  }
+  .stamp-slots {
+    gap: 8px;
+  }
+  .stamp-rewards button {
+    gap: 10px;
+    min-height: 76px;
+    padding: 8px 10px 8px 8px;
+  }
+  .stamp-reward-icon {
+    width: 48px;
+    height: 48px;
+  }
+  .stamp-reward-name {
+    font-size: 22px;
+  }
+  .stamp-reward-go {
+    width: 52px;
+    height: 52px;
+  }
+  .stamp-legend {
     font-size: 16px;
   }
   .today-tasks li {
@@ -957,12 +1032,33 @@
   }
 }
 @media (max-width: 380px) {
-  .today-tasks-flag {
-    width: 32px;
+  .stamp-dialog header {
+    gap: 6px;
+  }
+  .stamp-sheet-art {
+    width: 30px;
     height: 46px;
   }
-  .today-tasks h2 {
-    font-size: 23px;
+  .stamp-dialog h2 {
+    font-size: 22px;
+  }
+  .stamp-rewards button {
+    gap: 8px;
+  }
+  .stamp-reward-icon {
+    width: 38px;
+    height: 38px;
+  }
+  .stamp-reward-icon svg {
+    width: 22px;
+    height: 22px;
+  }
+  .stamp-reward-name {
+    font-size: 19px;
+  }
+  .stamp-reward-go {
+    width: 46px;
+    height: 46px;
   }
   .today-tasks li {
     gap: 6px;
