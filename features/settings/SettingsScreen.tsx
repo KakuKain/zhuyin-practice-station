@@ -143,6 +143,8 @@ export function SettingsScreen({
     | "stampBook"
     | "stampProgress"
     | "awardStamp"
+    | "addDailyTask"
+    | "removeDailyTask"
   >;
 }) {
   const {
@@ -326,6 +328,9 @@ export function SettingsScreen({
           book={app.stampBook}
           progress={app.stampProgress}
           onCheer={app.awardStamp}
+          catalog={app.catalog}
+          onAddTask={app.addDailyTask}
+          onRemoveTask={app.removeDailyTask}
         />
       )}
       {morePanel === "children" && (

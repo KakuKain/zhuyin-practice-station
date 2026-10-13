@@ -4,6 +4,9 @@ import { updateChild, useChildProfiles } from "../../lib/storage/child-profiles"
 import { useState } from "react";
 import { ChildGreeting, childLabel } from "../../components/ChildPicker";
 import { StampCardDialog, StampChip } from "../rewards/StampCard";
+import { TodayTasks } from "../rewards/TodayTasks";
+import { taskDestination } from "../rewards/daily-tasks";
+import { visibleTasks } from "../rewards/stamp-book";
 
 import { PageHeading } from "../../components/PageHeading";
 import type { AppController } from "../usePracticeApp";
@@ -29,6 +32,7 @@ export function CourseList({
     | "stampProgress"
     | "chooseReward"
     | "dismissStampNews"
+    | "navigate"
   >;
 }) {
   const { openLesson, practiceState } = app;
@@ -64,6 +68,18 @@ export function CourseList({
             // The card itself now shows what the toast was saying.
             app.dismissStampNews();
             setCardOpen(true);
+          }}
+        />
+      )}
+      {app.rewardSettings.enabled && (
+        <TodayTasks
+          tasks={visibleTasks(app.stampBook)}
+          onGo={(task) => {
+            const destination = taskDestination(task.key);
+            if (destination.kind === "lesson") openLesson(destination.lessonIndex);
+            else if (destination.kind === "math") app.openMathLesson(destination.lessonId);
+            // 辨音 and 待補強 are both on the 練習 page.
+            else app.navigate("practice");
           }}
         />
       )}

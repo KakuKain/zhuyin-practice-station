@@ -4,7 +4,11 @@ import { childKey } from "../../lib/storage/child-profiles";
 import { storageKeys } from "../../lib/storage/storage-keys";
 import {
   addStamp,
+  addTask,
   cardProgress,
+  completeTask,
+  removeTask,
+  type DailyTask,
   defaultRewardSettings,
   emptyStampBook,
   redeemCard,
@@ -41,14 +45,21 @@ export function useStampBook() {
   );
   const [stampNews, setStampNews] = useState<StampNews | null>(null);
 
-  /** Called when a practice is finished; does nothing while 集章卡 is off. */
+  /**
+   * Called when a practice is finished; does nothing while 集章卡 is off. A practice that
+   * matches 今天的任務 also earns a 任務章, which is what the child hears about.
+   */
   const awardStamp = useCallback(
     (input: StampInput) => {
       if (!rewardSettings.enabled) return;
       const result: { value: ReturnType<typeof addStamp> | null } = { value: null };
       saveStampBook((current) => {
-        result.value = addStamp(current, rewardSettings, input);
-        return result.value.book;
+        const added = addStamp(current, rewardSettings, input);
+        const task = input.taskKey
+          ? completeTask(added.book, input.taskKey, input.subject)
+          : { book: added.book, entry: null };
+        result.value = { book: task.book, entry: task.entry ?? added.entry };
+        return task.book;
       });
       if (result.value?.entry)
         setStampNews({
@@ -57,6 +68,16 @@ export function useStampBook() {
         });
     },
     [rewardSettings, saveStampBook],
+  );
+
+  const addDailyTask = useCallback(
+    (task: Omit<DailyTask, "id" | "at" | "doneAt">) =>
+      saveStampBook((current) => addTask(current, task)),
+    [saveStampBook],
+  );
+  const removeDailyTask = useCallback(
+    (id: string) => saveStampBook((current) => removeTask(current, id)),
+    [saveStampBook],
   );
 
   const chooseReward = useCallback(
@@ -71,6 +92,8 @@ export function useStampBook() {
     stampProgress: cardProgress(stampBook, rewardSettings),
     stampStorageError: rewardSettingsError || stampBookError,
     awardStamp,
+    addDailyTask,
+    removeDailyTask,
     chooseReward,
     stampNews,
     dismissStampNews: useCallback(() => setStampNews(null), []),

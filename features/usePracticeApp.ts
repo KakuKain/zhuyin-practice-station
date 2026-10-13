@@ -27,7 +27,8 @@ import {
 import { fillLayout } from "./fill/fill-layout";
 import { useFillFlow } from "./fill/useFillFlow";
 import { useStampBook } from "./rewards/useStampBook";
-import type { AwardLessonStamp } from "./rewards/stamp-book";
+import { taskKeys, type AwardLessonStamp } from "./rewards/stamp-book";
+import { lessonPlace } from "./rewards/daily-tasks";
 
 /**
  * Cross-feature coordinator: the current view and lesson, shared stores, audio, the course
@@ -73,15 +74,20 @@ export function usePracticeApp() {
     activity,
     needsPractice,
     oncePerDay,
+    task,
   }) => {
     const item = catalog.find((entry) => entry.index === lessonIndex);
-    const name = !item ? "" : item.listeningOnly || item.custom ? item.title : `第${item.number}課`;
+    const name = item ? lessonPlace(item) : "";
+    // Any correction finishes 「改對一題待補強」; a whole-lesson practice finishes its own task.
+    const taskKey =
+      kind === "fix" ? taskKeys.fix : task ? taskKeys.lesson(lessonIndex, task) : undefined;
     stamps.awardStamp({
       kind,
       subject: "zhuyin",
       detail: `${name} ${activity}`.trim(),
       ...(needsPractice ? { needsPractice } : {}),
       ...(oncePerDay ? { key: `${kind}:${lessonIndex}:${activity}` } : {}),
+      ...(taskKey ? { taskKey } : {}),
     });
   };
 

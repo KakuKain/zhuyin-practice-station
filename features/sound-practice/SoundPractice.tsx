@@ -1,4 +1,5 @@
 import { ShowMsg } from "../../components/ShowMsg";
+import { taskKeys } from "../rewards/stamp-book";
 
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, CaretRight, CheckCircle, XCircle } from "@phosphor-icons/react";
@@ -337,6 +338,7 @@ export function SoundPractice({ audio, onBack }: { audio: Audio; onBack?: () => 
                             kind: "practice",
                             subject: "zhuyin",
                             detail: `辨音 ${pair.title}`,
+                            taskKey: taskKeys.sound,
                           });
                       }, 1200);
                     } else {

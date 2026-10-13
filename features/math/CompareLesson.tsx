@@ -11,6 +11,7 @@ import type { AppController } from "../usePracticeApp";
 import { isPalmContact } from "../../lib/ink/gesture";
 import { MathHeader, MathPrompt, MathStartButton } from "./MathChrome";
 import { mathPromptUrl, mathPrompts } from "./math-audio";
+import { taskKeys } from "../rewards/stamp-book";
 import type { MathLesson } from "./math-lessons";
 import { recordMathResult } from "./math-round";
 import {
@@ -139,6 +140,7 @@ export function CompareLesson({ app, lesson }: { app: CompareApp; lesson: MathLe
       kind: "practice",
       subject: "math",
       detail: `數學${lesson.number} ${lesson.title}`,
+      taskKey: taskKeys.math(lesson.id),
       needsPractice: topics.length,
     });
     setFinished({ total: round.questions.length, topics });

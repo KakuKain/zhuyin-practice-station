@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Gift, Heart, SealCheck, Star, Stamp, X, type Icon } from "@phosphor-icons/react";
+import { Gift, Heart, Medal, SealCheck, Star, Stamp, X, type Icon } from "@phosphor-icons/react";
 import type { CardProgress, RewardSettings, StampBook, StampKind } from "./stamp-book";
 import type { StampNews } from "./useStampBook";
 
@@ -7,6 +7,7 @@ export const stampLooks: Record<StampKind, { icon: Icon; label: string }> = {
   practice: { icon: SealCheck, label: "練習章" },
   fix: { icon: Star, label: "訂正之星" },
   cheer: { icon: Heart, label: "鼓勵章" },
+  task: { icon: Medal, label: "任務章" },
 };
 
 /** The card: a slot per stamp, filled in the order they were earned. */
@@ -138,7 +139,7 @@ export function StampCardDialog({
               </div>
             )}
             <ul className="stamp-legend" aria-label="章的種類">
-              {(["practice", "fix", "cheer"] as const).map((kind) => {
+              {(["practice", "fix", "cheer", "task"] as const).map((kind) => {
                 const { icon: Mark, label } = stampLooks[kind];
                 return (
                   <li key={kind} className={`is-${kind}`}>
@@ -183,7 +184,13 @@ export function StampNewsToast({ news, onDismiss }: { news: StampNews; onDismiss
               <Mark size={44} weight="fill" />
             </span>
             <span>
-              <strong>{entry.kind === "practice" ? "蓋了一個章！" : `得到${label}！`}</strong>
+              <strong>
+                {entry.kind === "practice"
+                  ? "蓋了一個章！"
+                  : entry.kind === "task"
+                    ? "完成今天的任務！"
+                    : `得到${label}！`}
+              </strong>
               <small>
                 {progress.full
                   ? "集滿一張卡了！回到課程列表選獎勵吧。"

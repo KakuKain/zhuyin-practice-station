@@ -121,7 +121,12 @@ export function useListeningRound({
     setReviewedIndexes(listeningQuestions.map((_, index) => index));
     setSessionScore({ listeningCorrect: correctUnits });
     recordSession("listening", sessionWritingUnits, correctUnits, pending);
-    awardLessonStamp({ lessonIndex: selectedLesson, activity: "聽寫", needsPractice: pending });
+    awardLessonStamp({
+      lessonIndex: selectedLesson,
+      activity: "聽寫",
+      task: "listening",
+      needsPractice: pending,
+    });
     // Questions that needed practice and are right this time earn one 訂正之星 together.
     if (corrected)
       awardLessonStamp({
