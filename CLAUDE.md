@@ -41,7 +41,7 @@ Asset pipelines:
 - To re-voice a word with Gemini (`gemini-3.8-flash-tts`, voice Fola), run `GEMINI_API_KEY=… npx tsx scripts/generate-gemini-words.ts <words…>` (or `--from <folder>` with `<word>.wav` files saved from AI Studio; `--prompts` prints the prompts). It writes `public/listening-audio/gemini/words/`, removes the old Meijia clip, and records the prompt in `gemini/manifest.json`; then run `npm run assets:audio-registry`. The Meijia script skips words that have a Gemini clip.
 - `node scripts/build-app-icons.mjs` regenerates the home-screen icons in `public/icons/` from `public/favicon.svg`.
 - `npx tsx scripts/generate-math-audio.ts [--refresh]` voices every math instruction in `features/math/math-audio.ts` into `public/math-audio/` (macOS Meijia). First graders cannot read yet, so every math question is spoken; a unit test checks each prompt has a clip.
-- `python3 scripts/build-yo-fonts.py` rebuilds the lesson font subsets after you add characters or IVS glyphs, and writes `assets/font-sources/KidLessonYoOnly-readings.json` (what each character and variation sequence shows). `scripts/build-fonts.py` rebuilds the full fonts. Both need fontTools and brotli. Bump the `?v=` on the fonts in `styles/02-typography.css` when they change.
+- `python3 scripts/build-yo-fonts.py` rebuilds the lesson font subsets after you add characters or IVS glyphs, and writes `assets/font-sources/KidLessonYoOnly-readings.json` and `KidLessonYoSans-readings.json` (what each character and variation sequence shows). `scripts/build-fonts.py` rebuilds the full fonts. Both need fontTools and brotli. Bump the `?v=` on the fonts in `styles/02-typography.css` when they change.
 
 ## Build and deploy
 
@@ -65,6 +65,10 @@ There is one build: a static Vite SPA. `index.html` → `app/main.tsx` → `crea
   - The course list's 國語｜數學 switch (not 注音, which would clash with the 注音 symbol-chart tab) is remembered per child (`ChildProfile.subject`). `openMathLesson` sets `mathLessonId` and the `math` view, and `MathScreen` runs the round.
   - Lesson 1 asks 4 數一數 (tap pictures to mark them, write the number) and then 4 畫圈圈 (each stroke is numbered as it is drawn), all spoken aloud.
   - The parent checks it at the end. The round persists per child in `kid-math-round-v1`, and finished rounds go to `kid-math-records-v1`.
+  - Every instruction is spoken and shown in 國字注音 (`MathPrompt` in `MathChrome.tsx`: an icon-only replay button and `AnnotatedText`).
+    - `mathPromptReadings` in `math-audio.ts` gives one syllable per character. The four polyphones the font would misread (數一數, 箱子／兔子, 曲線, 蘿蔔) get `\u{E01E1}` from `alternateReadings`.
+    - A unit test checks every character against `KidLessonYoSans-readings.json`.
+    - A sentence the font cannot annotate correctly is reworded: 寫下來 needs ˙ㄌㄞ, so the prompt says 用筆寫出數字.
   - Lesson 2 (比一比) is a lazy chunk: `CompareLesson.tsx` with `styles/lazy/math-compare.css`. `compare-round.ts` builds the round and holds the rules.
     - A round has 8 questions in textbook order: 比長短 lined up, then out of line; 比高矮 on the ground, then one child on a box; 排順序 by length and by height; 直線和曲線; 哪條路最近.
     - Answers are taps, checked at once and retried until right, like 辨音.

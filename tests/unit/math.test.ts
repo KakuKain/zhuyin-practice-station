@@ -8,7 +8,15 @@ import {
   newMathRound,
   validateMathRound,
 } from "../../features/math/math-round";
-import { mathPromptId, mathPromptUrl, mathPrompts } from "../../features/math/math-audio";
+import { readFileSync } from "node:fs";
+import {
+  isHan,
+  mathPromptId,
+  mathPromptReadings,
+  mathPromptUrl,
+  mathPromptVariants,
+  mathPrompts,
+} from "../../features/math/math-audio";
 import {
   answerOf,
   buildCompareRound,
@@ -186,4 +194,32 @@ test("every 第二課 instruction and both answers are read aloud from a shipped
     assert.ok(mathPrompts[id], id);
     assert.ok(existsSync(`public/${mathPromptUrl(id).split("?")[0]}`), id);
   }
+});
+
+// Written by scripts/build-yo-fonts.py from the shipped KidLessonYoSans subset.
+const annotated: Record<string, string> = JSON.parse(
+  readFileSync("assets/font-sources/KidLessonYoSans-readings.json", "utf8"),
+);
+
+test("every math instruction shows the right zhuyin beside each character", () => {
+  for (const [id, text] of Object.entries(mathPrompts)) {
+    const readings = mathPromptReadings[id]?.split(" ") ?? [];
+    const characters = Array.from(text);
+    const han = characters.filter(isHan);
+    assert.equal(readings.length, han.length, `${id}: one reading per character`);
+    const variants = mathPromptVariants(id);
+    let syllable = 0;
+    characters.forEach((character, index) => {
+      if (!isHan(character)) return;
+      const glyph = character + (variants[index] ?? "");
+      const reading = readings[syllable++];
+      assert.ok(
+        glyph in annotated,
+        `${id}: ${character} is missing; run scripts/build-yo-fonts.py`,
+      );
+      assert.equal(annotated[glyph], reading, `${id}: ${character} should read ${reading}`);
+    });
+  }
+  // 數一數 counts (ㄕㄨˇ), 數字 is a number (ㄕㄨˋ).
+  assert.deepEqual(mathPromptVariants("count"), { 0: "\u{E01E1}", 2: "\u{E01E1}" });
 });

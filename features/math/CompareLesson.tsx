@@ -201,7 +201,7 @@ function QuestionView({
 
   return (
     <section className={`compare-question is-${question.kind}`}>
-      <MathPrompt text={mathPrompts[promptId]} onPlay={() => say(promptId)} />
+      <MathPrompt id={promptId} onPlay={() => say(promptId)} />
       {question.kind === "compare" || question.kind === "order" ? (
         <BarStage
           question={question}

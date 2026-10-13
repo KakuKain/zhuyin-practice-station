@@ -139,12 +139,11 @@ def build(source_name: str, output_name: str, family_name: str) -> None:
     corrected = check["glyf"][check.getBestCmap()[ord("喲")]]
     assert any(component.glyphName == "zyo" for component in corrected.components)
     assert not any(component.glyphName == "z_yao1" for component in corrected.components)
-    if output_name == "KidLessonYoOnly.woff2":
-        # Lets a unit test prove every answer glyph is in the subset and shows its reading.
-        snapshot = SOURCE_DIR / "KidLessonYoOnly-readings.json"
-        snapshot.write_text(
-            json.dumps(readings(check), ensure_ascii=False, indent=0) + "\n", encoding="utf-8"
-        )
+    # Lets unit tests prove every answer glyph and annotated sentence shows its reading.
+    snapshot = SOURCE_DIR / output_name.replace(".woff2", "-readings.json")
+    snapshot.write_text(
+        json.dumps(readings(check), ensure_ascii=False, indent=0) + "\n", encoding="utf-8"
+    )
     print(f"{output_path.name}: {output_path.stat().st_size:,} bytes")
 
 
