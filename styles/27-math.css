@@ -31,101 +31,202 @@
   font-style: normal;
 }
 
-/* Practice screen */
+/* A math lesson's page: the 注音 lesson page's heading and cards, then what the lesson practises. */
+/* Math titles are short; 認識 1～10 stays on one line instead of breaking before ～. */
+.math-lesson-page .lesson-heading .lesson-title {
+  text-wrap: nowrap;
+}
+.lesson-page .mode-grid.is-single {
+  grid-template-columns: minmax(0, 1fr);
+}
+.math-lesson-parts {
+  padding-inline: var(--lesson-inset);
+}
+.math-lesson-parts h2 {
+  margin: 24px 0 12px;
+  color: var(--ref-navy);
+  font-size: clamp(20px, 3vw, 32px);
+  font-weight: 900;
+}
+.math-lesson-parts ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+  gap: 12px;
+  margin: 0 0 24px;
+  padding: 0;
+  list-style: none;
+}
+.math-lesson-parts li {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  min-height: 64px;
+  padding: 10px 18px;
+  border-radius: 20px;
+  background: linear-gradient(110deg, #f3faff 0%, #e6f3ff 72%, #eff8ff 100%);
+  color: var(--ref-navy);
+  font-size: clamp(20px, 2.6vw, 26px);
+  font-weight: 800;
+}
+.math-lesson-parts li:nth-child(3n + 2) {
+  background: linear-gradient(110deg, #f4fcf7 0%, #e5f6eb 72%, #effbf3 100%);
+}
+.math-lesson-parts li:nth-child(3n) {
+  background: linear-gradient(110deg, #fffdf5 0%, #fff4dc 72%, #fff9ea 100%);
+}
+
+/* Practice screen: the watercolor paper and the header of 聽寫. */
 .math-shell {
   display: flex;
   flex-direction: column;
   min-height: 100dvh;
-  background: #fffdf6;
-  color: #18375d;
+  background: #fefdf7 url("/course-art/lesson-watercolor-paper.webp") center bottom / 100% auto
+    no-repeat;
+  color: var(--ink);
 }
 .math-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-height: 72px;
-  padding: 10px 16px;
-  border-bottom: 1px solid #e3edf3;
-  background: #fff;
-}
-.math-header > div {
   display: grid;
-  gap: 2px;
+  grid-template-columns: 84px minmax(0, 1fr) 84px;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-bottom: 1px solid #c7dce8;
+  background: #fffefb;
+}
+.math-header h1 {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  color: #19375b;
+  font-size: 17px;
+  font-weight: 700;
+  text-align: center;
+}
+/* A long title breaks only at the spaces around ·, never inside a word. */
+.math-header h1 > span {
+  word-break: keep-all;
 }
 .math-header small {
-  color: #5b6f86;
+  color: #617b91;
   font-size: 14px;
+  font-weight: 500;
+}
+@media (max-width: 420px) {
+  .math-header {
+    grid-template-columns: auto minmax(0, 1fr) 8px;
+    padding-inline: 8px;
+  }
 }
 .math-back {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  justify-self: start;
+  gap: 5px;
   min-height: 44px;
-  padding: 0 12px;
-  border: 1px solid #c7dce8;
+  padding: 11px 8px;
+  border: 0;
   border-radius: 12px;
-  background: #fff;
-  color: #264d74;
+  background: transparent;
+  color: #2d659d;
   font: inherit;
+  white-space: nowrap;
 }
 .math-question,
-.math-ready,
-.math-check,
-.math-result {
+.math-check {
   display: grid;
   gap: 16px;
   width: min(100%, 720px);
   margin: 0 auto;
   padding: 16px;
 }
-.math-ready,
+
+/* The end of a round, drawn like 辨音's: the cat with its trophy on a paper card. */
 .math-result {
-  justify-items: center;
-  padding-top: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: min(100% - 32px, 560px);
+  margin: 24px auto;
+  padding: 24px 18px 28px;
+  border: 2px solid #c6dfe7;
+  border-radius: 28px;
+  background: #fffefa;
   text-align: center;
+  box-shadow: 0 8px 24px #355d6b0d;
 }
-.math-ready h1,
-.math-result h1 {
+.math-result-art {
+  width: 220px;
+  height: 220px;
+  object-fit: contain;
+}
+.math-result h2 {
   margin: 0;
-  font-size: clamp(28px, 6vw, 40px);
+  color: #19375b;
+  font-size: clamp(26px, 5vw, 34px);
 }
-.math-ready p,
 .math-result p {
   margin: 0;
-  color: #4d6680;
+  color: #527188;
   font-size: 18px;
+  line-height: 1.7;
 }
-.math-start {
+.math-result-actions {
   display: grid;
-  place-items: center;
-  gap: 4px;
-  width: 168px;
-  height: 168px;
-  border: 0;
-  border-radius: 50%;
-  background: #3474d7;
-  color: #fff;
+  gap: 14px;
+  width: 100%;
+  max-width: 420px;
+  margin-top: 6px;
+}
+.math-result-actions button {
+  min-height: 54px;
+  border-radius: 18px;
   font: inherit;
-  font-size: 22px;
-  font-weight: 700;
+  font-size: 1.15rem;
+  font-weight: 800;
 }
-.math-actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 12px;
+.math-result-again {
+  border: 0;
+  background: #2477d6;
+  color: #fff;
+  box-shadow: 0 5px 0 #badbf3;
 }
-.math-actions button {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
+.math-result-leave {
+  border: 1.5px solid #357bc8;
+  background: #fff;
+  color: #357bc8;
+}
+@media (max-height: 740px) {
+  .math-result-art {
+    width: 170px;
+    height: 170px;
+  }
 }
 
-/* Every instruction can be heard again. */
+/* Every instruction can be heard again, on a card washed like the course cards. */
 .math-prompt {
+  position: relative;
+  isolation: isolate;
   display: flex;
   align-items: center;
   gap: 14px;
+  padding: 12px 16px 12px 12px;
+  border-radius: 24px;
+  background: linear-gradient(110deg, #f3faff 0%, #e6f3ff 72%, #eff8ff 100%);
+}
+.math-prompt::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  border-radius: inherit;
+  background: url("/course-art/course-card-paper-v1.webp") center / 210px repeat;
+  mix-blend-mode: multiply;
+  opacity: 0.24;
+  pointer-events: none;
 }
 /* 國字注音, large enough for the zhuyin beside each character. */
 .math-prompt p {
@@ -142,8 +243,9 @@
   height: 60px;
   border: 0;
   border-radius: 50%;
-  background: #e6f1ff;
-  color: #1f5fae;
+  background: #fff;
+  color: #2d659d;
+  box-shadow: 0 2px 0 rgba(47, 95, 138, 0.14);
 }
 
 .math-pictures {
@@ -151,9 +253,9 @@
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 8px;
   padding: 12px;
-  border: 1px solid #e3edf3;
-  border-radius: 20px;
-  background: #fff;
+  border: 2px solid #c6dfe7;
+  border-radius: 22px;
+  background: #fffefa;
 }
 .math-pictures button,
 .math-join-group button {
@@ -345,10 +447,12 @@
   opacity: 0.4;
 }
 
-/* 家長檢查 */
-.math-check h1 {
+/* 家長檢查, like 聽寫's 整輪檢查. */
+.math-check > h2 {
   margin: 0;
+  color: #19375b;
   font-size: 26px;
+  font-weight: 800;
 }
 .math-check > p {
   margin: 0;

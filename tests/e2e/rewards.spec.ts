@@ -19,11 +19,17 @@ const openRewards = async (page: Page) => {
   await page.getByRole("button", { name: /^集章卡/ }).click();
 };
 
+/** From a finished math round: its lesson page, then the course list. */
+const backToCourses = async (page: Page) => {
+  await page.getByRole("button", { name: "回到這一課" }).click();
+  await page.getByRole("button", { name: "回到課程" }).click();
+};
+
 /** 數學第一課 with nothing written: the parent's check still finishes the practice. */
 const finishMathLesson = async (page: Page) => {
   await page.getByRole("button", { name: "數學", exact: true }).click();
   await page.getByRole("button", { name: /數學第一課/ }).click();
-  await page.getByRole("button", { name: "開始練習" }).click();
+  await page.getByRole("button", { name: "開始練習", exact: true }).click();
   for (let i = 0; i < 7; i++)
     await page.getByRole("button", { name: "下一題", exact: true }).click();
   await page.getByRole("button", { name: "寫完了，請家長檢查" }).click();
@@ -61,7 +67,7 @@ test("集章卡 is set up in three steps, stamps finished practice and trades a 
   await expect(toast).toContainText("蓋了一個章！");
   // How full the card is shows only on the card itself.
   await expect(toast).not.toContainText("/");
-  await page.getByRole("button", { name: "回到課程" }).click();
+  await backToCourses(page);
   await openFromDock(page, "集章卡");
   await expect(page.locator(".stamp-slots li.is-filled")).toHaveCount(1);
   await page.getByRole("button", { name: "關閉" }).click();
@@ -113,7 +119,7 @@ test("集章卡 is set up in three steps, stamps finished practice and trades a 
   await page.reload();
   await finishMathLesson(page);
   await expect(toast).toContainText("今天好認真！");
-  await page.getByRole("button", { name: "回到課程" }).click();
+  await backToCourses(page);
   await openRewards(page);
   await expect(page.locator(".reward-log li").first()).toContainText("今天的章已經蓋滿");
   expect(errors).toEqual([]);
@@ -211,13 +217,13 @@ test("a parent sets 今天的任務 from what needs help; finishing it earns a �
   await expect(today.locator("li")).toHaveCount(2);
   await today.getByRole("button", { name: "去做：數學第一課 認識 1～10" }).click();
   await expect(page.getByRole("heading", { name: "認識 1～10" })).toBeVisible();
-  await page.getByRole("button", { name: "開始練習" }).click();
+  await page.getByRole("button", { name: "開始練習", exact: true }).click();
   for (let i = 0; i < 7; i++)
     await page.getByRole("button", { name: "下一題", exact: true }).click();
   await page.getByRole("button", { name: "寫完了，請家長檢查" }).click();
   await page.getByRole("button", { name: "檢查完成" }).click();
   await expect(page.locator(".stamp-toast")).toContainText("完成今天的任務！");
-  await page.getByRole("button", { name: "回到課程" }).click();
+  await backToCourses(page);
   await openFromDock(page, "今天的任務");
   await expect(today.locator("li.is-done")).toContainText("完成了");
   await page.getByRole("button", { name: "關閉" }).click();

@@ -33,7 +33,7 @@ test("第一課 reads each question aloud, keeps the round and ends with the par
   await page.goto("./");
   await page.getByRole("button", { name: "數學", exact: true }).click();
   await page.getByRole("button", { name: /數學第一課/ }).click();
-  await page.getByRole("button", { name: "開始練習" }).click();
+  await page.getByRole("button", { name: "開始練習", exact: true }).click();
 
   // 數一數: the question is spoken, pictures can be marked, the number is written.
   await expect(page.locator(".math-header")).toContainText("第 1 題 / 8");
@@ -82,7 +82,7 @@ test("第一課 reads each question aloud, keeps the round and ends with the par
   await expect(cards.nth(4)).toContainText("畫了 2 格");
   await cards.nth(0).locator(".math-check-toggle").click();
   await page.getByRole("button", { name: "檢查完成" }).click();
-  await expect(page.getByRole("heading", { name: "練習完成！" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "這一課練完了！" })).toBeVisible();
   const records = await page.evaluate(() =>
     JSON.parse(localStorage.getItem("kid-math-records-v1") ?? "{}"),
   );
@@ -90,7 +90,9 @@ test("第一課 reads each question aloud, keeps the round and ends with the par
   expect(records.rounds[0].needsPractice.length).toBe(7);
   expect(await page.evaluate(() => localStorage.getItem("kid-math-round-v1"))).toBeNull();
 
-  // The course list stays on 數學 for this child.
+  // Back to the lesson page, then the course list, which stays on 數學 for this child.
+  await page.getByRole("button", { name: "回到這一課" }).click();
+  await expect(page.getByRole("button", { name: "開始練習", exact: true })).toBeVisible();
   await page.getByRole("button", { name: "回到課程" }).click();
   await expect(page.getByRole("button", { name: "數學", exact: true })).toHaveAttribute(
     "aria-pressed",
@@ -107,7 +109,7 @@ test("第二課 has things lined up before comparing, lets a wrong tap be tried 
   await page.goto("./");
   await page.getByRole("button", { name: "數學", exact: true }).click();
   await page.getByRole("button", { name: /數學第二課/ }).click();
-  await page.getByRole("button", { name: "開始練習" }).click();
+  await page.getByRole("button", { name: "開始練習", exact: true }).click();
 
   const header = page.locator(".math-header small");
   // A clip played before comes from the cache, so check what it says rather than its file.
@@ -218,8 +220,8 @@ test("第二課 has things lined up before comparing, lets a wrong tap be tried 
   await expect(page.getByRole("img", { name: "小兔子" })).toBeVisible();
   await tapUntilRight(page.locator(".compare-route .route-flag"), 8);
 
-  await expect(page.getByRole("heading", { name: "練習完成！" })).toBeVisible();
-  await expect(page.locator(".compare-result-topics")).toContainText("比長短（先對齊）");
+  await expect(page.getByRole("heading", { name: "這一課練完了！" })).toBeVisible();
+  await expect(page.locator(".math-result")).toContainText("比長短（先對齊）");
   const records = await page.evaluate(() =>
     JSON.parse(localStorage.getItem("kid-math-records-v1") ?? "{}"),
   );
@@ -239,15 +241,18 @@ test("第三課 adds with pictures and circles, keeps 第一課's round and ends
 
   // An unfinished 第一課 round stays saved while 第三課 is practised.
   await page.getByRole("button", { name: /數學第一課/ }).click();
-  await page.getByRole("button", { name: "開始練習" }).click();
+  await page.getByRole("button", { name: "開始練習", exact: true }).click();
   await stroke(page, page.getByLabel("寫數字"), [
     [30, 30],
     [60, 70],
   ]);
+  // 返回 goes back to the lesson page, which now offers to continue.
   await page.getByRole("button", { name: "返回" }).click();
+  await expect(page.getByRole("button", { name: "繼續上次的練習" })).toBeVisible();
+  await page.getByRole("button", { name: "回到課程" }).click();
 
   await page.getByRole("button", { name: /數學第三課/ }).click();
-  await page.getByRole("button", { name: "開始練習" }).click();
+  await page.getByRole("button", { name: "開始練習", exact: true }).click();
   const header = page.locator(".math-header");
   const audio = page.locator("audio");
 
@@ -302,7 +307,7 @@ test("第三課 adds with pictures and circles, keeps 第一課's round and ends
   await expect(cards.nth(4).locator(".math-check-toggle")).toHaveAttribute("aria-pressed", "false");
   await expect(cards.nth(4).locator("figcaption")).toHaveText([/畫了 2 格/, /畫了 1 格/]);
   await page.getByRole("button", { name: "檢查完成" }).click();
-  await expect(page.getByRole("heading", { name: "練習完成！" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "這一課練完了！" })).toBeVisible();
   await expect(page.locator(".math-result")).toContainText("＋");
 
   const stored = await page.evaluate(() => ({
@@ -317,6 +322,7 @@ test("第三課 adds with pictures and circles, keeps 第一課's round and ends
   expect(stored.lesson3).toBeNull();
   expect(JSON.parse(stored.lesson1!).lessonId).toBe(1);
 
+  await page.getByRole("button", { name: "回到這一課" }).click();
   await page.getByRole("button", { name: "回到課程" }).click();
   await page.getByRole("button", { name: /數學第一課/ }).click();
   await expect(page.getByRole("button", { name: "繼續上次的練習" })).toBeVisible();

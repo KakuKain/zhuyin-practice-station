@@ -28,6 +28,7 @@ const SettingsScreen = lazy(() =>
 import { ListeningResult } from "../features/listening/ListeningResult";
 import { ListeningScreen } from "../features/listening/ListeningScreen";
 import { MathScreen } from "../features/math/MathScreen";
+import { MathLessonPage } from "../features/math/MathLessonPage";
 import { StampNewsToast } from "../features/rewards/StampCard";
 const SymbolChart = lazy(() =>
   import("../features/symbols/SymbolChart").then((module) => ({ default: module.SymbolChart })),
@@ -105,6 +106,8 @@ function PracticeContent({ app }: { app: ReturnType<typeof usePracticeApp> }) {
         return <FillBlank app={app} />;
       case "result":
         return <ListeningResult app={app} />;
+      case "math-lesson":
+        return <MathLessonPage app={app} />;
       default:
         return <CourseList app={app} />;
     }
@@ -130,14 +133,14 @@ function PracticeContent({ app }: { app: ReturnType<typeof usePracticeApp> }) {
 
   return (
     <HeaderBackSlot.Provider value={backSlot}>
-      <div className={`app-shell is-${view}`}>
+      <div className={`app-shell is-${view}${view === "math-lesson" ? " is-lesson" : ""}`}>
         <AppHeader
           backSlotRef={setBackSlot}
           title={view === "practice" ? "練習" : undefined}
           materialSelector={view === "courses" ? <MaterialSelector app={app} /> : undefined}
           onCourses={() => navigate("courses")}
           onBack={
-            view === "lesson"
+            view === "lesson" || view === "math-lesson"
               ? () => navigate("courses")
               : view === "fill"
                 ? () => navigate("lesson")
@@ -160,7 +163,11 @@ function PracticeContent({ app }: { app: ReturnType<typeof usePracticeApp> }) {
           </Suspense>
         </main>
         <BottomNav
-          active={view === "lesson" || view === "fill" || view === "result" ? "courses" : view}
+          active={
+            view === "lesson" || view === "fill" || view === "result" || view === "math-lesson"
+              ? "courses"
+              : view
+          }
           onNavigate={navigate}
         />
         {view === "fill" && <FillDialogs app={app} />}

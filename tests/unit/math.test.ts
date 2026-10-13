@@ -23,6 +23,7 @@ import {
   mathPromptVariants,
   mathPrompts,
 } from "../../features/math/math-audio";
+import { mathLessons, mathWord, mathWordReadings } from "../../features/math/math-lessons";
 import {
   answerOf,
   buildCompareRound,
@@ -326,4 +327,34 @@ test("each math lesson keeps its own unfinished round, for every child", () => {
     "kid-math-round-v1-3@k2",
     "kid-math-round-v1@k2",
   ]);
+});
+
+test("the math course cards and lesson pages show every word in 國字注音", () => {
+  const shown = [
+    "數學",
+    ...mathLessons.flatMap((lesson) => [lesson.number, lesson.title, ...lesson.parts]),
+    ...["這一課", "開始", "開始練習", "從頭開始", "繼續", "繼續練習", "第", "題"],
+  ];
+  for (const text of shown) {
+    assert.ok(mathWordReadings[text], `${text} needs its readings`);
+    const readings = mathWordReadings[text].split(" ");
+    const characters = Array.from(text);
+    assert.equal(readings.length, characters.filter(isHan).length, `${text}: one per character`);
+    const { variants } = mathWord(text);
+    let syllable = 0;
+    characters.forEach((character, index) => {
+      if (!isHan(character)) return;
+      const glyph = character + (variants[index] ?? "");
+      assert.ok(glyph in annotated, `${text}: ${character} is missing from the font`);
+      assert.equal(annotated[glyph], readings[syllable++], `${text}: ${character}`);
+    });
+  }
+  // Each lesson page says how many questions a round has.
+  const sizes = [mathRoundSize, compareRoundSize, additionRoundSize].map((size) =>
+    typeof size === "number" ? size : Object.values(size).reduce((sum, n) => sum + n, 0),
+  );
+  assert.deepEqual(
+    mathLessons.map((lesson) => lesson.questions),
+    sizes,
+  );
 });

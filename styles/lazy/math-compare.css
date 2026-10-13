@@ -366,10 +366,6 @@
   }
 }
 
-.compare-result-topics {
-  max-width: 520px;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .compare-item,
   .compare-box {

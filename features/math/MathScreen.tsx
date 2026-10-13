@@ -1,5 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from "react";
-import { Play } from "@phosphor-icons/react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import type { AppController } from "../usePracticeApp";
 import type { InkStroke } from "../types";
 import { InkPreview } from "../../components/AppChrome";
@@ -19,13 +18,13 @@ import {
 import { chineseNumber, mathPromptId, mathPromptUrl, mathPrompts } from "./math-audio";
 import { taskKeys } from "../rewards/stamp-book";
 import { mathLessons, type MathLesson } from "./math-lessons";
-import { MathHeader, MathPrompt, MathStartButton } from "./MathChrome";
+import { MathHeader, MathPrompt, MathResult } from "./MathChrome";
 import { CountPictures, JoinPictures } from "./MathPictures";
 import { AdditionWork, DrawFrame, FramePreview, InkSquare } from "./MathInk";
 
 type MathApp = Pick<
   AppController,
-  "speak" | "stopPlayback" | "navigate" | "mathLessonId" | "awardStamp"
+  "speak" | "stopPlayback" | "navigate" | "mathLessonId" | "mathStart" | "awardStamp"
 >;
 
 const CompareLesson = lazy(() =>
@@ -71,8 +70,10 @@ export function MathScreen({ app }: { app: MathApp }) {
  * round. Each lesson keeps its own unfinished round.
  */
 function WritingLesson({ app, lesson }: { app: MathApp; lesson: MathLesson }) {
-  const [saved] = useState(() => readMathRound(lesson.id));
-  const [round, setRound] = useState<MathRound | null>(null);
+  // The lesson page chose to continue the saved round or start a new one.
+  const [round, setRound] = useState<MathRound | null>(
+    () => (app.mathStart === "continue" && readMathRound(lesson.id)) || newMathRound(lesson.id),
+  );
   const [marked, setMarked] = useState<ReadonlySet<number>>(new Set());
   const [finished, setFinished] = useState<MathRound | null>(null);
   const { speak, stopPlayback } = app;
@@ -86,85 +87,50 @@ function WritingLesson({ app, lesson }: { app: MathApp; lesson: MathLesson }) {
   const play = (question: MathQuestion) =>
     speak(mathPrompts[mathPromptId(question)], { url: mathPromptUrl(mathPromptId(question)) });
 
+  // The first question is read out as the round opens, as tapping 開始練習 unlocked audio.
+  const opened = useRef(false);
+  useEffect(() => {
+    if (opened.current || !round || round.phase === "check") return;
+    opened.current = true;
+    play(round.questions[round.index]);
+  });
+
   const goTo = (current: MathRound, index: number) => {
     setMarked(new Set());
     setRound({ ...current, index });
     play(current.questions[index]);
   };
-  const start = (next: MathRound) => {
-    setFinished(null);
-    if (next.phase === "check") return setRound(next);
-    goTo(next, next.index);
-  };
   const leave = () => {
     stopPlayback();
-    app.navigate("courses");
+    app.navigate("math-lesson");
   };
 
   const header = (title: string, detail?: string) => (
     <MathHeader title={title} detail={detail} onLeave={leave} />
   );
 
-  if (finished) {
-    const needs = finished.needsPractice.map((index) => finished.questions[index]);
+  if (finished || !round) {
+    const done = finished ?? newMathRound(lesson.id);
+    const needs = done.needsPractice.map((index) => done.questions[index]);
     return (
-      <main className="math-shell">
-        {header(`${lesson.number} · ${lesson.title}`)}
-        <section className="math-result">
-          <h1>練習完成！</h1>
-          <p>
-            {finished.questions.length} 題都寫完了
-            {needs.length
-              ? `，有 ${needs.length} 題要再練習：${needs.map(questionName).join("、")}。`
-              : "，全部都會了！"}
-          </p>
-          <div className="math-actions">
-            <button
-              type="button"
-              className="primary-button"
-              onClick={() => start(newMathRound(lesson.id))}
-            >
-              再練一次
-            </button>
-            <button type="button" className="secondary-button" onClick={leave}>
-              回到課程
-            </button>
-          </div>
-        </section>
+      <main className="math-shell is-result">
+        {header(`數學${lesson.number} · ${lesson.title}`)}
+        <MathResult
+          title="這一課練完了！"
+          note={
+            needs.length
+              ? `有 ${needs.length} 題要再練習：${needs.map(questionName).join("、")}`
+              : `${done.questions.length} 題全部都會了！`
+          }
+          onAgain={() => {
+            setFinished(null);
+            goTo(newMathRound(lesson.id), 0);
+          }}
+          onLeave={leave}
+        />
       </main>
     );
   }
-
-  if (!round)
-    return (
-      <main className="math-shell">
-        {header(`${lesson.number} · ${lesson.title}`)}
-        <section className="math-ready">
-          <h1>{lesson.title}</h1>
-          <p>{lesson.round}</p>
-          {saved ? (
-            <div className="math-actions">
-              <button type="button" className="primary-button" onClick={() => start(saved)}>
-                <Play size={22} weight="fill" aria-hidden="true" />
-                繼續上次的練習
-              </button>
-              <button
-                type="button"
-                className="secondary-button"
-                onClick={() => {
-                  clearMathRound(lesson.id);
-                  start(newMathRound(lesson.id));
-                }}
-              >
-                重新開始
-              </button>
-            </div>
-          ) : (
-            <MathStartButton onStart={() => start(newMathRound(lesson.id))} />
-          )}
-        </section>
-      </main>
-    );
 
   if (round.phase === "check") {
     const toggle = (index: number) =>
@@ -178,7 +144,7 @@ function WritingLesson({ app, lesson }: { app: MathApp; lesson: MathLesson }) {
       <main className="math-shell is-check">
         {header(`${lesson.number} · 家長檢查`)}
         <section className="math-check">
-          <h1>請家長一起檢查</h1>
+          <h2>請家長一起檢查</h2>
           <p>對照答案，把還不會的題目標成「需要補強」。也可以看看孩子哪些數字還不熟。</p>
           {round.questions.map((question, index) => {
             const strokes = round.ink[index] ?? [];

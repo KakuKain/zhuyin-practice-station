@@ -92,7 +92,13 @@ There is one build: a static Vite SPA. `index.html` → `app/main.tsx` → `crea
     - `RewardsPanel` holds the guide, 今天的任務, 鼓勵章, log and settings.
   - Google sign-in and cloud sync were discussed but are not built. They would change the hard constraints above.
 - `features/math/` is self-contained.
-  - The course list's 國語｜數學 switch (not 注音, which would clash with the 注音 symbol-chart tab) is remembered per child (`ChildProfile.subject`). `openMathLesson` sets `mathLessonId` and the `math` view, and `MathScreen` runs the round.
+  - The course list's 國語｜數學 switch (not 注音, which would clash with the 注音 symbol-chart tab) is remembered per child (`ChildProfile.subject`).
+  - Math is drawn like 國語 so the two subjects feel like one site:
+    - `MathCourseList` uses the 注音 journey cards, with each lesson's watercolor picture (`MathLesson.art`).
+    - `openMathLesson` sets `mathLessonId` and opens the `math-lesson` view. `MathLessonPage` is a 國語 lesson page inside the app shell: the heading over the picture, a 開始練習 mode card (plus 繼續上次的練習 when a round is saved, which turns the other card into 從頭開始), and 這一課's parts.
+    - `startMathPractice` records `mathStart` and opens the full-screen `math` view; the round starts at once and reads its first question. 返回 and the back gesture go to the lesson page.
+    - The practice screens use 聽寫's watercolor paper and header (`MathHeader`), the prompt sits on a washed card, and a round ends on `MathResult`, drawn like 辨音's finished card.
+    - Every word on the cards and the lesson page is 國字注音 from `mathWordReadings` in `math-lessons.ts`; a unit test checks it against the font.
   - Lesson 1 asks 4 數一數 (tap pictures to mark them, write the number) and then 4 畫圈圈, all spoken aloud.
   - Circles are always drawn in a 十格框 (5 × 2 cells, one circle each, `DrawFrame`/`TenFrame` in `MathInk.tsx`):
     - Every cell is its own square canvas, because a non-square canvas would stretch the strokes. One `useInkCanvas` serves them all, so only one pen draws at a time.
@@ -204,7 +210,7 @@ Layout: `features/<feature>/` holds feature UI and logic, `components/` holds sh
 
 ### Styles
 
-- `app/globals.css` imports `styles/00-…css` through `styles/28-…css` in a fixed cascade order. Order matters. `26-children.css` styles the child picker, the course-list greeting and 更多 → 孩子; `27-math.css` the subject switch and the math screen (landscape tablets put the square on the right; 畫圈圈算加法 keeps its three squares in one row, and phones wrap the answer below); `28-rewards.css` the 集章卡 chip, card, toast and settings.
+- `app/globals.css` imports `styles/00-…css` through `styles/28-…css` in a fixed cascade order. Order matters. `26-children.css` styles the child picker, the course-list greeting and 更多 → 孩子; `27-math.css` the subject switch, the math lesson page and the math screen (landscape tablets put the square on the right; 畫圈圈算加法 keeps its three squares in one row, and phones wrap the answer below); `28-rewards.css` the 集章卡 chip, card, toast and settings.
 - `00-reset.css` is the former Tailwind preflight, kept in cascade layers so every unlayered rule wins. There is no Tailwind and there are no utility classes.
 - `24-fill-tablet.css` makes dictation (sheet, writing cell, review) full width at ≥ 600px: the square grows to the space left by the header and controls, and landscape tablets put the heading and finish button beside it. Phones keep the 480px column.
 - `25-listen-tablet.css` does the same for listening at ≥ 600px: the single square fills the width, a word's squares stack top to bottom with their tools beside them (side by side, first character on the right, in landscape), and the batch check shows two cards per row.
