@@ -386,7 +386,7 @@ function CountingLesson({ app, lesson }: { app: MathApp; lesson: MathLesson }) {
         `第 ${round.index + 1} 題 / ${round.questions.length}`,
       )}
       <section className={`math-question is-${question.kind}`}>
-        <MathPrompt text={mathPrompts[mathPromptId(question)]} onPlay={() => play(question)} />
+        <MathPrompt id={mathPromptId(question)} onPlay={() => play(question)} />
         {question.kind === "count" ? (
           <div className="math-count">
             <CountPictures

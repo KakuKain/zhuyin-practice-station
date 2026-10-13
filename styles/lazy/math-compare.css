@@ -14,7 +14,7 @@
   --stage-ratio: 1.6;
   position: relative;
   container-type: inline-size;
-  width: min(100%, calc((100dvh - 210px) * var(--stage-ratio)));
+  width: min(100%, calc((100dvh - 280px) * var(--stage-ratio)));
   aspect-ratio: var(--stage-ratio);
   margin: 0 auto;
   border: 1px solid #e3edf3;
@@ -226,7 +226,7 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
-  width: min(100%, calc(100dvh - 230px));
+  width: min(100%, calc(100dvh - 300px));
   margin: 0 auto;
 }
 .compare-lines button {
@@ -265,7 +265,7 @@
 /* 哪條路最近 */
 .compare-route {
   position: relative;
-  width: min(100%, calc((100dvh - 210px) * 1.6));
+  width: min(100%, calc((100dvh - 280px) * 1.6));
   aspect-ratio: 1.6;
   margin: 0 auto;
   border: 1px solid #dcebd2;

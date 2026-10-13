@@ -1,4 +1,6 @@
 import { ArrowLeft, Play, SpeakerHigh } from "@phosphor-icons/react";
+import { AnnotatedText } from "../../components/AnnotatedText";
+import { mathPromptVariants, mathPrompts } from "./math-audio";
 
 /** The header every math lesson shows: back to the course list, the lesson and progress. */
 export function MathHeader({
@@ -24,15 +26,19 @@ export function MathHeader({
   );
 }
 
-/** Every instruction is spoken; the button hears it again and the sentence is there for parents. */
-export function MathPrompt({ text, onPlay }: { text: string; onPlay: () => void }) {
+/**
+ * Every instruction is spoken; the speaker hears it again. The sentence is written in 國字注音,
+ * so a child who knows zhuyin can read along.
+ */
+export function MathPrompt({ id, onPlay }: { id: string; onPlay: () => void }) {
   return (
     <div className="math-prompt">
-      <button type="button" className="math-prompt-play" onClick={onPlay}>
-        <SpeakerHigh size={28} weight="fill" aria-hidden="true" />
-        <span>再聽一次</span>
+      <button type="button" className="math-prompt-play" onClick={onPlay} aria-label="再聽一次">
+        <SpeakerHigh size={32} weight="fill" aria-hidden="true" />
       </button>
-      <p>{text}</p>
+      <p>
+        <AnnotatedText text={mathPrompts[id]} variants={mathPromptVariants(id)} />
+      </p>
     </div>
   );
 }

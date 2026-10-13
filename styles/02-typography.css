@@ -16,7 +16,7 @@
 
 @font-face {
   font-family: "KidLessonYoSans";
-  src: url("/fonts/KidLessonYoSans.woff2?v=5") format("woff2");
+  src: url("/fonts/KidLessonYoSans.woff2?v=6") format("woff2");
   font-style: normal;
   font-weight: 400;
   font-display: swap;
@@ -24,7 +24,7 @@
 
 @font-face {
   font-family: "KidLessonYoOnly";
-  src: url("/fonts/KidLessonYoOnly.woff2?v=5") format("woff2");
+  src: url("/fonts/KidLessonYoOnly.woff2?v=6") format("woff2");
   font-style: normal;
   font-weight: 400;
   font-display: swap;
