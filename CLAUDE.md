@@ -76,6 +76,7 @@ There is one build: a static Vite SPA. `index.html` → `app/main.tsx` → `crea
   - `useStampBook` lives in the coordinator.
     - `awardLessonStamp` names the lesson for the log; flows receive it like `recordSession`.
     - 辨音 and math call `awardStamp` directly.
+    - Everything the child reads on the card, chip and toast is 國字注音 from `stamp-words.ts`, one reading per character. The suggested rewards are annotated too; a parent's own reward or child's name is shown as typed. A unit test checks each character against the font.
     - `StampNewsToast` shows at the app root; `StampChip`, `TodayTasks` and `StampCardDialog` are on the course list; `RewardsPanel` holds the guide, 今天的任務, 鼓勵章, log and settings.
   - Google sign-in and cloud sync were discussed but are not built. They would change the hard constraints above.
 - `features/math/` is self-contained.
@@ -90,7 +91,7 @@ There is one build: a static Vite SPA. `index.html` → `app/main.tsx` → `crea
     - Each lesson's unfinished round persists per child: lesson 1 in `kid-math-round-v1`, others in `kid-math-round-v1-<lesson>` (`mathRoundStorageKey`). Starting one lesson never replaces another's.
     - The circles live in `MathRound.work`. Finished rounds go to `kid-math-records-v1`.
   - Every instruction is spoken and shown in 國字注音 (`MathPrompt` in `MathChrome.tsx`: an icon-only replay button and `AnnotatedText`).
-    - `mathPromptReadings` in `math-audio.ts` gives one syllable per character. The four polyphones the font would misread (數一數, 箱子／兔子, 曲線, 蘿蔔) get `\u{E01E1}` from `alternateReadings`.
+    - `mathPromptReadings` in `math-audio.ts` gives one syllable per character. The four polyphones the font would misread (數一數, 箱子／兔子, 曲線, 蘿蔔) get `\u{E01E1}` from `alternateReadings` in `features/lesson/reading-variants.ts`, the one table every 國字注音 sentence written for children uses.
     - A unit test checks every character against `KidLessonYoSans-readings.json`.
     - A sentence the font cannot annotate correctly is reworded: 寫下來 needs ˙ㄌㄞ, so the prompt says 用筆寫出數字.
   - Lesson 2 (比一比) is a lazy chunk: `CompareLesson.tsx` with `styles/lazy/math-compare.css`. `compare-round.ts` builds the round and holds the rules.

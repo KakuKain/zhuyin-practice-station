@@ -1,11 +1,15 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { readFileSync } from "node:fs";
+import { rewardReadings, stampWords } from "../../features/rewards/stamp-words";
+import { isHan, readingVariants } from "../../features/lesson/reading-variants";
 import {
   addStamp,
   cardProgress,
   defaultRewardSettings,
   emptyStampBook,
   redeemCard,
+  rewardIdeas,
   validateRewardSettings,
   validateStampBook,
   type StampBook,
@@ -140,4 +144,35 @@ test("each child has their own stamps; the family shares the settings; backup in
   assert.ok(ownsStorageKey(`${storageKeys.stamps}@k2`));
   assert.ok(ownsStorageKey(storageKeys.rewardSettings));
   assert.ok(!ownsStorageKey(`${storageKeys.rewardSettings}@k2`));
+});
+
+// Written by scripts/build-yo-fonts.py from the shipped KidLessonYoSans subset.
+const annotated: Record<string, string> = JSON.parse(
+  readFileSync("assets/font-sources/KidLessonYoSans-readings.json", "utf8"),
+);
+
+test("everything a child reads on the stamp card shows the right zhuyin", () => {
+  const sentences: [string, string][] = [
+    ...Object.values(stampWords).map(([text, reading]) => [text, reading] as [string, string]),
+    ...Object.entries(rewardReadings),
+  ];
+  for (const [text, reading] of sentences) {
+    const variants = readingVariants(text, reading);
+    const syllables = reading.split(" ");
+    const characters = Array.from(text);
+    assert.equal(characters.filter(isHan).length, syllables.length, text);
+    let syllable = 0;
+    characters.forEach((character, index) => {
+      if (!isHan(character)) return;
+      const glyph = character + (variants[index] ?? "");
+      assert.equal(annotated[glyph], syllables[syllable++], `${text}: ${character}`);
+    });
+  }
+  // Every suggested reward can be read by the child.
+  for (const idea of rewardIdeas) assert.ok(rewardReadings[idea], idea);
+  // 爸爸媽媽: the second of each is neutral.
+  assert.deepEqual(readingVariants("爸爸媽媽", "ㄅㄚˋ ˙ㄅㄚ ㄇㄚ ˙ㄇㄚ"), {
+    1: "\u{E01E1}",
+    3: "\u{E01E1}",
+  });
 });

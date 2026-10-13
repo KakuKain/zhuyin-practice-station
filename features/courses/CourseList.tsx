@@ -85,7 +85,7 @@ export function CourseList({
       )}
       {cardOpen && (
         <StampCardDialog
-          name={child && profiles.children.length > 1 ? childLabel(child, profiles) : "我"}
+          name={child && profiles.children.length > 1 ? childLabel(child, profiles) : undefined}
           progress={app.stampProgress}
           book={app.stampBook}
           settings={app.rewardSettings}

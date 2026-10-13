@@ -18,7 +18,7 @@
   background: #fff7fa;
   color: #8c2f4e;
   font: inherit;
-  font-size: 17px;
+  font-size: 22px;
   font-weight: 700;
   text-align: left;
 }
@@ -27,7 +27,7 @@
 }
 .stamp-chip strong {
   color: #d0466f;
-  font-size: 18px;
+  font-size: 22px;
 }
 .stamp-chip.is-full {
   border-color: #e8b21f;
@@ -107,7 +107,7 @@
 }
 .stamp-dialog h2 {
   margin: 0;
-  font-size: 22px;
+  font-size: 26px;
 }
 .stamp-close {
   display: grid;
@@ -121,7 +121,7 @@
 }
 .stamp-hint {
   margin: 0;
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 700;
   text-align: center;
 }
@@ -144,7 +144,7 @@
   background: #fff7fa;
   color: #8c2f4e;
   font: inherit;
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 700;
   text-align: left;
 }
@@ -158,7 +158,7 @@
 .stamp-confirm p,
 .stamp-done p {
   margin: 0;
-  font-size: 20px;
+  font-size: 24px;
   line-height: 1.6;
 }
 .stamp-done svg {
@@ -172,7 +172,7 @@
   margin: 0;
   padding: 0;
   color: #5b6f86;
-  font-size: 14px;
+  font-size: 18px;
   list-style: none;
 }
 .stamp-legend li {
@@ -183,7 +183,7 @@
 .stamp-history {
   margin: 0;
   color: #5b6f86;
-  font-size: 14px;
+  font-size: 18px;
   text-align: center;
 }
 
@@ -220,11 +220,12 @@
   gap: 2px;
 }
 .stamp-toast strong {
-  font-size: 20px;
+  font-size: 24px;
+  font-weight: 400;
 }
 .stamp-toast small {
   color: #5b6f86;
-  font-size: 15px;
+  font-size: 19px;
 }
 .stamp-toast-mark {
   display: grid;
@@ -318,6 +319,8 @@
 /* 更多 → 集章卡 */
 .rewards-panel section {
   display: grid;
+  /* A long lesson name in the task list must not widen the page on a phone. */
+  grid-template-columns: minmax(0, 1fr);
   gap: 12px;
   margin-top: 22px;
 }
