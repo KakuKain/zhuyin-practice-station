@@ -5,7 +5,10 @@ import type { InkStroke } from "../types";
 import { InkPreview } from "../../components/AppChrome";
 import {
   clearMathRound,
+  filledCells,
+  frameCells,
   isAnswered,
+  workCells,
   newMathRound,
   readMathRound,
   recordMathRound,
@@ -18,7 +21,7 @@ import { taskKeys } from "../rewards/stamp-book";
 import { mathLessons, type MathLesson } from "./math-lessons";
 import { MathHeader, MathPrompt, MathStartButton } from "./MathChrome";
 import { CountPictures, JoinPictures } from "./MathPictures";
-import { AdditionWork, InkSquare, StrokeNumbers } from "./MathInk";
+import { AdditionWork, DrawFrame, FramePreview, InkSquare } from "./MathInk";
 
 type MathApp = Pick<
   AppController,
@@ -198,15 +201,9 @@ function WritingLesson({ app, lesson }: { app: MathApp; lesson: MathLesson }) {
                         <div className="math-check-circles">
                           {question.parts.map((count, side) => (
                             <figure key={side}>
-                              <div className="math-check-ink is-small">
-                                {circles[side]?.length ? (
-                                  <InkPreview strokes={circles[side]} />
-                                ) : (
-                                  <span>沒有畫</span>
-                                )}
-                              </div>
+                              <FramePreview cells={circles} start={side * frameCells} />
                               <figcaption>
-                                {count} 個，畫了 {circles[side]?.length ?? 0} 筆
+                                {count} 個，畫了 {filledCells(circles, side * frameCells)} 格
                               </figcaption>
                             </figure>
                           ))}
@@ -217,12 +214,28 @@ function WritingLesson({ app, lesson }: { app: MathApp; lesson: MathLesson }) {
                     )}
                   </div>
                   <div className="math-check-answer">
-                    <span className="math-check-label">孩子寫的</span>
-                    <div className="math-check-ink">
-                      {strokes.length ? <InkPreview strokes={strokes} /> : <span>沒有作答</span>}
-                    </div>
-                    {question.kind === "draw" && strokes.length > 0 && (
-                      <small>畫了 {strokes.length} 筆</small>
+                    <span className="math-check-label">
+                      {question.kind === "draw" ? "孩子畫的" : "孩子寫的"}
+                    </span>
+                    {question.kind === "draw" && circles.length ? (
+                      <>
+                        <FramePreview cells={circles} />
+                        <small>畫了 {filledCells(circles)} 格</small>
+                      </>
+                    ) : (
+                      <>
+                        {/* 畫圈圈 drawn before 十格框 shows as it was drawn. */}
+                        <div className="math-check-ink">
+                          {strokes.length ? (
+                            <InkPreview strokes={strokes} />
+                          ) : (
+                            <span>沒有作答</span>
+                          )}
+                        </div>
+                        {question.kind === "draw" && strokes.length > 0 && (
+                          <small>畫了 {strokes.length} 筆</small>
+                        )}
+                      </>
                     )}
                   </div>
                   <div className="math-check-key">
@@ -272,12 +285,16 @@ function WritingLesson({ app, lesson }: { app: MathApp; lesson: MathLesson }) {
     setRound((current) =>
       current ? { ...current, ink: { ...current.ink, [current.index]: next } } : current,
     );
-  const setCircles = (side: number, next: InkStroke[]) =>
+  const setWorkCell = (cell: number, next: InkStroke[]) =>
     setRound((current) => {
       if (!current) return current;
-      const areas = [...(current.work[current.index] ?? [[], []])];
-      areas[side] = next;
-      return { ...current, work: { ...current.work, [current.index]: areas } };
+      const size = workCells(current.questions[current.index]);
+      const cells = Array.from(
+        { length: size },
+        (_, index) => current.work[current.index]?.[index] ?? [],
+      );
+      cells[cell] = next;
+      return { ...current, work: { ...current.work, [current.index]: cells } };
     });
   const toggleMark = (index: number) =>
     setMarked((current) => {
@@ -309,9 +326,9 @@ function WritingLesson({ app, lesson }: { app: MathApp; lesson: MathLesson }) {
           <AdditionWork
             scope={scope}
             parts={question.parts}
-            circles={round.work[round.index] ?? []}
+            cells={round.work[round.index] ?? []}
             answer={strokes}
-            onCircles={setCircles}
+            onCell={setWorkCell}
             onAnswer={setInk}
           />
         ) : (
@@ -320,15 +337,12 @@ function WritingLesson({ app, lesson }: { app: MathApp; lesson: MathLesson }) {
               <strong>{question.target}</strong>
               <span>畫出{chineseNumber(question.target)}個</span>
             </div>
-            <InkSquare
+            <DrawFrame
               scope={scope}
-              initial={strokes}
-              onChange={setInk}
-              label={`畫出 ${question.target} 個圈圈`}
-              plain
-            >
-              <StrokeNumbers strokes={strokes} />
-            </InkSquare>
+              target={question.target}
+              cells={round.work[round.index] ?? []}
+              onCell={setWorkCell}
+            />
           </div>
         )}
         <nav className="math-nav" aria-label="題目">

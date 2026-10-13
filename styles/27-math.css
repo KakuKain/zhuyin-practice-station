@@ -204,7 +204,7 @@
   margin: 0 auto;
 }
 .math-draw .math-ink {
-  width: min(100%, 560px);
+  width: min(100%, 600px);
 }
 .canvas-paper.math-paper {
   position: relative;
@@ -230,25 +230,68 @@
   color: #4d6680;
   font-size: 20px;
 }
-.math-stroke-numbers {
+/* 十格框: two rows of five cells, one circle in each. */
+.math-frame-tools {
+  grid-template-columns: repeat(2, 48px);
+  justify-content: end;
+}
+.math-frame {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 3px;
+  padding: 3px;
+  border-radius: 14px;
+  background: #8fb4cf;
+}
+.math-frame-cell {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 9px;
+  background: #fffefb;
+}
+.math-frame-cell.is-used {
+  background: #f3f8ff;
+}
+.math-frame-cell canvas {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+.math-frame-number {
   position: absolute;
   z-index: 3;
-  inset: 0;
-  pointer-events: none;
-}
-.math-stroke-numbers > span:not(.visually-hidden) {
-  position: absolute;
+  top: 4px;
+  left: 4px;
   display: grid;
   place-items: center;
-  min-width: 26px;
-  height: 26px;
-  padding: 0 6px;
-  border-radius: 13px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 5px;
+  border-radius: 11px;
   background: #3474d7;
   color: #fff;
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 700;
-  transform: translate(-30%, -60%);
+  pointer-events: none;
+}
+.math-frame.is-preview {
+  width: 110px;
+  gap: 1px;
+  padding: 1px;
+  border-radius: 6px;
+}
+.math-frame.is-preview .math-frame-cell {
+  border-radius: 2px;
+}
+.math-frame.is-preview .ink-preview {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .math-nav {
@@ -408,51 +451,46 @@
   font-size: 18px;
 }
 
-/* 畫圈圈算加法: circles for each number, then the answer, in one row (two rows on phones). */
+/*
+ * 畫圈圈算加法: a 十格框 for each number, then the answer square, top to bottom; landscape tablets
+ * put them in one row.
+ */
 .math-add {
   display: grid;
   gap: 8px;
 }
-.math-add-row {
+.math-add-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  gap: 6px;
+}
+.math-add-result {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 8px 10px;
-}
-.math-add-terms,
-.math-add-result {
-  display: flex;
-  align-items: center;
   gap: 10px;
+  width: 100%;
 }
-.math-add-terms {
-  flex: 2 1 260px;
-}
-.math-add-result {
-  flex: 1 1 130px;
-}
-@media (max-width: 599px) {
+/* Tablets: both frames side by side, ＝ and the answer on the row below. */
+@media (min-width: 600px) {
+  .math-add-grid {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+  }
   .math-add-result {
-    max-width: 240px;
-  }
-}
-/* Two squares and their tools do not fit side by side on the narrowest phones. */
-@media (max-width: 359px) {
-  .math-add-terms {
-    flex-direction: column;
-  }
-  .math-add-terms .math-add-side {
-    width: min(100%, 240px);
+    grid-column: 1 / -1;
   }
 }
 .math-add-side {
   display: grid;
-  flex: 1 1 0;
   justify-items: center;
   gap: 6px;
+  width: min(100%, 520px);
   min-width: 0;
-  max-width: 300px;
+}
+.math-add-side.is-answer {
+  width: min(100%, 220px);
 }
 .math-add-number {
   color: #18375d;
@@ -511,17 +549,25 @@
   .math-draw-target {
     justify-content: flex-start;
   }
-  /* 畫圈圈算加法 keeps its three squares in one row across the screen. */
+  /* 畫圈圈算加法: both frames and the answer in one row across the screen. */
   .math-question.is-add {
     grid-template-columns: minmax(0, 1fr);
-    width: min(100%, 1100px);
+    width: min(100%, 1180px);
   }
   .math-question.is-add .math-ink {
     grid-column: auto;
     grid-row: auto;
     width: 100%;
   }
-  .math-question.is-add .math-add-side {
-    max-width: calc(100dvh - 380px);
+  .math-add-grid {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(150px, 210px);
+    align-items: center;
+  }
+  .math-add-result {
+    display: contents;
+  }
+  .math-add-side,
+  .math-add-side.is-answer {
+    width: 100%;
   }
 }

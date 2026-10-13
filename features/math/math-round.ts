@@ -38,7 +38,10 @@ export type MathRound = {
   questions: MathQuestion[];
   /** Strokes per question, in the 0–100 coordinates of its square. */
   ink: Record<number, InkStroke[]>;
-  /** 畫圈圈算加法: the circles drawn for each number, before the written answer in ink. */
+  /**
+   * Circles drawn in 十格框 (5 × 2 cells, one circle each): 畫圈圈 has one frame, 畫圈圈算加法
+   * one per number (cells 0–9 and 10–19). The written answer stays in ink.
+   */
   work: Record<number, InkStroke[][]>;
   index: number;
   phase: "active" | "check";
@@ -50,6 +53,11 @@ export type MathRound = {
 };
 
 export const mathRoundSize = { count: 4, draw: 4 } as const;
+/** A 十格框: two rows of five, the way a child lines up circles to count them. */
+export const frameCells = 10;
+/** How many 十格框 cells a question draws in. */
+export const workCells = (question: MathQuestion) =>
+  question.kind === "draw" ? frameCells : question.kind === "add" ? 2 * frameCells : 0;
 export const additionRoundSize = { join: 4, add: 4 } as const;
 export const maxCount = 10;
 
@@ -183,11 +191,17 @@ export function validateMathRound(raw: unknown): MathRound | null {
     const index = inRound(key);
     if (index !== null && validStrokes(strokes)) ink[index] = strokes;
   }
-  // Rounds saved before 第三課 have no circle drawings.
+  // Circles drawn before 十格框 (free drawing) do not fit the cells and are left out.
   const work: Record<number, InkStroke[][]> = {};
-  for (const [key, areas] of Object.entries(value.work ?? {})) {
+  for (const [key, cells] of Object.entries(value.work ?? {})) {
     const index = inRound(key);
-    if (index !== null && Array.isArray(areas) && areas.every(validStrokes)) work[index] = areas;
+    if (
+      index !== null &&
+      Array.isArray(cells) &&
+      cells.length === workCells(questions[index]!) &&
+      cells.every(validStrokes)
+    )
+      work[index] = cells;
   }
   return {
     version: 1,
@@ -240,8 +254,17 @@ export function clearMathRound(lessonId: number) {
   }
 }
 
-/** A question counts as answered once it has any ink. */
-export const isAnswered = (round: MathRound, index: number) => (round.ink[index]?.length ?? 0) > 0;
+/** Cells of a 十格框 with a circle in them. */
+export const filledCells = (cells: InkStroke[][] | undefined, from = 0) =>
+  (cells ?? []).slice(from, from + frameCells).filter((strokes) => strokes.length > 0).length;
+
+/**
+ * A question counts as answered once it has a written answer, or, for 畫圈圈, a circle in the
+ * frame (or ink from before the frame).
+ */
+export const isAnswered = (round: MathRound, index: number) =>
+  (round.ink[index]?.length ?? 0) > 0 ||
+  (round.questions[index]?.kind === "draw" && filledCells(round.work[index]) > 0);
 
 export type MathRecord = {
   lessonId: number;

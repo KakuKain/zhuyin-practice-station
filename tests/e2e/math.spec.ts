@@ -1,6 +1,7 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 
 async function stroke(page: Page, canvas: Locator, points: [number, number][]) {
+  await canvas.scrollIntoViewIfNeeded();
   const box = (await canvas.boundingBox())!;
   const at = ([x, y]: [number, number]) =>
     [box.x + (box.width * x) / 100, box.y + (box.height * y) / 100] as const;
@@ -48,23 +49,26 @@ test("第一課 reads each question aloud, keeps the round and ends with the par
   for (let i = 0; i < 4; i++)
     await page.getByRole("button", { name: "下一題", exact: true }).click();
 
-  // 畫圈圈: every circle shows its number while drawing.
+  // 畫圈圈: one circle in each cell of a 十格框; filled cells are numbered in reading order.
   await expect(page.locator(".math-header")).toContainText("第 5 題 / 8");
   await expect(page.locator("audio")).toHaveAttribute("src", /math-audio\/draw-\d+\.m4a/);
-  const paper = page.locator(".math-draw canvas");
-  await stroke(page, paper, circle(25, 25));
-  await stroke(page, paper, circle(60, 25));
-  await expect(page.locator(".math-stroke-numbers > span:not(.visually-hidden)")).toHaveText([
-    "1",
-    "2",
-  ]);
+  const cells = page.locator(".math-draw .math-frame canvas");
+  await expect(cells).toHaveCount(10);
+  // Drawn in the second row first, then the first row: numbered by place, not by time.
+  await stroke(page, cells.nth(6), circle(50, 50));
+  await stroke(page, cells.nth(0), circle(50, 50));
+  await expect(page.locator(".math-frame-number")).toHaveText(["1", "2"]);
+  // 復原 takes back the latest circle; drawing it again restores two.
+  await page.getByRole("button", { name: /^復原畫出/ }).click();
+  await expect(page.locator(".math-frame-number")).toHaveCount(1);
+  await stroke(page, cells.nth(1), circle(50, 50));
 
   // A reload continues the same round where it was.
   await page.reload();
   await page.getByRole("button", { name: /數學第一課/ }).click();
   await page.getByRole("button", { name: "繼續上次的練習" }).click();
   await expect(page.locator(".math-header")).toContainText("第 5 題 / 8");
-  await expect(page.locator(".math-stroke-numbers > span:not(.visually-hidden)")).toHaveCount(2);
+  await expect(page.locator(".math-frame-number")).toHaveCount(2);
 
   for (let i = 0; i < 3; i++)
     await page.getByRole("button", { name: "下一題", exact: true }).click();
@@ -75,7 +79,7 @@ test("第一課 reads each question aloud, keeps the round and ends with the par
   await expect(cards.nth(0).locator(".math-check-toggle")).toHaveAttribute("aria-pressed", "false");
   await expect(cards.nth(1).locator(".math-check-toggle")).toHaveAttribute("aria-pressed", "true");
   await expect(cards.nth(4).locator(".math-check-toggle")).toHaveAttribute("aria-pressed", "false");
-  await expect(cards.nth(4)).toContainText("畫了 2 筆");
+  await expect(cards.nth(4)).toContainText("畫了 2 格");
   await cards.nth(0).locator(".math-check-toggle").click();
   await page.getByRole("button", { name: "檢查完成" }).click();
   await expect(page.getByRole("heading", { name: "練習完成！" })).toBeVisible();
@@ -265,17 +269,18 @@ test("第三課 adds with pictures and circles, keeps 第一課's round and ends
   // 畫圈圈算加法: each side numbers its own circles; the answer has its own square.
   await expect(header).toContainText("畫圈圈算加法");
   await expect(audio).toHaveAttribute("data-clip-text", /^.加.等於多少？先畫圈圈，再寫答案。$/);
-  const sides = page.locator(".math-add-side .canvas-paper");
-  await stroke(page, page.locator("canvas[data-word-index='0']"), circle(25, 25));
-  await stroke(page, page.locator("canvas[data-word-index='0']"), circle(65, 60));
-  await stroke(page, page.locator("canvas[data-word-index='1']"), circle(40, 40));
-  await stroke(page, page.locator("canvas[data-word-index='2']"), [
+  // A 十格框 for each number (cells 0–9 and 10–19), then the answer square.
+  const frames = page.locator(".math-add-side .math-frame");
+  await expect(frames).toHaveCount(2);
+  await stroke(page, page.locator("canvas[data-word-index='0']"), circle(50, 50));
+  await stroke(page, page.locator("canvas[data-word-index='1']"), circle(50, 50));
+  await stroke(page, page.locator("canvas[data-word-index='10']"), circle(50, 50));
+  await stroke(page, page.locator("canvas[data-word-index='20']"), [
     [30, 25],
     [70, 25],
     [40, 80],
   ]);
-  const numbers = (side: number) =>
-    sides.nth(side).locator(".math-stroke-numbers > span:not(.visually-hidden)");
+  const numbers = (side: number) => frames.nth(side).locator(".math-frame-number");
   await expect(numbers(0)).toHaveText(["1", "2"]);
   await expect(numbers(1)).toHaveText(["1"]);
 
@@ -295,7 +300,7 @@ test("第三課 adds with pictures and circles, keeps 第一課's round and ends
   await expect(cards.nth(0).locator(".math-check-toggle")).toHaveAttribute("aria-pressed", "false");
   await expect(cards.nth(1).locator(".math-check-toggle")).toHaveAttribute("aria-pressed", "true");
   await expect(cards.nth(4).locator(".math-check-toggle")).toHaveAttribute("aria-pressed", "false");
-  await expect(cards.nth(4).locator("figcaption")).toHaveText([/畫了 2 筆/, /畫了 1 筆/]);
+  await expect(cards.nth(4).locator("figcaption")).toHaveText([/畫了 2 格/, /畫了 1 格/]);
   await page.getByRole("button", { name: "檢查完成" }).click();
   await expect(page.getByRole("heading", { name: "練習完成！" })).toBeVisible();
   await expect(page.locator(".math-result")).toContainText("＋");

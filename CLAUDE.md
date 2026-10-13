@@ -81,10 +81,14 @@ There is one build: a static Vite SPA. `index.html` → `app/main.tsx` → `crea
   - Google sign-in and cloud sync were discussed but are not built. They would change the hard constraints above.
 - `features/math/` is self-contained.
   - The course list's 國語｜數學 switch (not 注音, which would clash with the 注音 symbol-chart tab) is remembered per child (`ChildProfile.subject`). `openMathLesson` sets `mathLessonId` and the `math` view, and `MathScreen` runs the round.
-  - Lesson 1 asks 4 數一數 (tap pictures to mark them, write the number) and then 4 畫圈圈 (each stroke is numbered as it is drawn), all spoken aloud.
+  - Lesson 1 asks 4 數一數 (tap pictures to mark them, write the number) and then 4 畫圈圈, all spoken aloud.
+  - Circles are always drawn in a 十格框 (5 × 2 cells, one circle each, `DrawFrame`/`TenFrame` in `MathInk.tsx`):
+    - Every cell is its own square canvas, because a non-square canvas would stretch the strokes. One `useInkCanvas` serves them all, so only one pen draws at a time.
+    - Filled cells are numbered in reading order. 復原 takes back the latest circle in that frame and 清空 clears it.
+    - The cells are saved in `MathRound.work`. Free drawings saved before the frame are dropped, and old ink still shows on the parent's check.
   - Lesson 3 asks 4 合在一起 and then 4 畫圈圈算加法:
     - 合在一起 shows two groups of up to 5 markable pictures; the child writes the total.
-    - 畫圈圈算加法 has three squares: circles for each number, then the answer. They share one `useInkCanvas`, so one pen writes at a time. Each side numbers its own circles; counting them together is the child's part.
+    - 畫圈圈算加法 has a 十格框 for each number (cells 0–9 and 10–19), then an answer square (canvas 20). Each frame numbers its own circles; counting them together is the child's part. Tablets put the two frames side by side with ＝ and the answer below, landscape tablets in one row, and phones stack them.
     - Each sum has its own clip (`join-a-b`, `add-a-b`). Counting says 兩個, but a sum says 二加三.
   - Lessons 1 and 3 share `WritingLesson` in `MathScreen.tsx`. The ink pieces live in `MathInk.tsx` and the pictures in `MathPictures.tsx`.
   - The parent checks the round at the end.
