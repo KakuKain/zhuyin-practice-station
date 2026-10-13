@@ -29,7 +29,7 @@ import {
   type LineShape,
 } from "./compare-round";
 
-type CompareApp = Pick<AppController, "speak" | "stopPlayback" | "navigate">;
+type CompareApp = Pick<AppController, "speak" | "stopPlayback" | "navigate" | "awardStamp">;
 type BarQuestion = Extract<CompareQuestion, { kind: "compare" | "order" }>;
 type Feedback = { kind: "correct" | "retry"; pick: number } | null;
 
@@ -134,6 +134,12 @@ export function CompareLesson({ app, lesson }: { app: CompareApp; lesson: MathLe
       lessonId: lesson.id,
       total: round.questions.length,
       needsPractice: topics.map((kind) => ({ kind })),
+    });
+    app.awardStamp({
+      kind: "practice",
+      subject: "math",
+      detail: `數學${lesson.number} ${lesson.title}`,
+      needsPractice: topics.length,
     });
     setFinished({ total: round.questions.length, topics });
     setRound(null);

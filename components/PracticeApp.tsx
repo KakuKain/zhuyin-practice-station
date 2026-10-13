@@ -28,6 +28,7 @@ const SettingsScreen = lazy(() =>
 import { ListeningResult } from "../features/listening/ListeningResult";
 import { ListeningScreen } from "../features/listening/ListeningScreen";
 import { MathScreen } from "../features/math/MathScreen";
+import { StampNewsToast } from "../features/rewards/StampCard";
 const SymbolChart = lazy(() =>
   import("../features/symbols/SymbolChart").then((module) => ({ default: module.SymbolChart })),
 );
@@ -71,6 +72,7 @@ function PracticeSession() {
           aria-hidden="true"
         />
         <PracticeContent app={app} />
+        {app.stampNews && <StampNewsToast news={app.stampNews} onDismiss={app.dismissStampNews} />}
       </MaterialContext.Provider>
     </ShowMsgProvider>
   );

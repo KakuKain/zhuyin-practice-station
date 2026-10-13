@@ -26,6 +26,8 @@ import {
 } from "./listening/listening-data";
 import { fillLayout } from "./fill/fill-layout";
 import { useFillFlow } from "./fill/useFillFlow";
+import { useStampBook } from "./rewards/useStampBook";
+import type { AwardLessonStamp } from "./rewards/stamp-book";
 
 /**
  * Cross-feature coordinator: the current view and lesson, shared stores, audio, the course
@@ -62,6 +64,26 @@ export function usePracticeApp() {
     readListeningSettings,
     validateListeningSettings,
   );
+
+  // 集章卡: flows report a finished practice; the stamp names the lesson for the parent's log.
+  const stamps = useStampBook();
+  const awardLessonStamp: AwardLessonStamp = ({
+    kind = "practice",
+    lessonIndex,
+    activity,
+    needsPractice,
+    oncePerDay,
+  }) => {
+    const item = catalog.find((entry) => entry.index === lessonIndex);
+    const name = !item ? "" : item.listeningOnly || item.custom ? item.title : `第${item.number}課`;
+    stamps.awardStamp({
+      kind,
+      subject: "zhuyin",
+      detail: `${name} ${activity}`.trim(),
+      ...(needsPractice ? { needsPractice } : {}),
+      ...(oncePerDay ? { key: `${kind}:${lessonIndex}:${activity}` } : {}),
+    });
+  };
 
   /** Undo offers and notices belong to the screen that showed them. */
   const clearNotices = () => {
@@ -110,6 +132,7 @@ export function usePracticeApp() {
     removeQuestion: practice.removeQuestion,
     markQuestionPracticed: practice.markQuestionPracticed,
     recordSession: practice.recordSession,
+    awardLessonStamp,
     setPracticeNotice,
     clearNotices,
     continueReview,
@@ -128,6 +151,7 @@ export function usePracticeApp() {
     unfavoriteFill: fillCollection.unfavoriteFill,
     markFillMastered: fillCollection.markFillMastered,
     recordSession: practice.recordSession,
+    awardLessonStamp,
     setPracticeNotice,
     setUnfavoriteUndo,
     clearNotices,
@@ -244,7 +268,8 @@ export function usePracticeApp() {
     fill.draftStorageError ||
     practice.practiceStorageError ||
     fillCollection.favoritesStorageError ||
-    settingsStorageError;
+    settingsStorageError ||
+    stamps.stampStorageError;
 
   return {
     ...materials,
@@ -253,6 +278,7 @@ export function usePracticeApp() {
     ...preview,
     ...listening,
     ...fill,
+    ...stamps,
     customAudio,
     audioError: audio.audioError,
     audioLoading: audio.audioLoading,

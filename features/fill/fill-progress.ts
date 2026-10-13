@@ -3,6 +3,7 @@ import type { InkStroke, SyllableItem, FillFavorite, PracticeSession, StateSette
 import { writeFillDraft } from "./fill-storage";
 import { isFillCellComplete } from "./fill-draft-policy";
 import { fillFavoriteKey } from "../practice/practice-storage";
+import type { AwardLessonStamp } from "../rewards/stamp-book";
 
 type Params = {
   activeFillCell: number | null;
@@ -31,6 +32,7 @@ type Params = {
     correct: number,
     pending: number,
   ) => void;
+  awardLessonStamp: AwardLessonStamp;
   openFillReview: () => void;
 };
 
@@ -56,6 +58,7 @@ export function useFillProgress({
   persistFillRef,
   fillComplete,
   recordSession,
+  awardLessonStamp,
   openFillReview,
 }: Params) {
   const fillLineForCell = (index: number) =>
@@ -153,6 +156,8 @@ export function useFillProgress({
       current.includes(selectedLesson) ? current : [...current, selectedLesson],
     );
     recordSession("fill", lessonItems.length, lessonItems.length, 0);
+    // Editing a cell reopens the check; confirming it again the same day stamps nothing more.
+    awardLessonStamp({ lessonIndex: selectedLesson, activity: "默寫", oncePerDay: true });
   };
   return { fillLineForCell, openFillCell, saveFillDrawing, leaveFillCell, confirmFillReview };
 }

@@ -7,6 +7,7 @@ import { useFillDraft } from "./useFillDraft";
 import { useFillProgress } from "./fill-progress";
 import { clearFillDraft, readFillDraft } from "./fill-storage";
 import { isFillCellComplete } from "./fill-draft-policy";
+import type { AwardLessonStamp } from "../rewards/stamp-book";
 
 type Options = {
   view: View;
@@ -24,6 +25,7 @@ type Options = {
     correct: number,
     pending: number,
   ) => void;
+  awardLessonStamp: AwardLessonStamp;
   setPracticeNotice: StateSetter<string>;
   setUnfavoriteUndo: (value: null) => void;
   clearNotices: () => void;
@@ -47,6 +49,7 @@ export function useFillFlow({
   unfavoriteFill,
   markFillMastered,
   recordSession,
+  awardLessonStamp,
   setPracticeNotice,
   setUnfavoriteUndo,
   clearNotices,
@@ -147,6 +150,7 @@ export function useFillFlow({
     persistFillRef,
     fillComplete,
     recordSession,
+    awardLessonStamp,
     openFillReview,
   });
 
@@ -237,6 +241,13 @@ export function useFillFlow({
     setUnfavoriteUndo(null);
     markFillMastered(favorite);
     recordSession("single", 1, 1, 0);
+    // A cell that needed rewriting and is now right earns a 訂正之星.
+    if (favorite.status === "needs_rewrite")
+      awardLessonStamp({
+        kind: "fix",
+        lessonIndex: favorite.lessonIndex,
+        activity: `默寫訂正「${favorite.character}」`,
+      });
     setFillPracticeTarget(null);
     setView("practice");
     continueReview();

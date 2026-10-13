@@ -1,5 +1,6 @@
 import { ShowMsg } from "../../components/ShowMsg";
 import { ChildrenPanel } from "./ChildrenPanel";
+import { RewardsPanel } from "./RewardsPanel";
 import { childLabel } from "../../components/ChildPicker";
 import { useChildProfiles } from "../../lib/storage/child-profiles";
 import { HeaderBack } from "../../components/AppChrome";
@@ -16,6 +17,7 @@ import {
   Microphone,
   MusicNotes,
   Question,
+  Stamp,
   UsersThree,
 } from "@phosphor-icons/react";
 import { siteReleaseNotes } from "../courses/course-data";
@@ -136,6 +138,11 @@ export function SettingsScreen({
     | "stopPlayback"
     | "audioLoading"
     | "audioError"
+    | "rewardSettings"
+    | "saveRewardSettings"
+    | "stampBook"
+    | "stampProgress"
+    | "awardStamp"
   >;
 }) {
   const {
@@ -171,6 +178,22 @@ export function SettingsScreen({
                   {children.children.length > 1
                     ? children.children.map((child) => childLabel(child, children)).join("、")
                     : "新增孩子，每個人的紀錄分開"}
+                </small>
+              </span>
+              <span className="more-arrow" aria-hidden="true">
+                <ArrowRight size={21} weight="bold" />
+              </span>
+            </button>
+            <button type="button" onClick={() => setMorePanel("rewards")}>
+              <span className="more-row-icon pink">
+                <Stamp size={21} aria-hidden="true" />
+              </span>
+              <span>
+                <strong>集章卡</strong>
+                <small>
+                  {app.rewardSettings.enabled
+                    ? `使用中 · 一張 ${app.rewardSettings.cardSize} 格`
+                    : "完成練習蓋章，集滿換獎勵（可以不開）"}
                 </small>
               </span>
               <span className="more-arrow" aria-hidden="true">
@@ -295,6 +318,15 @@ export function SettingsScreen({
             audioError={app.audioError}
           />
         </Suspense>
+      )}
+      {morePanel === "rewards" && (
+        <RewardsPanel
+          settings={app.rewardSettings}
+          onSettings={app.saveRewardSettings}
+          book={app.stampBook}
+          progress={app.stampProgress}
+          onCheer={app.awardStamp}
+        />
       )}
       {morePanel === "children" && (
         <ChildrenPanel materials={app.materialsState} familyMaterialId={app.familyMaterialId} />

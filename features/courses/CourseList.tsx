@@ -1,7 +1,9 @@
 import { ProgressiveImage } from "../../components/ProgressiveImage";
 import { MathCourseList } from "../math/MathCourseList";
 import { updateChild, useChildProfiles } from "../../lib/storage/child-profiles";
-import { ChildGreeting } from "../../components/ChildPicker";
+import { useState } from "react";
+import { ChildGreeting, childLabel } from "../../components/ChildPicker";
+import { StampCardDialog, StampChip } from "../rewards/StampCard";
 
 import { PageHeading } from "../../components/PageHeading";
 import type { AppController } from "../usePracticeApp";
@@ -22,10 +24,17 @@ export function CourseList({
     | "materialsState"
     | "setMorePanel"
     | "setView"
+    | "rewardSettings"
+    | "stampBook"
+    | "stampProgress"
+    | "chooseReward"
+    | "dismissStampNews"
   >;
 }) {
   const { openLesson, practiceState } = app;
   const profiles = useChildProfiles();
+  const [cardOpen, setCardOpen] = useState(false);
+  const child = profiles.children.find((item) => item.id === profiles.activeId);
   const subject =
     profiles.children.find((child) => child.id === profiles.activeId)?.subject ?? "zhuyin";
   const material = app.materialsState.materials.find(
@@ -48,6 +57,26 @@ export function CourseList({
         artwork="course-art/course-journey-hero-v2.webp"
       />
       <ChildGreeting />
+      {app.rewardSettings.enabled && (
+        <StampChip
+          progress={app.stampProgress}
+          onOpen={() => {
+            // The card itself now shows what the toast was saying.
+            app.dismissStampNews();
+            setCardOpen(true);
+          }}
+        />
+      )}
+      {cardOpen && (
+        <StampCardDialog
+          name={child && profiles.children.length > 1 ? childLabel(child, profiles) : "我"}
+          progress={app.stampProgress}
+          book={app.stampBook}
+          settings={app.rewardSettings}
+          onChoose={app.chooseReward}
+          onClose={() => setCardOpen(false)}
+        />
+      )}
       <div className="subject-switch" role="group" aria-label="科目">
         {(
           [

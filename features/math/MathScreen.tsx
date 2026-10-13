@@ -19,7 +19,10 @@ import { MathHeader, MathPrompt, MathStartButton } from "./MathChrome";
 import { CountPictures, JoinPictures } from "./MathPictures";
 import { AdditionWork, InkSquare, StrokeNumbers } from "./MathInk";
 
-type MathApp = Pick<AppController, "speak" | "stopPlayback" | "navigate" | "mathLessonId">;
+type MathApp = Pick<
+  AppController,
+  "speak" | "stopPlayback" | "navigate" | "mathLessonId" | "awardStamp"
+>;
 
 const CompareLesson = lazy(() =>
   Promise.all([import("./CompareLesson"), import("../../styles/lazy/math-compare.css")]).then(
@@ -242,6 +245,12 @@ function WritingLesson({ app, lesson }: { app: MathApp; lesson: MathLesson }) {
             className="primary-button math-check-finish"
             onClick={() => {
               recordMathRound(round);
+              app.awardStamp({
+                kind: "practice",
+                subject: "math",
+                detail: `數學${lesson.number} ${lesson.title}`,
+                needsPractice: round.needsPractice.length,
+              });
               clearMathRound(lesson.id);
               setFinished(round);
               setRound(null);

@@ -102,6 +102,14 @@ export type ListeningSettings = {
 };
 
 export type MorePanel =
-  "home" | "help" | "listening" | "audio" | "versions" | "materials" | "backup" | "children";
+  | "home"
+  | "help"
+  | "listening"
+  | "audio"
+  | "versions"
+  | "materials"
+  | "backup"
+  | "children"
+  | "rewards";
 
 export type StateSetter<T> = import("react").Dispatch<import("react").SetStateAction<T>>;

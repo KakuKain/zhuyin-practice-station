@@ -1,4 +1,5 @@
 import { useEffect, useEffectEvent, useRef, useState } from "react";
+import type { AwardLessonStamp } from "../rewards/stamp-book";
 import type { CatalogLesson } from "../courses/materials";
 import type {
   InkStroke,
@@ -56,6 +57,7 @@ type Options = {
     correct: number,
     pending: number,
   ) => void;
+  awardLessonStamp: AwardLessonStamp;
   setPracticeNotice: StateSetter<string>;
   clearNotices: () => void;
   /** Called when a single-question practice ends inside a course review queue. */
@@ -95,6 +97,7 @@ export function useListeningFlow({
   removeQuestion,
   markQuestionPracticed,
   recordSession,
+  awardLessonStamp,
   setPracticeNotice,
   clearNotices,
   continueReview,
@@ -226,6 +229,7 @@ export function useListeningFlow({
     selectedLesson,
     saveQuestion,
     recordSession,
+    awardLessonStamp,
     sessionWritingUnits,
     setView,
     practiceState,
@@ -364,9 +368,17 @@ export function useListeningFlow({
       current.includes(listenIndex) ? current : [...current, listenIndex],
     );
     if (result === "correct") {
+      // A question that needed practice and is now right earns a 訂正之星.
+      const corrected = isSaved(currentQuestion.id, "needsPractice");
       markQuestionPracticed(selectedLesson, currentQuestion.id);
       clearNotices();
       recordSession("single", wordLength, wordLength, 0);
+      if (corrected)
+        awardLessonStamp({
+          kind: "fix",
+          lessonIndex: selectedLesson,
+          activity: `聽寫訂正「${currentQuestion.audioText}」`,
+        });
       backToPractice("家長已確認這題掌握，已移出待補強；收藏仍會保留。");
       return;
     }

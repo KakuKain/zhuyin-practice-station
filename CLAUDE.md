@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-A login-free Zhuyin (注音) practice site for Taiwanese first graders and their parents: lessons 1–9 plus three review sets, a symbol chart, handwriting dictation, listening dictation, and sound discrimination. It also has 數學 (康軒 115, first grade): lessons 1 (認識 1～10), 2 (比一比) and 3 (加法) are built. UI copy and all docs are in Traditional Chinese (zh-Hant). `docs/architecture.md` is the detailed reference for feature boundaries and invariants. Read it before changing state, storage, audio, or ink behavior.
+A login-free Zhuyin (注音) practice site for Taiwanese first graders and their parents: lessons 1–9 plus three review sets, a symbol chart, handwriting dictation, listening dictation, and sound discrimination. It also has 數學 (康軒 115, first grade): lessons 1 (認識 1～10), 2 (比一比) and 3 (加法) are built. An optional 集章卡 (stamp card) rewards finished practice; it stays on the device and needs no login. UI copy and all docs are in Traditional Chinese (zh-Hant). `docs/architecture.md` is the detailed reference for feature boundaries and invariants. Read it before changing state, storage, audio, or ink behavior.
 
 Hard product constraints: no login, no DB, no cloud sync, no service worker or offline cache, no runtime AI or speech API calls, and no changes to the teacher-defined lesson scope. A web app manifest so the site can be added to the home screen (full screen, portrait-locked, no browser UI) is fine.
 
@@ -61,6 +61,19 @@ There is one build: a static Vite SPA. `index.html` → `app/main.tsx` → `crea
   - `features/fill/useFillFlow.ts`: handwriting dictation (默寫), whole lesson and single-cell practice. It composes `useFillSession`, `useFillCanvas`, `useFillDraft` and `useFillProgress`.
   - `fillLayout(lesson)` maps the title column (shown rightmost) to stored cell order.
 - Flows receive `clearNotices`, `continueReview` and `stopReview` from the coordinator instead of reaching into each other.
+- 集章卡 (`features/rewards/`) is off until a parent finishes the three-step guide in 更多 → 集章卡.
+  - `stamp-book.ts` holds the rules:
+    - 1 stamp per finished practice: 聽寫 and 默寫 after the parent's check; 辨音 and math when done. Re-confirming the same 默寫 check that day stamps nothing (`oncePerDay`).
+    - A 訂正之星 when a 需要補強 question is corrected: in single-question practice, or one per whole-lesson round.
+    - A 鼓勵章 the parent sends with a note.
+    - Stamps never depend on accuracy, are never taken away, and are never compared between children.
+    - A daily cap (default 5) logs extra practice unstamped; the child only hears 今天好認真.
+    - A full card lets the child pick one of the parent's rewards; extra stamps carry over.
+  - `useStampBook` lives in the coordinator.
+    - `awardLessonStamp` names the lesson for the log; flows receive it like `recordSession`.
+    - 辨音 and math call `awardStamp` directly.
+    - `StampNewsToast` shows at the app root; `StampChip` and `StampCardDialog` are on the course list; `RewardsPanel` holds the guide, 鼓勵章, log and settings.
+  - Google sign-in and cloud sync were discussed but are not built. They would change the hard constraints above.
 - `features/math/` is self-contained.
   - The course list's 國語｜數學 switch (not 注音, which would clash with the 注音 symbol-chart tab) is remembered per child (`ChildProfile.subject`). `openMathLesson` sets `mathLessonId` and the `math` view, and `MathScreen` runs the round.
   - Lesson 1 asks 4 數一數 (tap pictures to mark them, write the number) and then 4 畫圈圈 (each stroke is numbered as it is drawn), all spoken aloud.
@@ -118,7 +131,7 @@ Layout: `features/<feature>/` holds feature UI and logic, `components/` holds sh
 - All user data lives in browser `localStorage` behind `lib/storage/persistent-store.ts` (an external store read with `useSyncExternalStore`, not mirrored into React state). Older versions (for example `practice-state` v1–v3) are migrated forward on read, and their original keys are preserved.
 - **Every key is listed in `lib/storage/storage-keys.ts`**, the single registry that device backup (`ownsStorageKey`) is derived from. A new key must be added there, or backup will silently skip it; a unit test checks the known keys.
 - **Children** (`lib/storage/child-profiles.ts`, key `zhuyin-children-v1`; managed in 更多 → 孩子) have separate records:
-  - Child-scoped keys (`childScopedKeys`) are practice state, fill favorites, the listening round, the free board, the math rounds and records, and fill drafts. Everything else (materials, listening settings, recordings) is shared.
+  - Child-scoped keys (`childScopedKeys`) are practice state, fill favorites, the listening round, the free board, the math rounds and records, the stamp book (`kid-stamps-v1`) and fill drafts. Everything else (materials, listening settings, recordings, 集章卡 settings `kid-reward-settings-v1`) is shared.
   - Per-lesson keys (fill drafts, math rounds after lesson 1) are recognized by `isLessonRecordKey`. Both backup and removing a child use it.
   - Which material is open belongs to each child: `ChildProfile.materialId`, applied by `withChildMaterial` in `useMaterials`. Choosing a material records it on the child; only the first child's choice also moves the family default that children without a choice follow.
   - The first child, id `main`, uses the original keys, so existing records need no migration and only `main` reads the pre-v4 practice keys. Every other child uses `<key>@<id>`.
@@ -170,7 +183,7 @@ Layout: `features/<feature>/` holds feature UI and logic, `components/` holds sh
 
 ### Styles
 
-- `app/globals.css` imports `styles/00-…css` through `styles/27-…css` in a fixed cascade order. Order matters. `26-children.css` styles the child picker, the course-list greeting and 更多 → 孩子; `27-math.css` the subject switch and the math screen (landscape tablets put the square on the right; 畫圈圈算加法 keeps its three squares in one row, and phones wrap the answer below).
+- `app/globals.css` imports `styles/00-…css` through `styles/28-…css` in a fixed cascade order. Order matters. `26-children.css` styles the child picker, the course-list greeting and 更多 → 孩子; `27-math.css` the subject switch and the math screen (landscape tablets put the square on the right; 畫圈圈算加法 keeps its three squares in one row, and phones wrap the answer below); `28-rewards.css` the 集章卡 chip, card, toast and settings.
 - `00-reset.css` is the former Tailwind preflight, kept in cascade layers so every unlayered rule wins. There is no Tailwind and there are no utility classes.
 - `24-fill-tablet.css` makes dictation (sheet, writing cell, review) full width at ≥ 600px: the square grows to the space left by the header and controls, and landscape tablets put the heading and finish button beside it. Phones keep the 480px column.
 - `25-listen-tablet.css` does the same for listening at ≥ 600px: the single square fills the width, a word's squares stack top to bottom with their tools beside them (side by side, first character on the right, in landscape), and the batch check shows two cards per row.

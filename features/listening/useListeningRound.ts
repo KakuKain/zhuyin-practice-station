@@ -10,6 +10,7 @@ import type {
 import type { ClipOptions } from "../../lib/audio/useAudioPlayer";
 import type { useListeningSession } from "./useListeningSession";
 import { isListeningAnswerComplete } from "./listening-policy";
+import type { AwardLessonStamp } from "../rewards/stamp-book";
 type Options = {
   session: ReturnType<typeof useListeningSession>;
   listeningDraftsRef: RefObject<Record<number, InkStroke[][]>>;
@@ -28,6 +29,7 @@ type Options = {
     correct: number,
     pending: number,
   ) => void;
+  awardLessonStamp: AwardLessonStamp;
   sessionWritingUnits: number;
   setView: StateSetter<View>;
   practiceState: PracticeState;
@@ -47,6 +49,7 @@ export function useListeningRound({
   selectedLesson,
   saveQuestion,
   recordSession,
+  awardLessonStamp,
   sessionWritingUnits,
   setView,
   practiceState,
@@ -96,12 +99,19 @@ export function useListeningRound({
   const finishBatchReview = () => {
     let correctUnits = 0;
     let pending = 0;
+    let corrected = 0;
+    const neededPractice = new Set(
+      practiceState.savedQuestions
+        .filter((item) => item.lessonIndex === selectedLesson && item.needsPractice)
+        .map((item) => item.questionId),
+    );
     listeningQuestions.forEach((question, index) => {
       const units = question.answer.split("|").length;
       const cells = listeningDraftsRef.current[index] ?? [];
       const complete = isListeningAnswerComplete(question.answer, cells);
       if (complete && !batchNeedsReview.includes(index)) {
         correctUnits += units;
+        if (neededPractice.has(question.id)) corrected++;
         markQuestionPracticed(selectedLesson, question.id);
       } else {
         pending++;
@@ -111,6 +121,14 @@ export function useListeningRound({
     setReviewedIndexes(listeningQuestions.map((_, index) => index));
     setSessionScore({ listeningCorrect: correctUnits });
     recordSession("listening", sessionWritingUnits, correctUnits, pending);
+    awardLessonStamp({ lessonIndex: selectedLesson, activity: "聽寫", needsPractice: pending });
+    // Questions that needed practice and are right this time earn one 訂正之星 together.
+    if (corrected)
+      awardLessonStamp({
+        kind: "fix",
+        lessonIndex: selectedLesson,
+        activity: `聽寫改對 ${corrected} 題`,
+      });
     setView("result");
   };
   const toggleBatchFavorite = (questionId: string) => {
