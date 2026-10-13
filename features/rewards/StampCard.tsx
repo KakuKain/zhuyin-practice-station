@@ -1,5 +1,14 @@
 import { useEffect, useState } from "react";
-import { Gift, Heart, Medal, SealCheck, Star, X, type Icon } from "@phosphor-icons/react";
+import {
+  ArrowRight,
+  Gift,
+  Heart,
+  Medal,
+  SealCheck,
+  Star,
+  X,
+  type Icon,
+} from "@phosphor-icons/react";
 import { AnnotatedText } from "../../components/AnnotatedText";
 import { readingVariants } from "../lesson/reading-variants";
 import type { CardProgress, RewardSettings, StampBook, StampKind } from "./stamp-book";
@@ -72,20 +81,46 @@ export function StampCardDialog({
   const [chosen, setChosen] = useState<string | null>(null);
   const [done, setDone] = useState<string | null>(null);
   const recent = book.redemptions.slice(-3).reverse();
+  // What to do next sits under the title; asking and the finished pick say it in their own card.
+  const hint =
+    done || chosen ? null : !progress.full ? (
+      <Say word="toGo" n={progress.size - progress.filled} />
+    ) : settings.rewards.length === 0 ? (
+      <Say word="noRewards" />
+    ) : (
+      <Say word="choose" />
+    );
   return (
     <div className="fill-dialog-backdrop">
-      <div className="stamp-dialog" role="dialog" aria-modal="true" aria-labelledby="stamp-title">
+      <div
+        className="stamp-dialog stamp-card-sheet"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="stamp-title"
+      >
         <header>
-          <h2 id="stamp-title">
-            {name ? (
-              <>
-                {name}
-                <Say word="ofCard" />
-              </>
-            ) : (
-              <Say word="myCard" />
-            )}
-          </h2>
+          <img
+            className="stamp-sheet-art"
+            src={
+              progress.full
+                ? "course-art/festival-watercolor.webp"
+                : "course-art/sound-complete-cat.webp"
+            }
+            alt=""
+          />
+          <div>
+            <h2 id="stamp-title">
+              {name ? (
+                <>
+                  {name}
+                  <Say word="ofCard" />
+                </>
+              ) : (
+                <Say word="myCard" />
+              )}
+            </h2>
+            {hint && <p>{hint}</p>}
+          </div>
           <button type="button" className="stamp-close" onClick={onClose} aria-label="關閉">
             <X size={22} weight="bold" aria-hidden="true" />
           </button>
@@ -108,16 +143,10 @@ export function StampCardDialog({
           </div>
         ) : (
           <>
-            <StampSlots progress={progress} />
-            {!progress.full ? (
-              <p className="stamp-hint">
-                <Say word="toGo" n={progress.size - progress.filled} />
-              </p>
-            ) : settings.rewards.length === 0 ? (
-              <p className="stamp-hint">
-                <Say word="noRewards" />
-              </p>
-            ) : chosen ? (
+            <div className="stamp-board">
+              <StampSlots progress={progress} />
+            </div>
+            {chosen ? (
               <div className="stamp-confirm">
                 <p>
                   <Say word="ask" />「
@@ -147,20 +176,26 @@ export function StampCardDialog({
                 </div>
               </div>
             ) : (
-              <div className="stamp-rewards">
-                <img className="stamp-rewards-art" src="course-art/happy-watercolor.webp" alt="" />
-                <p className="stamp-hint">
-                  <Say word="choose" />
-                </p>
-                <div>
+              progress.full &&
+              settings.rewards.length > 0 && (
+                <ul className="stamp-rewards">
                   {settings.rewards.map((reward) => (
-                    <button type="button" key={reward} onClick={() => setChosen(reward)}>
-                      <Gift size={22} weight="fill" aria-hidden="true" />
-                      <RewardName reward={reward} />
-                    </button>
+                    <li key={reward}>
+                      <button type="button" onClick={() => setChosen(reward)}>
+                        <span className="stamp-reward-icon" aria-hidden="true">
+                          <Gift size={30} weight="fill" />
+                        </span>
+                        <span className="stamp-reward-name">
+                          <RewardName reward={reward} />
+                        </span>
+                        <span className="stamp-reward-go" aria-hidden="true">
+                          <ArrowRight size={28} weight="bold" />
+                        </span>
+                      </button>
+                    </li>
                   ))}
-                </div>
-              </div>
+                </ul>
+              )
             )}
             <ul className="stamp-legend" aria-label="章的種類">
               {(["practice", "fix", "cheer", "task"] as const).map((kind) => {

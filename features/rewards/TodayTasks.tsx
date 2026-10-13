@@ -41,7 +41,7 @@ export function TasksDialog({
         aria-labelledby="today-tasks-title"
       >
         <header>
-          <img className="today-tasks-flag" src="course-art/course-flag-grass-v1.webp" alt="" />
+          <img className="stamp-sheet-art" src="course-art/course-flag-grass-v1.webp" alt="" />
           <div>
             <h2 id="today-tasks-title">
               <AnnotatedText text="今天的任務" />
