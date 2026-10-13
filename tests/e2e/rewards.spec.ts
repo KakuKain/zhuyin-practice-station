@@ -8,6 +8,12 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
+/** The floating button on the course list opens a menu: 今天的任務 and 集章卡. */
+const openFromDock = async (page: Page, item: "今天的任務" | "集章卡") => {
+  await page.getByRole("button", { name: "任務和集章卡" }).click();
+  await page.getByRole("menuitem", { name: item }).click();
+};
+
 const openRewards = async (page: Page) => {
   await page.getByRole("button", { name: "更多" }).click();
   await page.getByRole("button", { name: /^集章卡/ }).click();
@@ -31,7 +37,7 @@ test("集章卡 is set up in three steps, stamps finished practice and trades a 
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("./");
   // Off until a parent turns it on.
-  await expect(page.getByRole("button", { name: /^集章卡/ })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "任務和集章卡" })).toHaveCount(0);
 
   await openRewards(page);
   await expect(page.getByRole("heading", { name: "誰會集章？" })).toBeVisible();
@@ -49,13 +55,16 @@ test("集章卡 is set up in three steps, stamps finished practice and trades a 
 
   // A finished practice earns a stamp, shown for a moment.
   await page.getByRole("button", { name: "課程" }).first().click();
-  await expect(page.getByRole("button", { name: /^集章卡/ })).toContainText("0 / 5");
+  await expect(page.getByRole("button", { name: "任務和集章卡" })).toBeVisible();
   await finishMathLesson(page);
   const toast = page.locator(".stamp-toast");
   await expect(toast).toContainText("蓋了一個章！");
-  await expect(toast).toContainText("集章卡 1 / 5");
+  // How full the card is shows only on the card itself.
+  await expect(toast).not.toContainText("/");
   await page.getByRole("button", { name: "回到課程" }).click();
-  await expect(page.getByRole("button", { name: /^集章卡/ })).toContainText("1 / 5");
+  await openFromDock(page, "集章卡");
+  await expect(page.locator(".stamp-slots li.is-filled")).toHaveCount(1);
+  await page.getByRole("button", { name: "關閉" }).click();
 
   // The parent sees where it came from and sends 鼓勵章 with a note.
   await openRewards(page);
@@ -70,16 +79,18 @@ test("集章卡 is set up in three steps, stamps finished practice and trades a 
 
   // The child opens the full card and chooses one of the parent's rewards.
   await page.getByRole("button", { name: "課程" }).first().click();
-  const chip = page.getByRole("button", { name: /^集章卡/ });
-  await expect(chip).toContainText("集滿了！");
-  await chip.click();
+  // A full card puts a dot on the floating button.
+  await expect(page.locator(".reward-dock-button .reward-dock-dot")).toBeVisible();
+  await openFromDock(page, "集章卡");
   const card = page.getByRole("dialog", { name: "我的集章卡" });
   await expect(card.locator(".stamp-slots li.is-filled")).toHaveCount(5);
   await card.getByRole("button", { name: "一起騎腳踏車" }).click();
   await card.getByRole("button", { name: "就選這個" }).click();
   await expect(card).toContainText("你選了「一起騎腳踏車」！");
   await card.getByRole("button", { name: "好", exact: true }).click();
-  await expect(chip).toContainText("0 / 5");
+  await openFromDock(page, "集章卡");
+  await expect(page.locator(".stamp-slots li.is-filled")).toHaveCount(0);
+  await page.getByRole("button", { name: "關閉" }).click();
   const book = await page.evaluate(() => JSON.parse(localStorage.getItem("kid-stamps-v1")!));
   expect(book.redemptions).toEqual([expect.objectContaining({ reward: "一起騎腳踏車", size: 5 })]);
   expect(book.log).toHaveLength(5);
@@ -194,8 +205,9 @@ test("a parent sets 今天的任務 from what needs help; finishing it earns a �
 
   // The child sees them in 國字注音 and goes straight to the practice.
   await page.getByRole("button", { name: "課程" }).first().click();
-  const today = page.locator(".today-tasks");
-  await expect(today.getByRole("heading", { name: "今天的任務" })).toBeVisible();
+  await openFromDock(page, "今天的任務");
+  const today = page.getByRole("dialog", { name: "今天的任務" });
+  await expect(today).toBeVisible();
   await expect(today.locator("li")).toHaveCount(2);
   await today.getByRole("button", { name: "去做：數學第一課 認識 1～10" }).click();
   await expect(page.getByRole("heading", { name: "認識 1～10" })).toBeVisible();
@@ -206,8 +218,12 @@ test("a parent sets 今天的任務 from what needs help; finishing it earns a �
   await page.getByRole("button", { name: "檢查完成" }).click();
   await expect(page.locator(".stamp-toast")).toContainText("完成今天的任務！");
   await page.getByRole("button", { name: "回到課程" }).click();
+  await openFromDock(page, "今天的任務");
   await expect(today.locator("li.is-done")).toContainText("完成了");
-  await expect(page.getByRole("button", { name: /^集章卡/ })).toContainText("3 / 10");
+  await page.getByRole("button", { name: "關閉" }).click();
+  await openFromDock(page, "集章卡");
+  await expect(page.locator(".stamp-slots li.is-filled")).toHaveCount(3);
+  await page.getByRole("button", { name: "關閉" }).click();
 
   // The parent sees the 任務章 in the log and can cancel the other task.
   await openRewards(page);

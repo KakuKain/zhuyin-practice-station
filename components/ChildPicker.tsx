@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { ArrowsLeftRight } from "@phosphor-icons/react";
 import {
-  childAvatars,
   chooseChild,
   useChildProfiles,
+  type ChildAvatar as Avatar,
   type ChildProfile,
   type ChildProfiles,
 } from "../lib/storage/child-profiles";
@@ -12,11 +12,17 @@ import {
 export const childLabel = (child: ChildProfile, profiles: ChildProfiles) =>
   child.name || `孩子 ${profiles.children.indexOf(child) + 1}`;
 
+/** Watercolor animal faces, cut from one painted sheet (scripts/slice-avatars.py). */
+export const avatarImage = (avatar: Avatar) => `course-art/avatar-${avatar}.webp`;
+
 export function ChildAvatar({ child }: { child: ChildProfile }) {
   return (
-    <span className={`child-avatar is-${child.avatar}`} aria-hidden="true">
-      {childAvatars[child.avatar]}
-    </span>
+    <img
+      className={`child-avatar is-${child.avatar}`}
+      src={avatarImage(child.avatar)}
+      alt=""
+      draggable={false}
+    />
   );
 }
 
@@ -78,15 +84,18 @@ export function ChildGreeting() {
   const child = profiles.children.find((item) => item.id === profiles.activeId);
   if (profiles.children.length < 2 || !child) return null;
   return (
-    <div className="child-greeting">
-      <ChildAvatar child={child} />
-      <p>
-        <strong>{childLabel(child, profiles)}</strong>，今天想練哪一課？
-      </p>
-      <button type="button" onClick={() => setChoosing(true)}>
-        <ArrowsLeftRight size={18} weight="bold" aria-hidden="true" />
-        換人
-      </button>
+    <>
+      <div className="child-greeting">
+        <ChildAvatar child={child} />
+        <p>
+          <strong>{childLabel(child, profiles)}</strong>，今天想練哪一課？
+        </p>
+        <button type="button" onClick={() => setChoosing(true)}>
+          <ArrowsLeftRight size={18} weight="bold" aria-hidden="true" />
+          換人
+        </button>
+      </div>
+      {/* Outside the card, whose paper layer would keep the sheet below the lessons. */}
       {choosing && (
         <ChildPicker
           onChoose={(id) => {
@@ -96,6 +105,6 @@ export function ChildGreeting() {
           onClose={() => setChoosing(false)}
         />
       )}
-    </div>
+    </>
   );
 }

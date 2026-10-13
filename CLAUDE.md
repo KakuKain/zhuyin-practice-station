@@ -40,6 +40,10 @@ Asset pipelines:
 - New words in `circled-vocabulary.ts` need clips: `node scripts/generate-listening-audio.mjs` (macOS, Meijia voice) creates missing ones, then run `npm run assets:audio-registry`. A word must have a single reading across all content, or no clip can serve it.
 - To re-voice a word with Gemini (`gemini-3.8-flash-tts`, voice Fola), run `GEMINI_API_KEY=… npx tsx scripts/generate-gemini-words.ts <words…>` (or `--from <folder>` with `<word>.wav` files saved from AI Studio; `--prompts` prints the prompts). It writes `public/listening-audio/gemini/words/`, removes the old Meijia clip, and records the prompt in `gemini/manifest.json`; then run `npm run assets:audio-registry`. The Meijia script skips words that have a Gemini clip.
 - `node scripts/build-app-icons.mjs` regenerates the home-screen icons in `public/icons/` from `public/favicon.svg`.
+- `python3 scripts/slice-avatars.py assets/artwork/avatars/sheet.png` cuts the 12 watercolor child avatars from one 4 × 3 sheet into round, transparent `public/course-art/avatar-<name>.webp` files.
+  - The sheet was painted with ChatGPT; Claude cannot generate raster images.
+  - The output is 192 px, lossy WebP at quality 88.
+  - The originals live in `assets/artwork/avatars/`, a subfolder that `optimize-artwork.mjs` skips.
 - `npx tsx scripts/generate-math-audio.ts [--refresh]` voices every math instruction in `features/math/math-audio.ts` into `public/math-audio/` (macOS Meijia). First graders cannot read yet, so every math question is spoken; a unit test checks each prompt has a clip.
 - `python3 scripts/build-yo-fonts.py` rebuilds the lesson font subsets after you add characters or IVS glyphs, and writes `assets/font-sources/KidLessonYoOnly-readings.json` and `KidLessonYoSans-readings.json` (what each character and variation sequence shows). `scripts/build-fonts.py` rebuilds the full fonts. Both need fontTools and brotli. Bump the `?v=` on the fonts in `styles/02-typography.css` when they change.
 
@@ -54,6 +58,9 @@ There is one build: a static Vite SPA. `index.html` → `app/main.tsx` → `crea
 ## Architecture
 
 **There are no routes; this is a single-page state machine.** The entry renders only `<PracticeApp />`. The screen is selected by the `View` union in `features/types.ts`. `PracticeApp` first asks 現在是誰在練習？ when two or more children share the device and this app session has not chosen yet (`components/ChildPicker.tsx`). It then renders the app keyed by the active child, so switching children remounts every screen and store with that child's records.
+
+- Children are shown by watercolor animal avatars (`ChildAvatar`, `avatarImage`).
+- 更多 → 孩子 is a card per child (picture, name, 正在練習, material, remove) plus a 新增孩子 card, with no explanatory text: the user found it self-evident.
 
 - `features/usePracticeApp.ts` is a thin coordinator. It owns the view and lesson, the shared stores, audio, and the course-review queue. It spreads each flow's API into one flat controller object, which components read through `Pick<AppController, …>`.
 - **Each flow owns its own state and actions:**
@@ -72,12 +79,17 @@ There is one build: a static Vite SPA. `index.html` → `app/main.tsx` → `crea
     - 今天的任務: a parent sets up to 3 tasks for a child, either suggested from recent practice with questions marked 需要補強, or chosen from a list.
       - Choices are each lesson's 聽寫 or 默寫 (reviews only 聽寫), 辨音, 改對一題待補強, or a math lesson.
       - The practice whose `taskKey` (`taskKeys`) matches a task finishes it and earns a 任務章, which the daily cap never stops. A finished task stays visible until the end of the day.
-      - The child sees the tasks in 國字注音 on the course list (`TodayTasks`), with 去做 leading to the lesson. `daily-tasks.ts` builds the options; a unit test checks the zhuyin of every task word.
+      - The child sees the tasks in 國字注音 in a sheet (`TasksDialog`), with 去做 leading to the lesson. `daily-tasks.ts` builds the options; a unit test checks the zhuyin of every task word.
   - `useStampBook` lives in the coordinator.
     - `awardLessonStamp` names the lesson for the log; flows receive it like `recordSession`.
     - 辨音 and math call `awardStamp` directly.
     - Everything the child reads on the card, chip and toast is 國字注音 from `stamp-words.ts`, one reading per character. The suggested rewards are annotated too; a parent's own reward or child's name is shown as typed. A unit test checks each character against the font.
-    - `StampNewsToast` shows at the app root; `StampChip`, `TodayTasks` and `StampCardDialog` are on the course list; `RewardsPanel` holds the guide, 今天的任務, 鼓勵章, log and settings.
+    - `StampNewsToast` shows at the app root. It says what was earned but not how full the card is; the card is the only place that shows that.
+    - On the course list, one floating watercolor button (`RewardDock`) takes no room from the lessons.
+      - It opens a menu with 今天的任務 and 集章卡, each opening its own sheet. A coral dot marks a waiting task or a full card.
+      - It can be dragged. On release it settles against the nearer side, and the place is remembered per device in `kid-reward-dock-v1`.
+      - Its picture is `draggable={false}`, since a native image drag would cancel the pointer.
+    - `RewardsPanel` holds the guide, 今天的任務, 鼓勵章, log and settings.
   - Google sign-in and cloud sync were discussed but are not built. They would change the hard constraints above.
 - `features/math/` is self-contained.
   - The course list's 國語｜數學 switch (not 注音, which would clash with the 注音 symbol-chart tab) is remembered per child (`ChildProfile.subject`). `openMathLesson` sets `mathLessonId` and the `math` view, and `MathScreen` runs the round.
@@ -140,7 +152,7 @@ Layout: `features/<feature>/` holds feature UI and logic, `components/` holds sh
 - All user data lives in browser `localStorage` behind `lib/storage/persistent-store.ts` (an external store read with `useSyncExternalStore`, not mirrored into React state). Older versions (for example `practice-state` v1–v3) are migrated forward on read, and their original keys are preserved.
 - **Every key is listed in `lib/storage/storage-keys.ts`**, the single registry that device backup (`ownsStorageKey`) is derived from. A new key must be added there, or backup will silently skip it; a unit test checks the known keys.
 - **Children** (`lib/storage/child-profiles.ts`, key `zhuyin-children-v1`; managed in 更多 → 孩子) have separate records:
-  - Child-scoped keys (`childScopedKeys`) are practice state, fill favorites, the listening round, the free board, the math rounds and records, the stamp book (`kid-stamps-v1`) and fill drafts. Everything else (materials, listening settings, recordings, 集章卡 settings `kid-reward-settings-v1`) is shared.
+  - Child-scoped keys (`childScopedKeys`) are practice state, fill favorites, the listening round, the free board, the math rounds and records, the stamp book (`kid-stamps-v1`) and fill drafts. Everything else (materials, listening settings, recordings, 集章卡 settings `kid-reward-settings-v1`, the floating button's place `kid-reward-dock-v1`) is shared.
   - Per-lesson keys (fill drafts, math rounds after lesson 1) are recognized by `isLessonRecordKey`. Both backup and removing a child use it.
   - Which material is open belongs to each child: `ChildProfile.materialId`, applied by `withChildMaterial` in `useMaterials`. Choosing a material records it on the child; only the first child's choice also moves the family default that children without a choice follow.
   - The first child, id `main`, uses the original keys, so existing records need no migration and only `main` reads the pre-v4 practice keys. Every other child uses `<key>@<id>`.

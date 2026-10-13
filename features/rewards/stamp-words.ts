@@ -40,7 +40,6 @@ export const stampWords = {
     "集滿一張卡了！回到課程列表選獎勵吧。",
     "ㄐㄧˊ ㄇㄢˇ ㄧ ㄓㄤ ㄎㄚˇ ˙ㄌㄜ ㄏㄨㄟˊ ㄉㄠˋ ㄎㄜˋ ㄔㄥˊ ㄌㄧㄝˋ ㄅㄧㄠˇ ㄒㄩㄢˇ ㄐㄧㄤˇ ㄌㄧˋ ˙ㄅㄚ",
   ],
-  progress: ["集章卡 {n} / {m}", "ㄐㄧˊ ㄓㄤ ㄎㄚˇ"],
   rest: ["今天好認真！", "ㄐㄧㄣ ㄊㄧㄢ ㄏㄠˇ ㄖㄣˋ ㄓㄣ"],
   tomorrow: ["明天繼續蓋章。", "ㄇㄧㄥˊ ㄊㄧㄢ ㄐㄧˋ ㄒㄩˋ ㄍㄞˋ ㄓㄤ"],
 } as const satisfies Record<string, readonly [string, string]>;

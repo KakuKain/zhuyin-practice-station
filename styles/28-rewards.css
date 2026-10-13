@@ -17,8 +17,6 @@
 }
 
 /* Paper texture, as on the course cards. */
-.stamp-chip::before,
-.today-tasks::before,
 .stamp-dialog::before,
 .stamp-toast::before {
   content: "";
@@ -31,82 +29,157 @@
   opacity: 0.24;
   pointer-events: none;
 }
-.stamp-chip > *,
-.today-tasks > *,
 .stamp-dialog > *,
 .stamp-toast > * {
   position: relative;
   z-index: 1;
 }
 
-/* On the course list, like a course card in a warm wash. */
-.stamp-chip {
+/*
+ * On the course list: one floating watercolor button that takes no room from the lessons, and the
+ * small menu it opens above itself.
+ */
+.reward-dock {
+  position: fixed;
+  z-index: 60;
+  width: 72px;
+  height: 72px;
+  transition:
+    left 0.25s ease,
+    top 0.25s ease;
+}
+.reward-dock.is-dragging {
+  transition: none;
+}
+.reward-dock-button {
   position: relative;
   isolation: isolate;
   display: grid;
-  grid-template-columns: 64px minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  min-height: 84px;
-  margin: 0 0 14px;
-  padding: 8px 18px 8px 10px;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  padding: 0;
   border: 0;
-  border-radius: 24px;
-  background: linear-gradient(110deg, #fff9f2 0%, #ffeee4 72%, #fff6ef 100%);
-  color: var(--ink);
-  font: inherit;
-  text-align: left;
+  border-radius: 50%;
+  background: linear-gradient(160deg, #fffaf2 0%, #fff0e4 100%);
+  box-shadow: 0 10px 24px rgba(60, 50, 30, 0.24);
 }
-.stamp-chip-art {
-  width: 64px;
-  height: 64px;
+.reward-dock-button img {
+  width: 56px;
+  height: 56px;
   object-fit: contain;
 }
-.stamp-chip-copy {
+.reward-dock-button[aria-expanded="true"] {
+  box-shadow:
+    0 0 0 3px rgba(237, 132, 92, 0.45),
+    0 10px 24px rgba(60, 50, 30, 0.24);
+}
+.reward-dock-button.is-full {
+  background: linear-gradient(160deg, #fffbea 0%, #ffefc4 100%);
+  animation: stamp-glow 1.6s ease-in-out infinite alternate;
+}
+.reward-dock-dot {
+  position: absolute;
+  z-index: 2;
+  top: 4px;
+  right: 4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--coral);
+  box-shadow: 0 0 0 2px #fff;
+}
+.is-dragging .reward-dock-button {
+  cursor: grabbing;
+  transform: scale(1.08);
+}
+/* The menu opens away from the edge the button rests against, above it or below it. */
+.reward-menu {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 10px);
+  isolation: isolate;
   display: grid;
   gap: 6px;
-  min-width: 0;
+  min-width: 220px;
+  padding: 8px;
+  border-radius: 24px;
+  background: #fffaf2;
+  box-shadow: 0 14px 34px rgba(60, 50, 30, 0.24);
+  transform-origin: bottom right;
+  animation: reward-menu-in 0.18s ease-out both;
 }
-.stamp-chip-title {
-  color: #8a4b3c;
-  font-size: 22px;
+.reward-dock.is-left .reward-menu {
+  right: auto;
+  left: 0;
+  transform-origin: bottom left;
 }
-.stamp-chip-dots {
+.reward-dock.is-menu-below .reward-menu {
+  top: calc(100% + 10px);
+  bottom: auto;
+  transform-origin: top right;
+}
+.reward-dock.is-left.is-menu-below .reward-menu {
+  transform-origin: top left;
+}
+.reward-menu::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  border-radius: inherit;
+  background: url("/course-art/course-card-paper-v1.webp") center / 210px repeat;
+  mix-blend-mode: multiply;
+  opacity: 0.24;
+  pointer-events: none;
+}
+.reward-menu button {
+  position: relative;
+  z-index: 1;
   display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-}
-.stamp-chip-dots i {
-  width: 14px;
-  height: 14px;
-  border: 1.5px dashed #d9c3b1;
-  border-radius: 50%;
-}
-.stamp-chip-dots i[class] {
+  align-items: center;
+  gap: 10px;
+  min-height: 60px;
+  padding: 4px 18px 4px 8px;
   border: 0;
-  background:
-    radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.45), transparent 55%),
-    var(--stamp-practice);
+  border-radius: 18px;
+  background: linear-gradient(110deg, #fff9f2 0%, #ffeee4 100%);
+  color: #6b3b31;
+  font: inherit;
+  font-size: 22px;
+  text-align: left;
 }
-.stamp-chip-dots i.is-fix {
-  background-color: var(--stamp-fix);
+.reward-menu button:first-child:not(:only-child) {
+  background: linear-gradient(110deg, #f6fbff 0%, #e6f3ff 100%);
+  color: #2f5f8a;
 }
-.stamp-chip-dots i.is-cheer {
-  background-color: var(--stamp-cheer);
+.reward-menu img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
 }
-.stamp-chip-dots i.is-task {
-  background-color: var(--stamp-task);
+.reward-menu img.is-flag {
+  width: 32px;
+  margin: 0 8px;
 }
-.stamp-chip-count {
-  color: #c25f4a;
-  font-size: 24px;
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
+.reward-menu .reward-dock-dot {
+  top: 8px;
+  right: 8px;
 }
-.stamp-chip.is-full {
-  background: linear-gradient(110deg, #fffbea 0%, #fff0c8 72%, #fff8e2 100%);
-  animation: stamp-glow 1.6s ease-in-out infinite alternate;
+@keyframes reward-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* The card: five stamps to a row, like a paper stamp card. */
@@ -377,24 +450,21 @@
   padding-left: 22px;
 }
 
-/* 今天的任務 on the course list, in 國字注音: a card in a sky wash with the little flag. */
-.today-tasks {
-  position: relative;
-  isolation: isolate;
-  display: grid;
-  gap: 10px;
-  margin: 0 0 18px;
-  padding: 12px 14px 14px;
-  border-radius: 24px;
-  background: linear-gradient(110deg, #f3faff 0%, #e6f3ff 72%, #eff8ff 100%);
+/* 今天的任務, opened from the floating flag: the card in a sky wash, in 國字注音. */
+.stamp-dialog.today-tasks {
+  background: linear-gradient(160deg, #f6fbff 0%, #e6f3ff 100%);
 }
 .today-tasks h2 {
   display: flex;
+  flex: 1;
   align-items: center;
   gap: 6px;
+  white-space: nowrap;
   margin: 0;
+  padding: 0;
+  background: none;
   color: #2f5f8a;
-  font-size: 23px;
+  font-size: 26px;
   font-weight: 400;
 }
 .today-tasks h2 img {
@@ -783,7 +853,8 @@
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .stamp-chip.is-full,
+  .reward-dock-button.is-full,
+  .reward-menu,
   .stamp-slots li.is-filled,
   .stamp-toast,
   .stamp-toast-mark {

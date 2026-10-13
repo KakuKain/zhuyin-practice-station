@@ -45,55 +45,11 @@ export function StampSlots({ progress }: { progress: CardProgress }) {
                 <Mark size={30} weight="fill" aria-hidden="true" />
                 <span className="visually-hidden">{label}</span>
               </>
-            ) : (
-              <span aria-hidden="true">{index + 1}</span>
-            )}
+            ) : null}
           </li>
         );
       })}
     </ol>
-  );
-}
-
-/** On the course list: how full the card is; a tap opens it. */
-export function StampChip({ progress, onOpen }: { progress: CardProgress; onOpen: () => void }) {
-  return (
-    <button
-      type="button"
-      className={`stamp-chip${progress.full ? " is-full" : ""}`}
-      onClick={onOpen}
-      aria-label={`集章卡，${progress.full ? "集滿了，可以選獎勵" : `${progress.filled} / ${progress.size}`}`}
-    >
-      <img
-        className="stamp-chip-art"
-        src={
-          progress.full
-            ? "course-art/festival-watercolor.webp"
-            : "course-art/sound-complete-cat.webp"
-        }
-        alt=""
-      />
-      <span className="stamp-chip-copy">
-        <span className="stamp-chip-title">
-          <Say word="card" />
-        </span>
-        <span className="stamp-chip-dots" aria-hidden="true">
-          {Array.from({ length: progress.size }, (_, index) => (
-            <i
-              key={index}
-              className={
-                index < progress.filled
-                  ? `is-${progress.slots[index]?.kind ?? "practice"}`
-                  : undefined
-              }
-            />
-          ))}
-        </span>
-      </span>
-      <strong className="stamp-chip-count">
-        {progress.full ? <Say word="full" /> : `${progress.filled} / ${progress.size}`}
-      </strong>
-    </button>
   );
 }
 
@@ -271,13 +227,7 @@ export function StampNewsToast({ news, onDismiss }: { news: StampNews; onDismiss
                   }
                 />
               </strong>
-              <small>
-                {progress.full ? (
-                  <Say word="cardFull" />
-                ) : (
-                  <Say word="progress" n={progress.filled} m={progress.size} />
-                )}
-              </small>
+              <small>{progress.full && <Say word="cardFull" />}</small>
             </span>
           </>
         ) : (
