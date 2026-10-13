@@ -12,6 +12,20 @@ export const mathPrompts: Record<string, string> = {
       .slice(1)
       .map((_, index) => [`draw-${index + 1}`, `畫出${chineseNumber(index + 1)}個圈圈。`]),
   ),
+  // 第二課 比一比
+  "length-more": "哪一枝鉛筆比較長？點一下。",
+  "length-less": "哪一枝鉛筆比較短？點一下。",
+  "height-more": "哪一個小朋友比較高？點一下。",
+  "height-less": "哪一個小朋友比較矮？點一下。",
+  "align-length": "鉛筆沒有對齊。先把每一枝鉛筆拉到紅線。",
+  "align-height": "有人站在箱子上。先把小朋友拉到地上。",
+  "order-length": "先點最短的，再點中間的，最後點最長的。",
+  "order-height": "先點最矮的，再點中間的，最後點最高的。",
+  "line-straight": "哪一條是直線？點一下。",
+  "line-curve": "哪一條是曲線？點一下。",
+  route: "小兔子要去拿紅蘿蔔。哪一條路最近？點一下。",
+  correct: "答對了！",
+  retry: "再想想看。",
 };
 
 export const mathPromptId = (question: { kind: string; target: number }) =>

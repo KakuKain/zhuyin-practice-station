@@ -1,0 +1,387 @@
+/* 數學第二課 比一比, loaded with CompareLesson. */
+
+.compare-question {
+  position: relative;
+  display: grid;
+  gap: 16px;
+  width: min(100%, 980px);
+  margin: 0 auto;
+  padding: 16px;
+}
+
+/* Pencils along the start line, or children on the ground. */
+.compare-stage {
+  --stage-ratio: 1.6;
+  position: relative;
+  container-type: inline-size;
+  width: min(100%, calc((100dvh - 210px) * var(--stage-ratio)));
+  aspect-ratio: var(--stage-ratio);
+  margin: 0 auto;
+  border: 1px solid #e3edf3;
+  border-radius: 20px;
+  background: #fff;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.compare-stage.is-length.is-three {
+  --stage-ratio: 1.25;
+}
+/* Wide screens are short: pencils lie in a longer, lower picture. */
+@media (orientation: landscape) {
+  .compare-stage {
+    --stage-ratio: 2.2;
+  }
+  .compare-stage.is-length.is-three {
+    --stage-ratio: 1.7;
+  }
+}
+.compare-stage.is-height {
+  --stage-ratio: 1.34;
+  background: #eef7ff;
+}
+
+.compare-start-line {
+  position: absolute;
+  top: 3%;
+  bottom: 3%;
+  border-left: 4px dashed #e0485d;
+  transform: translateX(-2px);
+}
+.compare-start-line span {
+  position: absolute;
+  top: -2px;
+  left: 8px;
+  color: #c23a4d;
+  font-size: clamp(14px, 2.4cqw, 20px);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.compare-ground {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border-top: 3px solid #4f9f48;
+  background: linear-gradient(#8fd17f, #6dbb63);
+}
+.compare-box {
+  position: absolute;
+  width: 18%;
+  border: 2px solid #9a6331;
+  border-bottom: 0;
+  border-radius: 6px 6px 0 0;
+  background: repeating-linear-gradient(90deg, #d39a5e 0 16px, #c98b4f 16px 19px);
+  transform: translateX(-50%);
+  transition: opacity 0.35s ease;
+}
+/* Once the child stands on the ground, the box is no longer part of the comparison. */
+.compare-box.is-empty {
+  opacity: 0.3;
+}
+
+.compare-item {
+  position: absolute;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  transition:
+    left 0.35s ease,
+    bottom 0.35s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.compare-item.is-movable {
+  cursor: grab;
+  touch-action: none;
+}
+.compare-item.is-dragging {
+  z-index: 3;
+  cursor: grabbing;
+  transition: none;
+}
+.compare-item.is-pencil {
+  --pencil-thickness: clamp(22px, 4.4cqw, 44px);
+  display: flex;
+  align-items: center;
+  height: calc(var(--pencil-thickness) + 32px);
+  transform: translateY(-50%);
+}
+.compare-item.is-child {
+  aspect-ratio: 2 / 5;
+  transform: translateX(-50%);
+}
+.compare-item.is-child svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.compare-item.is-lined {
+  animation: compare-lined 0.6s ease-out;
+}
+.compare-item.is-picked,
+.compare-item.is-correct {
+  outline: 4px solid #6cc28e;
+  outline-offset: 3px;
+}
+.compare-item.is-wrong {
+  outline: 4px solid #e5b46b;
+  outline-offset: 3px;
+}
+
+.pencil {
+  display: flex;
+  width: 100%;
+  height: var(--pencil-thickness);
+  filter: drop-shadow(0 2px 0 rgba(24, 55, 93, 0.16));
+}
+.pencil-eraser {
+  flex: none;
+  width: calc(var(--pencil-thickness) * 0.5);
+  border-radius: 6px 0 0 6px;
+  background: #f2a7b5;
+}
+.pencil-band {
+  flex: none;
+  width: calc(var(--pencil-thickness) * 0.25);
+  background: #b9c3cc;
+}
+.pencil-body {
+  flex: 1;
+  min-width: 0;
+  background:
+    linear-gradient(transparent 32%, rgba(255, 255, 255, 0.3) 32% 46%, transparent 46%),
+    var(--pencil);
+}
+.pencil-tip {
+  flex: none;
+  width: calc(var(--pencil-thickness) * 1.15);
+  height: 100%;
+}
+
+/* 排順序: each tap shows its place in the order. */
+.compare-pick-number {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #3474d7;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 800;
+  transform: translate(-40%, -45%);
+}
+
+/* A hand shows how to drag the first thing into line, until the child touches one. */
+.compare-hint {
+  position: absolute;
+  z-index: 4;
+  color: #18375d;
+  pointer-events: none;
+  transform: translate(-45%, -8%);
+  animation: compare-hint 2s ease-in-out infinite;
+}
+@keyframes compare-hint {
+  0%,
+  12% {
+    top: var(--hint-y0);
+    left: var(--hint-x0);
+    opacity: 0;
+  }
+  24% {
+    top: var(--hint-y0);
+    left: var(--hint-x0);
+    opacity: 1;
+  }
+  76% {
+    top: var(--hint-y1);
+    left: var(--hint-x1);
+    opacity: 1;
+  }
+  100% {
+    top: var(--hint-y1);
+    left: var(--hint-x1);
+    opacity: 0;
+  }
+}
+@keyframes compare-lined {
+  from {
+    outline: 4px solid #6cc28e;
+    outline-offset: 3px;
+  }
+  to {
+    outline: 4px solid transparent;
+    outline-offset: 3px;
+  }
+}
+
+/* 直線和曲線 */
+.compare-lines {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  width: min(100%, calc(100dvh - 230px));
+  margin: 0 auto;
+}
+.compare-lines button {
+  aspect-ratio: 1;
+  padding: 6px;
+  border: 2px solid #d6e4ec;
+  border-radius: 18px;
+  background: #fff;
+}
+.compare-lines button.is-correct {
+  border-color: #6cc28e;
+  background: #eef9f1;
+}
+.compare-lines button.is-wrong {
+  border-color: #e5b46b;
+  background: #fff6e8;
+}
+.compare-lines svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.compare-lines path {
+  fill: none;
+  stroke: #18375d;
+  stroke-linecap: round;
+  stroke-width: 6;
+}
+@media (min-width: 700px) {
+  .compare-lines {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    width: 100%;
+  }
+}
+
+/* 哪條路最近 */
+.compare-route {
+  position: relative;
+  width: min(100%, calc((100dvh - 210px) * 1.6));
+  aspect-ratio: 1.6;
+  margin: 0 auto;
+  border: 1px solid #dcebd2;
+  border-radius: 20px;
+  background: #f4fbef;
+}
+.compare-route > svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.compare-route g {
+  cursor: pointer;
+  outline: none;
+}
+.route-hit {
+  fill: none;
+  stroke: transparent;
+  stroke-linecap: round;
+  stroke-width: 12;
+  pointer-events: stroke;
+}
+.route-line {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 3;
+  pointer-events: none;
+}
+.route-flag {
+  stroke: #fff;
+  stroke-width: 1.5;
+}
+.compare-route g:focus-visible .route-line,
+.compare-route g.is-correct .route-line {
+  stroke-width: 5;
+}
+.compare-route g.is-wrong .route-line {
+  stroke-dasharray: 4 3;
+}
+.route-end {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 12%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 0 rgba(24, 55, 93, 0.12);
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+.route-end svg {
+  width: 72%;
+  height: 72%;
+}
+.route-end:first-of-type svg {
+  color: #8a7a6a;
+}
+.route-end:last-of-type svg {
+  color: #ef7d1f;
+}
+
+/* 答對了！ / 再想想看 */
+.math-feedback {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 20px;
+  background: rgba(255, 253, 246, 0.86);
+  color: #2f9a55;
+  pointer-events: none;
+}
+.math-feedback.is-retry {
+  color: #dc806d;
+}
+.math-feedback svg {
+  animation: math-feedback-pop 420ms cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+}
+.math-feedback span {
+  font-size: 26px;
+  font-weight: 800;
+}
+@keyframes math-feedback-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.45);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.compare-result-topics {
+  max-width: 520px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .compare-item,
+  .compare-box {
+    transition: none;
+  }
+  .compare-hint {
+    top: var(--hint-y0);
+    left: var(--hint-x0);
+    animation: none;
+  }
+  .compare-item.is-lined,
+  .math-feedback svg {
+    animation: none;
+  }
+}

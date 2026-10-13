@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-A login-free Zhuyin (注音) practice site for Taiwanese first graders and their parents: lessons 1–9 plus three review sets, a symbol chart, handwriting dictation, listening dictation, and sound discrimination. It also has 數學 (康軒 115, first grade): lesson 1 (認識 1～10) is built; lessons 2 and 3 are listed as 製作中. UI copy and all docs are in Traditional Chinese (zh-Hant). `docs/architecture.md` is the detailed reference for feature boundaries and invariants. Read it before changing state, storage, audio, or ink behavior.
+A login-free Zhuyin (注音) practice site for Taiwanese first graders and their parents: lessons 1–9 plus three review sets, a symbol chart, handwriting dictation, listening dictation, and sound discrimination. It also has 數學 (康軒 115, first grade): lessons 1 (認識 1～10) and 2 (比一比) are built; lesson 3 (加法) is listed as 製作中. UI copy and all docs are in Traditional Chinese (zh-Hant). `docs/architecture.md` is the detailed reference for feature boundaries and invariants. Read it before changing state, storage, audio, or ink behavior.
 
 Hard product constraints: no login, no DB, no cloud sync, no service worker or offline cache, no runtime AI or speech API calls, and no changes to the teacher-defined lesson scope. A web app manifest so the site can be added to the home screen (full screen, portrait-locked, no browser UI) is fine.
 
@@ -65,6 +65,12 @@ There is one build: a static Vite SPA. `index.html` → `app/main.tsx` → `crea
   - The course list's 國語｜數學 switch (not 注音, which would clash with the 注音 symbol-chart tab) is remembered per child (`ChildProfile.subject`). `openMathLesson` sets `mathLessonId` and the `math` view, and `MathScreen` runs the round.
   - Lesson 1 asks 4 數一數 (tap pictures to mark them, write the number) and then 4 畫圈圈 (each stroke is numbered as it is drawn), all spoken aloud.
   - The parent checks it at the end. The round persists per child in `kid-math-round-v1`, and finished rounds go to `kid-math-records-v1`.
+  - Lesson 2 (比一比) is a lazy chunk: `CompareLesson.tsx` with `styles/lazy/math-compare.css`. `compare-round.ts` builds the round and holds the rules.
+    - A round has 8 questions in textbook order: 比長短 lined up, then out of line; 比高矮 on the ground, then one child on a box; 排順序 by length and by height; 直線和曲線; 哪條路最近.
+    - Answers are taps, checked at once and retried until right, like 辨音.
+    - Things out of line must be dragged to the start line or the ground first (a tap slides them there). Only then is the question asked.
+    - Out of line, the shorter one always looks longer or taller, so skipping the lining-up step gives the wrong answer.
+    - It is not saved mid-round, so it never replaces a saved lesson 1 round. What took more than one try goes to `kid-math-records-v1` and the result screen.
 - `PracticeList`, `SettingsScreen`, `SymbolChart`, and their heavy sub-panels are `React.lazy` chunks. Keep them out of the initial bundle.
 - One `<audio>` element is mounted at the app root for every screen, so iOS keeps the playback a tap unlocked.
 - Answer zhuyin (`ZhuyinStack`) is drawn by the `KidLessonYoOnly` font, which puts each syllable on a Han character (`syllableGlyphs` in `features/lesson/zhuyin-glyphs.ts`; ㄏㄨˊ is 蝴). Until that font has loaded (`lib/loading/font-ready.ts`), the syllable is spelled out in the UI font so a stand-in character never shows. A polyphone needs its variation selector there (`"奶\u{E01E1}"` for ˙ㄋㄞ); `tests/unit/zhuyin-glyphs.test.ts` fails if a glyph is missing from the subset or shows another reading.

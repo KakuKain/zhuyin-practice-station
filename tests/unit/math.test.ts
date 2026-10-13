@@ -9,6 +9,19 @@ import {
   validateMathRound,
 } from "../../features/math/math-round";
 import { mathPromptId, mathPromptUrl, mathPrompts } from "../../features/math/math-audio";
+import {
+  answerOf,
+  buildCompareRound,
+  comparePromptIds,
+  compareRoundSize,
+  ground,
+  needsLining,
+  routeLength,
+  routePoints,
+  snapDistance,
+  startLine,
+  type CompareQuestion,
+} from "../../features/math/compare-round";
 import { ownsStorageKey, storageKeys } from "../../lib/storage/storage-keys";
 
 test("a 第一課 round counts 4 numbers and draws 4, each from 1 to 10 without repeats", () => {
@@ -69,5 +82,108 @@ test("math records belong to each child and are included in device backup", () =
   for (const key of [storageKeys.mathRound, storageKeys.mathRecords]) {
     assert.ok(ownsStorageKey(key));
     assert.ok(ownsStorageKey(`${key}@k2`));
+  }
+});
+
+const rounds = Array.from({ length: 200 }, () => buildCompareRound());
+type BarQuestion = Extract<CompareQuestion, { kind: "compare" | "order" }>;
+
+test("a 第二課 round walks 比長短, 比高矮, 排順序, 直線和曲線 and 哪條路最近 in order", () => {
+  for (const round of rounds) {
+    assert.equal(round.length, compareRoundSize);
+    assert.deepEqual(
+      round.map((question) =>
+        question.kind === "compare" || question.kind === "order"
+          ? `${question.kind}-${question.measure}-${needsLining(question) ? "apart" : "lined"}`
+          : question.kind,
+      ),
+      [
+        "compare-length-lined",
+        "compare-length-apart",
+        "compare-height-lined",
+        "compare-height-apart",
+        "order-length-lined",
+        "order-height-lined",
+        "line",
+        "route",
+      ],
+    );
+  }
+});
+
+test("things out of line mislead a child who skips lining them up, and all fit the picture", () => {
+  for (const round of rounds) {
+    for (const question of round.slice(0, 6) as BarQuestion[]) {
+      const sizes = question.bars.map((bar) => bar.size);
+      assert.equal(new Set(sizes).size, sizes.length);
+      for (const bar of question.bars) {
+        if (question.measure === "length") assert.ok(startLine + bar.offset + bar.size <= 97);
+        else assert.ok(ground - bar.offset - bar.size >= 4);
+      }
+      if (!needsLining(question)) continue;
+      const [big, small] = [...question.bars].sort((a, b) => b.size - a.size);
+      if (question.measure === "length") {
+        // Both pencils need moving, and the shorter one's tip reaches farther right.
+        assert.ok(question.bars.every((bar) => bar.offset > snapDistance));
+        assert.ok(small.offset + small.size > big.offset + big.size);
+      } else {
+        // The shorter child stands on a box and so looks taller.
+        assert.equal(big.offset, 0);
+        assert.ok(small.offset > snapDistance);
+        assert.ok(small.offset + small.size > big.size);
+      }
+    }
+  }
+});
+
+test("each 第二課 answer is the one a child should tap", () => {
+  for (const round of rounds) {
+    for (const question of round) {
+      const answer = answerOf(question);
+      if (question.kind === "compare") {
+        const sizes = question.bars.map((bar) => bar.size);
+        const pick = sizes[answer[0]];
+        assert.equal(pick, question.ask === "more" ? Math.max(...sizes) : Math.min(...sizes));
+      } else if (question.kind === "order") {
+        const sizes = answer.map((index) => question.bars[index].size);
+        assert.deepEqual(
+          sizes,
+          [...sizes].sort((a, b) => a - b),
+        );
+        assert.equal(new Set(answer).size, 3);
+      } else if (question.kind === "line") {
+        assert.equal(question.lines.length, 4);
+        const matching = question.lines.filter(
+          (line) => (line.shape === "straight") === (question.ask === "straight"),
+        );
+        assert.equal(matching.length, 1);
+        assert.equal(question.lines[answer[0]], matching[0]);
+      } else {
+        // The straight road is the shortest, and every road stays inside the picture.
+        const lengths = question.routes.map((route) =>
+          routeLength(routePoints(question, route.shape)),
+        );
+        const shortest = Math.min(...lengths);
+        assert.equal(lengths[answer[0]], shortest);
+        assert.equal(lengths.filter((value) => value < shortest * 1.15).length, 1);
+        for (const route of question.routes)
+          for (const [, y] of routePoints(question, route.shape)) assert.ok(y > 4 && y < 96);
+      }
+    }
+  }
+});
+
+test("every 第二課 instruction and both answers are read aloud from a shipped clip", () => {
+  const ids = new Set(["correct", "retry"]);
+  for (const round of rounds)
+    for (const question of round) {
+      const { lineUp, ask } = comparePromptIds(question);
+      ids.add(ask);
+      if (lineUp) ids.add(lineUp);
+    }
+  assert.ok(ids.has("align-length") && ids.has("align-height"));
+  for (const id of ids) {
+    assert.ok(mathPrompts[id], id);
+    assert.ok(existsSync(`public/${mathPromptUrl(id).split("?")[0]}`), id);
   }
 });
