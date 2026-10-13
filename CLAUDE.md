@@ -102,8 +102,12 @@ There is one build: a static Vite SPA. `index.html` → `app/main.tsx` → `crea
   - Lesson 1 asks 4 數一數 (tap pictures to mark them, write the number) and then 4 畫圈圈, all spoken aloud.
   - Circles are always drawn in a 十格框 (5 × 2 cells, one circle each, `DrawFrame`/`TenFrame` in `MathInk.tsx`):
     - Every cell is its own square canvas, because a non-square canvas would stretch the strokes. One `useInkCanvas` serves them all, so only one pen draws at a time.
-    - Filled cells are numbered in reading order. 復原 takes back the latest circle in that frame and 清空 clears it.
-    - More circles than asked (counted in reading order, `extraCells`) turn the frame's lines coral, wash and dash the extra cells, show 多畫了 N 個 in 國字注音 on the tool bar's left (so the frame never moves) and make 復原 glow. The parent's check marks the same cells and says 多畫 N 格.
+    - Filled cells are numbered in reading order. Each frame has its own tools:
+      - The eraser takes away the one circle tapped next, then the pen is back; tapping an empty cell just draws. 復原 brings an erased circle back first.
+      - 復原 takes back the latest circle in that frame, and 清空 clears it.
+    - Circles are compared with the number asked in reading order (`frameMarks`).
+      - While drawing, each extra circle gets a red box, the tool bar says 多畫了 N 個 in 國字注音 on its left (so the frame never moves), and 復原 glows.
+      - Too few is not shown to the child; the parent chose that. The parent's check shows extra circles in red boxes and missing ones as red dashed circles in the next empty cells, and says 多畫/少畫 N 格.
     - The cells are saved in `MathRound.work`. Free drawings saved before the frame are dropped, and old ink still shows on the parent's check.
   - Lesson 3 asks 4 合在一起 and then 4 畫圈圈算加法:
     - 合在一起 shows two groups of up to 5 markable pictures; the child writes the total.

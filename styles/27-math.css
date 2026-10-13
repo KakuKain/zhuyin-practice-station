@@ -335,10 +335,11 @@
 /* 十格框: two rows of five cells, one circle in each, on the same paper as dictation. */
 /* The bar keeps its height when 多畫了 shows on its left, so the frame never moves. */
 .math-frame-tools {
-  grid-template-columns: minmax(0, 1fr) repeat(2, 48px);
+  grid-template-columns: minmax(0, 1fr) repeat(3, 46px);
+  container-type: inline-size;
 }
 .math-frame-tools.is-over {
-  background: #fde8e0;
+  background: #fdeceb;
 }
 .math-frame-over {
   display: flex;
@@ -347,7 +348,7 @@
   min-width: 0;
   padding-left: 8px;
   overflow: hidden;
-  color: #b8452d;
+  color: #c0322a;
   font-size: 20px;
   font-weight: 700;
   white-space: nowrap;
@@ -355,11 +356,21 @@
 .math-frame-over svg {
   flex: none;
 }
+/* Narrow bars (phones, a landscape 加法 frame) keep the words and drop the icon. */
+@container (max-width: 340px) {
+  .math-frame-over {
+    padding-left: 4px;
+    font-size: 16px;
+  }
+  .math-frame-over svg {
+    display: none;
+  }
+}
 /* 復原 glows so the child knows what to press. */
 .math-frame-tools .ink-undo.is-hint {
   background: #fff;
-  color: #b8452d;
-  box-shadow: 0 0 0 3px var(--coral);
+  color: #c0322a;
+  box-shadow: 0 0 0 3px #e0574c;
   animation: math-undo-hint 0.9s ease-in-out 3;
 }
 @keyframes math-undo-hint {
@@ -436,33 +447,58 @@
   box-shadow: 0 1px 0 var(--coral-dark);
   pointer-events: none;
 }
-/* More circles than asked: the frame's lines turn coral and the extra cells are washed and dashed. */
-.math-frame.is-over {
-  background: #f0a28a;
-}
+/* More circles than asked: each extra one gets a red box. */
 .math-frame-cell.is-extra {
-  background: #fde8e0;
+  background: #fdeceb;
 }
-.math-frame-cell.is-extra::after {
+.math-frame-cell.is-extra::after,
+.math-frame-cell.is-missing::after {
   content: "";
   position: absolute;
   z-index: 1;
-  inset: 4px;
-  border: 2px dashed #e07a5f;
-  border-radius: 6px;
   pointer-events: none;
 }
+.math-frame-cell.is-extra::after {
+  inset: 3px;
+  border: 3px solid #d63b30;
+  border-radius: 6px;
+}
 .math-frame-cell.is-extra .math-frame-number {
-  background: #b8452d;
-  box-shadow: 0 1px 0 #8a2f1d;
+  background: #c0322a;
+  box-shadow: 0 1px 0 #8f2119;
 }
 .math-frame.is-preview .math-frame-cell.is-extra::after {
   inset: 1px;
-  border-width: 1px;
-  border-radius: 1px;
+  border-width: 2px;
+  border-radius: 2px;
+}
+/* Too few, on the parent's check: a red dashed circle where each missing one would go. */
+.math-frame-cell.is-missing::after {
+  inset: 18%;
+  border: 2px dashed #d63b30;
+  border-radius: 50%;
 }
 .math-check-over {
-  color: #b8452d;
+  color: #c0322a;
+}
+/* The eraser is on: every circle shows a × to tap. */
+.math-frame.is-erasing .math-frame-cell.is-used {
+  background: #fff7e3;
+}
+.math-frame-erase {
+  position: absolute;
+  z-index: 3;
+  top: 5px;
+  right: 5px;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #fff;
+  color: #c0322a;
+  box-shadow: 0 0 0 2px #e0574c;
+  pointer-events: none;
 }
 /* Tablets have room for a frame the parent can read at a glance. */
 @media (min-width: 600px) {

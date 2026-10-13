@@ -46,12 +46,16 @@ const questionName = (question: MathQuestion) =>
     ? question.parts.join("＋")
     : `${sectionLabels[question.kind]} ${question.target}`;
 
-/** 「畫了 6 格」 for the parent, and how many too many in coral. */
+/** 「畫了 6 格」 for the parent, and in red how many too many or too few. */
 function DrawnCount({ drawn, target }: { drawn: number; target: number }) {
   return (
     <>
       畫了 {drawn} 格
-      {drawn > target && <strong className="math-check-over">，多畫 {drawn - target} 格</strong>}
+      {drawn !== target && (
+        <strong className="math-check-over">
+          ，{drawn > target ? "多" : "少"}畫 {Math.abs(drawn - target)} 格
+        </strong>
+      )}
     </>
   );
 }

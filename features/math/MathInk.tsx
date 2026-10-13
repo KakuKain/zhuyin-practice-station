@@ -1,5 +1,5 @@
-import { useRef, type ReactNode } from "react";
-import { ArrowUUpLeft, Trash, WarningCircle } from "@phosphor-icons/react";
+import { useRef, useState, type PointerEvent, type ReactNode } from "react";
+import { ArrowUUpLeft, Eraser, Trash, WarningCircle, X } from "@phosphor-icons/react";
 import type { InkStroke } from "../types";
 import { useInkCanvas } from "../../lib/ink/useInkCanvas";
 import { InkStatus, InkTools } from "../../components/InkTools";
@@ -8,15 +8,20 @@ import { filledCells, frameCells } from "./math-round";
 import { MathWords } from "./MathChrome";
 
 /**
- * Which cells of a frame hold more circles than asked for: counted in reading order, like the
- * numbers on the cells, so the cells after the target are the extra ones.
+ * How a frame's circles compare with the number asked for, counted in reading order like the
+ * numbers on the cells: the circles after the target are extra, and when there are too few,
+ * the next empty cells are the missing ones.
  */
-const extraCells = (cells: InkStroke[][], start: number, target: number) => {
+const frameMarks = (cells: InkStroke[][], start: number, target: number) => {
   const extra = new Set<number>();
+  const missing = new Set<number>();
+  const used = (offset: number) => (cells[start + offset]?.length ?? 0) > 0;
   let count = 0;
   for (let offset = 0; offset < frameCells; offset++)
-    if ((cells[start + offset]?.length ?? 0) > 0 && ++count > target) extra.add(offset);
-  return extra;
+    if (used(offset) && ++count > target) extra.add(offset);
+  for (let offset = 0; offset < frameCells && count + missing.size < target; offset++)
+    if (!used(offset)) missing.add(offset);
+  return { extra, missing };
 };
 
 /** One square to write or draw in, with the same pen, eraser and undo as dictation. */
@@ -103,14 +108,20 @@ function useFrameOrder(initial: (index: number) => InkStroke[], count: number) {
     for (let index = start; index < start + frameCells; index++)
       if (ink.ink[index]) ink.clear(index);
   };
-  return { track, undo, clear };
+  /** The eraser takes one chosen circle away; 復原 brings it back first. */
+  const erase = (ink: Ink, index: number) => {
+    order.current.push(index);
+    ink.clear(index);
+  };
+  return { track, undo, clear, erase };
 }
 
 /**
  * 十格框: two rows of five cells, one circle in each. Every cell is its own square canvas, so a
  * circle is never stretched, and the frame shows at a glance how many there are. Filled cells
- * are numbered in reading order. Circles past the target turn the frame coral, mark the extra
- * cells, say 多畫了 in the tool bar (so the frame never moves) and point at 復原.
+ * are numbered in reading order. Circles past the target get a red box, 多畫了 shows in the tool
+ * bar (so the frame never moves) and 復原 is pointed out. Too few is left for the parent's check.
+ * The eraser takes away the one circle tapped next, then the pen is back.
  */
 function TenFrame({
   ink,
@@ -121,6 +132,7 @@ function TenFrame({
   label,
   onUndo,
   onClear,
+  onErase,
 }: {
   ink: Ink;
   canvases: React.RefObject<(HTMLCanvasElement | null)[]>;
@@ -130,9 +142,11 @@ function TenFrame({
   label: string;
   onUndo: () => void;
   onClear: () => void;
+  onErase: (index: number) => void;
 }) {
+  const [erasing, setErasing] = useState(false);
   const filled = filledCells(cells, start);
-  const extra = extraCells(cells, start, target);
+  const { extra } = frameMarks(cells, start, target);
   const hasInk = Array.from({ length: frameCells }, (_, offset) => ink.ink[start + offset]).some(
     Boolean,
   );
@@ -140,6 +154,17 @@ function TenFrame({
     { length: frameCells },
     (_, offset) => ink.undoAvailable[start + offset],
   ).some(Boolean);
+  // Erasing: a tap on a circle takes it away; a tap on an empty cell goes back to drawing.
+  const down = (index: number) => (event: PointerEvent<HTMLCanvasElement>) => {
+    if (erasing) {
+      setErasing(false);
+      if ((cells[index]?.length ?? 0) > 0) {
+        event.preventDefault();
+        return onErase(index);
+      }
+    }
+    ink.begin(event);
+  };
   let number = 0;
   return (
     <div className="math-ink math-frame-ink">
@@ -156,6 +181,17 @@ function TenFrame({
             </>
           )}
         </span>
+        <button
+          type="button"
+          className={`ink-tool ink-eraser${erasing ? " is-active" : ""}`}
+          aria-label={`擦掉一個圈圈，${label}`}
+          aria-pressed={erasing}
+          title={erasing ? "不擦了，繼續畫" : "點一個圈圈擦掉"}
+          disabled={!hasInk && !erasing}
+          onClick={() => setErasing(!erasing)}
+        >
+          <Eraser size={21} aria-hidden="true" />
+        </button>
         <button
           type="button"
           className={`ink-tool ink-undo${extra.size ? " is-hint" : ""}`}
@@ -177,7 +213,11 @@ function TenFrame({
           <Trash size={19} aria-hidden="true" />
         </button>
       </div>
-      <div className={`math-frame${extra.size ? " is-over" : ""}`} role="group" aria-label={label}>
+      <div
+        className={`math-frame${extra.size ? " is-over" : ""}${erasing ? " is-erasing" : ""}`}
+        role="group"
+        aria-label={label}
+      >
         {Array.from({ length: frameCells }, (_, offset) => {
           const index = start + offset;
           const used = (cells[index]?.length ?? 0) > 0;
@@ -192,7 +232,7 @@ function TenFrame({
                   canvases.current[index] = element;
                 }}
                 data-word-index={index}
-                onPointerDown={ink.begin}
+                onPointerDown={down(index)}
                 onPointerMove={ink.move}
                 onPointerUp={ink.end}
                 onPointerCancel={ink.end}
@@ -202,6 +242,11 @@ function TenFrame({
               {used && (
                 <span className="math-frame-number" aria-hidden="true">
                   {number}
+                </span>
+              )}
+              {used && erasing && (
+                <span className="math-frame-erase" aria-hidden="true">
+                  <X size={16} weight="bold" />
                 </span>
               )}
             </div>
@@ -252,6 +297,7 @@ export function DrawFrame({
         label={`畫出 ${target} 個圈圈`}
         onUndo={() => order.undo(ink, 0)}
         onClear={() => order.clear(ink, 0)}
+        onErase={(index) => order.erase(ink, index)}
       />
       <InkStatus message={ink.notice} />
     </>
@@ -310,6 +356,7 @@ export function AdditionWork({
         label={`${side ? "右邊" : "左邊"}畫 ${parts[side]} 個圈圈`}
         onUndo={() => order.undo(ink, side * frameCells)}
         onClear={() => order.clear(ink, side * frameCells)}
+        onErase={(index) => order.erase(ink, index)}
       />
     </div>
   );
@@ -365,7 +412,10 @@ export function AdditionWork({
   );
 }
 
-/** For the parent's check: the frame in miniature, each cell as it was drawn, extras marked. */
+/**
+ * For the parent's check: the frame in miniature, each cell as it was drawn. Extra circles get a
+ * red box; when there are too few, a red dashed circle shows where each missing one would go.
+ */
 export function FramePreview({
   cells,
   start = 0,
@@ -375,11 +425,14 @@ export function FramePreview({
   start?: number;
   target: number;
 }) {
-  const extra = extraCells(cells, start, target);
+  const { extra, missing } = frameMarks(cells, start, target);
   return (
     <div className={`math-frame is-preview${extra.size ? " is-over" : ""}`} aria-hidden="true">
       {Array.from({ length: frameCells }, (_, offset) => (
-        <div className={`math-frame-cell${extra.has(offset) ? " is-extra" : ""}`} key={offset}>
+        <div
+          className={`math-frame-cell${extra.has(offset) ? " is-extra" : ""}${missing.has(offset) ? " is-missing" : ""}`}
+          key={offset}
+        >
           {(cells[start + offset]?.length ?? 0) > 0 && (
             <InkPreview strokes={cells[start + offset]} />
           )}
