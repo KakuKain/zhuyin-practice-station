@@ -1,7 +1,6 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from "react";
 import {
   Acorn,
-  ArrowLeft,
   Balloon,
   Bird,
   Butterfly,
@@ -14,7 +13,6 @@ import {
   IceCream,
   Leaf,
   Play,
-  SpeakerHigh,
   Star,
   type Icon,
 } from "@phosphor-icons/react";
@@ -35,9 +33,16 @@ import {
   type MathRound,
 } from "./math-round";
 import { chineseNumber, mathPromptId, mathPromptUrl, mathPrompts } from "./math-audio";
-import { mathLessons } from "./math-lessons";
+import { mathLessons, type MathLesson } from "./math-lessons";
+import { MathHeader, MathPrompt, MathStartButton } from "./MathChrome";
 
 type MathApp = Pick<AppController, "speak" | "stopPlayback" | "navigate" | "mathLessonId">;
+
+const CompareLesson = lazy(() =>
+  Promise.all([import("./CompareLesson"), import("../../styles/lazy/math-compare.css")]).then(
+    ([module]) => ({ default: module.CompareLesson }),
+  ),
+);
 
 const icons: Record<CountIcon, { icon: Icon; color: string; name: string }> = {
   fish: { icon: Fish, color: "#2f8fd8", name: "魚" },
@@ -176,20 +181,27 @@ function StrokeNumbers({ strokes }: { strokes: InkStroke[] }) {
   );
 }
 
-function PromptButton({ question, onPlay }: { question: MathQuestion; onPlay: () => void }) {
-  return (
-    <div className="math-prompt">
-      <button type="button" className="math-prompt-play" onClick={onPlay}>
-        <SpeakerHigh size={28} weight="fill" aria-hidden="true" />
-        <span>再聽一次</span>
-      </button>
-      <p>{mathPrompts[mathPromptId(question)]}</p>
-    </div>
-  );
-}
-
 export function MathScreen({ app }: { app: MathApp }) {
   const lesson = mathLessons.find((item) => item.id === app.mathLessonId) ?? mathLessons[0];
+  if (lesson.id === 2)
+    return (
+      <Suspense
+        fallback={
+          <main className="math-shell">
+            <p className="feature-loading" role="status">
+              正在準備練習…
+            </p>
+          </main>
+        }
+      >
+        <CompareLesson app={app} lesson={lesson} />
+      </Suspense>
+    );
+  return <CountingLesson app={app} lesson={lesson} />;
+}
+
+/** 第一課 認識 1～10: write and draw, then the parent checks the round. */
+function CountingLesson({ app, lesson }: { app: MathApp; lesson: MathLesson }) {
   const [saved] = useState(() => {
     const round = readMathRound();
     return round?.lessonId === lesson.id ? round : null;
@@ -224,16 +236,7 @@ export function MathScreen({ app }: { app: MathApp }) {
   };
 
   const header = (title: string, detail?: string) => (
-    <header className="math-header">
-      <button type="button" className="math-back" onClick={leave}>
-        <ArrowLeft size={20} weight="bold" aria-hidden="true" />
-        返回
-      </button>
-      <div>
-        <strong>{title}</strong>
-        {detail && <small>{detail}</small>}
-      </div>
-    </header>
+    <MathHeader title={title} detail={detail} onLeave={leave} />
   );
 
   if (finished) {
@@ -291,15 +294,7 @@ export function MathScreen({ app }: { app: MathApp }) {
               </button>
             </div>
           ) : (
-            <button
-              type="button"
-              className="math-start"
-              onClick={() => start(newMathRound(lesson.id))}
-              aria-label="開始練習"
-            >
-              <Play size={56} weight="fill" aria-hidden="true" />
-              <span>開始</span>
-            </button>
+            <MathStartButton onStart={() => start(newMathRound(lesson.id))} />
           )}
         </section>
       </main>
@@ -391,7 +386,7 @@ export function MathScreen({ app }: { app: MathApp }) {
         `第 ${round.index + 1} 題 / ${round.questions.length}`,
       )}
       <section className={`math-question is-${question.kind}`}>
-        <PromptButton question={question} onPlay={() => play(question)} />
+        <MathPrompt text={mathPrompts[mathPromptId(question)]} onPlay={() => play(question)} />
         {question.kind === "count" ? (
           <div className="math-count">
             <CountPictures

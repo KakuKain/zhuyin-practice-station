@@ -20,8 +20,8 @@ export const mathLessons: MathLesson[] = [
     id: 2,
     number: "第二課",
     title: "比一比",
-    round: "比長短、比高矮、排順序、直線和曲線。",
-    ready: false,
+    round: "8 題：比長短、比高矮、排順序、直線和曲線、哪條路最近。點一點就知道對不對。",
+    ready: true,
   },
   { id: 3, number: "第三課", title: "加法", round: "用圈圈學加法。", ready: false },
 ];

@@ -172,8 +172,11 @@ export type MathRecord = {
   lessonId: number;
   at: number;
   total: number;
-  /** What the parent marked to practise again, e.g. 「數一數 7」. */
-  needsPractice: { kind: MathQuestion["kind"]; target: number }[];
+  /**
+   * What to practise again: what the parent marked in 第一課 (「數一數 7」), or what took more
+   * than one try in 第二課 (「比長短（先對齊）」).
+   */
+  needsPractice: { kind: string; target?: number }[];
 };
 export type MathRecords = { version: 1; rounds: MathRecord[] };
 const maxRecords = 60;
@@ -192,20 +195,9 @@ export function readMathRecords(): MathRecords {
 }
 
 /** Kept for the parent, and later for 集章卡: what each child practised and what to revisit. */
-export function recordMathRound(round: MathRound, now = Date.now()) {
+export function recordMathResult(result: Omit<MathRecord, "at">, now = Date.now()) {
   const records = readMathRecords();
-  records.rounds = [
-    ...records.rounds,
-    {
-      lessonId: round.lessonId,
-      at: now,
-      total: round.questions.length,
-      needsPractice: round.needsPractice.map((index) => ({
-        kind: round.questions[index].kind,
-        target: round.questions[index].target,
-      })),
-    },
-  ].slice(-maxRecords);
+  records.rounds = [...records.rounds, { ...result, at: now }].slice(-maxRecords);
   try {
     window.localStorage.setItem(childKey(storageKeys.mathRecords), JSON.stringify(records));
     return true;
@@ -213,3 +205,16 @@ export function recordMathRound(round: MathRound, now = Date.now()) {
     return false;
   }
 }
+
+export const recordMathRound = (round: MathRound, now = Date.now()) =>
+  recordMathResult(
+    {
+      lessonId: round.lessonId,
+      total: round.questions.length,
+      needsPractice: round.needsPractice.map((index) => ({
+        kind: round.questions[index].kind,
+        target: round.questions[index].target,
+      })),
+    },
+    now,
+  );
