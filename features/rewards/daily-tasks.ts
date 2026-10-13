@@ -74,6 +74,7 @@ export function taskDestination(key: string): TaskDestination {
  */
 export const taskPhraseReadings: Record<string, string> = {
   今天的任務: "ㄐㄧㄣ ㄊㄧㄢ ˙ㄉㄜ ㄖㄣˋ ㄨˋ",
+  "完成任務，就能拿到任務章！": "ㄨㄢˊ ㄔㄥˊ ㄖㄣˋ ㄨˋ ㄐㄧㄡˋ ㄋㄥˊ ㄋㄚˊ ㄉㄠˋ ㄖㄣˋ ㄨˋ ㄓㄤ",
   聽寫: "ㄊㄧㄥ ㄒㄧㄝˇ",
   默寫: "ㄇㄛˋ ㄒㄧㄝˇ",
   辨音練習: "ㄅㄧㄢˋ ㄧㄣ ㄌㄧㄢˋ ㄒㄧˊ",

@@ -106,6 +106,8 @@
   isolation: isolate;
   display: grid;
   gap: 6px;
+  /* Sized by its words, not by the 72px button it hangs from, so 今天的任務 stays on one line. */
+  width: max-content;
   min-width: 220px;
   padding: 8px;
   border-radius: 24px;
@@ -153,6 +155,7 @@
   font: inherit;
   font-size: 22px;
   text-align: left;
+  white-space: nowrap;
 }
 .reward-menu button:first-child:not(:only-child) {
   background: linear-gradient(110deg, #f6fbff 0%, #e6f3ff 100%);
@@ -450,65 +453,141 @@
   padding-left: 22px;
 }
 
-/* 今天的任務, opened from the floating flag: the card in a sky wash, in 國字注音. */
+/*
+ * 今天的任務, opened from the floating button: a sky wash with clouds, the flag beside a large
+ * title, and one washed card per task with its picture, the lesson as a tag and an arrow button.
+ */
 .stamp-dialog.today-tasks {
-  background: linear-gradient(160deg, #f6fbff 0%, #e6f3ff 100%);
+  /* The unbroken title must not push the cards past the edge on a phone. */
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  width: min(100%, 620px);
+  padding: 24px 24px 22px;
+  background:
+    url("/course-art/sound-comparison-clouds-watercolor-v1.webp") right -150px top 54px / 380px auto
+      no-repeat,
+    linear-gradient(180deg, #eef7ff 0%, #fbfdff 46%, #ffffff 100%);
+}
+.today-tasks header {
+  align-items: flex-start;
+  gap: 10px;
+}
+.today-tasks header > div {
+  flex: 1;
+  min-width: 0;
+}
+.today-tasks-flag {
+  flex: none;
+  width: 64px;
+  height: 84px;
+  object-fit: contain;
 }
 .today-tasks h2 {
-  display: flex;
-  flex: 1;
-  align-items: center;
-  gap: 6px;
-  white-space: nowrap;
   margin: 0;
   padding: 0;
   background: none;
-  color: #2f5f8a;
-  font-size: 26px;
+  color: #1f4f86;
+  font-size: 40px;
   font-weight: 400;
+  white-space: nowrap;
 }
-.today-tasks h2 img {
-  width: 30px;
-  height: 44px;
-  object-fit: contain;
+.today-tasks header p {
+  margin: 2px 0 0;
+  color: #4f6b86;
+  font-size: 19px;
 }
 .today-tasks ul {
   display: grid;
-  gap: 8px;
+  gap: 12px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 .today-tasks li {
+  --task-wash: #eaf4ff;
+  --task-edge: rgba(91, 151, 209, 0.22);
+  --task-tag: #d8eaff;
+  --task-tag-ink: #2f5f8a;
   display: flex;
   align-items: center;
-  gap: 10px;
-  min-height: 60px;
-  padding: 6px 8px 6px 16px;
-  border-radius: 18px;
-  background: rgba(255, 254, 251, 0.86);
-  box-shadow: 0 1px 0 rgba(47, 95, 138, 0.08);
+  gap: 14px;
+  min-height: 112px;
+  padding: 10px 16px 10px 12px;
+  border: 1.5px solid var(--task-edge);
+  border-radius: 24px;
+  background: linear-gradient(110deg, rgba(255, 255, 255, 0.92) 0%, var(--task-wash) 100%);
+  box-shadow: 0 2px 8px rgba(47, 95, 138, 0.08);
+}
+.today-tasks li.is-leaf {
+  --task-wash: #eaf6e8;
+  --task-edge: rgba(76, 159, 122, 0.24);
+  --task-tag: #d9efd9;
+  --task-tag-ink: #2f6f4f;
+}
+.today-tasks li.is-sun {
+  --task-wash: #fff4dc;
+  --task-edge: rgba(238, 164, 58, 0.26);
+  --task-tag: #ffe9bf;
+  --task-tag-ink: #8a5a14;
+}
+.today-tasks li.is-rose {
+  --task-wash: #fff0ee;
+  --task-edge: rgba(233, 120, 106, 0.24);
+  --task-tag: #ffe0dc;
+  --task-tag-ink: #9a4438;
+}
+.today-tasks li.is-peach {
+  --task-wash: #fff1e6;
+  --task-edge: rgba(237, 132, 92, 0.24);
+  --task-tag: #ffe2cf;
+  --task-tag-ink: #94502f;
+}
+.today-task-art {
+  flex: none;
+  width: 92px;
+  height: 92px;
+  object-fit: contain;
 }
 .today-task-name {
+  display: grid;
   flex: 1;
+  justify-items: start;
+  gap: 6px;
   min-width: 0;
   color: var(--ink);
-  font-size: 24px;
+}
+.today-task-place {
+  max-width: 100%;
+  padding: 2px 14px;
+  border-radius: 999px;
+  background: var(--task-tag);
+  color: var(--task-tag-ink);
+  font-size: 18px;
+}
+.today-task-name strong {
+  overflow-wrap: anywhere;
+  color: #1f3550;
+  font-size: 34px;
+  font-weight: 400;
+  line-height: 1.25;
 }
 .today-tasks li button {
-  display: inline-flex;
+  display: grid;
   flex: none;
-  align-items: center;
-  gap: 6px;
-  min-height: 48px;
-  padding: 0 16px;
+  place-items: center;
+  width: 68px;
+  height: 68px;
   border: 0;
-  border-radius: 999px;
-  background: var(--coral);
+  border-radius: 50%;
+  background: linear-gradient(180deg, #f59a6c 0%, var(--coral) 100%);
   color: #fff;
-  font: inherit;
-  font-size: 20px;
-  box-shadow: 0 2px 0 var(--coral-dark);
+  box-shadow:
+    0 3px 0 var(--coral-dark),
+    0 6px 14px rgba(201, 106, 72, 0.28);
+}
+.today-tasks li button:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--coral-dark);
 }
 .today-task-done {
   display: inline-flex;
@@ -519,9 +598,14 @@
   font-size: 20px;
 }
 .today-tasks li.is-done {
-  background: rgba(240, 250, 244, 0.86);
+  --task-wash: #f0f6f2;
+  --task-edge: rgba(76, 159, 122, 0.18);
+  box-shadow: none;
 }
-.today-tasks li.is-done .today-task-name {
+.today-tasks li.is-done .today-task-art {
+  opacity: 0.6;
+}
+.today-tasks li.is-done .today-task-name strong {
   color: #6d8a7e;
 }
 
@@ -833,14 +917,74 @@
     box-shadow: 0 0 0 8px rgba(232, 178, 31, 0);
   }
 }
-@media (max-width: 420px) {
-  .today-task-name {
-    font-size: 19px;
+@media (max-width: 520px) {
+  .stamp-dialog.today-tasks {
+    padding: 18px 14px 16px;
   }
-  .today-tasks li button,
+  .today-tasks-flag {
+    width: 44px;
+    height: 60px;
+  }
+  .today-tasks h2 {
+    font-size: 28px;
+  }
+  .today-tasks header p {
+    font-size: 16px;
+  }
+  .today-tasks li {
+    gap: 10px;
+    min-height: 92px;
+    padding: 8px 10px 8px 8px;
+  }
+  .today-task-art {
+    width: 60px;
+    height: 60px;
+  }
+  .today-task-place {
+    padding: 2px 10px;
+    font-size: 15px;
+  }
+  .today-task-name strong {
+    font-size: 25px;
+  }
+  .today-tasks li button {
+    width: 56px;
+    height: 56px;
+  }
   .today-task-done {
-    font-size: 17px;
+    flex-direction: column;
+    font-size: 15px;
   }
+}
+@media (max-width: 380px) {
+  .today-tasks-flag {
+    width: 32px;
+    height: 46px;
+  }
+  .today-tasks h2 {
+    font-size: 23px;
+  }
+  .today-tasks li {
+    gap: 6px;
+  }
+  .today-task-art {
+    width: 40px;
+    height: 40px;
+  }
+  .today-task-place {
+    padding: 1px 8px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  .today-task-name strong {
+    font-size: 22px;
+  }
+  .today-tasks li button {
+    width: 48px;
+    height: 48px;
+  }
+}
+@media (max-width: 420px) {
   .reward-log li {
     grid-template-columns: 24px minmax(0, 1fr);
   }
