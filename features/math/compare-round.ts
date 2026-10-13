@@ -18,6 +18,8 @@ export type RouteShape = "straight" | "arch" | "wave";
 
 export type CompareQuestion =
   | { kind: "compare"; measure: Measure; ask: "more" | "less"; bars: Bar[] }
+  /** 比厚薄: books standing on a shelf, the same height; a book's thickness is its width. */
+  | { kind: "thickness"; ask: "more" | "less"; books: { size: number; color: number }[] }
   | { kind: "line"; ask: "straight" | "curve"; lines: { shape: LineShape; angle: number }[] }
   | {
       kind: "route";
@@ -99,6 +101,26 @@ export function compareBars(measure: Measure, aligned: boolean, random = Math.ra
   return shuffle([big, small], random);
 }
 
+/** Two books, one clearly thicker: thickness in % of the shelf's width. */
+export function thicknessQuestion(
+  random = Math.random,
+): Extract<CompareQuestion, { kind: "thickness" }> {
+  const [first, second] = colors(2, random);
+  const thick = between(random, 20, 30);
+  const thin = thick - between(random, 8, 13);
+  return {
+    kind: "thickness",
+    ask: random() < 0.5 ? "more" : "less",
+    books: shuffle(
+      [
+        { size: thick, color: first },
+        { size: thin, color: second },
+      ],
+      random,
+    ),
+  };
+}
+
 export function lineQuestion(random = Math.random): Extract<CompareQuestion, { kind: "line" }> {
   const ask = random() < 0.5 ? "straight" : "curve";
   const straightAngles = shuffle([0, 30, 60, 90, 120, 150], random);
@@ -136,9 +158,12 @@ export function routeQuestion(random = Math.random): Extract<CompareQuestion, { 
   };
 }
 
-export const compareRoundSize = 6;
+export const compareRoundSize = 7;
 
-/** One round walks the lesson in the textbook's order. 排順序 is 第三課's, with numbers. */
+/**
+ * One round walks the lesson in the textbook's order: 比長短, 比高矮、比厚薄, then 直線和曲線
+ * with 哪條路最近. 排順序 is 第三課's, with numbers.
+ */
 export function buildCompareRound(random = Math.random): CompareQuestion[] {
   const ask = () => (random() < 0.5 ? ("more" as const) : ("less" as const));
   return [
@@ -146,6 +171,7 @@ export function buildCompareRound(random = Math.random): CompareQuestion[] {
     { kind: "compare", measure: "length", ask: ask(), bars: compareBars("length", false, random) },
     { kind: "compare", measure: "height", ask: ask(), bars: compareBars("height", true, random) },
     { kind: "compare", measure: "height", ask: ask(), bars: compareBars("height", false, random) },
+    thicknessQuestion(random),
     lineQuestion(random),
     routeQuestion(random),
   ];
@@ -159,6 +185,11 @@ export function answerOf(question: CompareQuestion): number[] {
   switch (question.kind) {
     case "compare": {
       const sizes = question.bars.map((bar) => bar.size);
+      const target = question.ask === "more" ? Math.max(...sizes) : Math.min(...sizes);
+      return [sizes.indexOf(target)];
+    }
+    case "thickness": {
+      const sizes = question.books.map((book) => book.size);
       const target = question.ask === "more" ? Math.max(...sizes) : Math.min(...sizes);
       return [sizes.indexOf(target)];
     }
@@ -210,10 +241,12 @@ export function compareTopic(question: CompareQuestion) {
         : needsLining(question)
           ? "比高矮（先站到地上）"
           : "比高矮";
+    case "thickness":
+      return "比厚薄";
     case "line":
       return "直線和曲線";
     case "route":
-      return "哪條路最近";
+      return "直線和曲線（哪條路最近）";
   }
 }
 
@@ -225,6 +258,8 @@ export function comparePromptIds(question: CompareQuestion): { lineUp?: string; 
         lineUp: needsLining(question) ? `align-${question.measure}` : undefined,
         ask: `${question.measure}-${question.ask}`,
       };
+    case "thickness":
+      return { ask: `thick-${question.ask}` };
     case "line":
       return { ask: `line-${question.ask}` };
     case "route":

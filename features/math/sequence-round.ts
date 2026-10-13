@@ -1,6 +1,7 @@
 /**
  * 第三課 排順序、比多少. Like 第二課, every question is a tap, checked at once and tried again
- * until right. The round walks the lesson in order: 第幾個, 數的順序, 比多少, then 比大小.
+ * until right. The round walks the textbook's sections in order: 排數字, 排在第幾個, 第幾個和幾個
+ * and 比多少. (比大小 is 第六課's, with numbers up to 30.)
  */
 import { countIcons, type CountIcon } from "./math-round";
 
@@ -11,12 +12,14 @@ export type SequenceQuestion =
   | { kind: "missing"; numbers: number[]; gap: number; choices: number[] }
   /** 數的順序: five numbers out of order; tap them from the smallest to the largest. */
   | { kind: "sequence"; numbers: number[] }
+  /** 第幾個和幾個: a row of the same picture; tap this many from the left, in any order. */
+  | { kind: "group"; count: number; icon: CountIcon; length: number }
+  /** 第幾個和幾個: the same row; tap only the one at this place from the left. */
+  | { kind: "nth"; place: number; icon: CountIcon; length: number }
   /** 比多少: two rows matched one to one; tap the row with more (or fewer), or 一樣多. */
-  | { kind: "rows"; ask: "more" | "less"; counts: [number, number]; icons: [CountIcon, CountIcon] }
-  /** 比大小: two numbers; tap the larger (or smaller) one. */
-  | { kind: "numbers"; ask: "more" | "less"; numbers: [number, number] };
+  | { kind: "rows"; ask: "more" | "less"; counts: [number, number]; icons: [CountIcon, CountIcon] };
 
-export const sequenceKinds = ["position", "missing", "sequence", "rows", "numbers"] as const;
+export const sequenceKinds = ["position", "missing", "sequence", "group", "nth", "rows"] as const;
 export const isSequenceQuestion = (question: { kind: string }): question is SequenceQuestion =>
   (sequenceKinds as readonly string[]).includes(question.kind);
 
@@ -93,30 +96,33 @@ export function rowsQuestion(
   return { kind: "rows", ask, counts, icons: [top, bottom] };
 }
 
-export function numbersQuestion(
-  ask: "more" | "less",
+/** 「點三個」 then 「點第三個」 in the same row of seven, with the same number. */
+export function groupQuestions(
   random = Math.random,
-): Extract<SequenceQuestion, { kind: "numbers" }> {
-  const [a, b] = shuffle(
-    Array.from({ length: 10 }, (_, index) => index + 1),
-    random,
-  );
-  return { kind: "numbers", ask, numbers: [a, b] };
+): [Extract<SequenceQuestion, { kind: "group" }>, Extract<SequenceQuestion, { kind: "nth" }>] {
+  const count = between(random, 2, 5);
+  const [icon] = shuffle(countIcons, random);
+  return [
+    { kind: "group", count, icon, length: 7 },
+    { kind: "nth", place: count, icon, length: 7 },
+  ];
 }
 
 /** One round walks the lesson in the textbook's order. 一樣多 comes up about every other round. */
 export function buildSequenceRound(random = Math.random): SequenceQuestion[] {
   return [
-    positionQuestion("left", random),
-    positionQuestion("right", random),
     missingQuestion(random),
     sequenceQuestion(random),
+    positionQuestion("left", random),
+    positionQuestion("right", random),
+    ...groupQuestions(random),
     rowsQuestion("more", false, random),
     rowsQuestion("less", random() < 0.5, random),
-    numbersQuestion("more", random),
-    numbersQuestion("less", random),
   ];
 }
+
+/** 「點三個」 is right in any order; everything else is one tap, or 從小到大 in order. */
+export const inAnyOrder = (question: SequenceQuestion) => question.kind === "group";
 
 /** The taps that answer a question, in order: one tap, or five for 從小到大. */
 export function sequenceAnswer(question: SequenceQuestion): number[] {
@@ -132,14 +138,14 @@ export function sequenceAnswer(question: SequenceQuestion): number[] {
         .map((value, index) => ({ value, index }))
         .sort((a, b) => a.value - b.value)
         .map((item) => item.index);
+    case "group":
+      return Array.from({ length: question.count }, (_, index) => index);
+    case "nth":
+      return [question.place - 1];
     case "rows": {
       const [top, bottom] = question.counts;
       if (top === bottom) return [sameChoice];
       return [(question.ask === "more") === top > bottom ? 0 : 1];
-    }
-    case "numbers": {
-      const [a, b] = question.numbers;
-      return [(question.ask === "more") === a > b ? 0 : 1];
     }
   }
 }
@@ -147,15 +153,16 @@ export function sequenceAnswer(question: SequenceQuestion): number[] {
 /** The section a question belongs to, shown in the header. */
 export function sequenceSection(question: SequenceQuestion) {
   switch (question.kind) {
-    case "position":
-      return "第幾個";
     case "missing":
     case "sequence":
-      return "數的順序";
+      return "排數字";
+    case "position":
+      return "排在第幾個";
+    case "group":
+    case "nth":
+      return "第幾個和幾個";
     case "rows":
       return "比多少";
-    case "numbers":
-      return "比大小";
   }
 }
 
@@ -163,15 +170,17 @@ export function sequenceSection(question: SequenceQuestion) {
 export function sequenceTopic(question: SequenceQuestion) {
   switch (question.kind) {
     case "position":
-      return `第幾個（從${question.from === "left" ? "左" : "右"}邊數）`;
+      return `排在第幾個（從${question.from === "left" ? "左" : "右"}邊數）`;
     case "missing":
-      return "數的順序（中間少了哪個數）";
+      return "排數字（中間少了哪個數）";
     case "sequence":
-      return "數的順序（從小到大）";
+      return "排數字（從小到大）";
+    case "group":
+      return "第幾個和幾個（幾個）";
+    case "nth":
+      return "第幾個和幾個（第幾個）";
     case "rows":
       return question.counts[0] === question.counts[1] ? "比多少（一樣多）" : "比多少";
-    case "numbers":
-      return question.ask === "more" ? "比大小（比較大）" : "比大小（比較小）";
   }
 }
 
@@ -184,9 +193,11 @@ export function sequencePromptId(question: SequenceQuestion) {
       return "missing";
     case "sequence":
       return "sequence";
+    case "group":
+      return `group-${question.count}`;
+    case "nth":
+      return `nth-${question.place}`;
     case "rows":
       return `rows-${question.ask}`;
-    case "numbers":
-      return `numbers-${question.ask}`;
   }
 }

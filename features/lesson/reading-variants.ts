@@ -13,6 +13,8 @@ export const alternateReadings: Record<string, string> = {
   "個˙ㄍㄜ": "\u{E01E1}",
   // 和 joining two things, as the lessons read it (河馬和河狸).
   和ㄏㄢˋ: "\u{E01E1}",
+  // 合起來: added to the fonts by scripts/build-yo-fonts.py, which the upstream fonts lack.
+  "來˙ㄌㄞ": "\u{E01E1}",
 };
 
 export const isHan = (character: string) => /\p{Script=Han}/u.test(character);

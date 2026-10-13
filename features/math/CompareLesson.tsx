@@ -16,6 +16,7 @@ import type { MathLesson } from "./math-lessons";
 import { recordMathResult } from "./math-round";
 import {
   buildSequenceRound,
+  inAnyOrder,
   isSequenceQuestion,
   sequenceAnswer,
   sequencePromptId,
@@ -48,7 +49,7 @@ type TapQuestion = CompareQuestion | SequenceQuestion;
 /** Each tapped lesson's round, by lesson id. */
 const tapRounds: Record<number, () => TapQuestion[]> = {
   2: buildCompareRound,
-  4: buildSequenceRound,
+  7: buildSequenceRound,
 };
 
 const correctDelay = 1300;
@@ -61,9 +62,9 @@ const sectionOf = (question: TapQuestion) =>
       ? question.measure === "length"
         ? "比長短"
         : "比高矮"
-      : question.kind === "line"
-        ? "直線和曲線"
-        : "哪條路最近";
+      : question.kind === "thickness"
+        ? "比厚薄"
+        : "直線和曲線";
 
 const topicOf = (question: TapQuestion) =>
   isSequenceQuestion(question) ? sequenceTopic(question) : compareTopic(question);
@@ -206,10 +207,12 @@ function QuestionView({
   const promptId = lining && ids.lineUp ? ids.lineUp : ids.ask;
   const answer = isSequenceQuestion(question) ? sequenceAnswer(question) : answerOf(question);
 
+  // 「點三個」 takes the three in any order; 從小到大 must go in order.
+  const anyOrder = isSequenceQuestion(question) && inAnyOrder(question);
   const pick = (choice: number) => {
     if (feedback || lining || picks.includes(choice)) return;
     if (timer.current !== null) window.clearTimeout(timer.current);
-    if (choice === answer[picks.length]) {
+    if (anyOrder ? answer.includes(choice) : choice === answer[picks.length]) {
       const chosen = [...picks, choice];
       setPicks(chosen);
       if (chosen.length < answer.length) return;
@@ -241,6 +244,8 @@ function QuestionView({
           feedback={feedback}
           onPick={pick}
         />
+      ) : question.kind === "thickness" ? (
+        <BookShelf question={question} feedback={feedback} onPick={pick} />
       ) : question.kind === "line" ? (
         <LineChoices question={question} feedback={feedback} onPick={pick} />
       ) : (
@@ -261,6 +266,42 @@ function QuestionView({
         </div>
       )}
     </section>
+  );
+}
+
+/** 比厚薄: two books standing on a shelf, the same height, so only their thickness differs. */
+function BookShelf({
+  question,
+  feedback,
+  onPick,
+}: {
+  question: Extract<CompareQuestion, { kind: "thickness" }>;
+  feedback: Feedback;
+  onPick: (index: number) => void;
+}) {
+  return (
+    <div className="compare-shelf" role="group" aria-label="書架上的兩本書">
+      <div className="compare-books">
+        {question.books.map((book, index) => {
+          const { color, name } = palette[book.color];
+          return (
+            <button
+              type="button"
+              key={index}
+              className={`compare-book${choiceState(index, [], feedback)}`}
+              style={{ width: `${book.size}%`, "--book": color } as CSSProperties}
+              aria-label={`${name}的書`}
+              onClick={() => onPick(index)}
+            >
+              <span className="compare-book-band" aria-hidden="true" />
+              <span className="compare-book-label" aria-hidden="true" />
+              <span className="compare-book-band" aria-hidden="true" />
+            </button>
+          );
+        })}
+      </div>
+      <div className="compare-shelf-board" aria-hidden="true" />
+    </div>
   );
 }
 

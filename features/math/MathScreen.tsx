@@ -34,14 +34,26 @@ const CompareLesson = lazy(() =>
   ),
 );
 
-const sectionLabels: Record<MathQuestion["kind"], string> = {
-  count: "數一數",
-  draw: "畫圈圈",
-  join: "合在一起",
-  add: "畫圈圈算加法",
-  split: "分一分",
-  combine: "合一合",
-  ways: "分分看",
+/** The textbook section a question belongs to, shown in the header and on the parent's check. */
+const sectionOf = (question: MathQuestion) => {
+  switch (question.kind) {
+    case "count":
+      return question.target === 0 ? "認識 0" : question.target <= 5 ? "認識 1～5" : "認識 6～10";
+    case "draw":
+      return "表示數量";
+    case "join":
+      return "合起來是多少";
+    case "add":
+      return question.parts.includes(0) ? "0的加法" : "加加看";
+    case "split":
+    case "combine":
+    case "ways":
+      return question.target === 10
+        ? "10的分與合"
+        : question.kind === "split"
+          ? "分一分"
+          : "合一合";
+  }
 };
 
 /** How the result and the parent name a question: 「數一數 7」, 「3＋4」 or 「7 分成 3 和 ？」. */
@@ -50,7 +62,7 @@ const questionName = (question: MathQuestion) =>
     ? bondLabel(question)
     : "parts" in question
       ? question.parts.join("＋")
-      : `${sectionLabels[question.kind]} ${question.target}`;
+      : `${question.kind === "count" ? "數一數" : "畫圈圈"} ${question.target}`;
 
 const isBond = (question: MathQuestion): question is BondQuestion =>
   question.kind === "split" || question.kind === "combine" || question.kind === "ways";
@@ -176,7 +188,7 @@ function WritingLesson({ app, lesson }: { app: MathApp; lesson: MathLesson }) {
             return (
               <article className="math-check-card" key={index}>
                 <h2>
-                  第 {index + 1} 題 · {sectionLabels[question.kind]}
+                  第 {index + 1} 題 · {sectionOf(question)}
                 </h2>
                 <div className="math-check-row">
                   <div className="math-check-question">
@@ -319,7 +331,7 @@ function WritingLesson({ app, lesson }: { app: MathApp; lesson: MathLesson }) {
   return (
     <main className="math-shell">
       {header(
-        `${lesson.number} · ${sectionLabels[question.kind]}`,
+        `${lesson.number} · ${sectionOf(question)}`,
         `第 ${round.index + 1} 題 / ${round.questions.length}`,
       )}
       <section className={`math-question is-${question.kind}`}>

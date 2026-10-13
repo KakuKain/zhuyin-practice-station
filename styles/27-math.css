@@ -23,6 +23,16 @@
   background: #3474d7;
   color: #fff;
 }
+/* 上學期 and 下學期, each its own journey. */
+.math-term + .math-term {
+  margin-top: 28px;
+}
+.math-term-title {
+  margin: 0 0 20px;
+  color: var(--ref-navy);
+  font-size: clamp(20px, 3vw, 28px);
+  font-weight: 900;
+}
 .journey-card.is-coming {
   opacity: 0.6;
   cursor: default;
@@ -283,6 +293,17 @@
   border-radius: 50%;
   background: #2f9a55;
   color: #fff;
+}
+/* 認識 0: an empty basket. */
+.math-pictures.is-empty {
+  grid-template-columns: minmax(0, 1fr);
+  place-items: center;
+  min-height: 160px;
+}
+.math-pictures.is-empty.is-small {
+  min-height: 0;
+  width: 64px;
+  justify-content: center;
 }
 .math-pictures.is-small {
   display: flex;

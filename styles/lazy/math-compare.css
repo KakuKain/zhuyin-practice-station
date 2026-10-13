@@ -360,6 +360,62 @@
   }
 }
 
+/* 比厚薄: books on a wooden shelf; tapping a book picks it. */
+.compare-shelf {
+  display: grid;
+  width: min(100%, 560px);
+  margin: 0 auto;
+  padding: 18px 18px 0;
+  border: 2px solid #c6dfe7;
+  border-radius: 22px;
+  background: #fffefa;
+}
+.compare-books {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 12%;
+  height: clamp(180px, 34vw, 300px);
+}
+.compare-book {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: stretch;
+  height: 100%;
+  padding: 14% 0;
+  border: 3px solid color-mix(in srgb, var(--book) 70%, #000);
+  border-bottom: 0;
+  border-radius: 8px 8px 0 0;
+  background: var(--book);
+  cursor: pointer;
+}
+.compare-book-band {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.55);
+}
+.compare-book-label {
+  align-self: center;
+  width: 54%;
+  height: 22%;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.82);
+}
+.compare-book.is-correct {
+  outline: 4px solid #6cc28e;
+  outline-offset: 4px;
+}
+.compare-book.is-wrong {
+  outline: 4px solid #e5b46b;
+  outline-offset: 4px;
+}
+.compare-shelf-board {
+  height: 18px;
+  margin: 0 -18px;
+  border-radius: 0 0 20px 20px;
+  background: linear-gradient(#c8955f, #a87444);
+}
+
 /* 第三課 排順序、比多少: pictures and number cards on paper, like the rest of the lesson. */
 .sequence-row,
 .sequence-missing,

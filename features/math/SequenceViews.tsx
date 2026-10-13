@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import { MathWords } from "./MathChrome";
 import { icons } from "./MathPictures";
+import type { CountIcon } from "./math-round";
 import { sameChoice, sequenceAnswer, type SequenceQuestion } from "./sequence-round";
 
 export type Feedback = { kind: "correct" | "retry"; pick: number } | null;
@@ -25,34 +26,56 @@ export function SequenceStage(props: StageProps<SequenceQuestion["kind"]>) {
   const { question } = props;
   switch (question.kind) {
     case "position":
-      return <PositionRow {...props} question={question} />;
+      return <PictureRow {...props} pictures={question.icons} from={question.from} />;
+    case "group":
+    case "nth":
+      return (
+        <PictureRow
+          {...props}
+          pictures={Array<CountIcon>(question.length).fill(question.icon)}
+          from="left"
+        />
+      );
     case "missing":
       return <MissingNumber {...props} question={question} />;
     case "sequence":
       return <SortNumbers {...props} question={question} />;
     case "rows":
       return <MatchedRows {...props} question={question} />;
-    case "numbers":
-      return <TwoNumbers {...props} question={question} />;
   }
 }
 
-/** 第幾個: a row of different pictures; the side to count from is marked at its end. */
-function PositionRow({ question, picks, feedback, onPick }: StageProps<"position">) {
+/**
+ * 排在第幾個 and 第幾個和幾個: a row of pictures (different ones, or all the same); the side to
+ * count from is marked at its end. Taps stay marked, so 「點三個」 shows the three.
+ */
+function PictureRow({
+  pictures,
+  from,
+  picks,
+  feedback,
+  onPick,
+}: {
+  pictures: CountIcon[];
+  from: "left" | "right";
+  picks: number[];
+  feedback: Feedback;
+  onPick: (index: number) => void;
+}) {
   return (
-    <div className={`sequence-row is-from-${question.from}`}>
+    <div className={`sequence-row is-from-${from}`}>
       <div
         className="sequence-items"
-        style={{ "--count": question.icons.length } as CSSProperties}
+        style={{ "--count": pictures.length } as CSSProperties}
         role="group"
         aria-label="一排圖片"
       >
-        {question.icons.map((icon, index) => {
+        {pictures.map((icon, index) => {
           const { icon: Picture, color, name } = icons[icon];
           return (
             <button
               type="button"
-              key={icon}
+              key={index}
               className={`sequence-item${choiceState(index, picks, feedback)}`}
               aria-label={`從左邊數第 ${index + 1} 個，${name}`}
               onClick={() => onPick(index)}
@@ -63,10 +86,10 @@ function PositionRow({ question, picks, feedback, onPick }: StageProps<"position
         })}
       </div>
       <div className="sequence-ends" aria-hidden="true">
-        <span className={question.from === "left" ? "is-start" : undefined}>
+        <span className={from === "left" ? "is-start" : undefined}>
           <MathWords text="左邊" />
         </span>
-        <span className={question.from === "right" ? "is-start" : undefined}>
+        <span className={from === "right" ? "is-start" : undefined}>
           <MathWords text="右邊" />
         </span>
       </div>
@@ -74,7 +97,7 @@ function PositionRow({ question, picks, feedback, onPick }: StageProps<"position
   );
 }
 
-/** 數的順序: five numbers in order with a gap, and three cards to fill it. */
+/** 排數字: five numbers in order with a gap, and three cards to fill it. */
 function MissingNumber({ question, picks, feedback, onPick }: StageProps<"missing">) {
   const answer = question.numbers[question.gap];
   return (
@@ -185,24 +208,6 @@ function MatchedRows({ question, picks, feedback, onPick }: StageProps<"rows">) 
       >
         <MathWords text="一樣多" />
       </button>
-    </div>
-  );
-}
-
-/** 比大小: two numbers side by side. */
-function TwoNumbers({ question, picks, feedback, onPick }: StageProps<"numbers">) {
-  return (
-    <div className="sequence-choices is-pair" role="group" aria-label="兩個數">
-      {question.numbers.map((value, index) => (
-        <button
-          type="button"
-          key={value}
-          className={`sequence-card is-choice is-big${choiceState(index, picks, feedback)}`}
-          onClick={() => onPick(index)}
-        >
-          {value}
-        </button>
-      ))}
     </div>
   );
 }
