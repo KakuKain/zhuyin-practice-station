@@ -68,6 +68,13 @@
 .stamp-slots li.is-cheer {
   background: #e0567a;
 }
+.stamp-slots li.is-task {
+  background: #7b62d6;
+}
+.stamp-legend .is-task svg,
+.reward-log .is-task > svg {
+  color: #7b62d6;
+}
 .stamp-legend .is-practice svg,
 .reward-log .is-practice > svg {
   color: #2f9a55;
@@ -234,6 +241,75 @@
 }
 .stamp-toast.is-cheer .stamp-toast-mark {
   background: #e0567a;
+}
+.stamp-toast.is-task .stamp-toast-mark {
+  background: #7b62d6;
+}
+
+/* 今天的任務 on the course list, in 國字注音. */
+.today-tasks {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 18px;
+  padding: 12px 14px;
+  border: 1px solid #d9cff5;
+  border-radius: 20px;
+  background: #f7f4ff;
+}
+.today-tasks h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: #4f3aa8;
+  font-size: 22px;
+}
+.today-tasks ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.today-tasks li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 56px;
+  padding: 6px 8px 6px 14px;
+  border-radius: 16px;
+  background: #fff;
+}
+.today-task-name {
+  flex: 1;
+  min-width: 0;
+  color: #18375d;
+  font-size: 24px;
+}
+.today-tasks li button {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 14px;
+  background: #7b62d6;
+  color: #fff;
+  font: inherit;
+  font-size: 20px;
+}
+.today-task-done {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  color: #2f9a55;
+  font-size: 20px;
+}
+.today-tasks li.is-done .today-task-name {
+  color: #5b6f86;
 }
 .stamp-toast.is-rest {
   padding-left: 20px;
@@ -439,6 +515,68 @@
 .reward-log li.is-reward > svg {
   color: #d0466f;
 }
+.reward-task-list,
+.reward-task-suggestions ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.reward-task-list li,
+.reward-task-suggestions li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid #e3edf3;
+  border-radius: 14px;
+  background: #fff;
+}
+.reward-task-list li > span,
+.reward-task-suggestions li > span {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+  min-width: 0;
+}
+.reward-task-list small,
+.reward-task-suggestions small {
+  color: #5b6f86;
+}
+.reward-task-list li.is-done strong {
+  color: #2f9a55;
+}
+.reward-task-list button,
+.reward-task-suggestions button {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid #c7dce8;
+  border-radius: 12px;
+  background: #fff;
+  color: #264d74;
+  font: inherit;
+}
+.reward-task-suggestions button {
+  border-color: #d9cff5;
+  background: #f7f4ff;
+  color: #4f3aa8;
+  font-weight: 700;
+}
+.reward-add select {
+  flex: 1;
+  min-width: 0;
+  min-height: 48px;
+  padding: 0 10px;
+  border: 1px solid #c7dce8;
+  border-radius: 14px;
+  background: #fff;
+  font: inherit;
+}
 .reward-summary,
 .reward-sent,
 .reward-empty,
@@ -484,6 +622,13 @@
   }
 }
 @media (max-width: 420px) {
+  .today-task-name {
+    font-size: 19px;
+  }
+  .today-tasks li button,
+  .today-task-done {
+    font-size: 17px;
+  }
   .reward-log li {
     grid-template-columns: 24px minmax(0, 1fr);
   }

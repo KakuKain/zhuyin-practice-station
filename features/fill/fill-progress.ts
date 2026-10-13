@@ -157,7 +157,12 @@ export function useFillProgress({
     );
     recordSession("fill", lessonItems.length, lessonItems.length, 0);
     // Editing a cell reopens the check; confirming it again the same day stamps nothing more.
-    awardLessonStamp({ lessonIndex: selectedLesson, activity: "默寫", oncePerDay: true });
+    awardLessonStamp({
+      lessonIndex: selectedLesson,
+      activity: "默寫",
+      task: "fill",
+      oncePerDay: true,
+    });
   };
   return { fillLineForCell, openFillCell, saveFillDrawing, leaveFillCell, confirmFillReview };
 }

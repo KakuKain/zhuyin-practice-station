@@ -69,10 +69,14 @@ There is one build: a static Vite SPA. `index.html` → `app/main.tsx` → `crea
     - Stamps never depend on accuracy, are never taken away, and are never compared between children.
     - A daily cap (default 5) logs extra practice unstamped; the child only hears 今天好認真.
     - A full card lets the child pick one of the parent's rewards; extra stamps carry over.
+    - 今天的任務: a parent sets up to 3 tasks for a child, either suggested from recent practice with questions marked 需要補強, or chosen from a list.
+      - Choices are each lesson's 聽寫 or 默寫 (reviews only 聽寫), 辨音, 改對一題待補強, or a math lesson.
+      - The practice whose `taskKey` (`taskKeys`) matches a task finishes it and earns a 任務章, which the daily cap never stops. A finished task stays visible until the end of the day.
+      - The child sees the tasks in 國字注音 on the course list (`TodayTasks`), with 去做 leading to the lesson. `daily-tasks.ts` builds the options; a unit test checks the zhuyin of every task word.
   - `useStampBook` lives in the coordinator.
     - `awardLessonStamp` names the lesson for the log; flows receive it like `recordSession`.
     - 辨音 and math call `awardStamp` directly.
-    - `StampNewsToast` shows at the app root; `StampChip` and `StampCardDialog` are on the course list; `RewardsPanel` holds the guide, 鼓勵章, log and settings.
+    - `StampNewsToast` shows at the app root; `StampChip`, `TodayTasks` and `StampCardDialog` are on the course list; `RewardsPanel` holds the guide, 今天的任務, 鼓勵章, log and settings.
   - Google sign-in and cloud sync were discussed but are not built. They would change the hard constraints above.
 - `features/math/` is self-contained.
   - The course list's 國語｜數學 switch (not 注音, which would clash with the 注音 symbol-chart tab) is remembered per child (`ChildProfile.subject`). `openMathLesson` sets `mathLessonId` and the `math` view, and `MathScreen` runs the round.

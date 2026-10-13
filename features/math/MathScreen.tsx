@@ -14,6 +14,7 @@ import {
   type MathRound,
 } from "./math-round";
 import { chineseNumber, mathPromptId, mathPromptUrl, mathPrompts } from "./math-audio";
+import { taskKeys } from "../rewards/stamp-book";
 import { mathLessons, type MathLesson } from "./math-lessons";
 import { MathHeader, MathPrompt, MathStartButton } from "./MathChrome";
 import { CountPictures, JoinPictures } from "./MathPictures";
@@ -249,6 +250,7 @@ function WritingLesson({ app, lesson }: { app: MathApp; lesson: MathLesson }) {
                 kind: "practice",
                 subject: "math",
                 detail: `數學${lesson.number} ${lesson.title}`,
+                taskKey: taskKeys.math(lesson.id),
                 needsPractice: round.needsPractice.length,
               });
               clearMathRound(lesson.id);

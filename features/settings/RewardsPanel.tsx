@@ -3,10 +3,18 @@ import { Gift, Plus, X } from "@phosphor-icons/react";
 import { ChildAvatar, childLabel } from "../../components/ChildPicker";
 import { useChildProfiles } from "../../lib/storage/child-profiles";
 import { StampSlots, stampLooks } from "../rewards/StampCard";
+import { taskName } from "../rewards/TodayTasks";
+import { taskOptions, type TaskOption } from "../rewards/daily-tasks";
+import type { CatalogLesson } from "../courses/materials";
 import {
   cardSizes,
   dailyCaps,
   maxNoteLength,
+  maxOpenTasks,
+  openTasks,
+  taskSuggestions,
+  visibleTasks,
+  type DailyTask,
   rewardIdeas,
   suggestedRewards,
   type CardProgress,
@@ -110,6 +118,7 @@ const rules = (settings: RewardSettings) => [
   "完成一次練習蓋一個章：聽寫、默寫要家長一起檢查完；辨音、數學做完就蓋。",
   "待補強的題目改對了，得到一顆「訂正之星」。",
   "家長可以隨時送「鼓勵章」，寫一句鼓勵的話。",
+  "家長可以把需要加強的練習設成「今天的任務」，完成時多得到一個任務章。",
   "蓋章不看對錯，也不會扣章；每個孩子有自己的卡，不互相比較。",
   `一天最多蓋 ${settings.dailyCap} 個章。孩子看不到這個數字，蓋滿了只會說「今天好認真，明天繼續蓋章！」`,
   "每個章都記下從哪裡來，你可以在紀錄裡看出孩子哪裡需要幫忙。",
@@ -220,6 +229,127 @@ function SetupGuide({
   );
 }
 
+/**
+ * 今天的任務: practices the parent asks for, from what the log shows needs help. Finishing one
+ * earns a 任務章 that the day's limit never stops.
+ */
+function DailyTasks({
+  book,
+  catalog,
+  onAdd,
+  onRemove,
+}: {
+  book: StampBook;
+  catalog: readonly CatalogLesson[];
+  onAdd: (task: Omit<DailyTask, "id" | "at" | "doneAt">) => void;
+  onRemove: (id: string) => void;
+}) {
+  const options = taskOptions(catalog);
+  const [choice, setChoice] = useState("");
+  const tasks = visibleTasks(book);
+  const open = openTasks(book);
+  const full = open.length >= maxOpenTasks;
+  const add = (option: TaskOption | undefined) => {
+    if (!option || full) return;
+    onAdd({
+      key: option.key,
+      place: option.place,
+      activity: option.activity,
+      annotate: option.annotate,
+    });
+    setChoice("");
+  };
+  const suggestions = taskSuggestions(book).flatMap((suggestion) => {
+    const option = options.find((item) => item.key === suggestion.taskKey);
+    return option ? [{ ...suggestion, option }] : [];
+  });
+  const groups = [...new Set(options.map((option) => option.group))];
+  return (
+    <section className="reward-tasks">
+      <h2>今天的任務</h2>
+      <p>
+        從紀錄看出孩子需要加強的地方，就把那一課設成任務。完成時會多得到一個任務章，不受每天的上限限制。
+      </p>
+      {tasks.length > 0 && (
+        <ul className="reward-task-list">
+          {tasks.map((task) => (
+            <li key={task.id} className={task.doneAt ? "is-done" : undefined}>
+              <span>
+                <strong>{taskName(task)}</strong>
+                <small>{task.doneAt ? `完成了 ${timeFormat.format(task.doneAt)}` : "還沒做"}</small>
+              </span>
+              {!task.doneAt && (
+                <button
+                  type="button"
+                  onClick={() => onRemove(task.id)}
+                  aria-label={`取消任務：${taskName(task)}`}
+                >
+                  <X size={18} weight="bold" aria-hidden="true" />
+                  取消
+                </button>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+      {suggestions.length > 0 && !full && (
+        <div className="reward-task-suggestions">
+          <h3>最近需要補強</h3>
+          <ul>
+            {suggestions.map((suggestion) => (
+              <li key={suggestion.taskKey}>
+                <span>
+                  {suggestion.detail}
+                  <small>需要補強 {suggestion.needsPractice} 題</small>
+                </span>
+                <button type="button" onClick={() => add(suggestion.option)}>
+                  設為任務
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {full ? (
+        <p className="reward-note">已經有 {maxOpenTasks} 個任務，完成或取消一個再加新的。</p>
+      ) : (
+        <div className="reward-add">
+          <select
+            value={choice}
+            aria-label="選擇任務"
+            onChange={(event) => setChoice(event.target.value)}
+          >
+            <option value="">選一個練習…</option>
+            {groups.map((group) => (
+              <optgroup label={group} key={group}>
+                {options
+                  .filter((option) => option.group === group)
+                  .map((option) => (
+                    <option
+                      key={option.key}
+                      value={option.key}
+                      disabled={open.some((task) => task.key === option.key)}
+                    >
+                      {taskName({ ...option, id: "", at: 0 })}
+                    </option>
+                  ))}
+              </optgroup>
+            ))}
+          </select>
+          <button
+            type="button"
+            disabled={!choice}
+            onClick={() => add(options.find((option) => option.key === choice))}
+          >
+            <Plus size={18} weight="bold" aria-hidden="true" />
+            加入任務
+          </button>
+        </div>
+      )}
+    </section>
+  );
+}
+
 const timeFormat = new Intl.DateTimeFormat("zh-TW", {
   month: "numeric",
   day: "numeric",
@@ -285,12 +415,18 @@ export function RewardsPanel({
   book,
   progress,
   onCheer,
+  catalog,
+  onAddTask,
+  onRemoveTask,
 }: {
   settings: RewardSettings;
   onSettings: (settings: RewardSettings) => void;
   book: StampBook;
   progress: CardProgress;
   onCheer: (stamp: StampInput) => void;
+  catalog: readonly CatalogLesson[];
+  onAddTask: (task: Omit<DailyTask, "id" | "at" | "doneAt">) => void;
+  onRemoveTask: (id: string) => void;
 }) {
   const profiles = useChildProfiles();
   const child = profiles.children.find((item) => item.id === profiles.activeId);
@@ -323,6 +459,8 @@ export function RewardsPanel({
           {profiles.children.length > 1 && "。要看其他孩子的卡，請在課程列表按「換人」。"}
         </p>
       </section>
+
+      <DailyTasks book={book} catalog={catalog} onAdd={onAddTask} onRemove={onRemoveTask} />
 
       <section className="reward-cheer">
         <h2>送一個鼓勵章</h2>
