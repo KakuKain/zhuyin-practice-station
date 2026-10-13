@@ -30,7 +30,13 @@ export type MathQuestion =
   /** 合在一起：two groups of pictures; write how many in all. */
   | { kind: "join"; target: number; parts: [number, number]; icon: JoinIcon }
   /** 畫圈圈算加法：draw circles for each number, then write the sum. */
-  | { kind: "add"; target: number; parts: [number, number] };
+  | { kind: "add"; target: number; parts: [number, number] }
+  /** 分一分：the total and its first part are given in a 分合圖; write the other part. */
+  | { kind: "split"; target: number; parts: [number, number]; icon: CountIcon }
+  /** 合一合：both parts are given in a 分合圖; write the total on top. */
+  | { kind: "combine"; target: number; parts: [number, number]; icon: JoinIcon }
+  /** 分分看：only the total is given; write any two numbers that make it. */
+  | { kind: "ways"; target: number; icon: CountIcon };
 
 export type MathRound = {
   version: 1;
@@ -40,7 +46,8 @@ export type MathRound = {
   ink: Record<number, InkStroke[]>;
   /**
    * Circles drawn in 十格框 (5 × 2 cells, one circle each): 畫圈圈 has one frame, 畫圈圈算加法
-   * one per number (cells 0–9 and 10–19). The written answer stays in ink.
+   * one per number (cells 0–9 and 10–19). 分分看 writes its two numbers here (cells 0 and 1).
+   * Any other written answer stays in ink.
    */
   work: Record<number, InkStroke[][]>;
   index: number;
@@ -55,10 +62,17 @@ export type MathRound = {
 export const mathRoundSize = { count: 4, draw: 4 } as const;
 /** A 十格框: two rows of five, the way a child lines up circles to count them. */
 export const frameCells = 10;
-/** How many 十格框 cells a question draws in. */
+/** How many cells a question keeps in `work`: 十格框 cells, or 分分看's two squares. */
 export const workCells = (question: MathQuestion) =>
-  question.kind === "draw" ? frameCells : question.kind === "add" ? 2 * frameCells : 0;
+  question.kind === "draw"
+    ? frameCells
+    : question.kind === "add"
+      ? 2 * frameCells
+      : question.kind === "ways"
+        ? 2
+        : 0;
 export const additionRoundSize = { join: 4, add: 4 } as const;
+export const bondRoundSize = { split: 4, combine: 2, ways: 2 } as const;
 export const maxCount = 10;
 
 const shuffle = <T>(items: readonly T[], random: () => number) => {
@@ -124,11 +138,61 @@ export function buildAdditionRound(random = Math.random): MathQuestion[] {
   ];
 }
 
+/**
+ * 第四課 分與合, read from a 分合圖: 4 分一分 (totals 3 to 10, each different), 2 合一合 (up to 5
+ * on each side, different totals), then 2 分分看 (totals 4 to 10), in the textbook's order.
+ */
+export function buildBondRound(random = Math.random): MathQuestion[] {
+  const pictures = shuffle(countIcons, random);
+  const joined = shuffle(joinIcons, random);
+  const splits = shuffle(
+    numbers.filter((total) => total >= 3),
+    random,
+  )
+    .slice(0, bondRoundSize.split)
+    .map((total) => {
+      const first = 1 + Math.floor(random() * (total - 1));
+      return [first, total - first] as [number, number];
+    });
+  const ways = shuffle(
+    numbers.filter((total) => total >= 4),
+    random,
+  ).slice(0, bondRoundSize.ways);
+  return [
+    ...splits.map((parts, index) => ({
+      kind: "split" as const,
+      target: parts[0] + parts[1],
+      parts,
+      icon: pictures[index],
+    })),
+    ...pickPairs(
+      pairs(5).filter(([a, b]) => a + b >= 3),
+      bondRoundSize.combine,
+      random,
+    ).map((parts, index) => ({
+      kind: "combine" as const,
+      target: parts[0] + parts[1],
+      parts,
+      icon: joined[index],
+    })),
+    ...ways.map((target, index) => ({
+      kind: "ways" as const,
+      target,
+      icon: pictures[bondRoundSize.split + index],
+    })),
+  ];
+}
+
+const roundBuilders: Record<number, (random?: () => number) => MathQuestion[]> = {
+  3: buildAdditionRound,
+  4: buildBondRound,
+};
+
 export function newMathRound(lessonId: number, now = Date.now()): MathRound {
   return {
     version: 1,
     lessonId,
-    questions: lessonId === 3 ? buildAdditionRound() : buildCountingRound(),
+    questions: (roundBuilders[lessonId] ?? buildCountingRound)(),
     ink: {},
     work: {},
     index: 0,
@@ -158,10 +222,16 @@ function validQuestion(raw: unknown): MathQuestion | null {
   if (item.kind === "draw") return { kind: "draw", target };
   if (item.kind === "count" && countIcons.includes(item.icon as CountIcon))
     return { kind: "count", target, icon: item.icon as CountIcon };
+  if (item.kind === "ways" && target >= 2 && countIcons.includes(item.icon as CountIcon))
+    return { kind: "ways", target, icon: item.icon as CountIcon };
   const parts = validParts(item.parts, target);
   if (item.kind === "add" && parts) return { kind: "add", target, parts };
   if (item.kind === "join" && parts && joinIcons.includes(item.icon as JoinIcon))
     return { kind: "join", target, parts, icon: item.icon as JoinIcon };
+  if (item.kind === "split" && parts && countIcons.includes(item.icon as CountIcon))
+    return { kind: "split", target, parts, icon: item.icon as CountIcon };
+  if (item.kind === "combine" && parts && joinIcons.includes(item.icon as JoinIcon))
+    return { kind: "combine", target, parts, icon: item.icon as JoinIcon };
   return null;
 }
 
@@ -260,11 +330,15 @@ export const filledCells = (cells: InkStroke[][] | undefined, from = 0) =>
 
 /**
  * A question counts as answered once it has a written answer, or, for 畫圈圈, a circle in the
- * frame (or ink from before the frame).
+ * frame (or ink from before the frame). 分分看 needs both of its numbers.
  */
-export const isAnswered = (round: MathRound, index: number) =>
-  (round.ink[index]?.length ?? 0) > 0 ||
-  (round.questions[index]?.kind === "draw" && filledCells(round.work[index]) > 0);
+export const isAnswered = (round: MathRound, index: number) => {
+  const kind = round.questions[index]?.kind;
+  if (kind === "ways") return filledCells(round.work[index]) === 2;
+  return (
+    (round.ink[index]?.length ?? 0) > 0 || (kind === "draw" && filledCells(round.work[index]) > 0)
+  );
+};
 
 export type MathRecord = {
   lessonId: number;

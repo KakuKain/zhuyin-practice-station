@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-A login-free Zhuyin (注音) practice site for Taiwanese first graders and their parents: lessons 1–9 plus three review sets, a symbol chart, handwriting dictation, listening dictation, and sound discrimination. It also has 數學 (康軒 115, first grade): lessons 1 (認識 1～10), 2 (比一比) and 3 (加法) are built. An optional 集章卡 (stamp card) rewards finished practice; it stays on the device and needs no login. UI copy and all docs are in Traditional Chinese (zh-Hant). `docs/architecture.md` is the detailed reference for feature boundaries and invariants. Read it before changing state, storage, audio, or ink behavior.
+A login-free Zhuyin (注音) practice site for Taiwanese first graders and their parents: lessons 1–9 plus three review sets, a symbol chart, handwriting dictation, listening dictation, and sound discrimination. It also has 數學 (康軒 115, first grade): lessons 1 (認識 1～10), 2 (比一比), 3 (加法) and 4 (分與合) are built. An optional 集章卡 (stamp card) rewards finished practice; it stays on the device and needs no login. UI copy and all docs are in Traditional Chinese (zh-Hant). `docs/architecture.md` is the detailed reference for feature boundaries and invariants. Read it before changing state, storage, audio, or ink behavior.
 
 Hard product constraints: no login, no DB, no cloud sync, no service worker or offline cache, no runtime AI or speech API calls, and no changes to the teacher-defined lesson scope. A web app manifest so the site can be added to the home screen (full screen, portrait-locked, no browser UI) is fine.
 
@@ -44,7 +44,7 @@ Asset pipelines:
   - The sheet was painted with ChatGPT; Claude cannot generate raster images.
   - The output is 192 px, lossy WebP at quality 88.
   - The originals live in `assets/artwork/avatars/`, a subfolder that `optimize-artwork.mjs` skips.
-- `npx tsx scripts/generate-math-audio.ts [--refresh]` voices every math instruction in `features/math/math-audio.ts` into `public/math-audio/` (macOS Meijia). First graders cannot read yet, so every math question is spoken; a unit test checks each prompt has a clip.
+- `npx tsx scripts/generate-math-audio.ts [--refresh]` voices every math instruction in `features/math/math-audio.ts` into `public/math-audio/` (macOS Meijia). First graders cannot read yet, so every math question is spoken; a unit test checks each prompt has a clip. Meijia reads 和 as ㄏㄜˊ, but the lessons read it ㄏㄢˋ, so `mathPromptSpeech` voices it as the homophone 漢.
 - `python3 scripts/build-yo-fonts.py` rebuilds the lesson font subsets after you add characters or IVS glyphs, and writes `assets/font-sources/KidLessonYoOnly-readings.json` and `KidLessonYoSans-readings.json` (what each character and variation sequence shows). `scripts/build-fonts.py` rebuilds the full fonts. Both need fontTools and brotli. Bump the `?v=` on the fonts in `styles/02-typography.css` when they change.
 
 ## Build and deploy
@@ -113,12 +113,19 @@ There is one build: a static Vite SPA. `index.html` → `app/main.tsx` → `crea
     - 合在一起 shows two groups of up to 5 markable pictures; the child writes the total.
     - 畫圈圈算加法 has a 十格框 for each number (cells 0–9 and 10–19), then an answer square (canvas 20). Each frame numbers its own circles; counting them together is the child's part. Tablets put the two frames side by side with ＝ and the answer below, landscape tablets in one row, and phones stack them.
     - Each sum has its own clip (`join-a-b`, `add-a-b`). Counting says 兩個, but a sum says 二加三.
-  - Lessons 1 and 3 share `WritingLesson` in `MathScreen.tsx`. The ink pieces live in `MathInk.tsx` and the pictures in `MathPictures.tsx`.
+  - Lesson 4 (分與合) reads a 分合圖 (`MathBond.tsx`): the total on top, joined by two lines to its parts.
+    - A round has 4 分一分 (total 3–10 and one part given; write the other), 2 合一合 (parts up to 5 given; write the total on top), then 2 分分看 (total 4–10; write any two numbers that make it).
+    - Given numbers sit on washed cards. Each number to write is a square with its own ink tools, placed away from the lines: above the total, below a part.
+    - One answer is kept in the question's ink. 分分看's two numbers are its two `work` cells, and it counts as answered only with both.
+    - Markable pictures beside the 分合圖 help the child split or join.
+    - The parent's check shows a small 分合圖 with what the child wrote. For 分分看, any two numbers that make the total are right.
+    - Questions say 和 (ㄏㄢˋ) and 合在一起, never 合起來: 來 there needs ˙ㄌㄞ, which the font lacks.
+  - Lessons 1, 3 and 4 share `WritingLesson` in `MathScreen.tsx`. The ink pieces live in `MathInk.tsx` and the pictures in `MathPictures.tsx`.
   - The parent checks the round at the end.
     - Each lesson's unfinished round persists per child: lesson 1 in `kid-math-round-v1`, others in `kid-math-round-v1-<lesson>` (`mathRoundStorageKey`). Starting one lesson never replaces another's.
     - The circles live in `MathRound.work`. Finished rounds go to `kid-math-records-v1`.
   - Every instruction is spoken and shown in 國字注音 (`MathPrompt` in `MathChrome.tsx`: an icon-only replay button and `AnnotatedText`).
-    - `mathPromptReadings` in `math-audio.ts` gives one syllable per character. The four polyphones the font would misread (數一數, 箱子／兔子, 曲線, 蘿蔔) get `\u{E01E1}` from `alternateReadings` in `features/lesson/reading-variants.ts`, the one table every 國字注音 sentence written for children uses.
+    - `mathPromptReadings` in `math-audio.ts` gives one syllable per character. The polyphones the font would misread (數一數, 箱子／兔子, 曲線, 蘿蔔, and 和 as ㄏㄢˋ) get `\u{E01E1}` from `alternateReadings` in `features/lesson/reading-variants.ts`, the one table every 國字注音 sentence written for children uses.
     - A unit test checks every character against `KidLessonYoSans-readings.json`.
     - A sentence the font cannot annotate correctly is reworded: 寫下來 needs ˙ㄌㄞ, so the prompt says 用筆寫出數字.
   - Lesson 2 (比一比) is a lazy chunk: `CompareLesson.tsx` with `styles/lazy/math-compare.css`. `compare-round.ts` builds the round and holds the rules.

@@ -11,6 +11,8 @@ export const alternateReadings: Record<string, string> = {
   "爸˙ㄅㄚ": "\u{E01E1}",
   "媽˙ㄇㄚ": "\u{E01E1}",
   "個˙ㄍㄜ": "\u{E01E1}",
+  // 和 joining two things, as the lessons read it (河馬和河狸).
+  和ㄏㄢˋ: "\u{E01E1}",
 };
 
 export const isHan = (character: string) => /\p{Script=Han}/u.test(character);

@@ -20,6 +20,10 @@ const addPairs = range(1, 9).flatMap((a) =>
     .filter((b) => a + b >= 3 && a + b <= 10)
     .map((b) => [a, b] as const),
 );
+/** 第四課: 分一分 splits 3 to 10 any way; 合一合 has up to 5 on each side; 分分看 is 4 to 10. */
+const splitPairs = addPairs;
+const combinePairs = joinPairs.filter(([a, b]) => a + b >= 3);
+const waysTotals = range(4, 10);
 
 export const mathPrompts: Record<string, string> = {
   count: "數一數，有幾個？用筆寫出數字。",
@@ -53,6 +57,25 @@ export const mathPrompts: Record<string, string> = {
     addPairs.map(([a, b]) => [
       `add-${a}-${b}`,
       `${sumNumerals[a]}加${sumNumerals[b]}等於多少？先畫圈圈，再寫答案。`,
+    ]),
+  ),
+  // 第四課 分與合: numbers are said as in a sum (二, not 兩), and 和 is ㄏㄢˋ as in the lessons.
+  ...Object.fromEntries(
+    splitPairs.map(([a, b]) => [
+      `split-${a}-${b}`,
+      `${sumNumerals[a + b]}可以分成${sumNumerals[a]}和幾？`,
+    ]),
+  ),
+  ...Object.fromEntries(
+    combinePairs.map(([a, b]) => [
+      `combine-${a}-${b}`,
+      `${sumNumerals[a]}和${sumNumerals[b]}合在一起是幾？`,
+    ]),
+  ),
+  ...Object.fromEntries(
+    waysTotals.map((total) => [
+      `ways-${total}`,
+      `${sumNumerals[total]}可以分成幾和幾？寫出一種分法。`,
     ]),
   ),
 };
@@ -101,7 +124,31 @@ export const mathPromptReadings: Record<string, string> = {
       `${sumReadings[a]} ㄐㄧㄚ ${sumReadings[b]} ㄉㄥˇ ㄩˊ ㄉㄨㄛ ㄕㄠˇ ㄒㄧㄢ ㄏㄨㄚˋ ㄑㄩㄢ ㄑㄩㄢ ㄗㄞˋ ㄒㄧㄝˇ ㄉㄚˊ ㄢˋ`,
     ]),
   ),
+  ...Object.fromEntries(
+    splitPairs.map(([a, b]) => [
+      `split-${a}-${b}`,
+      `${sumReadings[a + b]} ㄎㄜˇ ㄧˇ ㄈㄣ ㄔㄥˊ ${sumReadings[a]} ㄏㄢˋ ㄐㄧˇ`,
+    ]),
+  ),
+  ...Object.fromEntries(
+    combinePairs.map(([a, b]) => [
+      `combine-${a}-${b}`,
+      `${sumReadings[a]} ㄏㄢˋ ${sumReadings[b]} ㄏㄜˊ ㄗㄞˋ ㄧ ㄑㄧˇ ㄕˋ ㄐㄧˇ`,
+    ]),
+  ),
+  ...Object.fromEntries(
+    waysTotals.map((total) => [
+      `ways-${total}`,
+      `${sumReadings[total]} ㄎㄜˇ ㄧˇ ㄈㄣ ㄔㄥˊ ㄐㄧˇ ㄏㄢˋ ㄐㄧˇ ㄒㄧㄝˇ ㄔㄨ ㄧ ㄓㄨㄥˇ ㄈㄣ ㄈㄚˇ`,
+    ]),
+  ),
 };
+
+/**
+ * What Meijia is given to say. She reads 和 as ㄏㄜˊ, but the lessons and the 國字注音 beside
+ * the prompt read it ㄏㄢˋ, so it is voiced as the homophone 漢.
+ */
+export const mathPromptSpeech = (id: string) => (mathPrompts[id] ?? "").replaceAll("和", "漢");
 
 export { isHan };
 
@@ -116,9 +163,11 @@ export const mathPromptId = (question: {
 }) =>
   question.kind === "count"
     ? "count"
-    : question.parts
-      ? `${question.kind}-${question.parts.join("-")}`
-      : `draw-${question.target}`;
+    : question.kind === "ways"
+      ? `ways-${question.target}`
+      : question.parts
+        ? `${question.kind}-${question.parts.join("-")}`
+        : `draw-${question.target}`;
 
 /** Clips re-recorded after their sentence changed; the query skips a cached old clip. */
 const promptVersions: Record<string, number> = { count: 2 };

@@ -442,3 +442,88 @@ test("第三課 adds with pictures and circles, keeps 第一課's round and ends
   await expect(page.getByRole("button", { name: "繼續上次的練習" })).toBeVisible();
   expect(errors).toEqual([]);
 });
+
+test("第四課 reads 分合圖: the missing part, the total and a way to split, then the parent checks", async ({
+  page,
+}) => {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("./");
+  await page.getByRole("button", { name: "數學", exact: true }).click();
+  await page.getByRole("button", { name: /數學第四課/ }).click();
+  await expect(page.getByRole("heading", { name: "分與合" })).toBeVisible();
+  await page.getByRole("button", { name: "開始練習", exact: true }).click();
+  const header = page.locator(".math-header");
+  const audio = page.locator("audio");
+  const next = page.getByRole("button", { name: "下一題", exact: true });
+  const four: [number, number][] = [
+    [60, 15],
+    [25, 65],
+    [80, 65],
+  ];
+
+  // 分一分: the total and one part are given; the other part is written.
+  await expect(header).toContainText("分一分");
+  await expect(header).toContainText("第 1 題 / 8");
+  await expect(audio).toHaveAttribute("src", /math-audio\/split-\d+-\d+\.m4a/);
+  await expect(audio).toHaveAttribute("data-clip-text", /^.可以分成.和幾？$/);
+  await expect(page.getByRole("group", { name: /^分合圖：\d+ 分成 \d+ 和 ？$/ })).toBeVisible();
+  const picture = page.locator(".math-pictures button").first();
+  await picture.click();
+  await expect(picture).toHaveAttribute("aria-pressed", "true");
+  await stroke(page, page.getByLabel("寫答案，在右下"), four);
+  for (let i = 0; i < 4; i++) await next.click();
+
+  // 合一合: both parts are given; the total is written on top.
+  await expect(header).toContainText("合一合");
+  await expect(audio).toHaveAttribute("data-clip-text", /^.和.合在一起是幾？$/);
+  await expect(page.getByRole("group", { name: /^分合圖：\d+ 和 \d+ 合起來是 ？$/ })).toBeVisible();
+  await stroke(page, page.getByLabel("寫答案，在上面"), four);
+
+  // A reload continues 第四課 where it was, with what was written.
+  await page.reload();
+  await page.getByRole("button", { name: /數學第四課/ }).click();
+  await page.getByRole("button", { name: "繼續上次的練習" }).click();
+  await expect(header).toContainText("第 5 題 / 8");
+  await expect(page.getByRole("button", { name: "清空答案" })).toBeEnabled();
+  for (let i = 0; i < 2; i++) await next.click();
+
+  // 分分看: only the total is given; any two numbers that make it are written.
+  await expect(header).toContainText("分分看");
+  await expect(audio).toHaveAttribute("data-clip-text", /^.+可以分成幾和幾？寫出一種分法。$/);
+  await stroke(page, page.getByLabel("寫第一個數，在左下"), four);
+  await stroke(page, page.getByLabel("寫第二個數，在右下"), four);
+  await next.click();
+  // Only one of the two numbers: not answered yet.
+  await stroke(page, page.getByLabel("寫第一個數，在左下"), four);
+  await page.getByRole("button", { name: "寫完了，請家長檢查" }).click();
+
+  const cards = page.locator(".math-check-card");
+  await expect(cards).toHaveCount(8);
+  const marked = (index: number) => cards.nth(index).locator(".math-check-toggle");
+  for (const [index, pending] of [
+    [0, "false"],
+    [1, "true"],
+    [4, "false"],
+    [5, "true"],
+    [6, "false"],
+    [7, "true"],
+  ] as const)
+    await expect(marked(index)).toHaveAttribute("aria-pressed", pending);
+  await expect(cards.nth(0)).toContainText("分成");
+  await expect(cards.nth(0).locator(".math-bond.is-preview .ink-preview")).toHaveCount(1);
+  await expect(cards.nth(6)).toContainText("兩個數合起來是");
+  await expect(cards.nth(6).locator(".math-bond.is-preview .ink-preview")).toHaveCount(2);
+  await page.getByRole("button", { name: "檢查完成" }).click();
+  await expect(page.getByRole("heading", { name: "這一課練完了！" })).toBeVisible();
+
+  const stored = await page.evaluate(() => ({
+    records: JSON.parse(localStorage.getItem("kid-math-records-v1") ?? "{}"),
+    round: localStorage.getItem("kid-math-round-v1-4"),
+  }));
+  expect(stored.records.rounds).toHaveLength(1);
+  expect(stored.records.rounds[0]).toMatchObject({ lessonId: 4, total: 8 });
+  expect(stored.records.rounds[0].needsPractice).toHaveLength(5);
+  expect(stored.round).toBeNull();
+  expect(errors).toEqual([]);
+});

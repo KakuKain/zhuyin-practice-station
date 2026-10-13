@@ -15,7 +15,7 @@ import {
   Star,
   type Icon,
 } from "@phosphor-icons/react";
-import type { CountIcon, MathQuestion } from "./math-round";
+import type { CountIcon, JoinIcon } from "./math-round";
 
 export const icons: Record<CountIcon, { icon: Icon; color: string; name: string }> = {
   fish: { icon: Fish, color: "#2f8fd8", name: "魚" },
@@ -71,7 +71,7 @@ export function CountPictures({
   onToggle,
   small = false,
 }: {
-  question: Extract<MathQuestion, { kind: "count" }>;
+  question: { target: number; icon: CountIcon };
   marked?: ReadonlySet<number>;
   onToggle?: (index: number) => void;
   small?: boolean;
@@ -110,7 +110,7 @@ export function JoinPictures({
   onToggle,
   small = false,
 }: {
-  question: Extract<MathQuestion, { kind: "join" }>;
+  question: { parts: readonly [number, number]; icon: JoinIcon };
   marked?: ReadonlySet<number>;
   onToggle?: (index: number) => void;
   small?: boolean;

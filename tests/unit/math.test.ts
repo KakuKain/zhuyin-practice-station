@@ -3,7 +3,9 @@ import test from "node:test";
 import { existsSync, readFileSync } from "node:fs";
 import {
   additionRoundSize,
+  bondRoundSize,
   buildAdditionRound,
+  buildBondRound,
   buildCountingRound,
   countIcons,
   filledCells,
@@ -19,6 +21,7 @@ import {
   isHan,
   mathPromptId,
   mathPromptReadings,
+  mathPromptSpeech,
   mathPromptUrl,
   mathPromptVariants,
   mathPrompts,
@@ -350,11 +353,69 @@ test("the math course cards, lesson pages and practice screens show every word i
     });
   }
   // Each lesson page says how many questions a round has.
-  const sizes = [mathRoundSize, compareRoundSize, additionRoundSize].map((size) =>
+  const sizes = [mathRoundSize, compareRoundSize, additionRoundSize, bondRoundSize].map((size) =>
     typeof size === "number" ? size : Object.values(size).reduce((sum, n) => sum + n, 0),
   );
   assert.deepEqual(
     mathLessons.map((lesson) => lesson.questions),
     sizes,
   );
+});
+
+test("a 第四課 round reads 分合圖: 4 分一分, 2 合一合 and 2 分分看, with different totals", () => {
+  for (let run = 0; run < 200; run++) {
+    const round = buildBondRound();
+    assert.deepEqual(
+      round.map((question) => question.kind),
+      [
+        ...Array(bondRoundSize.split).fill("split"),
+        ...Array(bondRoundSize.combine).fill("combine"),
+        ...Array(bondRoundSize.ways).fill("ways"),
+      ],
+    );
+    for (const kind of ["split", "combine", "ways"]) {
+      const totals = round.filter((question) => question.kind === kind).map((q) => q.target);
+      assert.equal(new Set(totals).size, totals.length, kind);
+    }
+    for (const question of round) {
+      if (question.kind === "split") {
+        const [given, answer] = question.parts;
+        assert.ok(question.target >= 3 && question.target <= 10);
+        assert.ok(given >= 1 && answer >= 1 && given + answer === question.target);
+      } else if (question.kind === "combine") {
+        const [a, b] = question.parts;
+        assert.ok(a <= 5 && b <= 5 && a + b === question.target && question.target >= 3);
+      } else if (question.kind === "ways") {
+        assert.ok(question.target >= 4 && question.target <= 10);
+      } else assert.fail(question.kind);
+      // Every question is spoken from its own clip and shown in 國字注音.
+      const id = mathPromptId(question);
+      assert.ok(mathPrompts[id] && mathPromptReadings[id], id);
+      assert.ok(existsSync(`public/${mathPromptUrl(id).split("?")[0]}`), id);
+    }
+  }
+  // 和 reads ㄏㄢˋ beside the prompt, so Meijia is given the homophone 漢.
+  assert.equal(mathPrompts["split-3-4"], "七可以分成三和幾？");
+  assert.equal(mathPromptSpeech("split-3-4"), "七可以分成三漢幾？");
+  assert.equal(mathPromptSpeech("count"), mathPrompts.count);
+});
+
+test("a saved 第四課 round keeps 分分看's two numbers, and needs both to count as answered", () => {
+  const round = newMathRound(4);
+  const ways = round.questions.findIndex((question) => question.kind === "ways");
+  const stroke = [[{ x: 10, y: 10 }]];
+  const both = validateMathRound(
+    JSON.parse(JSON.stringify({ ...round, work: { [ways]: [stroke, stroke] } })),
+  )!;
+  assert.equal(both.questions[ways].kind, "ways");
+  assert.ok(isAnswered(both, ways));
+  assert.ok(!isAnswered({ ...both, work: { [ways]: [stroke, []] } }, ways));
+  // The wrong number of squares is dropped rather than misread.
+  assert.deepEqual(validateMathRound({ ...round, work: { [ways]: [stroke] } })!.work, {});
+  // 分一分 and 合一合 keep their answer as the question's ink.
+  assert.ok(isAnswered({ ...both, ink: { 0: stroke } }, 0));
+  assert.ok(!isAnswered(both, 0));
+  // A 分一分 whose parts do not make its total is not restored.
+  const broken = { ...round.questions[0], parts: [1, 1] };
+  assert.equal(validateMathRound({ ...round, questions: [broken] }), null);
 });

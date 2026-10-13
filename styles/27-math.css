@@ -632,6 +632,148 @@
   margin-bottom: 24px;
 }
 
+/*
+ * 第四課 分與合: the 分合圖, the total on top joined by two lines to its parts. Columns are
+ * node, 0.6 node, node, which the lines' ends (19.23% and 80.77%) follow.
+ */
+.math-bond-question {
+  display: grid;
+  gap: 16px;
+  align-items: start;
+}
+.math-bond-work {
+  display: grid;
+  justify-items: center;
+}
+.math-bond {
+  --node: clamp(104px, 29vw, 160px);
+  display: grid;
+  grid-template-columns: var(--node) calc(var(--node) * 0.6) var(--node);
+  grid-template-rows: auto calc(var(--node) * 0.32) auto;
+  justify-content: center;
+}
+.math-bond > .is-top {
+  grid-column: 1 / -1;
+  justify-self: center;
+  align-self: end;
+}
+.math-bond > .is-left,
+.math-bond > .is-right {
+  grid-row: 3;
+  align-self: start;
+}
+.math-bond > .is-left {
+  grid-column: 1;
+}
+.math-bond > .is-right {
+  grid-column: 3;
+}
+.math-bond-lines {
+  display: block;
+  grid-row: 2;
+  grid-column: 1 / -1;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.math-bond-lines line {
+  stroke: #7fb8a3;
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+.math-bond-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: var(--node);
+}
+/* A number the question gives, on a wash like the course cards. */
+.math-bond-node.is-given {
+  position: relative;
+  isolation: isolate;
+  justify-content: center;
+  aspect-ratio: 1;
+  border: 3px solid #a9d1c1;
+  border-radius: 22px;
+  background: linear-gradient(110deg, #f3faff 0%, #e6f3ff 72%, #eff8ff 100%);
+  color: var(--ref-navy);
+}
+.math-bond-node.is-given.is-left {
+  background: linear-gradient(110deg, #f4fcf7 0%, #e5f6eb 72%, #effbf3 100%);
+}
+.math-bond-node.is-given.is-right {
+  background: linear-gradient(110deg, #fffdf5 0%, #fff4dc 72%, #fff9ea 100%);
+}
+.math-bond-node.is-given::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  border-radius: inherit;
+  background: url("/course-art/course-card-paper-v1.webp") center / 210px repeat;
+  mix-blend-mode: multiply;
+  opacity: 0.24;
+}
+.math-bond-node.is-given strong {
+  font-size: calc(var(--node) * 0.5);
+  font-weight: 800;
+  line-height: 1;
+}
+/* Three tools need more room than the smallest square; they spill into the gap, not the page. */
+.math-bond-node .ink-tools {
+  width: max(100%, 140px);
+}
+.math-bond-node .ink-tools .ink-tool {
+  width: 40px;
+  height: 40px;
+}
+/* The parent's check: the same 分合圖, small, with what the child wrote. */
+.math-bond.is-preview {
+  --node: 48px;
+}
+.math-bond.is-preview .math-bond-lines line {
+  stroke-width: 2;
+}
+.math-bond.is-preview .math-bond-node.is-given {
+  border-width: 2px;
+  border-radius: 10px;
+}
+.math-bond-ink {
+  display: grid;
+  place-items: center;
+  width: var(--node);
+  aspect-ratio: 1;
+  border: 2px solid #c9a96b;
+  border-radius: 10px;
+  background: #fffefb;
+  color: #9aa9a2;
+  font-size: 20px;
+  font-weight: 700;
+}
+.math-bond-ink.is-empty {
+  border-style: dashed;
+}
+.math-bond-ink .ink-preview {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+.math-check-ways {
+  max-width: 7em;
+  color: var(--ink-soft);
+  font-size: 14px;
+  text-align: center;
+}
+@media (min-width: 600px) {
+  .math-bond {
+    --node: min(210px, 26vw);
+  }
+  .math-bond.is-preview {
+    --node: 58px;
+  }
+}
+
 /* 第三課 加法 */
 .math-sign {
   align-self: center;
@@ -771,8 +913,19 @@
     grid-column: 1;
   }
   .math-count,
-  .math-draw {
+  .math-draw,
+  .math-bond-question {
     display: contents;
+  }
+  .math-bond-question > :not(.math-bond-work) {
+    grid-column: 1;
+  }
+  .math-bond-work {
+    grid-column: 2;
+    grid-row: 1 / span 4;
+  }
+  .math-bond {
+    --node: min(200px, calc((100dvh - 250px) / 2));
   }
   .math-question .math-ink,
   .math-draw .math-ink {
