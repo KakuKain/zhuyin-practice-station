@@ -80,6 +80,47 @@ def readings(font: TTFont) -> dict[str, str]:
     return dict(sorted(shown.items()))
 
 
+# Readings the upstream fonts lack, added as variation sequences: (character, selector,
+# annotation parts). 合起來 reads 來 in the neutral tone, ˙ㄌㄞ; the fonts only have ㄌㄞˊ.
+EXTRA_READINGS = (("來", 0xE01E1, ("zyl", "zyai")),)
+# Where a neutral-tone annotation puts its two symbols and the dot, as in z_ge5 (˙ㄍㄜ).
+NEUTRAL_LAYOUT = ((-512, 320), (-512, -30))
+NEUTRAL_DOT = (-512, 640)
+
+
+def add_neutral_reading(font: TTFont, character: str, selector: int, parts: tuple[str, str]) -> None:
+    """Add `character` + `selector` showing the neutral tone of `parts`, like the other ss01s."""
+    cmap = font.getBestCmap()
+    base_name = cmap[ord(character)]
+    bare = f"{base_name}.ss00"
+    glyf = font["glyf"]
+    if bare not in glyf.glyphs:
+        return
+    annotation = f"z_{base_name}_neutral"
+    variant = f"{base_name}.neutral"
+    pen = TTGlyphPen(font.getGlyphSet())
+    for part, (x, y) in zip(parts, NEUTRAL_LAYOUT):
+        pen.addComponent(part, (1, 0, 0, 1, x, y))
+    pen.addComponent("tone5", (1, 0, 0, 1, *NEUTRAL_DOT))
+    glyf[annotation] = pen.glyph()
+    glyf[annotation].recalcBounds(glyf)
+    pen = TTGlyphPen(font.getGlyphSet())
+    offset = next(c.x for c in glyf[base_name].components if c.glyphName.startswith("z_"))
+    pen.addComponent(annotation, (1, 0, 0, 1, offset, 0))
+    pen.addComponent(bare, (1, 0, 0, 1, 0, 0))
+    glyf[variant] = pen.glyph()
+    glyf[variant].recalcBounds(glyf)
+    font.setGlyphOrder(glyf.glyphOrder)
+    for table, source in (("hmtx", "z_ge5"), ("vmtx", "z_ge5")):
+        if table in font:
+            metrics = font[table].metrics
+            metrics[annotation] = metrics[source]
+            metrics[variant] = metrics[base_name]
+    for table in font["cmap"].tables:
+        if table.format == 14:
+            table.uvsDict.setdefault(selector, []).append((ord(character), variant))
+
+
 def build(source_name: str, output_name: str, family_name: str) -> None:
     font = TTFont(SOURCE_DIR / source_name, recalcBBoxes=False)
     glyph_name = font.getBestCmap()[ord("喲")]
@@ -102,6 +143,8 @@ def build(source_name: str, output_name: str, family_name: str) -> None:
     corrected_glyph.yMin = original.yMin
     corrected_glyph.yMax = original.yMax
     font["glyf"][glyph_name] = corrected_glyph
+    for character, selector, parts in EXTRA_READINGS:
+        add_neutral_reading(font, character, selector, parts)
 
     postscript_name = family_name.replace(" ", "")
     for record in font["name"].names:

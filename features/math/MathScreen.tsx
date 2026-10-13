@@ -21,6 +21,7 @@ import { mathLessons, type MathLesson } from "./math-lessons";
 import { MathHeader, MathPrompt, MathResult } from "./MathChrome";
 import { CountPictures, JoinPictures } from "./MathPictures";
 import { AdditionWork, DrawFrame, FramePreview, InkSquare } from "./MathInk";
+import { BondPreview, BondWork, bondLabel, type BondQuestion } from "./MathBond";
 
 type MathApp = Pick<
   AppController,
@@ -33,18 +34,38 @@ const CompareLesson = lazy(() =>
   ),
 );
 
-const sectionLabels: Record<MathQuestion["kind"], string> = {
-  count: "數一數",
-  draw: "畫圈圈",
-  join: "合在一起",
-  add: "畫圈圈算加法",
+/** The textbook section a question belongs to, shown in the header and on the parent's check. */
+const sectionOf = (question: MathQuestion) => {
+  switch (question.kind) {
+    case "count":
+      return question.target === 0 ? "認識 0" : question.target <= 5 ? "認識 1～5" : "認識 6～10";
+    case "draw":
+      return "表示數量";
+    case "join":
+      return "合起來是多少";
+    case "add":
+      return question.parts.includes(0) ? "0的加法" : "加加看";
+    case "split":
+    case "combine":
+    case "ways":
+      return question.target === 10
+        ? "10的分與合"
+        : question.kind === "split"
+          ? "分一分"
+          : "合一合";
+  }
 };
 
-/** How the result and the parent name a question: 「數一數 7」 or 「3＋4」. */
+/** How the result and the parent name a question: 「數一數 7」, 「3＋4」 or 「7 分成 3 和 ？」. */
 const questionName = (question: MathQuestion) =>
-  "parts" in question
-    ? question.parts.join("＋")
-    : `${sectionLabels[question.kind]} ${question.target}`;
+  isBond(question)
+    ? bondLabel(question)
+    : "parts" in question
+      ? question.parts.join("＋")
+      : `${question.kind === "count" ? "數一數" : "畫圈圈"} ${question.target}`;
+
+const isBond = (question: MathQuestion): question is BondQuestion =>
+  question.kind === "split" || question.kind === "combine" || question.kind === "ways";
 
 /** 「畫了 6 格」 for the parent, and in red how many too many or too few. */
 function DrawnCount({ drawn, target }: { drawn: number; target: number }) {
@@ -62,7 +83,7 @@ function DrawnCount({ drawn, target }: { drawn: number; target: number }) {
 
 export function MathScreen({ app }: { app: MathApp }) {
   const lesson = mathLessons.find((item) => item.id === app.mathLessonId) ?? mathLessons[0];
-  if (lesson.id === 2)
+  if (lesson.practice === "tap")
     return (
       <Suspense
         fallback={
@@ -167,7 +188,7 @@ function WritingLesson({ app, lesson }: { app: MathApp; lesson: MathLesson }) {
             return (
               <article className="math-check-card" key={index}>
                 <h2>
-                  第 {index + 1} 題 · {sectionLabels[question.kind]}
+                  第 {index + 1} 題 · {sectionOf(question)}
                 </h2>
                 <div className="math-check-row">
                   <div className="math-check-question">
@@ -175,6 +196,8 @@ function WritingLesson({ app, lesson }: { app: MathApp; lesson: MathLesson }) {
                       <CountPictures question={question} small />
                     ) : question.kind === "join" ? (
                       <JoinPictures question={question} small />
+                    ) : isBond(question) ? (
+                      <span className="math-check-draw">{bondLabel(question)}</span>
                     ) : question.kind === "add" ? (
                       <div className="math-check-add">
                         <span className="math-check-draw">{question.parts.join(" ＋ ")}</span>
@@ -205,7 +228,9 @@ function WritingLesson({ app, lesson }: { app: MathApp; lesson: MathLesson }) {
                     <span className="math-check-label">
                       {question.kind === "draw" ? "孩子畫的" : "孩子寫的"}
                     </span>
-                    {question.kind === "draw" && circles.length ? (
+                    {isBond(question) ? (
+                      <BondPreview question={question} answer={strokes} cells={circles} />
+                    ) : question.kind === "draw" && circles.length ? (
                       <>
                         <FramePreview cells={circles} target={question.target} />
                         <small>
@@ -230,7 +255,16 @@ function WritingLesson({ app, lesson }: { app: MathApp; lesson: MathLesson }) {
                   </div>
                   <div className="math-check-key">
                     <span className="math-check-label">答案</span>
-                    <strong>{question.target}</strong>
+                    {question.kind === "ways" ? (
+                      // Any two numbers that make the total are right.
+                      <small className="math-check-ways">
+                        兩個數合起來是 {question.target} 就對
+                      </small>
+                    ) : (
+                      <strong>
+                        {question.kind === "split" ? question.parts[1] : question.target}
+                      </strong>
+                    )}
                   </div>
                 </div>
                 <button
@@ -297,7 +331,7 @@ function WritingLesson({ app, lesson }: { app: MathApp; lesson: MathLesson }) {
   return (
     <main className="math-shell">
       {header(
-        `${lesson.number} · ${sectionLabels[question.kind]}`,
+        `${lesson.number} · ${sectionOf(question)}`,
         `第 ${round.index + 1} 題 / ${round.questions.length}`,
       )}
       <section className={`math-question is-${question.kind}`}>
@@ -311,6 +345,22 @@ function WritingLesson({ app, lesson }: { app: MathApp; lesson: MathLesson }) {
           <div className="math-count math-join">
             <JoinPictures question={question} marked={marked} onToggle={toggleMark} />
             <InkSquare scope={scope} initial={strokes} onChange={setInk} label="寫答案" />
+          </div>
+        ) : isBond(question) ? (
+          <div className="math-bond-question">
+            {question.kind === "combine" ? (
+              <JoinPictures question={question} marked={marked} onToggle={toggleMark} />
+            ) : (
+              <CountPictures question={question} marked={marked} onToggle={toggleMark} />
+            )}
+            <BondWork
+              scope={scope}
+              question={question}
+              answer={strokes}
+              cells={round.work[round.index] ?? []}
+              onAnswer={setInk}
+              onCell={setWorkCell}
+            />
           </div>
         ) : question.kind === "add" ? (
           <AdditionWork

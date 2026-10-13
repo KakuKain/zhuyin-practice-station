@@ -30,7 +30,7 @@ const finishMathLesson = async (page: Page) => {
   await page.getByRole("button", { name: "數學", exact: true }).click();
   await page.getByRole("button", { name: /數學第一課/ }).click();
   await page.getByRole("button", { name: "開始練習", exact: true }).click();
-  for (let i = 0; i < 7; i++)
+  for (let i = 0; i < 8; i++)
     await page.getByRole("button", { name: "下一題", exact: true }).click();
   await page.getByRole("button", { name: "寫完了，請家長檢查" }).click();
   await page.getByRole("button", { name: "檢查完成" }).click();
@@ -74,8 +74,8 @@ test("集章卡 is set up in three steps, stamps finished practice and trades a 
 
   // The parent sees where it came from and sends 鼓勵章 with a note.
   await openRewards(page);
-  await expect(page.locator(".reward-log")).toContainText("數學第一課 認識 1～10");
-  await expect(page.locator(".reward-log")).toContainText("需要補強 8 題");
+  await expect(page.locator(".reward-log")).toContainText("數學第一課 10以內的數");
+  await expect(page.locator(".reward-log")).toContainText("需要補強 9 題");
   for (let i = 0; i < 4; i++) {
     await page.getByLabel("鼓勵的話").fill("今天自己主動來練習！");
     await page.getByRole("button", { name: "鼓勵章" }).click();
@@ -184,7 +184,7 @@ test("a parent sets 今天的任務 from what needs help; finishing it earns a �
             at,
             kind: "practice",
             subject: "math",
-            detail: "數學第一課 認識 1～10",
+            detail: "數學第一課 10以內的數",
             needsPractice: 3,
             taskKey: "math:1",
             stamped: true,
@@ -204,7 +204,7 @@ test("a parent sets 今天的任務 from what needs help; finishing it earns a �
   const tasks = page.locator(".reward-tasks");
   await expect(tasks.locator(".reward-task-suggestions")).toContainText("需要補強 3 題");
   await tasks.getByRole("button", { name: "設為任務" }).click();
-  await expect(tasks.locator(".reward-task-list")).toContainText("數學第一課 認識 1～10");
+  await expect(tasks.locator(".reward-task-list")).toContainText("數學第一課 10以內的數");
   await tasks.getByLabel("選擇任務").selectOption({ label: "第一課 聽寫" });
   await tasks.getByRole("button", { name: "加入任務" }).click();
   await expect(tasks.locator(".reward-task-list li")).toHaveCount(2);
@@ -215,10 +215,10 @@ test("a parent sets 今天的任務 from what needs help; finishing it earns a �
   const today = page.getByRole("dialog", { name: "今天的任務" });
   await expect(today).toBeVisible();
   await expect(today.locator("li")).toHaveCount(2);
-  await today.getByRole("button", { name: "去做：數學第一課 認識 1～10" }).click();
-  await expect(page.getByRole("heading", { name: "認識 1～10" })).toBeVisible();
+  await today.getByRole("button", { name: "去做：數學第一課 10以內的數" }).click();
+  await expect(page.getByRole("heading", { name: "10以內的數" })).toBeVisible();
   await page.getByRole("button", { name: "開始練習", exact: true }).click();
-  for (let i = 0; i < 7; i++)
+  for (let i = 0; i < 8; i++)
     await page.getByRole("button", { name: "下一題", exact: true }).click();
   await page.getByRole("button", { name: "寫完了，請家長檢查" }).click();
   await page.getByRole("button", { name: "檢查完成" }).click();
@@ -233,7 +233,7 @@ test("a parent sets 今天的任務 from what needs help; finishing it earns a �
 
   // The parent sees the 任務章 in the log and can cancel the other task.
   await openRewards(page);
-  await expect(page.locator(".reward-log")).toContainText("今天的任務：數學第一課 認識 1～10");
+  await expect(page.locator(".reward-log")).toContainText("今天的任務：數學第一課 10以內的數");
   await tasks.getByRole("button", { name: "取消任務：第一課 聽寫" }).click();
   await expect(tasks.locator(".reward-task-list li")).toHaveCount(1);
   expect(errors).toEqual([]);

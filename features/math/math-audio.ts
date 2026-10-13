@@ -13,13 +13,35 @@ export const chineseNumber = (value: number) => numerals[value] ?? String(value)
 
 const range = (from: number, to: number) =>
   Array.from({ length: to - from + 1 }, (_, index) => from + index);
-/** Every sum 第三課 can ask: 合在一起 has up to 5 on each side; 畫圈圈 sums are 3 to 10. */
+/**
+ * Every sum 第七課 can ask: 合起來是多少 has up to 5 on each side, 加加看 sums are 3 to 10, and
+ * 0的加法 adds 0 to 1–9 either way round.
+ */
 const joinPairs = range(1, 5).flatMap((a) => range(1, 5).map((b) => [a, b] as const));
-const addPairs = range(1, 9).flatMap((a) =>
-  range(1, 9)
-    .filter((b) => a + b >= 3 && a + b <= 10)
-    .map((b) => [a, b] as const),
-);
+const addPairs = [
+  ...range(1, 9).flatMap((a) =>
+    range(1, 9)
+      .filter((b) => a + b >= 3 && a + b <= 10)
+      .map((b) => [a, b] as const),
+  ),
+  ...range(1, 9).flatMap((value) => [[value, 0] as const, [0, value] as const]),
+];
+/** 第三課 排在第幾個: rows of six or seven, never asking for the first or the last. */
+const positionPlaces = range(2, 6);
+/** 第三課 第幾個和幾個: 「點三個」 and 「點第三個」 in a row of seven. */
+const groupCounts = range(2, 5);
+/**
+ * 第四課: 分一分 splits 3 to 10 any way; 合一合 has up to 5 on each side, or makes 10; 分分看 is
+ * 10的分與合.
+ */
+const splitPairs = addPairs.filter(([a, b]) => a > 0 && b > 0);
+const combinePairs = [
+  ...joinPairs.filter(([a, b]) => a + b >= 3),
+  ...range(1, 9)
+    .filter((a) => a !== 5)
+    .map((a) => [a, 10 - a] as const),
+];
+const waysTotals = [10];
 
 export const mathPrompts: Record<string, string> = {
   count: "數一數，有幾個？用筆寫出數字。",
@@ -28,21 +50,21 @@ export const mathPrompts: Record<string, string> = {
       .slice(1)
       .map((_, index) => [`draw-${index + 1}`, `畫出${chineseNumber(index + 1)}個圈圈。`]),
   ),
-  // 第二課 比一比
+  // 第二課 比長短: 比長短, 比高矮、比厚薄, 直線和曲線 (哪條路最近 is part of it)
   "length-more": "哪一枝鉛筆比較長？點一下。",
   "length-less": "哪一枝鉛筆比較短？點一下。",
   "height-more": "哪一個小朋友比較高？點一下。",
   "height-less": "哪一個小朋友比較矮？點一下。",
+  "thick-more": "哪一本書比較厚？點一下。",
+  "thick-less": "哪一本書比較薄？點一下。",
   "align-length": "鉛筆沒有對齊。先把每一枝鉛筆拉到紅線。",
   "align-height": "有人站在箱子上。先把小朋友拉到地上。",
-  "order-length": "先點最短的，再點中間的，最後點最長的。",
-  "order-height": "先點最矮的，再點中間的，最後點最高的。",
   "line-straight": "哪一條是直線？點一下。",
   "line-curve": "哪一條是曲線？點一下。",
   route: "小兔子要去拿紅蘿蔔。哪一條路最近？點一下。",
   correct: "答對了！",
   retry: "再想想看。",
-  // 第三課 加法
+  // 第七課 10以內的加法: 合起來是多少 (join), 0的加法 and 加加看 (add)
   ...Object.fromEntries(
     joinPairs.map(([a, b]) => [
       `join-${a}-${b}`,
@@ -53,6 +75,44 @@ export const mathPrompts: Record<string, string> = {
     addPairs.map(([a, b]) => [
       `add-${a}-${b}`,
       `${sumNumerals[a]}加${sumNumerals[b]}等於多少？先畫圈圈，再寫答案。`,
+    ]),
+  ),
+  // 第三課 排順序、比多少: a place is said 第二, a count 兩個.
+  ...Object.fromEntries(
+    positionPlaces.flatMap((place) =>
+      (["left", "right"] as const).map((from) => [
+        `position-${from}-${place}`,
+        `從${from === "left" ? "左" : "右"}邊數，第${sumNumerals[place]}個是哪一個？點一下。`,
+      ]),
+    ),
+  ),
+  missing: "中間少了哪一個數？點一下。",
+  sequence: "從小到大，依順序點數字。",
+  "rows-more": "哪一排比較多？如果一樣多，就點一樣多。",
+  "rows-less": "哪一排比較少？如果一樣多，就點一樣多。",
+  ...Object.fromEntries(
+    groupCounts.flatMap((count) => [
+      [`group-${count}`, `從左邊數，點${numerals[count]}個。`],
+      [`nth-${count}`, `從左邊數，點第${sumNumerals[count]}個。`],
+    ]),
+  ),
+  // 第四課 分與合: numbers are said as in a sum (二, not 兩), and 和 is ㄏㄢˋ as in the lessons.
+  ...Object.fromEntries(
+    splitPairs.map(([a, b]) => [
+      `split-${a}-${b}`,
+      `${sumNumerals[a + b]}可以分成${sumNumerals[a]}和幾？`,
+    ]),
+  ),
+  ...Object.fromEntries(
+    combinePairs.map(([a, b]) => [
+      `combine-${a}-${b}`,
+      `${sumNumerals[a]}和${sumNumerals[b]}合在一起是幾？`,
+    ]),
+  ),
+  ...Object.fromEntries(
+    waysTotals.map((total) => [
+      `ways-${total}`,
+      `${sumNumerals[total]}可以分成幾和幾？寫出一種分法。`,
     ]),
   ),
 };
@@ -75,14 +135,12 @@ export const mathPromptReadings: Record<string, string> = {
   "length-less": "ㄋㄚˇ ㄧ ㄓ ㄑㄧㄢ ㄅㄧˇ ㄅㄧˇ ㄐㄧㄠˋ ㄉㄨㄢˇ ㄉㄧㄢˇ ㄧ ㄒㄧㄚˋ",
   "height-more": "ㄋㄚˇ ㄧ ㄍㄜˋ ㄒㄧㄠˇ ㄆㄥˊ ㄧㄡˇ ㄅㄧˇ ㄐㄧㄠˋ ㄍㄠ ㄉㄧㄢˇ ㄧ ㄒㄧㄚˋ",
   "height-less": "ㄋㄚˇ ㄧ ㄍㄜˋ ㄒㄧㄠˇ ㄆㄥˊ ㄧㄡˇ ㄅㄧˇ ㄐㄧㄠˋ ㄞˇ ㄉㄧㄢˇ ㄧ ㄒㄧㄚˋ",
+  "thick-more": "ㄋㄚˇ ㄧ ㄅㄣˇ ㄕㄨ ㄅㄧˇ ㄐㄧㄠˋ ㄏㄡˋ ㄉㄧㄢˇ ㄧ ㄒㄧㄚˋ",
+  "thick-less": "ㄋㄚˇ ㄧ ㄅㄣˇ ㄕㄨ ㄅㄧˇ ㄐㄧㄠˋ ㄅㄛˊ ㄉㄧㄢˇ ㄧ ㄒㄧㄚˋ",
   "align-length":
     "ㄑㄧㄢ ㄅㄧˇ ㄇㄟˊ ㄧㄡˇ ㄉㄨㄟˋ ㄑㄧˊ ㄒㄧㄢ ㄅㄚˇ ㄇㄟˇ ㄧ ㄓ ㄑㄧㄢ ㄅㄧˇ ㄌㄚ ㄉㄠˋ ㄏㄨㄥˊ ㄒㄧㄢˋ",
   "align-height":
     "ㄧㄡˇ ㄖㄣˊ ㄓㄢˋ ㄗㄞˋ ㄒㄧㄤ ˙ㄗ ㄕㄤˋ ㄒㄧㄢ ㄅㄚˇ ㄒㄧㄠˇ ㄆㄥˊ ㄧㄡˇ ㄌㄚ ㄉㄠˋ ㄉㄧˋ ㄕㄤˋ",
-  "order-length":
-    "ㄒㄧㄢ ㄉㄧㄢˇ ㄗㄨㄟˋ ㄉㄨㄢˇ ˙ㄉㄜ ㄗㄞˋ ㄉㄧㄢˇ ㄓㄨㄥ ㄐㄧㄢ ˙ㄉㄜ ㄗㄨㄟˋ ㄏㄡˋ ㄉㄧㄢˇ ㄗㄨㄟˋ ㄔㄤˊ ˙ㄉㄜ",
-  "order-height":
-    "ㄒㄧㄢ ㄉㄧㄢˇ ㄗㄨㄟˋ ㄞˇ ˙ㄉㄜ ㄗㄞˋ ㄉㄧㄢˇ ㄓㄨㄥ ㄐㄧㄢ ˙ㄉㄜ ㄗㄨㄟˋ ㄏㄡˋ ㄉㄧㄢˇ ㄗㄨㄟˋ ㄍㄠ ˙ㄉㄜ",
   "line-straight": "ㄋㄚˇ ㄧ ㄊㄧㄠˊ ㄕˋ ㄓˊ ㄒㄧㄢˋ ㄉㄧㄢˇ ㄧ ㄒㄧㄚˋ",
   "line-curve": "ㄋㄚˇ ㄧ ㄊㄧㄠˊ ㄕˋ ㄑㄩ ㄒㄧㄢˋ ㄉㄧㄢˇ ㄧ ㄒㄧㄚˋ",
   route:
@@ -101,7 +159,59 @@ export const mathPromptReadings: Record<string, string> = {
       `${sumReadings[a]} ㄐㄧㄚ ${sumReadings[b]} ㄉㄥˇ ㄩˊ ㄉㄨㄛ ㄕㄠˇ ㄒㄧㄢ ㄏㄨㄚˋ ㄑㄩㄢ ㄑㄩㄢ ㄗㄞˋ ㄒㄧㄝˇ ㄉㄚˊ ㄢˋ`,
     ]),
   ),
+  ...Object.fromEntries(
+    positionPlaces.flatMap((place) =>
+      (["left", "right"] as const).map((from) => [
+        `position-${from}-${place}`,
+        `ㄘㄨㄥˊ ${from === "left" ? "ㄗㄨㄛˇ" : "ㄧㄡˋ"} ㄅㄧㄢ ㄕㄨˇ ㄉㄧˋ ${sumReadings[place]} ㄍㄜˋ ㄕˋ ㄋㄚˇ ㄧ ㄍㄜˋ ㄉㄧㄢˇ ㄧ ㄒㄧㄚˋ`,
+      ]),
+    ),
+  ),
+  missing: "ㄓㄨㄥ ㄐㄧㄢ ㄕㄠˇ ˙ㄌㄜ ㄋㄚˇ ㄧ ㄍㄜˋ ㄕㄨˋ ㄉㄧㄢˇ ㄧ ㄒㄧㄚˋ",
+  sequence: "ㄘㄨㄥˊ ㄒㄧㄠˇ ㄉㄠˋ ㄉㄚˋ ㄧ ㄕㄨㄣˋ ㄒㄩˋ ㄉㄧㄢˇ ㄕㄨˋ ㄗˋ",
+  "rows-more":
+    "ㄋㄚˇ ㄧ ㄆㄞˊ ㄅㄧˇ ㄐㄧㄠˋ ㄉㄨㄛ ㄖㄨˊ ㄍㄨㄛˇ ㄧ ㄧㄤˋ ㄉㄨㄛ ㄐㄧㄡˋ ㄉㄧㄢˇ ㄧ ㄧㄤˋ ㄉㄨㄛ",
+  "rows-less":
+    "ㄋㄚˇ ㄧ ㄆㄞˊ ㄅㄧˇ ㄐㄧㄠˋ ㄕㄠˇ ㄖㄨˊ ㄍㄨㄛˇ ㄧ ㄧㄤˋ ㄉㄨㄛ ㄐㄧㄡˋ ㄉㄧㄢˇ ㄧ ㄧㄤˋ ㄉㄨㄛ",
+  ...Object.fromEntries(
+    groupCounts.flatMap((count) => [
+      [`group-${count}`, `ㄘㄨㄥˊ ㄗㄨㄛˇ ㄅㄧㄢ ㄕㄨˇ ㄉㄧㄢˇ ${numeralReadings[count]} ㄍㄜˋ`],
+      [`nth-${count}`, `ㄘㄨㄥˊ ㄗㄨㄛˇ ㄅㄧㄢ ㄕㄨˇ ㄉㄧㄢˇ ㄉㄧˋ ${sumReadings[count]} ㄍㄜˋ`],
+    ]),
+  ),
+  ...Object.fromEntries(
+    splitPairs.map(([a, b]) => [
+      `split-${a}-${b}`,
+      `${sumReadings[a + b]} ㄎㄜˇ ㄧˇ ㄈㄣ ㄔㄥˊ ${sumReadings[a]} ㄏㄢˋ ㄐㄧˇ`,
+    ]),
+  ),
+  ...Object.fromEntries(
+    combinePairs.map(([a, b]) => [
+      `combine-${a}-${b}`,
+      `${sumReadings[a]} ㄏㄢˋ ${sumReadings[b]} ㄏㄜˊ ㄗㄞˋ ㄧ ㄑㄧˇ ㄕˋ ㄐㄧˇ`,
+    ]),
+  ),
+  ...Object.fromEntries(
+    waysTotals.map((total) => [
+      `ways-${total}`,
+      `${sumReadings[total]} ㄎㄜˇ ㄧˇ ㄈㄣ ㄔㄥˊ ㄐㄧˇ ㄏㄢˋ ㄐㄧˇ ㄒㄧㄝˇ ㄔㄨ ㄧ ㄓㄨㄥˇ ㄈㄣ ㄈㄚˇ`,
+    ]),
+  ),
 };
+
+/**
+ * Homophones for what Meijia misreads, checked by comparing her recordings: she says 和 as ㄏㄜˊ
+ * where the lessons read ㄏㄢˋ, and 「從左邊數」 as ㄕㄨˋ (as in 樹) instead of ㄕㄨˇ. 數一數 she
+ * reads right.
+ */
+const spokenFixes: [RegExp, string][] = [
+  [/和/g, "漢"],
+  [/邊數，/g, "邊鼠，"],
+];
+
+/** What Meijia is given to say; the screen still shows the prompt as written. */
+export const mathPromptSpeech = (id: string) =>
+  spokenFixes.reduce((text, [pattern, fix]) => text.replace(pattern, fix), mathPrompts[id] ?? "");
 
 export { isHan };
 
@@ -116,9 +226,11 @@ export const mathPromptId = (question: {
 }) =>
   question.kind === "count"
     ? "count"
-    : question.parts
-      ? `${question.kind}-${question.parts.join("-")}`
-      : `draw-${question.target}`;
+    : question.kind === "ways"
+      ? `ways-${question.target}`
+      : question.parts
+        ? `${question.kind}-${question.parts.join("-")}`
+        : `draw-${question.target}`;
 
 /** Clips re-recorded after their sentence changed; the query skips a cached old clip. */
 const promptVersions: Record<string, number> = { count: 2 };

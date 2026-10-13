@@ -174,7 +174,7 @@ test("a task reads in 國字注音 with the right zhuyin on every character", ()
   for (const option of taskOptions(buildCatalog(initialMaterials)).filter((o) => o.annotate))
     for (const part of [option.place, option.activity].filter(Boolean))
       assert.ok(
-        Array.from(part.replace(/[ 0-9～]/g, "")).every((character) => character in annotated),
+        Array.from(part.replace(/[ 0-9～、]/g, "")).every((character) => character in annotated),
         part,
       );
 });

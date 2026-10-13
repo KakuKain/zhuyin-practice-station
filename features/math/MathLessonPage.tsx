@@ -16,8 +16,8 @@ export function MathLessonPage({
   app: Pick<AppController, "mathLessonId" | "startMathPractice">;
 }) {
   const lesson = mathLessons.find((item) => item.id === app.mathLessonId) ?? mathLessons[0];
-  // 第二課 is not saved mid-round, so it always starts afresh.
-  const [saved] = useState(() => (lesson.id === 2 ? null : readMathRound(lesson.id)));
+  // Tapped lessons are not saved mid-round, so they always start afresh.
+  const [saved] = useState(() => (lesson.practice === "tap" ? null : readMathRound(lesson.id)));
   return (
     <section className="page-section lesson-page math-lesson-page">
       <div className="lesson-heading">
