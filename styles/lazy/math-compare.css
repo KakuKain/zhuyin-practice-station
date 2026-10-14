@@ -30,9 +30,11 @@
     --stage-ratio: 2.2;
   }
 }
+/* 比高矮: the children stand on a watercolor meadow, like the lesson pages. */
 .compare-stage.is-height {
   --stage-ratio: 1.34;
-  background: #eef7ff;
+  background: #fbfdf8 url("/course-art/lesson-watercolor-footer.webp") center bottom / 100% auto
+    no-repeat;
 }
 
 .compare-start-line {
@@ -51,21 +53,28 @@
   font-weight: 700;
   white-space: nowrap;
 }
+/* The ground the children stand on: a soft green wash, with a gentle line where the feet go. */
 .compare-ground {
   position: absolute;
   right: 0;
   bottom: 0;
   left: 0;
-  border-top: 3px solid #4f9f48;
-  background: linear-gradient(#8fd17f, #6dbb63);
+  border-top: 3px solid rgba(110, 170, 90, 0.45);
+  background: linear-gradient(rgba(170, 210, 130, 0.55), rgba(140, 195, 110, 0.7));
 }
+/* A painted wooden box, on the same paper as the course cards. */
 .compare-box {
   position: absolute;
   width: 18%;
-  border: 2px solid #9a6331;
+  border: 2px solid #b8834c;
   border-bottom: 0;
-  border-radius: 6px 6px 0 0;
-  background: repeating-linear-gradient(90deg, #d39a5e 0 16px, #c98b4f 16px 19px);
+  border-radius: 10px 10px 3px 3px;
+  background:
+    url("/course-art/course-card-paper-v1.webp") center / 160px repeat,
+    repeating-linear-gradient(90deg, transparent 0 22%, rgba(150, 95, 45, 0.22) 22% 24%),
+    linear-gradient(#ecc08a, #d6a067);
+  background-blend-mode: multiply, normal, normal;
+  box-shadow: inset 0 4px 0 rgba(255, 255, 255, 0.35);
   transform: translateX(-50%);
   transition: opacity 0.35s ease;
 }
@@ -103,14 +112,17 @@
   height: calc(var(--pencil-thickness) + 32px);
   transform: translateY(-50%);
 }
+/* Each child's shape comes from its picture (kid-pictures.json), so its height is the child's. */
 .compare-item.is-child {
-  aspect-ratio: 2 / 5;
   transform: translateX(-50%);
 }
-.compare-item.is-child svg {
+.compare-kid {
   display: block;
   width: 100%;
   height: 100%;
+  pointer-events: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 .compare-item.is-lined {
   animation: compare-lined 0.6s ease-out;

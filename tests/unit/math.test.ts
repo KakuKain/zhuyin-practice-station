@@ -48,6 +48,7 @@ import {
   compareRoundSize,
   ground,
   needsLining,
+  palette,
   routeLength,
   routePoints,
   snapDistance,
@@ -55,6 +56,7 @@ import {
   type CompareQuestion,
 } from "../../features/math/compare-round";
 import { mathRoundStorageKey, ownsStorageKey, storageKeys } from "../../lib/storage/storage-keys";
+import kidPictures from "../../features/math/kid-pictures.json";
 import { childRecordKeys } from "../../lib/storage/child-profiles";
 
 test("a 第一課 round counts 1–5 twice, 6–10 twice and an empty basket, then draws 4", () => {
@@ -566,4 +568,14 @@ test("a 第三課 round walks 排數字, 排在第幾個, 第幾個和幾個 and
   // A count is 兩個, a place 第二個.
   assert.equal(mathPrompts["group-2"], "從左邊數，點兩個。");
   assert.equal(mathPrompts["nth-2"], "從左邊數，點第二個。");
+});
+
+test("比高矮 has a watercolor child for every shirt colour, cut from the top of the hair to the soles", () => {
+  const shapes = Object.values(kidPictures);
+  assert.equal(shapes.length, palette.length);
+  for (const [name, { width, height }] of Object.entries(kidPictures)) {
+    assert.ok(existsSync(`public/course-art/kid-${name}.webp`), name);
+    // Standing children: taller than wide, so a height in the stage is the child's height.
+    assert.ok(height > width && width > 0, name);
+  }
 });

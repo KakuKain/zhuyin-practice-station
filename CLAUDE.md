@@ -44,6 +44,7 @@ Asset pipelines:
   - The sheet was painted with ChatGPT; Claude cannot generate raster images.
   - The output is 192 px, lossy WebP at quality 88.
   - The originals live in `assets/artwork/avatars/`, a subfolder that `optimize-artwork.mjs` skips.
+- `python3 scripts/slice-kids.py assets/artwork/kids/sheet.png` cuts the six standing watercolor children of 比高矮 (painted with ChatGPT, transparent sheet, shirts in the 第二課 palette order) into `public/course-art/kid-<colour>.webp`, cropped from the top of the hair to the soles, and writes their sizes to `features/math/kid-pictures.json`.
 - `npx tsx scripts/generate-math-audio.ts [--refresh]` voices every math instruction in `features/math/math-audio.ts` into `public/math-audio/` (macOS Meijia). First graders cannot read yet, so every math question is spoken; a unit test checks each prompt has a clip. Meijia misreads some words, found by comparing her recordings: she says 和 as ㄏㄜˊ where the lessons read ㄏㄢˋ, and 「從左邊數」 with ㄕㄨˋ. (She reads 數一數 and 薄 ㄅㄛˊ right.) `mathPromptSpeech` voices them as the homophones 漢 and 鼠; the screen still shows the prompt as written.
 - `python3 scripts/build-yo-fonts.py` rebuilds the lesson font subsets after you add characters or IVS glyphs. Readings the upstream fonts lack are composed from their zhuyin parts (`EXTRA_READINGS`, so far 來 ˙ㄌㄞ), and writes `assets/font-sources/KidLessonYoOnly-readings.json` and `KidLessonYoSans-readings.json` (what each character and variation sequence shows). `scripts/build-fonts.py` rebuilds the full fonts. Both need fontTools and brotli. Bump the `?v=` on the fonts in `styles/02-typography.css` when they change.
 
@@ -139,6 +140,7 @@ There is one build: a static Vite SPA. `index.html` → `app/main.tsx` → `crea
     - A round is not saved mid-round. What took more than one try goes to `kid-math-records-v1` and the result screen.
   - 第二課 比長短: `compare-round.ts` builds the round and holds the rules.
     - A round has 7 questions in textbook order: 比長短 lined up, then out of line; 比高矮 on the ground, then one child on a box; 比厚薄 (two books on a shelf, the same height); 直線和曲線, then 哪條路最近, which the textbook teaches with 直線和曲線.
+    - 比高矮's children are watercolor pictures, one per palette colour (`kid-pictures.json`); a child's button takes its picture's shape, so its height is the child's height. They stand on the lesson pages' watercolor meadow, and the box is painted on card paper.
     - Things out of line must be dragged to the start line or the ground first (a tap slides them there). Only then is the question asked.
     - Out of line, the shorter one always looks longer or taller, so skipping the lining-up step gives the wrong answer.
   - 第三課 排順序、比多少 (id 7): `sequence-round.ts` builds the round, and `SequenceViews.tsx` draws it. A round has 8 questions in the textbook's sections:

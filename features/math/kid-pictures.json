@@ -1,0 +1,26 @@
+{
+  "pink": {
+    "width": 356,
+    "height": 591
+  },
+  "blue": {
+    "width": 266,
+    "height": 621
+  },
+  "green": {
+    "width": 262,
+    "height": 617
+  },
+  "yellow": {
+    "width": 290,
+    "height": 586
+  },
+  "purple": {
+    "width": 244,
+    "height": 649
+  },
+  "orange": {
+    "width": 278,
+    "height": 606
+  }
+}

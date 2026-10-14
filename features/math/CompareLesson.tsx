@@ -9,6 +9,7 @@ import {
 import { Carrot, CheckCircle, HandPointing, Rabbit, XCircle } from "@phosphor-icons/react";
 import type { AppController } from "../usePracticeApp";
 import { isPalmContact } from "../../lib/ink/gesture";
+import kidPictures from "./kid-pictures.json";
 import { MathHeader, MathPrompt, MathResult } from "./MathChrome";
 import { mathPromptUrl, mathPrompts } from "./math-audio";
 import { taskKeys } from "../rewards/stamp-book";
@@ -319,30 +320,26 @@ function Pencil({ color }: { color: string }) {
   );
 }
 
-function Child({ color }: { color: string }) {
+/** The watercolor children (scripts/slice-kids.py), one per palette colour, in its order. */
+const kidNames = ["pink", "blue", "green", "yellow", "purple", "orange"] as const;
+const kidShape = (shade: number) => kidPictures[kidNames[shade % kidNames.length]];
+
+/**
+ * A watercolor child in the shirt of the palette colour, cropped from the top of the hair to the
+ * soles, so the picture's height is the child's height.
+ */
+function Child({ shade }: { shade: number }) {
+  const name = kidNames[shade % kidNames.length];
+  const { width, height } = kidPictures[name];
   return (
-    <svg viewBox="0 0 40 100" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
-      <rect x="3" y="28" width="7" height="25" rx="3.5" fill={color} />
-      <rect x="30" y="28" width="7" height="25" rx="3.5" fill={color} />
-      <circle cx="6.5" cy="55" r="3.5" fill="#f5cfae" />
-      <circle cx="33.5" cy="55" r="3.5" fill="#f5cfae" />
-      <rect x="11" y="58" width="8" height="37" rx="3" fill="#3d4f6b" />
-      <rect x="21" y="58" width="8" height="37" rx="3" fill="#3d4f6b" />
-      <rect x="9" y="25" width="22" height="37" rx="8" fill={color} />
-      <ellipse cx="14" cy="96.5" rx="6" ry="3.5" fill="#2b2b2b" />
-      <ellipse cx="26" cy="96.5" rx="6" ry="3.5" fill="#2b2b2b" />
-      <circle cx="20" cy="13" r="11" fill="#f5cfae" />
-      <path d="M9 13 C9 3 31 3 31 13 C27 8 13 8 9 13 Z" fill="#3b2a20" />
-      <circle cx="16" cy="14" r="1.4" fill="#2b2b2b" />
-      <circle cx="24" cy="14" r="1.4" fill="#2b2b2b" />
-      <path
-        d="M16.5 18.5 Q20 21 23.5 18.5"
-        stroke="#c0605a"
-        strokeWidth="1.3"
-        fill="none"
-        strokeLinecap="round"
-      />
-    </svg>
+    <img
+      className="compare-kid"
+      src={`course-art/kid-${name}.webp`}
+      width={width}
+      height={height}
+      alt=""
+      draggable={false}
+    />
   );
 }
 
@@ -506,6 +503,7 @@ function BarStage({
                     left: `${slots[index]}%`,
                     bottom: `${100 - ground + offsets[index]}%`,
                     height: `${bar.size}%`,
+                    aspectRatio: `${kidShape(bar.color).width} / ${kidShape(bar.color).height}`,
                   }
             }
             aria-label={length ? `${name}的鉛筆` : `穿${name}衣服的小朋友`}
@@ -516,7 +514,7 @@ function BarStage({
             onLostPointerCapture={end}
             onClick={() => click(index)}
           >
-            {length ? <Pencil color={color} /> : <Child color={color} />}
+            {length ? <Pencil color={color} /> : <Child shade={bar.color} />}
           </button>
         );
       })}
