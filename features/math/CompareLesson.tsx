@@ -28,6 +28,8 @@ import { SequenceStage, choiceState, type Feedback } from "./SequenceViews";
 import {
   answerOf,
   buildCompareRound,
+  kidPicture,
+  kidStretches,
   comparePromptIds,
   compareTopic,
   ground,
@@ -319,29 +321,44 @@ function Pencil({ color }: { color: string }) {
   );
 }
 
-function Child({ color }: { color: string }) {
+/** A child's drawn shape once its body grows or shrinks by `stretch`. */
+const kidShape = (shade: number, stretch: number) => {
+  const { width, height, body } = kidPicture(shade);
+  const [top, bottom] = body.map((at) => at * height);
+  return { width, height, top, bottom, total: top + (bottom - top) * stretch + (height - bottom) };
+};
+
+/**
+ * A watercolor child in the shirt of the palette colour. The head and the shoes keep their
+ * size; only the part from below the chin to the socks grows or shrinks, the way classmates of
+ * different heights differ. Each part overlaps the next by a pixel, so no seam shows.
+ */
+function Child({ shade, stretch }: { shade: number; stretch: number }) {
+  const { width, height, top, bottom, total } = kidShape(shade, stretch);
+  const src = `course-art/kid-${palette[shade].kid}.webp`;
+  const middle = (bottom - top) * stretch;
+  const part = (at: number, size: number, from: number, to: number) => (
+    <svg
+      x={0}
+      y={at}
+      width={width}
+      height={size}
+      viewBox={`0 ${from} ${width} ${to - from}`}
+      preserveAspectRatio="none"
+    >
+      <image href={src} width={width} height={height} />
+    </svg>
+  );
   return (
-    <svg viewBox="0 0 40 100" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
-      <rect x="3" y="28" width="7" height="25" rx="3.5" fill={color} />
-      <rect x="30" y="28" width="7" height="25" rx="3.5" fill={color} />
-      <circle cx="6.5" cy="55" r="3.5" fill="#f5cfae" />
-      <circle cx="33.5" cy="55" r="3.5" fill="#f5cfae" />
-      <rect x="11" y="58" width="8" height="37" rx="3" fill="#3d4f6b" />
-      <rect x="21" y="58" width="8" height="37" rx="3" fill="#3d4f6b" />
-      <rect x="9" y="25" width="22" height="37" rx="8" fill={color} />
-      <ellipse cx="14" cy="96.5" rx="6" ry="3.5" fill="#2b2b2b" />
-      <ellipse cx="26" cy="96.5" rx="6" ry="3.5" fill="#2b2b2b" />
-      <circle cx="20" cy="13" r="11" fill="#f5cfae" />
-      <path d="M9 13 C9 3 31 3 31 13 C27 8 13 8 9 13 Z" fill="#3b2a20" />
-      <circle cx="16" cy="14" r="1.4" fill="#2b2b2b" />
-      <circle cx="24" cy="14" r="1.4" fill="#2b2b2b" />
-      <path
-        d="M16.5 18.5 Q20 21 23.5 18.5"
-        stroke="#c0605a"
-        strokeWidth="1.3"
-        fill="none"
-        strokeLinecap="round"
-      />
+    <svg
+      className="compare-kid"
+      viewBox={`0 0 ${width} ${total}`}
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      {part(top + middle - 1, height - bottom + 1, bottom - 1, height)}
+      {part(top - 1, middle + 2, top - 1, bottom + 1)}
+      {part(0, top + 1, 0, top + 1)}
     </svg>
   );
 }
@@ -441,6 +458,8 @@ function BarStage({
     }
   };
 
+  // 比高矮: both children at one scale, so their heads are the same size.
+  const stretches = length ? bars.map(() => 1) : kidStretches(bars);
   const rows = [30, 70];
   const slots = [32, 68];
   const hintIndex = lining && !touched && dragging === null ? offsets.findIndex((o) => o > 0) : -1;
@@ -506,6 +525,7 @@ function BarStage({
                     left: `${slots[index]}%`,
                     bottom: `${100 - ground + offsets[index]}%`,
                     height: `${bar.size}%`,
+                    aspectRatio: `${kidShape(bar.color, stretches[index]).width} / ${kidShape(bar.color, stretches[index]).total}`,
                   }
             }
             aria-label={length ? `${name}的鉛筆` : `穿${name}衣服的小朋友`}
@@ -516,7 +536,11 @@ function BarStage({
             onLostPointerCapture={end}
             onClick={() => click(index)}
           >
-            {length ? <Pencil color={color} /> : <Child color={color} />}
+            {length ? (
+              <Pencil color={color} />
+            ) : (
+              <Child shade={bar.color} stretch={stretches[index]} />
+            )}
           </button>
         );
       })}

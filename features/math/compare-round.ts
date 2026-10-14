@@ -3,6 +3,8 @@
  * right, like 辨音. When things are not lined up, the child first drags them to the start line
  * or down to the ground, so 一端對齊 is something they do, not only something they see.
  */
+import kidPictures from "./kid-pictures.json";
+
 export type Measure = "length" | "height";
 
 export type Bar = {
@@ -38,14 +40,38 @@ export const ground = 86;
 /** Released this close to lined up, a pencil or child settles there. */
 export const snapDistance = 5;
 
+/** Each colour, and the watercolor child of 比高矮 who wears it (scripts/slice-kids.py). */
 export const palette = [
-  { color: "#e0567a", name: "粉紅色" },
-  { color: "#3474d7", name: "藍色" },
-  { color: "#2f9a55", name: "綠色" },
-  { color: "#e8a21f", name: "黃色" },
-  { color: "#8a5cd6", name: "紫色" },
-  { color: "#ef7d1f", name: "橘色" },
-];
+  { color: "#e0567a", name: "粉紅色", kid: "pink" },
+  { color: "#3474d7", name: "藍色", kid: "blue" },
+  { color: "#2f9a55", name: "綠色", kid: "green" },
+  { color: "#e8a21f", name: "黃色", kid: "yellow" },
+  { color: "#8a5cd6", name: "紫色", kid: "purple" },
+  { color: "#ef7d1f", name: "橘色", kid: "orange" },
+] as const;
+
+type KidName = (typeof palette)[number]["kid"];
+/** A child's picture: its size in pixels, and the part (below the chin to the socks) that grows. */
+export const kidPicture = (shade: number) =>
+  kidPictures[palette[shade].kid as KidName] as { width: number; height: number; body: number[] };
+
+/**
+ * How much each child's body and legs grow or shrink so that both are drawn at one scale, with
+ * heads of the same size, and still stand exactly as tall as their bars. Classmates differ in
+ * height by their bodies and legs, not by being a smaller picture of the same child.
+ */
+export function kidStretches(bars: Bar[]): number[] {
+  const shapes = bars.map((bar) => kidPicture(bar.color));
+  // One scale for both: bar size per picture pixel, so the stretches balance around 1.
+  const scale =
+    bars.reduce((sum, bar) => sum + bar.size, 0) /
+    shapes.reduce((sum, shape) => sum + shape.height, 0);
+  return bars.map((bar, index) => {
+    const { height, body } = shapes[index];
+    const grows = (body[1] - body[0]) * height;
+    return 1 + (bar.size / scale - height) / grows;
+  });
+}
 
 const curveShapes: LineShape[] = ["arc", "wave", "s-curve", "hook"];
 
@@ -60,11 +86,15 @@ const shuffle = <T>(items: readonly T[], random: () => number) => {
 const between = (random: () => number, min: number, max: number) =>
   min + Math.floor(random() * (max - min + 1));
 
-function colors(count: number, random: () => number) {
-  return shuffle(
-    palette.map((_, index) => index),
-    random,
-  ).slice(0, count);
+const shades = palette.map((_, index) => index);
+/**
+ * 紫色's child wears her hair in a tall bun, which would muddle who is taller, so she sits out
+ * 比高矮.
+ */
+const heightShades = shades.filter((shade) => palette[shade].kid !== "purple");
+
+function colors(count: number, random: () => number, from: number[] = shades) {
+  return shuffle(from, random).slice(0, count);
 }
 
 /**
@@ -72,7 +102,7 @@ function colors(count: number, random: () => number) {
  * past the longer one's: a child who skips lining up picks the wrong one.
  */
 export function compareBars(measure: Measure, aligned: boolean, random = Math.random): Bar[] {
-  const [first, second] = colors(2, random);
+  const [first, second] = colors(2, random, measure === "height" ? heightShades : shades);
   let big: Bar;
   let small: Bar;
   if (measure === "length") {
@@ -87,16 +117,18 @@ export function compareBars(measure: Measure, aligned: boolean, random = Math.ra
       big = { size, offset, color: first };
       small = { size: size - gap, offset: offset + gap + between(random, 5, 10), color: second };
     }
-  } else if (aligned) {
-    const size = between(random, 58, 72);
-    big = { size, offset: 0, color: first };
-    small = { size: size - between(random, 12, 20), offset: 0, color: second };
   } else {
-    // The taller child stands on the ground; the shorter one stands on a box.
-    const size = between(random, 52, 64);
-    const gap = between(random, 10, 16);
-    big = { size, offset: 0, color: first };
-    small = { size: size - gap, offset: gap + between(random, 6, 12), color: second };
+    // Classmates: the shorter is 8–14% shorter, so both look like first graders. The child drawn
+    // taller in the picture plays the taller one, so bodies stretch only a little.
+    const [tall, short] = [first, second].sort(
+      (a, b) => kidPicture(b).height - kidPicture(a).height,
+    );
+    const size = aligned ? between(random, 62, 72) : between(random, 58, 66);
+    const shorter = Math.round((size * between(random, 86, 92)) / 100);
+    big = { size, offset: 0, color: tall };
+    // Out of line, the shorter child stands on a box and so looks taller.
+    const offset = aligned ? 0 : size - shorter + between(random, 6, 12);
+    small = { size: shorter, offset, color: short };
   }
   return shuffle([big, small], random);
 }

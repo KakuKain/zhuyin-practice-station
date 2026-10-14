@@ -47,7 +47,11 @@ import {
   comparePromptIds,
   compareRoundSize,
   ground,
+  compareBars,
+  kidPicture,
+  kidStretches,
   needsLining,
+  palette,
   routeLength,
   routePoints,
   snapDistance,
@@ -55,6 +59,7 @@ import {
   type CompareQuestion,
 } from "../../features/math/compare-round";
 import { mathRoundStorageKey, ownsStorageKey, storageKeys } from "../../lib/storage/storage-keys";
+import kidPictures from "../../features/math/kid-pictures.json";
 import { childRecordKeys } from "../../lib/storage/child-profiles";
 
 test("a 第一課 round counts 1–5 twice, 6–10 twice and an empty basket, then draws 4", () => {
@@ -566,4 +571,34 @@ test("a 第三課 round walks 排數字, 排在第幾個, 第幾個和幾個 and
   // A count is 兩個, a place 第二個.
   assert.equal(mathPrompts["group-2"], "從左邊數，點兩個。");
   assert.equal(mathPrompts["nth-2"], "從左邊數，點第二個。");
+});
+
+test("比高矮 has a watercolor child for every shirt colour, cut from the top of the hair to the soles", () => {
+  const shapes = Object.values(kidPictures);
+  assert.equal(shapes.length, palette.length);
+  for (const [name, { width, height }] of Object.entries(kidPictures)) {
+    assert.ok(existsSync(`public/course-art/kid-${name}.webp`), name);
+    // Standing children: taller than wide, so a height in the stage is the child's height.
+    assert.ok(height > width && width > 0, name);
+  }
+});
+
+test("比高矮's classmates share one scale, so heads match, and only bodies stretch a little", () => {
+  for (let run = 0; run < 2000; run++) {
+    const bars = compareBars("height", run % 2 === 0);
+    const [tall, short] = [...bars].sort((a, b) => b.size - a.size);
+    // 8–14% apart, like classmates.
+    assert.ok(short.size / tall.size >= 0.85 && short.size / tall.size <= 0.93);
+    // The girl with the tall bun sits out: her bun would muddle who is taller.
+    assert.ok(bars.every((bar) => palette[bar.color].kid !== "purple"));
+    const stretches = kidStretches(bars);
+    for (const stretch of stretches) assert.ok(stretch > 0.8 && stretch < 1.2, String(stretch));
+    // Drawn height over picture height after the stretch: the same for both, so heads match.
+    const scales = bars.map((bar, index) => {
+      const { height, body } = kidPicture(bar.color);
+      const drawn = height + (body[1] - body[0]) * height * (stretches[index] - 1);
+      return bar.size / drawn;
+    });
+    assert.ok(Math.abs(scales[0] - scales[1]) < 1e-9);
+  }
 });
