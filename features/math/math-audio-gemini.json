@@ -1,0 +1,47 @@
+{
+  "count": {
+    "version": 4,
+    "text": "數一數，有幾個？用筆寫出數字。",
+    "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、速度放慢、語氣親切，標點的地方自然停頓，句尾念完整。\n讀音照課本：「數一數」的數念ㄕㄨˇ、「數字」的數念ㄕㄨˋ。\n\n## Transcript:\n數一數，有幾個？用筆寫出數字。",
+    "duration": 5.23,
+    "voicedDuration": 4.66,
+    "createdAt": "2026-10-13",
+    "origin": "Gemini API"
+  },
+  "height-less": {
+    "version": 1,
+    "text": "哪一個小朋友比較矮？點一下。",
+    "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，從第一個字到最後一個字維持一樣的速度，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n讀音照課本：「哪」念ㄋㄚˇ。\n\n## Transcript:\n哪一個小朋友比較矮？點一下。",
+    "duration": 3.59,
+    "voicedDuration": 3.03,
+    "createdAt": "2026-10-14",
+    "origin": "Gemini API"
+  },
+  "height-more": {
+    "version": 1,
+    "text": "哪一個小朋友比較高？點一下。",
+    "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，從第一個字到最後一個字維持一樣的速度，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n讀音照課本：「哪」念ㄋㄚˇ。\n\n## Transcript:\n哪一個小朋友比較高？點一下。",
+    "duration": 3.73,
+    "voicedDuration": 3.13,
+    "createdAt": "2026-10-14",
+    "origin": "Gemini API"
+  },
+  "length-less": {
+    "version": 1,
+    "text": "哪一枝鉛筆比較短？點一下。",
+    "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、速度放慢、語氣親切，標點的地方自然停頓，句尾念完整。\n讀音照課本：「哪」念ㄋㄚˇ。\n\n## Transcript:\n哪一枝鉛筆比較短？點一下。",
+    "duration": 3.72,
+    "voicedDuration": 3.19,
+    "createdAt": "2026-10-13",
+    "origin": "Gemini API"
+  },
+  "length-more": {
+    "version": 1,
+    "text": "哪一枝鉛筆比較長？點一下。",
+    "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、速度放慢、語氣親切，標點的地方自然停頓，句尾念完整。\n讀音照課本：「哪」念ㄋㄚˇ、「長」念ㄔㄤˊ。\n\n## Transcript:\n哪一枝鉛筆比較長？點一下。",
+    "duration": 4.62,
+    "voicedDuration": 4.06,
+    "createdAt": "2026-10-13",
+    "origin": "Gemini API"
+  }
+}
