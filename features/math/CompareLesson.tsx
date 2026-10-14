@@ -9,7 +9,6 @@ import {
 import { Carrot, CheckCircle, HandPointing, Rabbit, XCircle } from "@phosphor-icons/react";
 import type { AppController } from "../usePracticeApp";
 import { isPalmContact } from "../../lib/ink/gesture";
-import kidPictures from "./kid-pictures.json";
 import { MathHeader, MathPrompt, MathResult } from "./MathChrome";
 import { mathPromptUrl, mathPrompts } from "./math-audio";
 import { taskKeys } from "../rewards/stamp-book";
@@ -29,6 +28,8 @@ import { SequenceStage, choiceState, type Feedback } from "./SequenceViews";
 import {
   answerOf,
   buildCompareRound,
+  kidPicture,
+  kidStretches,
   comparePromptIds,
   compareTopic,
   ground,
@@ -320,26 +321,45 @@ function Pencil({ color }: { color: string }) {
   );
 }
 
-/** The watercolor children (scripts/slice-kids.py), one per palette colour, in its order. */
-const kidNames = ["pink", "blue", "green", "yellow", "purple", "orange"] as const;
-const kidShape = (shade: number) => kidPictures[kidNames[shade % kidNames.length]];
+/** A child's drawn shape once its body grows or shrinks by `stretch`. */
+const kidShape = (shade: number, stretch: number) => {
+  const { width, height, body } = kidPicture(shade);
+  const [top, bottom] = body.map((at) => at * height);
+  return { width, height, top, bottom, total: top + (bottom - top) * stretch + (height - bottom) };
+};
 
 /**
- * A watercolor child in the shirt of the palette colour, cropped from the top of the hair to the
- * soles, so the picture's height is the child's height.
+ * A watercolor child in the shirt of the palette colour. The head and the shoes keep their
+ * size; only the part from below the chin to the socks grows or shrinks, the way classmates of
+ * different heights differ. Each part overlaps the next by a pixel, so no seam shows.
  */
-function Child({ shade }: { shade: number }) {
-  const name = kidNames[shade % kidNames.length];
-  const { width, height } = kidPictures[name];
-  return (
-    <img
-      className="compare-kid"
-      src={`course-art/kid-${name}.webp`}
+function Child({ shade, stretch }: { shade: number; stretch: number }) {
+  const { width, height, top, bottom, total } = kidShape(shade, stretch);
+  const src = `course-art/kid-${palette[shade].kid}.webp`;
+  const middle = (bottom - top) * stretch;
+  const part = (at: number, size: number, from: number, to: number) => (
+    <svg
+      x={0}
+      y={at}
       width={width}
-      height={height}
-      alt=""
-      draggable={false}
-    />
+      height={size}
+      viewBox={`0 ${from} ${width} ${to - from}`}
+      preserveAspectRatio="none"
+    >
+      <image href={src} width={width} height={height} />
+    </svg>
+  );
+  return (
+    <svg
+      className="compare-kid"
+      viewBox={`0 0 ${width} ${total}`}
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      {part(top + middle - 1, height - bottom + 1, bottom - 1, height)}
+      {part(top - 1, middle + 2, top - 1, bottom + 1)}
+      {part(0, top + 1, 0, top + 1)}
+    </svg>
   );
 }
 
@@ -438,6 +458,8 @@ function BarStage({
     }
   };
 
+  // 比高矮: both children at one scale, so their heads are the same size.
+  const stretches = length ? bars.map(() => 1) : kidStretches(bars);
   const rows = [30, 70];
   const slots = [32, 68];
   const hintIndex = lining && !touched && dragging === null ? offsets.findIndex((o) => o > 0) : -1;
@@ -503,7 +525,7 @@ function BarStage({
                     left: `${slots[index]}%`,
                     bottom: `${100 - ground + offsets[index]}%`,
                     height: `${bar.size}%`,
-                    aspectRatio: `${kidShape(bar.color).width} / ${kidShape(bar.color).height}`,
+                    aspectRatio: `${kidShape(bar.color, stretches[index]).width} / ${kidShape(bar.color, stretches[index]).total}`,
                   }
             }
             aria-label={length ? `${name}的鉛筆` : `穿${name}衣服的小朋友`}
@@ -514,7 +536,11 @@ function BarStage({
             onLostPointerCapture={end}
             onClick={() => click(index)}
           >
-            {length ? <Pencil color={color} /> : <Child shade={bar.color} />}
+            {length ? (
+              <Pencil color={color} />
+            ) : (
+              <Child shade={bar.color} stretch={stretches[index]} />
+            )}
           </button>
         );
       })}

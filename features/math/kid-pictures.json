@@ -1,26 +1,32 @@
 {
   "pink": {
     "width": 356,
-    "height": 591
+    "height": 591,
+    "body": [0.4, 0.865]
   },
   "blue": {
     "width": 266,
-    "height": 621
+    "height": 621,
+    "body": [0.39, 0.86]
   },
   "green": {
     "width": 262,
-    "height": 617
+    "height": 617,
+    "body": [0.39, 0.855]
   },
   "yellow": {
     "width": 290,
-    "height": 586
+    "height": 586,
+    "body": [0.39, 0.855]
   },
   "purple": {
     "width": 244,
-    "height": 649
+    "height": 649,
+    "body": [0.455, 0.875]
   },
   "orange": {
     "width": 278,
-    "height": 606
+    "height": 606,
+    "body": [0.41, 0.875]
   }
 }
