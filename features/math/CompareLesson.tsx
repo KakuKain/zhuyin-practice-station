@@ -36,6 +36,7 @@ import {
   type ShapeQuestion,
 } from "./shape-round";
 import { ShapeStage } from "./ShapeViews";
+import { newVariedRound } from "./math-variety";
 import {
   answerOf,
   buildCompareRound,
@@ -110,7 +111,7 @@ export function CompareLesson({ app, lesson }: { app: CompareApp; lesson: MathLe
   const buildRound = tapRounds[lesson.id] ?? buildCompareRound;
   const [round, setRound] = useState<{ id: number; questions: TapQuestion[] } | null>(() => ({
     id: Date.now(),
-    questions: buildRound(),
+    questions: newVariedRound(lesson.id, buildRound),
   }));
   const [index, setIndex] = useState(0);
   const [finished, setFinished] = useState<{ total: number; topics: string[] } | null>(null);
@@ -135,7 +136,7 @@ export function CompareLesson({ app, lesson }: { app: CompareApp; lesson: MathLe
     app.navigate("math-lesson");
   };
   const again = () => {
-    const questions = buildRound();
+    const questions = newVariedRound(lesson.id, buildRound);
     missed.current = new Set();
     setFinished(null);
     setIndex(0);

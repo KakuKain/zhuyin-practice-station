@@ -71,6 +71,7 @@ import {
   things,
   type PicturePart,
 } from "../../features/math/shape-round";
+import { mixOrder, roundTraits, variedRound } from "../../features/math/math-variety";
 import { mathRoundStorageKey, ownsStorageKey, storageKeys } from "../../lib/storage/storage-keys";
 import kidPictures from "../../features/math/kid-pictures.json";
 import { childRecordKeys } from "../../lib/storage/child-profiles";
@@ -134,7 +135,7 @@ test("a saved round survives a reload, and a damaged one is dropped", () => {
 });
 
 test("math records belong to each child and are included in device backup", () => {
-  for (const key of [storageKeys.mathRound, storageKeys.mathRecords]) {
+  for (const key of [storageKeys.mathRound, storageKeys.mathRecords, storageKeys.mathRecent]) {
     assert.ok(ownsStorageKey(key));
     assert.ok(ownsStorageKey(`${key}@k2`));
   }
@@ -276,7 +277,7 @@ test("a saved 加法 round keeps the circles in each number's 十格框, and 0�
   const add = fresh.questions.findIndex(
     (question) => question.kind === "add" && !question.parts.includes(0),
   );
-  assert.equal(add, 5);
+  assert.ok(add >= 0);
   const round = { ...fresh, ink: { [add]: [[{ x: 50, y: 50 }]] } };
   // Cells 0–9 are the first number's frame, 10–19 the second's.
   const cells = Array.from({ length: 20 }, () => [] as { x: number; y: number }[][]);
@@ -438,8 +439,15 @@ test("a 分與合 round reads 分合圖: 分一分 and 合一合 under 10, then 
       assert.equal(new Set(pictures).size, pictures.length, kinds.join());
     }
   }
-  assert.equal(newMathRound(4).questions[0].kind, "split");
-  assert.equal(newMathRound(1).questions[0].kind, "count");
+  // A new round asks the same kinds, in any order.
+  assert.deepEqual(
+    newMathRound(4)
+      .questions.map((question) => question.kind)
+      .sort(),
+    buildBondRound()
+      .map((question) => question.kind)
+      .sort(),
+  );
   // 和 reads ㄏㄢˋ beside the prompt, so Meijia is given the homophone 漢.
   assert.equal(mathPrompts["split-3-4"], "七可以分成三和幾？");
   assert.equal(mathPromptSpeech("split-3-4"), "七可以分成三漢幾？");
@@ -484,7 +492,7 @@ test("a 第七課 10以內的加法 round asks 合起來是多少, 0的加法, t
   assert.equal(mathPrompts["join-2-3"], "左邊有兩個，右邊有三個，合在一起有幾個？");
   assert.equal(mathPrompts["add-2-3"], "二加三等於多少？先畫圈圈，再寫答案。");
   assert.equal(mathPrompts["add-3-0"], "三加零等於多少？先畫圈圈，再寫答案。");
-  assert.equal(newMathRound(3).questions[0].kind, "join");
+  assert.ok(newMathRound(3).questions.every((question) => ["join", "add"].includes(question.kind)));
 });
 
 test("a saved 分與合 round keeps 分分看's two numbers, and needs both to count as answered", () => {
@@ -697,4 +705,58 @@ test("做造型's pictures keep 正方形 square and 長方形 long, inside the 
         assert.ok(part.x >= 0 && part.y >= 0 && part.x + part.w <= 100 && part.y + part.h <= 100);
       }
     }
+});
+
+test("a new round mixes the kinds of question and avoids the last round's numbers and pictures", () => {
+  // Numbers count with the kind of question they were in; pictures and colours count anywhere.
+  const traits = (question: object) => roundTraits([question as { kind: string }]).sort();
+  assert.deepEqual(traits({ kind: "count", target: 3, icon: "fish" }), ["count:3", "picture:fish"]);
+  // A question's numbers count together: 「7 分成 3 和幾」 is not 「7 分成 4 和幾」.
+  assert.deepEqual(traits({ kind: "split", target: 7, parts: [3, 4], icon: "fish" }), [
+    "picture:fish",
+    "split:7,3,4",
+  ]);
+  assert.deepEqual(traits({ kind: "build", target: "circle", picture: "cat" }), [
+    "picture:cat",
+    "picture:circle",
+  ]);
+  const builders: (() => { kind: string }[])[] = [
+    buildCountingRound,
+    buildCompareRound,
+    buildSequenceRound,
+    buildBondRound,
+    buildShapeRound,
+    buildAdditionRound,
+  ];
+  for (const build of builders) {
+    let plain = 0;
+    let varied = 0;
+    const firsts = new Set<string>();
+    for (let run = 0; run < 60; run++) {
+      const last = roundTraits(build());
+      const shared = (round: { kind: string }[]) =>
+        roundTraits(round).filter((trait) => last.includes(trait)).length;
+      plain += shared(build());
+      const round = variedRound(() => build(), last);
+      varied += shared(round);
+      firsts.add(round[0].kind);
+      // The same questions a round always asks, only in another order.
+      assert.deepEqual(
+        round.map((question) => question.kind).sort(),
+        build()
+          .map((question) => question.kind)
+          .sort(),
+      );
+    }
+    // 比長短 uses most of its six colours every round, so it can only share fewer.
+    const most = build === buildCompareRound ? 0.9 : 0.7;
+    assert.ok(varied < plain * most, `${build.name}: ${varied} shared, ${plain} at random`);
+    assert.ok(firsts.size > 1, `${build.name} always starts the same way`);
+  }
+  // 「點第三個」 uses the number of the 「點三個」 before it, so it always stays right after.
+  for (let run = 0; run < 200; run++) {
+    const round = mixOrder(buildSequenceRound());
+    const group = round.findIndex((question) => question.kind === "group");
+    assert.equal(round[group + 1].kind, "nth");
+  }
 });

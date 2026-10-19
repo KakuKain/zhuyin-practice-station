@@ -1,6 +1,7 @@
 import type { InkStroke } from "../types";
 import { childKey } from "../../lib/storage/child-profiles";
 import { mathRoundStorageKey, storageKeys } from "../../lib/storage/storage-keys";
+import { newVariedRound } from "./math-variety";
 
 /** Things a child counts: each picture is one whole object, never a pair or a bunch. */
 export const countIcons = [
@@ -202,7 +203,7 @@ export function newMathRound(lessonId: number, now = Date.now()): MathRound {
   return {
     version: 1,
     lessonId,
-    questions: (roundBuilders[lessonId] ?? buildCountingRound)(),
+    questions: newVariedRound(lessonId, roundBuilders[lessonId] ?? buildCountingRound),
     ink: {},
     work: {},
     index: 0,
