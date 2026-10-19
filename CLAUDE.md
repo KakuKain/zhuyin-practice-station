@@ -99,7 +99,7 @@ There is one build: a static Vite SPA. `index.html` → `app/main.tsx` → `crea
     - A lesson's `id` is permanent: saved rounds, records and tasks name it. The child sees the list position and `number`; the course card's station shows the position, not the id.
     - Id 3 has always been 加法, now 第七課 10以內的加法, so 第三課 排順序、比多少 is id 7. Other lessons use the id of their place (第四課 分與合 is 4, and so on); 下學期 is 10–18.
     - `practice: "tap"` lessons (第二、三、五課) run in `CompareLesson`; `"write"` lessons (第一、四、七課) in `WritingLesson`.
-    - Each built lesson's `parts` are the textbook's sections, which its round practises in order and the header names (`sectionOf`).
+    - Each built lesson's `parts` are the textbook's sections, which the header names (`sectionOf`). The builders list a round in textbook order; `newVariedRound` (`math-variety.ts`) then mixes the order and, of 400 candidate rounds, keeps the one sharing the fewest numbers and pictures with that lesson's last round (`kid-math-recent-v1`, per child). The parent asked for both. A question that refers to the one before (「點第三個」 after 「點三個」) stays right after it.
     - 第六課 30以內的數 will need 比大小 with numbers up to 30; the user moved 比大小 there from 第三課.
   - Math is drawn like 國語 so the two subjects feel like one site:
     - `MathCourseList` uses the 注音 journey cards, with each lesson's watercolor picture (`MathLesson.art`).
@@ -107,7 +107,8 @@ There is one build: a static Vite SPA. `index.html` → `app/main.tsx` → `crea
     - `startMathPractice` records `mathStart` and opens the full-screen `math` view; the round starts at once and reads its first question. 返回 and the back gesture go to the lesson page.
     - The practice screens use 聽寫's watercolor paper and header (`MathHeader`), the prompt sits on a washed card, and a round ends on `MathResult`, drawn like 辨音's finished card.
     - Every word on the cards and the lesson page is 國字注音 from `mathWordReadings` in `math-lessons.ts`; a unit test checks it against the font.
-  - 第一課 10以內的數 asks 9, all spoken aloud: 數一數 twice for 認識 1～5 and twice for 6～10 (tap pictures to mark them, write the number), 認識 0 with an empty basket, then 4 畫圈圈 for 表示數量.
+  - 第一課 10以內的數 asks 9, all spoken aloud: 數一數 twice for 認識 1～5 and twice for 6～10 (tap pictures to mark them, write the number), 認識 0, then 4 畫圈圈 for 表示數量.
+    - 認識 0 shows the pictures' place empty, with a dashed edge, and the prompt names what to count with its measure word (「這裡有幾隻小鳥？」, `zero-<icon>`). A basket drawn there was counted as one thing.
   - Circles are always drawn in a 十格框 (5 × 2 cells, one circle each, `DrawFrame`/`TenFrame` in `MathInk.tsx`):
     - Every cell is its own square canvas, because a non-square canvas would stretch the strokes. One `useInkCanvas` serves them all, so only one pen draws at a time.
     - Filled cells are numbered in reading order. Each frame has its own tools:
@@ -118,7 +119,7 @@ There is one build: a static Vite SPA. `index.html` → `app/main.tsx` → `crea
       - Too few is not shown to the child; the parent chose that. The parent's check shows extra circles in red boxes and missing ones as red dashed circles in the next empty cells, and says 多畫/少畫 N 格.
     - The cells are saved in `MathRound.work`. Free drawings saved before the frame are dropped, and old ink still shows on the parent's check.
   - 第四課 分與合 (id 4) reads a 分合圖 (`MathBond.tsx`), the total on top joined by two lines to its parts.
-    - A round has 8 questions: 3 分一分 (the total, 3–9, and one part given; write the other), 2 合一合 (both parts, up to 5, given; write the total on top), then 10的分與合: 分一分, 合一合 and 分分看 (write any two numbers that make 10).
+    - A round has 8 questions: 3 分一分 (the total, 3–9, and one part given; write the other; one is told as a story, 拿走了: the pictures show, then the taken ones slide into the hand's tray, `TakePictures`, and 「有五個，拿走了兩個，還剩幾個？」), 2 合一合 (both parts, up to 5, given; write the total on top), then 10的分與合: 分一分, 合一合 and 分分看 (write any two numbers that make 10).
     - Given numbers sit on washed cards. Each number to write is a square with its own ink tools, placed away from the lines: above the total, below a part.
     - One answer is kept in the question's ink. 分分看's two numbers are its two `work` cells, and it counts as answered only with both.
     - Markable pictures beside the 分合圖 help the child split or join.
@@ -195,7 +196,7 @@ Layout: `features/<feature>/` holds feature UI and logic, `components/` holds sh
 - All user data lives in browser `localStorage` behind `lib/storage/persistent-store.ts` (an external store read with `useSyncExternalStore`, not mirrored into React state). Older versions (for example `practice-state` v1–v3) are migrated forward on read, and their original keys are preserved.
 - **Every key is listed in `lib/storage/storage-keys.ts`**, the single registry that device backup (`ownsStorageKey`) is derived from. A new key must be added there, or backup will silently skip it; a unit test checks the known keys.
 - **Children** (`lib/storage/child-profiles.ts`, key `zhuyin-children-v1`; managed in 更多 → 孩子) have separate records:
-  - Child-scoped keys (`childScopedKeys`) are practice state, fill favorites, the listening round, the free board, the math rounds and records, the stamp book (`kid-stamps-v1`) and fill drafts. Everything else (materials, listening settings, recordings, 集章卡 settings `kid-reward-settings-v1`, the floating button's place `kid-reward-dock-v1`) is shared.
+  - Child-scoped keys (`childScopedKeys`) are practice state, fill favorites, the listening round, the free board, the math rounds, records and last rounds' numbers and pictures (`kid-math-recent-v1`), the stamp book (`kid-stamps-v1`) and fill drafts. Everything else (materials, listening settings, recordings, 集章卡 settings `kid-reward-settings-v1`, the floating button's place `kid-reward-dock-v1`) is shared.
   - Per-lesson keys (fill drafts, math rounds after lesson 1) are recognized by `isLessonRecordKey`. Both backup and removing a child use it.
   - Which material is open belongs to each child: `ChildProfile.materialId`, applied by `withChildMaterial` in `useMaterials`. Choosing a material records it on the child; only the first child's choice also moves the family default that children without a choice follow.
   - The first child, id `main`, uses the original keys, so existing records need no migration and only `main` reads the pre-v4 practice keys. Every other child uses `<key>@<id>`.
