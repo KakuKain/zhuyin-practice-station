@@ -100,18 +100,6 @@
       ]
     },
     {
-      "text": "ㄧㄤ",
-      "prompt": "央",
-      "tone": "第一聲",
-      "path": "/listening-audio/gemini/rhymes/3127-3124.m4a",
-      "duration": 1.72,
-      "voicedDuration": 1.12,
-      "sourceRange": [
-        22.29,
-        24.01
-      ]
-    },
-    {
       "text": "ㄧㄥ",
       "prompt": "英",
       "tone": "第一聲",
@@ -322,6 +310,21 @@
       "path": "/listening-audio/gemini/lessons/09.m4a",
       "duration": 32.24,
       "sourceSha256": "09e0890189666ab02121d040f068bb7f1b74953b005c23c53dfbc533e4c1419e"
+    }
+  ],
+  "retired": [
+    {
+      "text": "ㄧㄤ",
+      "prompt": "央",
+      "tone": "第一聲",
+      "path": "/listening-audio/gemini/rhymes/3127-3124.m4a",
+      "duration": 1.72,
+      "voicedDuration": 1.12,
+      "sourceRange": [
+        22.29,
+        24.01
+      ],
+      "retired": "2026-10-19：家長聽起來像 ㄧㄤˊ，改播教育部《國語辭典簡編本》「央」原始錄音（listening-audio/moe-examples/6160.mp3），播到 0.7 秒、部首旁白之前就停。"
     }
   ]
 }
