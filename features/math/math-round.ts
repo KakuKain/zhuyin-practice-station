@@ -1,6 +1,7 @@
 import type { InkStroke } from "../types";
 import { childKey } from "../../lib/storage/child-profiles";
 import { mathRoundStorageKey, storageKeys } from "../../lib/storage/storage-keys";
+import { newVariedRound } from "./math-variety";
 
 /** Things a child counts: each picture is one whole object, never a pair or a bunch. */
 export const countIcons = [
@@ -31,8 +32,11 @@ export type MathQuestion =
   | { kind: "join"; target: number; parts: [number, number]; icon: JoinIcon }
   /** 畫圈圈算加法：draw circles for each number, then write the sum. */
   | { kind: "add"; target: number; parts: [number, number] }
-  /** 分一分：the total and its first part are given in a 分合圖; write the other part. */
-  | { kind: "split"; target: number; parts: [number, number]; icon: CountIcon }
+  /**
+   * 分一分：the total and its first part are given in a 分合圖; write the other part. As a story
+   * (拿走了), the first part is taken away and the other is what is left.
+   */
+  | { kind: "split"; target: number; parts: [number, number]; icon: CountIcon; story?: true }
   /** 合一合：both parts are given in a 分合圖; write the total on top. */
   | { kind: "combine"; target: number; parts: [number, number]; icon: JoinIcon }
   /** 分分看：only the total is given; write any two numbers that make it. */
@@ -127,7 +131,8 @@ function pickPairs(
 
 /**
  * 第四課 分與合 (lesson id 4), read from a 分合圖 in the textbook's order: 3 分一分 (totals 3 to
- * 9), 2 合一合 (up to 5 on each side), then 10的分與合: 分一分, 合一合 and 分分看 for 10.
+ * 9; one of them told as a story, 拿走了), 2 合一合 (up to 5 on each side), then 10的分與合:
+ * 分一分, 合一合 and 分分看 for 10.
  */
 export function buildBondRound(random = Math.random): MathQuestion[] {
   const pictures = shuffle(countIcons, random);
@@ -154,6 +159,7 @@ export function buildBondRound(random = Math.random): MathQuestion[] {
       target: parts[0] + parts[1],
       parts,
       icon: pictures[index],
+      ...(index === 0 && { story: true as const }),
     })),
     ...[...combines, tenJoined].map((parts, index) => ({
       kind: "combine" as const,
@@ -202,7 +208,7 @@ export function newMathRound(lessonId: number, now = Date.now()): MathRound {
   return {
     version: 1,
     lessonId,
-    questions: (roundBuilders[lessonId] ?? buildCountingRound)(),
+    questions: newVariedRound(lessonId, roundBuilders[lessonId] ?? buildCountingRound),
     ink: {},
     work: {},
     index: 0,
@@ -247,7 +253,13 @@ function validQuestion(raw: unknown): MathQuestion | null {
   if (item.kind === "join" && parts && joinIcons.includes(item.icon as JoinIcon))
     return { kind: "join", target, parts, icon: item.icon as JoinIcon };
   if (item.kind === "split" && parts && countIcons.includes(item.icon as CountIcon))
-    return { kind: "split", target, parts, icon: item.icon as CountIcon };
+    return {
+      kind: "split",
+      target,
+      parts,
+      icon: item.icon as CountIcon,
+      ...(item.story === true && target < maxCount && { story: true as const }),
+    };
   if (item.kind === "combine" && parts && joinIcons.includes(item.icon as JoinIcon))
     return { kind: "combine", target, parts, icon: item.icon as JoinIcon };
   return null;

@@ -268,7 +268,8 @@
   background: #fffefa;
 }
 .math-pictures button,
-.math-join-group button {
+.math-join-group button,
+.math-take-left button {
   position: relative;
   display: grid;
   place-items: center;
@@ -278,7 +279,8 @@
   background: #fbfdff;
 }
 .math-pictures button.is-marked,
-.math-join-group button.is-marked {
+.math-join-group button.is-marked,
+.math-take-left button.is-marked {
   border-color: #73b98a;
   background: #eef9f1;
 }
@@ -294,16 +296,16 @@
   background: #2f9a55;
   color: #fff;
 }
-/* 認識 0: an empty basket. */
+/* 認識 0: the place the pictures would be, empty, with a dashed edge. */
 .math-pictures.is-empty {
   grid-template-columns: minmax(0, 1fr);
-  place-items: center;
   min-height: 160px;
+  border-style: dashed;
+  border-color: #b9cdd6;
 }
 .math-pictures.is-empty.is-small {
-  min-height: 0;
+  min-height: 40px;
   width: 64px;
-  justify-content: center;
 }
 .math-pictures.is-small {
   display: flex;
@@ -846,6 +848,109 @@
 }
 .math-join-pictures.is-small .math-sign {
   font-size: 18px;
+}
+
+/*
+ * 拿走了: the pictures, then the ones taken away slide into the hand's tray while their places
+ * fade, so the total splits into what was taken and what is left.
+ */
+.math-take {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+.math-take-left,
+.math-take-taken {
+  --picture: 48px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  max-width: calc(var(--picture) * 3 + 36px);
+  padding: 10px;
+  border: 2px dashed #b9d3e6;
+  border-radius: 20px;
+  background: #fff;
+}
+.math-take-left > *,
+.math-take-taken > span {
+  display: grid;
+  place-items: center;
+  width: var(--picture);
+  aspect-ratio: 1;
+}
+.math-take-left svg,
+.math-take-taken svg {
+  width: 80%;
+  height: 80%;
+}
+.math-take-tray {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+}
+.math-take-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #c0322a;
+  font-size: clamp(20px, 2.8vw, 26px);
+  font-weight: 800;
+}
+.math-take-taken {
+  min-width: calc(var(--picture) + 24px);
+  border-color: #f0b6ae;
+  background: #fff6f4;
+}
+.math-take-gone {
+  animation: math-take-out 0.6s ease-in 1.2s forwards;
+}
+.math-take-label,
+.math-take-taken > span {
+  animation: math-take-in 0.6s ease-out 1.3s backwards;
+}
+@keyframes math-take-out {
+  to {
+    opacity: 0;
+    transform: translateX(24px) scale(0.6);
+    visibility: hidden;
+  }
+}
+@keyframes math-take-in {
+  from {
+    opacity: 0;
+    transform: translateX(-24px) scale(0.6);
+  }
+}
+@media (max-width: 420px) {
+  .math-take-left,
+  .math-take-taken {
+    --picture: 40px;
+  }
+}
+.math-take.is-small {
+  gap: 4px;
+}
+.math-take.is-small .math-take-left,
+.math-take.is-small .math-take-taken {
+  --picture: 20px;
+  gap: 2px;
+  max-width: 76px;
+  padding: 4px;
+  border-width: 1px;
+  border-radius: 10px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .math-take-gone {
+    visibility: hidden;
+    animation: none;
+  }
+  .math-take-label,
+  .math-take-taken > span {
+    animation: none;
+  }
 }
 
 /*

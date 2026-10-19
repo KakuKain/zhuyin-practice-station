@@ -58,11 +58,25 @@ import {
   startLine,
   type CompareQuestion,
 } from "../../features/math/compare-round";
+import {
+  buildShapeRound,
+  countIn,
+  flatNames,
+  pictures,
+  shapeAnswer,
+  shapeInAnyOrder,
+  shapePromptId,
+  shapeRoundSize,
+  solidNames,
+  things,
+  type PicturePart,
+} from "../../features/math/shape-round";
+import { mixOrder, roundTraits, variedRound } from "../../features/math/math-variety";
 import { mathRoundStorageKey, ownsStorageKey, storageKeys } from "../../lib/storage/storage-keys";
 import kidPictures from "../../features/math/kid-pictures.json";
 import { childRecordKeys } from "../../lib/storage/child-profiles";
 
-test("a 第一課 round counts 1–5 twice, 6–10 twice and an empty basket, then draws 4", () => {
+test("a 第一課 round counts 1–5 twice, 6–10 twice and an empty place, then draws 4", () => {
   for (let run = 0; run < 50; run++) {
     const round = buildCountingRound();
     const count = round.filter((question) => question.kind === "count");
@@ -121,7 +135,7 @@ test("a saved round survives a reload, and a damaged one is dropped", () => {
 });
 
 test("math records belong to each child and are included in device backup", () => {
-  for (const key of [storageKeys.mathRound, storageKeys.mathRecords]) {
+  for (const key of [storageKeys.mathRound, storageKeys.mathRecords, storageKeys.mathRecent]) {
     assert.ok(ownsStorageKey(key));
     assert.ok(ownsStorageKey(`${key}@k2`));
   }
@@ -263,7 +277,7 @@ test("a saved 加法 round keeps the circles in each number's 十格框, and 0�
   const add = fresh.questions.findIndex(
     (question) => question.kind === "add" && !question.parts.includes(0),
   );
-  assert.equal(add, 5);
+  assert.ok(add >= 0);
   const round = { ...fresh, ink: { [add]: [[{ x: 50, y: 50 }]] } };
   // Cells 0–9 are the first number's frame, 10–19 the second's.
   const cells = Array.from({ length: 20 }, () => [] as { x: number; y: number }[][]);
@@ -340,7 +354,10 @@ test("the math course cards, lesson pages and practice screens show every word i
     ...mathCourse.flatMap((lesson) => [lesson.number, lesson.title]),
     ...mathLessons.flatMap((lesson) => lesson.parts),
     ...["這一課", "開始", "開始練習", "從頭開始", "繼續", "繼續練習", "第", "題", "多畫了", "個"],
-    ...["一樣多", "左邊", "右邊"],
+    ...["一樣多", "左邊", "右邊", "拿走了"],
+    // 第五課's answer cards.
+    ...Object.values(solidNames),
+    ...Object.values(flatNames),
   ];
   for (const text of shown) {
     assert.ok(mathWordReadings[text], `${text} needs its readings`);
@@ -363,6 +380,7 @@ test("the math course cards, lesson pages and practice screens show every word i
     compareRoundSize,
     sequenceRoundSize,
     bondRoundSize,
+    shapeRoundSize,
     additionRoundSize,
   ].map((size) =>
     typeof size === "number" ? size : Object.values(size).reduce((sum, n) => sum + n, 0),
@@ -413,6 +431,10 @@ test("a 分與合 round reads 分合圖: 分一分 and 合一合 under 10, then 
       assert.ok(mathPrompts[id] && mathPromptReadings[id], id);
       assert.ok(existsSync(`public/${mathPromptUrl(id).split("?")[0]}`), id);
     }
+    // One 分一分 under 10 is told as a story, 拿走了: the first part is taken away.
+    const stories = round.filter((question) => question.kind === "split" && question.story);
+    assert.equal(stories.length, 1);
+    assert.ok(stories[0].target < 10);
     // Each 分一分 (and 分分看) has its own pictures, and so does each 合一合.
     for (const kinds of [["split", "ways"], ["combine"]]) {
       const pictures = round.flatMap((question) =>
@@ -421,8 +443,16 @@ test("a 分與合 round reads 分合圖: 分一分 and 合一合 under 10, then 
       assert.equal(new Set(pictures).size, pictures.length, kinds.join());
     }
   }
-  assert.equal(newMathRound(4).questions[0].kind, "split");
-  assert.equal(newMathRound(1).questions[0].kind, "count");
+  // A new round asks the same kinds, in any order.
+  assert.deepEqual(
+    newMathRound(4)
+      .questions.map((question) => question.kind)
+      .sort(),
+    buildBondRound()
+      .map((question) => question.kind)
+      .sort(),
+  );
+  assert.equal(mathPrompts["take-2-3"], "有五個，拿走了兩個，還剩幾個？");
   // 和 reads ㄏㄢˋ beside the prompt, so Meijia is given the homophone 漢.
   assert.equal(mathPrompts["split-3-4"], "七可以分成三和幾？");
   assert.equal(mathPromptSpeech("split-3-4"), "七可以分成三漢幾？");
@@ -467,11 +497,21 @@ test("a 第七課 10以內的加法 round asks 合起來是多少, 0的加法, t
   assert.equal(mathPrompts["join-2-3"], "左邊有兩個，右邊有三個，合在一起有幾個？");
   assert.equal(mathPrompts["add-2-3"], "二加三等於多少？先畫圈圈，再寫答案。");
   assert.equal(mathPrompts["add-3-0"], "三加零等於多少？先畫圈圈，再寫答案。");
-  assert.equal(newMathRound(3).questions[0].kind, "join");
+  assert.ok(newMathRound(3).questions.every((question) => ["join", "add"].includes(question.kind)));
 });
 
 test("a saved 分與合 round keeps 分分看's two numbers, and needs both to count as answered", () => {
   const round = newMathRound(4);
+  // A reload keeps which 分一分 is told as 拿走了; only totals under 10 are.
+  assert.deepEqual(
+    validateMathRound(JSON.parse(JSON.stringify(round)))!.questions,
+    round.questions,
+  );
+  const [ten] = validateMathRound({
+    ...round,
+    questions: [{ kind: "split", target: 10, parts: [3, 7], icon: "fish", story: true }],
+  })!.questions;
+  assert.ok(!("story" in ten));
   const ways = round.questions.findIndex((question) => question.kind === "ways");
   const stroke = [[{ x: 10, y: 10 }]];
   const both = validateMathRound(
@@ -600,5 +640,138 @@ test("比高矮's classmates share one scale, so heads match, and only bodies st
       return bar.size / drawn;
     });
     assert.ok(Math.abs(scales[0] - scales[1]) < 1e-9);
+  }
+});
+
+test("a 第五課 round walks 堆疊與分類, 認識平面圖形 and 做造型, each answer the right tap", () => {
+  for (let run = 0; run < 300; run++) {
+    const round = buildShapeRound();
+    assert.equal(round.length, shapeRoundSize);
+    assert.deepEqual(
+      round.map((question) => question.kind),
+      ["classify", "classify", "stack", "roll", "trace", "trace", "find", "build", "build"],
+    );
+    for (const question of round) {
+      const answer = shapeAnswer(question);
+      const id = shapePromptId(question);
+      assert.ok(mathPrompts[id] && mathPromptReadings[id], id);
+      assert.ok(existsSync(`public/${mathPromptUrl(id).split("?")[0]}`), id);
+      if (question.kind === "find") {
+        // Two or three of the six, tapped in any order; every piece a different colour.
+        assert.equal(question.pieces.length, 6);
+        assert.ok(answer.length >= 2 && answer.length <= 3);
+        for (const [index, piece] of question.pieces.entries())
+          assert.equal(answer.includes(index), piece.flat === question.target);
+        assert.equal(new Set(question.pieces.map((piece) => piece.color)).size, 6);
+        assert.ok(shapeInAnyOrder(question));
+        continue;
+      }
+      assert.equal(answer.length, 1);
+      assert.ok(!shapeInAnyOrder(question));
+      const chosen = question.choices[answer[0]];
+      if (question.kind === "classify") assert.equal(chosen, things[question.thing].solid);
+      else if (question.kind === "stack") assert.equal(chosen, "ball");
+      else if (question.kind === "roll") assert.equal(chosen, "box");
+      else if (question.kind === "trace") {
+        const thing = things[question.thing];
+        assert.ok("face" in thing);
+        assert.equal(chosen, thing.face);
+      } else {
+        // 做造型 counts a shape the picture uses at least twice, among four numbers.
+        const count = countIn(question.picture, question.target);
+        assert.ok(count >= 2);
+        assert.equal(chosen, count);
+        assert.equal(new Set(question.choices).size, 4);
+        assert.deepEqual(
+          question.choices,
+          [...question.choices].sort((a, b) => a - b),
+        );
+      }
+    }
+    const [first, second, , , box, can, , picture, other] = round;
+    // 分類 asks about two different kinds; 描下來 a box, then a can; two different pictures.
+    assert.ok(first.kind === "classify" && second.kind === "classify");
+    assert.notEqual(things[first.thing].solid, things[second.thing].solid);
+    assert.ok(box.kind === "trace" && things[box.thing].solid === "box");
+    assert.ok(can.kind === "trace" && things[can.thing].solid === "can");
+    assert.ok(picture.kind === "build" && other.kind === "build");
+    assert.notEqual(picture.picture, other.picture);
+  }
+  assert.equal(mathPrompts["find-triangle"], "把所有的三角形都點出來。");
+  assert.equal(mathPrompts["build-circle"], "這個造型用了幾個圓形？點一下。");
+});
+
+test("做造型's pictures keep 正方形 square and 長方形 long, inside the picture", () => {
+  for (const [name, { parts }] of Object.entries(pictures))
+    for (const part of parts as readonly PicturePart[]) {
+      if (part.flat === "triangle") {
+        assert.equal(part.points.length, 3);
+        assert.ok(
+          part.points.flat().every((value) => value >= 0 && value <= 100),
+          name,
+        );
+      } else if (part.flat === "circle") {
+        assert.ok(part.cx - part.r >= 0 && part.cx + part.r <= 100, name);
+        assert.ok(part.cy - part.r >= 0 && part.cy + part.r <= 100, name);
+      } else {
+        const [short, long] = [part.w, part.h].sort((a, b) => a - b);
+        if (part.flat === "square") assert.equal(part.w, part.h, name);
+        else assert.ok(long >= 1.5 * short, `${name}: a 長方形 must not look square`);
+        assert.ok(part.x >= 0 && part.y >= 0 && part.x + part.w <= 100 && part.y + part.h <= 100);
+      }
+    }
+});
+
+test("a new round mixes the kinds of question and avoids the last round's numbers and pictures", () => {
+  // Numbers count with the kind of question they were in; pictures and colours count anywhere.
+  const traits = (question: object) => roundTraits([question as { kind: string }]).sort();
+  assert.deepEqual(traits({ kind: "count", target: 3, icon: "fish" }), ["count:3", "picture:fish"]);
+  // A question's numbers count together: 「7 分成 3 和幾」 is not 「7 分成 4 和幾」.
+  assert.deepEqual(traits({ kind: "split", target: 7, parts: [3, 4], icon: "fish" }), [
+    "picture:fish",
+    "split:7,3,4",
+  ]);
+  assert.deepEqual(traits({ kind: "build", target: "circle", picture: "cat" }), [
+    "picture:cat",
+    "picture:circle",
+  ]);
+  const builders: (() => { kind: string }[])[] = [
+    buildCountingRound,
+    buildCompareRound,
+    buildSequenceRound,
+    buildBondRound,
+    buildShapeRound,
+    buildAdditionRound,
+  ];
+  for (const build of builders) {
+    let plain = 0;
+    let varied = 0;
+    const firsts = new Set<string>();
+    for (let run = 0; run < 60; run++) {
+      const last = roundTraits(build());
+      const shared = (round: { kind: string }[]) =>
+        roundTraits(round).filter((trait) => last.includes(trait)).length;
+      plain += shared(build());
+      const round = variedRound(() => build(), last);
+      varied += shared(round);
+      firsts.add(round[0].kind);
+      // The same questions a round always asks, only in another order.
+      assert.deepEqual(
+        round.map((question) => question.kind).sort(),
+        build()
+          .map((question) => question.kind)
+          .sort(),
+      );
+    }
+    // 比長短 uses most of its six colours every round, so it can only share fewer.
+    const most = build === buildCompareRound ? 0.9 : 0.7;
+    assert.ok(varied < plain * most, `${build.name}: ${varied} shared, ${plain} at random`);
+    assert.ok(firsts.size > 1, `${build.name} always starts the same way`);
+  }
+  // 「點第三個」 uses the number of the 「點三個」 before it, so it always stays right after.
+  for (let run = 0; run < 200; run++) {
+    const round = mixOrder(buildSequenceRound());
+    const group = round.findIndex((question) => question.kind === "group");
+    assert.equal(round[group + 1].kind, "nth");
   }
 });

@@ -25,6 +25,37 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
+type SavedQuestion = { kind: string; target: number; parts?: number[]; story?: boolean };
+
+/** A written lesson's saved round: its questions, in the order this round asks them. */
+async function savedQuestions(page: Page, key: string): Promise<SavedQuestion[]> {
+  await expect.poll(() => page.evaluate((name) => localStorage.getItem(name), key)).not.toBeNull();
+  return page.evaluate((name) => JSON.parse(localStorage.getItem(name)!).questions, key);
+}
+
+/** Steps with 上一題 and 下一題 to question `index` (from 0): each round mixes the order. */
+async function goToQuestion(page: Page, index: number) {
+  const header = page.locator(".math-header");
+  for (;;) {
+    const at = Number(/第 (\d+) 題/.exec((await header.textContent()) ?? "")?.[1]) - 1;
+    if (at === index) return;
+    const forward = at < index;
+    await page.getByRole("button", { name: forward ? "下一題" : "上一題", exact: true }).click();
+    await expect(header).toContainText(`第 ${forward ? at + 2 : at} 題`);
+  }
+}
+
+/** The instruction now spoken, once 「答對了！」 or 「再想想看。」 has given way to it. */
+async function prompt(page: Page) {
+  const audio = page.locator("audio");
+  await expect(audio).not.toHaveAttribute("data-clip-text", /^(答對了！|再想想看。)$/);
+  return (await audio.getAttribute("data-clip-text")) ?? "";
+}
+
+/** Which kind of question an instruction asks, by the patterns a lesson's questions say. */
+const kindOf = (text: string, kinds: Record<string, RegExp>) =>
+  Object.entries(kinds).find(([, pattern]) => pattern.test(text))?.[0];
+
 test("第一課 10以內的數 reads each question aloud, keeps the round and ends with the parent's check", async ({
   page,
 }) => {
@@ -34,11 +65,20 @@ test("第一課 10以內的數 reads each question aloud, keeps the round and en
   await page.getByRole("button", { name: "數學", exact: true }).click();
   await page.getByRole("button", { name: /數學第一課/ }).click();
   await page.getByRole("button", { name: "開始練習", exact: true }).click();
+  const header = page.locator(".math-header");
+  const audio = page.locator("audio");
+  await expect(header).toContainText("第 1 題 / 9");
 
-  // 認識 1～5: the question is spoken, pictures can be marked, the number is written.
-  await expect(page.locator(".math-header")).toContainText("認識 1～5");
-  await expect(page.locator(".math-header")).toContainText("第 1 題 / 9");
-  await expect(page.locator("audio")).toHaveAttribute("src", /math-audio\/count\.m4a/);
+  // The kinds of question come in another order each round; the saved round says where.
+  const questions = await savedQuestions(page, "kid-math-round-v1");
+  const count = questions.findIndex((question) => question.kind === "count" && question.target);
+  const zero = questions.findIndex((question) => question.kind === "count" && !question.target);
+  const draw = questions.findIndex((question) => question.kind === "draw");
+
+  // 認識 1～5 or 6～10: the question is spoken, pictures can be marked, the number is written.
+  await goToQuestion(page, count);
+  await expect(header).toContainText(questions[count].target <= 5 ? "認識 1～5" : "認識 6～10");
+  await expect(audio).toHaveAttribute("data-clip-text", "數一數，有幾個？用筆寫出數字。");
   const picture = page.locator(".math-pictures button").first();
   await picture.click();
   await expect(picture).toHaveAttribute("aria-pressed", "true");
@@ -47,18 +87,17 @@ test("第一課 10以內的數 reads each question aloud, keeps the round and en
     [70, 25],
     [45, 80],
   ]);
-  for (let i = 0; i < 4; i++)
-    await page.getByRole("button", { name: "下一題", exact: true }).click();
 
-  // 認識 0: an empty basket.
-  await expect(page.locator(".math-header")).toContainText("認識 0");
-  await expect(page.getByRole("img", { name: "空的籃子，裡面沒有東西" })).toBeVisible();
-  await page.getByRole("button", { name: "下一題", exact: true }).click();
+  // 認識 0: the place the pictures would be, empty; the prompt names what to count.
+  await goToQuestion(page, zero);
+  await expect(header).toContainText("認識 0");
+  await expect(page.getByRole("img", { name: /^這裡沒有/ })).toBeVisible();
+  await expect(audio).toHaveAttribute("data-clip-text", /^這裡有幾.+？用筆寫出數字。$/);
 
   // 表示數量: one circle in each cell of a 十格框; filled cells are numbered in reading order.
-  await expect(page.locator(".math-header")).toContainText("表示數量");
-  await expect(page.locator(".math-header")).toContainText("第 6 題 / 9");
-  await expect(page.locator("audio")).toHaveAttribute("src", /math-audio\/draw-\d+\.m4a/);
+  await goToQuestion(page, draw);
+  await expect(header).toContainText("表示數量");
+  await expect(audio).toHaveAttribute("data-clip-text", /^畫出.+個圈圈。$/);
   const cells = page.locator(".math-draw .math-frame canvas");
   await expect(cells).toHaveCount(10);
   // Drawn in the second row first, then the first row: numbered by place, not by time.
@@ -74,21 +113,21 @@ test("第一課 10以內的數 reads each question aloud, keeps the round and en
   await page.reload();
   await page.getByRole("button", { name: /數學第一課/ }).click();
   await page.getByRole("button", { name: "繼續上次的練習" }).click();
-  await expect(page.locator(".math-header")).toContainText("第 6 題 / 9");
+  await expect(header).toContainText(`第 ${draw + 1} 題 / 9`);
   await expect(page.locator(".math-frame-number")).toHaveCount(2);
 
-  for (let i = 0; i < 3; i++)
-    await page.getByRole("button", { name: "下一題", exact: true }).click();
+  await goToQuestion(page, 8);
   await page.getByRole("button", { name: "寫完了，請家長檢查" }).click();
   const cards = page.locator(".math-check-card");
   await expect(cards).toHaveCount(9);
+  const toggle = (index: number) => cards.nth(index).locator(".math-check-toggle");
   // Answered questions start unmarked; unanswered ones start as 需要補強.
-  await expect(cards.nth(0).locator(".math-check-toggle")).toHaveAttribute("aria-pressed", "false");
-  await expect(cards.nth(1).locator(".math-check-toggle")).toHaveAttribute("aria-pressed", "true");
-  await expect(cards.nth(4)).toContainText("認識 0");
-  await expect(cards.nth(5).locator(".math-check-toggle")).toHaveAttribute("aria-pressed", "false");
-  await expect(cards.nth(5)).toContainText("畫了 2 格");
-  await cards.nth(0).locator(".math-check-toggle").click();
+  await expect(toggle(count)).toHaveAttribute("aria-pressed", "false");
+  await expect(toggle(zero)).toHaveAttribute("aria-pressed", "true");
+  await expect(cards.nth(zero)).toContainText("認識 0");
+  await expect(toggle(draw)).toHaveAttribute("aria-pressed", "false");
+  await expect(cards.nth(draw)).toContainText("畫了 2 格");
+  await toggle(count).click();
   await page.getByRole("button", { name: "檢查完成" }).click();
   await expect(page.getByRole("heading", { name: "這一課練完了！" })).toBeVisible();
   const records = await page.evaluate(() =>
@@ -260,77 +299,85 @@ test("第二課 比長短 has things lined up before comparing, lets a wrong tap
     for (let step = 1; step <= 10; step++) await page.mouse.move(x + dx * step, y + dy * step);
     await page.mouse.up();
   };
-  const answeredRight = async (question: number) => {
-    await expect(status).toHaveText("答對了！");
-    await spoken(/^答對了！$/);
-    if (question < 7) await expect(header).toHaveText(`第 ${question + 1} 題 / 7`);
-  };
   // Tries each choice, the way a guessing child would, until the question is answered.
-  const tapUntilRight = async (choices: Locator, question: number) => {
+  const tapUntilRight = async (choices: Locator) => {
     for (let index = 0; ; index++) {
       await choices.nth(index).click();
-      if ((await status.textContent()) === "答對了！") return answeredRight(question);
+      if ((await status.textContent()) === "答對了！") return;
       await expect(status).toHaveText("");
     }
   };
 
-  // 1 比長短, lined up: answer straight away.
+  // The seven kinds come in another order each round.
+  const kinds = {
+    lined: /哪一枝鉛筆比較(長|短)/,
+    outOfLine: /先把每一枝鉛筆拉到紅線/,
+    ground: /哪一個小朋友比較(高|矮)/,
+    onBox: /先把小朋友拉到地上/,
+    thickness: /^哪一本書比較(厚|薄)？點一下。$/,
+    line: /哪一條是(直|曲)線/,
+    route: /哪一條路最近/,
+  };
+  const asked: string[] = [];
   await expect(header).toHaveText("第 1 題 / 7");
-  await expect(audio).toHaveAttribute("src", /math-audio\/length-(more|less)\.m4a/);
-  await spoken(/哪一枝鉛筆比較(長|短)/);
-  await expect(page.locator(".compare-hint")).toHaveCount(0);
-  await items.nth(await rightIndex()).click();
-  await answeredRight(1);
-
-  // 2 比長短, out of line: a hand shows the drag, and only lined-up pencils can be compared.
-  await spoken(/先把每一枝鉛筆拉到紅線/);
-  await expect(page.locator(".compare-hint")).toBeVisible();
-  await expect(page.locator(".compare-item.is-movable")).toHaveCount(2);
-  const line = (await page.locator(".compare-start-line").boundingBox())!;
-  await drag(items.first(), -60, 0);
-  await expect(page.locator(".compare-hint")).toHaveCount(0);
-  await expect(page.locator(".compare-item.is-movable")).toHaveCount(1);
-  expect(Math.abs((await items.first().boundingBox())!.x - line.x)).toBeLessThan(6);
-  // A tap slides the other pencil to the line too; then the question is asked.
-  await page.locator(".compare-item.is-movable").click();
-  await expect(page.locator(".compare-item.is-movable")).toHaveCount(0);
-  await spoken(/哪一枝鉛筆比較(長|短)/);
-  await page.waitForTimeout(500);
-  const right = await rightIndex();
-  await items.nth(1 - right).click();
-  await expect(status).toHaveText("再想想看");
-  await spoken(/^再想想看。$/);
-  await expect(header).toHaveText("第 2 題 / 7");
-  await expect(status).toHaveText("");
-  await items.nth(right).click();
-  await answeredRight(2);
-
-  // 3 比高矮, standing on the ground.
-  await spoken(/哪一個小朋友比較(高|矮)/);
-  await items.nth(await rightIndex()).click();
-  await answeredRight(3);
-
-  // 4 比高矮: one child stands on a box and is dragged down to the ground.
-  await spoken(/先把小朋友拉到地上/);
-  await expect(page.locator(".compare-box")).toHaveCount(1);
-  await drag(page.locator(".compare-item.is-movable"), 0, 40);
-  await expect(page.locator(".compare-item.is-movable")).toHaveCount(0);
-  await spoken(/哪一個小朋友比較(高|矮)/);
-  await page.waitForTimeout(500);
-  await items.nth(await rightIndex()).click();
-  await answeredRight(4);
-
-  // 5 比厚薄: two books on a shelf.
-  await spoken(/^哪一本書比較(厚|薄)？點一下。$/);
-  await expect(page.locator(".compare-book")).toHaveCount(2);
-  await tapUntilRight(page.locator(".compare-book"), 5);
-
-  // 6 直線和曲線, 7 哪條路最近 (part of 直線和曲線): a wrong guess can be tried again.
-  await spoken(/哪一條是(直|曲)線/);
-  await tapUntilRight(page.locator(".compare-lines button"), 6);
-  await spoken(/哪一條路最近/);
-  await expect(page.getByRole("img", { name: "小兔子" })).toBeVisible();
-  await tapUntilRight(page.locator(".compare-route .route-flag"), 7);
+  await expect(audio).toHaveAttribute("src", /math-audio\/[a-z-]+\.m4a/);
+  for (let question = 1; question <= 7; question++) {
+    await expect(header).toHaveText(`第 ${question} 題 / 7`);
+    const kind = kindOf(await prompt(page), kinds);
+    asked.push(kind ?? "?");
+    if (kind === "lined") {
+      // 比長短, lined up: answer straight away.
+      await expect(page.locator(".compare-hint")).toHaveCount(0);
+      await items.nth(await rightIndex()).click();
+    } else if (kind === "outOfLine") {
+      // A hand shows the drag, and only lined-up pencils can be compared.
+      await expect(page.locator(".compare-hint")).toBeVisible();
+      await expect(page.locator(".compare-item.is-movable")).toHaveCount(2);
+      const line = (await page.locator(".compare-start-line").boundingBox())!;
+      await drag(items.first(), -60, 0);
+      await expect(page.locator(".compare-hint")).toHaveCount(0);
+      await expect(page.locator(".compare-item.is-movable")).toHaveCount(1);
+      expect(Math.abs((await items.first().boundingBox())!.x - line.x)).toBeLessThan(6);
+      // A tap slides the other pencil to the line too; then the question is asked.
+      await page.locator(".compare-item.is-movable").click();
+      await expect(page.locator(".compare-item.is-movable")).toHaveCount(0);
+      await spoken(kinds.lined);
+      await page.waitForTimeout(500);
+      const right = await rightIndex();
+      await items.nth(1 - right).click();
+      await expect(status).toHaveText("再想想看");
+      await spoken(/^再想想看。$/);
+      await expect(header).toHaveText(`第 ${question} 題 / 7`);
+      await expect(status).toHaveText("");
+      await items.nth(right).click();
+    } else if (kind === "ground") {
+      // 比高矮, standing on the ground.
+      await items.nth(await rightIndex()).click();
+    } else if (kind === "onBox") {
+      // One child stands on a box and is dragged down to the ground.
+      await expect(page.locator(".compare-box")).toHaveCount(1);
+      await drag(page.locator(".compare-item.is-movable"), 0, 40);
+      await expect(page.locator(".compare-item.is-movable")).toHaveCount(0);
+      await spoken(kinds.ground);
+      await page.waitForTimeout(500);
+      await items.nth(await rightIndex()).click();
+    } else if (kind === "thickness") {
+      // 比厚薄: two books on a shelf.
+      await expect(page.locator(".compare-book")).toHaveCount(2);
+      await tapUntilRight(page.locator(".compare-book"));
+    } else if (kind === "line") {
+      // 直線和曲線: a wrong guess can be tried again.
+      await tapUntilRight(page.locator(".compare-lines button"));
+    } else if (kind === "route") {
+      // 哪條路最近, part of 直線和曲線.
+      await expect(page.getByRole("img", { name: "小兔子" })).toBeVisible();
+      await tapUntilRight(page.locator(".compare-route .route-flag"));
+    } else throw new Error(`an instruction 第二課 does not ask: ${await prompt(page)}`);
+    await expect(status).toHaveText("答對了！");
+    await spoken(/^答對了！$/);
+    if (question < 7) await expect(header).toHaveText(`第 ${question + 1} 題 / 7`);
+  }
+  expect(asked.sort()).toEqual(Object.keys(kinds).sort());
 
   await expect(page.getByRole("heading", { name: "這一課練完了！" })).toBeVisible();
   await expect(page.locator(".math-result")).toContainText("比長短（先對齊）");
@@ -339,7 +386,7 @@ test("第二課 比長短 has things lined up before comparing, lets a wrong tap
   );
   expect(records.rounds).toHaveLength(1);
   expect(records.rounds[0]).toMatchObject({ lessonId: 2, total: 7 });
-  expect(records.rounds[0].needsPractice[0]).toEqual({ kind: "比長短（先對齊）" });
+  expect(records.rounds[0].needsPractice).toContainEqual({ kind: "比長短（先對齊）" });
   expect(errors).toEqual([]);
 });
 
@@ -354,6 +401,11 @@ test("第七課 10以內的加法 adds with pictures, 0 and circles, keeps 第�
   // An unfinished 第一課 round stays saved while 第七課 is practised.
   await page.getByRole("button", { name: /數學第一課/ }).click();
   await page.getByRole("button", { name: "開始練習", exact: true }).click();
+  const first = await savedQuestions(page, "kid-math-round-v1");
+  await goToQuestion(
+    page,
+    first.findIndex((question) => question.kind === "count"),
+  );
   await stroke(page, page.getByLabel("寫數字"), [
     [30, 30],
     [60, 70],
@@ -368,11 +420,19 @@ test("第七課 10以內的加法 adds with pictures, 0 and circles, keeps 第�
   await page.getByRole("button", { name: "開始練習", exact: true }).click();
   const header = page.locator(".math-header");
   const audio = page.locator("audio");
+  await expect(header).toContainText("第 1 題 / 8");
+  const questions = await savedQuestions(page, "kid-math-round-v1-3");
+  const join = questions.findIndex((question) => question.kind === "join");
+  const zero = questions.findIndex(
+    (question) => question.kind === "add" && question.parts!.includes(0),
+  );
+  const add = questions.findIndex(
+    (question) => question.kind === "add" && !question.parts!.includes(0),
+  );
 
   // 合起來是多少: the pictures can be marked, and the total is written.
+  await goToQuestion(page, join);
   await expect(header).toContainText("合起來是多少");
-  await expect(header).toContainText("第 1 題 / 8");
-  await expect(audio).toHaveAttribute("src", /math-audio\/join-\d-\d\.m4a/);
   await expect(audio).toHaveAttribute("data-clip-text", /^左邊有.個，右邊有.個，合在一起有幾個？$/);
   const picture = page.locator(".math-join-group button").first();
   await picture.click();
@@ -381,18 +441,20 @@ test("第七課 10以內的加法 adds with pictures, 0 and circles, keeps 第�
     [40, 20],
     [55, 80],
   ]);
-  for (let i = 0; i < 3; i++)
-    await page.getByRole("button", { name: "下一題", exact: true }).click();
 
   // 0的加法: a number and 零, with an empty 十格框 for the 0.
+  await goToQuestion(page, zero);
   await expect(header).toContainText("0的加法");
-  await expect(header).toContainText("第 4 題 / 8");
-  await expect(audio).toHaveAttribute("data-clip-text", /^.加零等於多少？先畫圈圈，再寫答案。$/);
-  await expect(page.locator(".math-add-number").nth(1)).toHaveText("0");
-  for (let i = 0; i < 2; i++)
-    await page.getByRole("button", { name: "下一題", exact: true }).click();
+  await expect(audio).toHaveAttribute(
+    "data-clip-text",
+    /^(.加零|零加.)等於多少？先畫圈圈，再寫答案。$/,
+  );
+  await expect(
+    page.locator(".math-add-number").nth(questions[zero].parts![0] === 0 ? 0 : 1),
+  ).toHaveText("0");
 
   // 加加看: each side numbers its own circles; the answer has its own square.
+  await goToQuestion(page, add);
   await expect(header).toContainText("加加看");
   await expect(audio).toHaveAttribute("data-clip-text", /^.加.等於多少？先畫圈圈，再寫答案。$/);
   // A 十格框 for each number (cells 0–9 and 10–19), then the answer square.
@@ -414,20 +476,20 @@ test("第七課 10以內的加法 adds with pictures, 0 and circles, keeps 第�
   await page.reload();
   await page.getByRole("button", { name: /數學第七課/ }).click();
   await page.getByRole("button", { name: "繼續上次的練習" }).click();
-  await expect(header).toContainText("第 6 題 / 8");
+  await expect(header).toContainText(`第 ${add + 1} 題 / 8`);
   await expect(numbers(0)).toHaveCount(2);
   await expect(numbers(1)).toHaveCount(1);
 
-  for (let i = 0; i < 2; i++)
-    await page.getByRole("button", { name: "下一題", exact: true }).click();
+  await goToQuestion(page, 7);
   await page.getByRole("button", { name: "寫完了，請家長檢查" }).click();
   const cards = page.locator(".math-check-card");
   await expect(cards).toHaveCount(8);
-  await expect(cards.nth(0).locator(".math-check-toggle")).toHaveAttribute("aria-pressed", "false");
-  await expect(cards.nth(1).locator(".math-check-toggle")).toHaveAttribute("aria-pressed", "true");
-  await expect(cards.nth(3)).toContainText("0的加法");
-  await expect(cards.nth(5).locator(".math-check-toggle")).toHaveAttribute("aria-pressed", "false");
-  await expect(cards.nth(5).locator("figcaption")).toHaveText([/畫了 2 格/, /畫了 1 格/]);
+  const toggle = (index: number) => cards.nth(index).locator(".math-check-toggle");
+  await expect(toggle(join)).toHaveAttribute("aria-pressed", "false");
+  await expect(toggle(zero)).toHaveAttribute("aria-pressed", "true");
+  await expect(cards.nth(zero)).toContainText("0的加法");
+  await expect(toggle(add)).toHaveAttribute("aria-pressed", "false");
+  await expect(cards.nth(add).locator("figcaption")).toHaveText([/畫了 2 格/, /畫了 1 格/]);
   await page.getByRole("button", { name: "檢查完成" }).click();
   await expect(page.getByRole("heading", { name: "這一課練完了！" })).toBeVisible();
   await expect(page.locator(".math-result")).toContainText("＋");
@@ -463,26 +525,44 @@ test("第四課 分與合 reads 分合圖: the missing part, the total and a way
   await page.getByRole("button", { name: "開始練習", exact: true }).click();
   const header = page.locator(".math-header");
   const audio = page.locator("audio");
-  const next = page.getByRole("button", { name: "下一題", exact: true });
   const four: [number, number][] = [
     [60, 15],
     [25, 65],
     [80, 65],
   ];
+  await expect(header).toContainText("第 1 題 / 8");
+  const questions = await savedQuestions(page, "kid-math-round-v1-4");
+  const where = (kind: string, ten: boolean, skip = -1) =>
+    questions.findIndex(
+      (question, index) =>
+        question.kind === kind && (question.target === 10) === ten && index !== skip,
+    );
+  const split = questions.findIndex(
+    (question) => question.kind === "split" && question.target < 10 && !question.story,
+  );
+  const story = questions.findIndex((question) => question.story);
+  const combine = where("combine", false);
 
   // 分一分: the total and one part are given; the other part is written.
+  await goToQuestion(page, split);
   await expect(header).toContainText("分一分");
-  await expect(header).toContainText("第 1 題 / 8");
-  await expect(audio).toHaveAttribute("src", /math-audio\/split-\d+-\d+\.m4a/);
   await expect(audio).toHaveAttribute("data-clip-text", /^.可以分成.和幾？$/);
   await expect(page.getByRole("group", { name: /^分合圖：\d+ 分成 \d+ 和 ？$/ })).toBeVisible();
   const picture = page.locator(".math-pictures button").first();
   await picture.click();
   await expect(picture).toHaveAttribute("aria-pressed", "true");
   await stroke(page, page.getByLabel("寫答案，在右下"), four);
-  for (let i = 0; i < 3; i++) await next.click();
+
+  // 拿走了: some of the pictures move into the hand's tray; what is left is written.
+  await goToQuestion(page, story);
+  await expect(header).toContainText("分一分");
+  await expect(audio).toHaveAttribute("data-clip-text", /^有.個，拿走了.個，還剩幾個？$/);
+  await expect(page.locator(".math-take-taken > span")).toHaveCount(questions[story].parts![0]);
+  await expect(page.locator(".math-take-left button")).toHaveCount(questions[story].parts![1]);
+  await expect(page.getByRole("group", { name: /^分合圖：\d+ 分成 \d+ 和 ？$/ })).toBeVisible();
 
   // 合一合: both parts are given; the total is written on top.
+  await goToQuestion(page, combine);
   await expect(header).toContainText("合一合");
   await expect(audio).toHaveAttribute("data-clip-text", /^.和.合在一起是幾？$/);
   await expect(page.getByRole("group", { name: /^分合圖：\d+ 和 \d+ 合起來是 ？$/ })).toBeVisible();
@@ -492,34 +572,36 @@ test("第四課 分與合 reads 分合圖: the missing part, the total and a way
   await page.reload();
   await page.getByRole("button", { name: /數學第四課/ }).click();
   await page.getByRole("button", { name: "繼續上次的練習" }).click();
-  await expect(header).toContainText("第 4 題 / 8");
+  await expect(header).toContainText(`第 ${combine + 1} 題 / 8`);
   await expect(page.getByRole("button", { name: "清空答案" })).toBeEnabled();
-  for (let i = 0; i < 2; i++) await next.click();
 
   // 10的分與合: 分一分 and 合一合 for 10, then 分分看, any two numbers that make 10.
+  await goToQuestion(page, where("split", true));
   await expect(header).toContainText("10的分與合");
   await expect(audio).toHaveAttribute("data-clip-text", /^十可以分成.和幾？$/);
-  for (let i = 0; i < 2; i++) await next.click();
+  const ways = where("ways", true);
+  await goToQuestion(page, ways);
   await expect(audio).toHaveAttribute("data-clip-text", "十可以分成幾和幾？寫出一種分法。");
   // Only one of the two numbers: not answered yet.
   await stroke(page, page.getByLabel("寫第一個數，在左下"), four);
+  await goToQuestion(page, 7);
   await page.getByRole("button", { name: "寫完了，請家長檢查" }).click();
 
   const cards = page.locator(".math-check-card");
   await expect(cards).toHaveCount(8);
   const marked = (index: number) => cards.nth(index).locator(".math-check-toggle");
   for (const [index, pending] of [
-    [0, "false"],
-    [1, "true"],
-    [3, "false"],
-    [4, "true"],
-    [7, "true"],
+    [split, "false"],
+    [where("split", false, split), "true"],
+    [combine, "false"],
+    [where("combine", false, combine), "true"],
+    [ways, "true"],
   ] as const)
     await expect(marked(index)).toHaveAttribute("aria-pressed", pending);
-  await expect(cards.nth(0)).toContainText("分成");
-  await expect(cards.nth(0).locator(".math-bond.is-preview .ink-preview")).toHaveCount(1);
-  await expect(cards.nth(7)).toContainText("兩個數合起來是 10");
-  await expect(cards.nth(7).locator(".math-bond.is-preview .ink-preview")).toHaveCount(1);
+  await expect(cards.nth(split)).toContainText("分成");
+  await expect(cards.nth(split).locator(".math-bond.is-preview .ink-preview")).toHaveCount(1);
+  await expect(cards.nth(ways)).toContainText("兩個數合起來是 10");
+  await expect(cards.nth(ways).locator(".math-bond.is-preview .ink-preview")).toHaveCount(1);
   await page.getByRole("button", { name: "檢查完成" }).click();
   await expect(page.getByRole("heading", { name: "這一課練完了！" })).toBeVisible();
 
@@ -550,14 +632,16 @@ test("第三課 排順序、比多少 is tapped: 排數字, 排在第幾個, 第
     [1, /第二課.*比長短/],
     [2, /第三課.*排順序、比多少/],
     [3, /第四課.*分與合/],
-    [4, /第五課.*方盒、圓罐、球.*製作中/],
+    [4, /第五課.*方盒、圓罐、球/],
+    [5, /第六課.*30以內的數.*製作中/],
     [6, /第七課.*10以內的加法/],
     [8, /第九課.*幾點鐘.*製作中/],
     [9, /第一課.*50以內的數.*製作中/],
     [17, /第九課.*幾月幾日星期幾.*製作中/],
   ] as const)
     await expect(cards.nth(index)).toHaveText(title);
-  await expect(cards.nth(4)).toBeDisabled();
+  await expect(cards.nth(4)).not.toContainText("製作中");
+  await expect(cards.nth(5)).toBeDisabled();
   await page.getByRole("button", { name: /數學第三課/ }).click();
   await expect(page.getByRole("heading", { name: "排順序、比多少" })).toBeVisible();
   await page.getByRole("button", { name: "開始練習", exact: true }).click();
@@ -570,10 +654,10 @@ test("第三課 排順序、比多少 is tapped: 排數字, 排在第幾個, 第
     await expect(status).toHaveText("答對了！");
     if (question < 8) await expect(header).toHaveText(`第 ${question + 1} 題 / 8`);
   };
-  const tapUntilRight = async (choices: Locator, question: number) => {
+  const tapUntilRight = async (choices: Locator) => {
     for (let index = 0; ; index++) {
       await choices.nth(index).click();
-      if ((await status.textContent()) === "答對了！") return answeredRight(question);
+      if ((await status.textContent()) === "答對了！") return;
       await expect(status).toHaveText("");
     }
   };
@@ -582,70 +666,78 @@ test("第三課 排順序、比多少 is tapped: 排數字, 排在第幾個, 第
     numbers[pattern.exec((await audio.getAttribute("data-clip-text")) ?? "")![1]];
   const items = page.locator(".sequence-item");
 
-  // 1 排數字: the missing number fills the gap.
+  // The kinds come in another order each round; 「點第三個」 always follows 「點三個」.
+  const kinds = {
+    missing: /^中間少了哪一個數？點一下。$/,
+    sort: /^從小到大，依順序點數字。$/,
+    left: /^從左邊數，第.個是哪一個？點一下。$/,
+    right: /^從右邊數，第.個是哪一個？點一下。$/,
+    group: /^從左邊數，點.個。$/,
+    more: /^哪一排比較多？如果一樣多，就點一樣多。$/,
+    less: /^哪一排比較少？/,
+  };
+  const asked: string[] = [];
   await expect(header).toHaveText("第 1 題 / 8");
-  await expect(audio).toHaveAttribute("src", /math-audio\/missing\.m4a/);
-  await spoken(/^中間少了哪一個數？點一下。$/);
-  const shown = await page.locator(".sequence-numbers .sequence-card").allTextContents();
-  const gap = shown.indexOf("？");
-  const step = Number(shown[gap === 1 ? 3 : 1]) > Number(shown[gap === 1 ? 2 : 0]) ? 1 : -1;
-  const missing = gap === 1 ? Number(shown[0]) + step : Number(shown[gap - 1]) + step;
-  await page
-    .locator(".sequence-choices .sequence-card", { hasText: new RegExp(`^${missing}$`) })
-    .click();
-  await expect(page.locator(".sequence-card.is-gap.is-filled")).toHaveText(String(missing));
-  await answeredRight(1);
-
-  // 2 從小到大: each tap takes its place in the row below.
-  await spoken(/^從小到大，依順序點數字。$/);
-  const sortCards = page.locator(".sequence-sort .sequence-choices .sequence-card");
-  const values = (await sortCards.allTextContents()).map(Number);
-  const sorted = [...values].sort((a, b) => a - b);
-  await sortCards.nth(values.indexOf(sorted[0])).click();
-  await sortCards.nth(values.indexOf(sorted[1])).click();
-  await expect(sortCards.nth(values.indexOf(sorted[0])).locator(".compare-pick-number")).toHaveText(
-    "1",
-  );
-  await expect(sortCards.nth(values.indexOf(sorted[1])).locator(".compare-pick-number")).toHaveText(
-    "2",
-  );
-  await expect(page.locator(".sequence-numbers.is-tray .sequence-card:not(.is-gap)")).toHaveText(
-    sorted.slice(0, 2).map(String),
-  );
-  for (const value of sorted.slice(2)) await sortCards.nth(values.indexOf(value)).click();
-  await answeredRight(2);
-
-  // 3 排在第幾個, from the left: the place counts from the marked end.
-  await expect(audio).toHaveAttribute("src", /math-audio\/position-left-\d\.m4a/);
-  await spoken(/^從左邊數，第.個是哪一個？點一下。$/);
-  await items.nth((await said(/第(.)個/)) - 1).click();
-  await answeredRight(3);
-
-  // 4 from the right: the first picture is never the answer, so it is a retry.
-  await spoken(/^從右邊數，第.個是哪一個？點一下。$/);
-  const fromRight = await said(/第(.)個/);
-  await items.first().click();
-  await expect(status).toHaveText("再想想看");
-  await expect(status).toHaveText("");
-  await items.nth((await items.count()) - fromRight).click();
-  await answeredRight(4);
-
-  // 5 幾個: the first ones from the left, in any order; 6 第幾個: only that one.
-  await spoken(/^從左邊數，點.個。$/);
-  const count = await said(/點(.)個/);
-  for (let index = count - 1; index >= 0; index--) await items.nth(index).click();
-  await answeredRight(5);
-  await spoken(/^從左邊數，點第.個。$/);
-  expect(await said(/第(.)個/)).toBe(count);
-  await items.nth(count - 1).click();
-  await answeredRight(6);
-
-  // 7–8 比多少: two rows and 一樣多.
-  await spoken(/^哪一排比較多？如果一樣多，就點一樣多。$/);
-  await expect(page.getByRole("button", { name: "一樣多" })).toBeVisible();
-  await tapUntilRight(page.locator(".sequence-rows > button"), 7);
-  await spoken(/^哪一排比較少？/);
-  await tapUntilRight(page.locator(".sequence-rows > button"), 8);
+  await expect(audio).toHaveAttribute("src", /math-audio\/[a-z0-9-]+\.m4a/);
+  for (let question = 1; question <= 8; question++) {
+    await expect(header).toHaveText(`第 ${question} 題 / 8`);
+    const kind = kindOf(await prompt(page), kinds);
+    asked.push(kind ?? "?");
+    if (kind === "missing") {
+      // 排數字: the missing number fills the gap.
+      const shown = await page.locator(".sequence-numbers .sequence-card").allTextContents();
+      const gap = shown.indexOf("？");
+      const step = Number(shown[gap === 1 ? 3 : 1]) > Number(shown[gap === 1 ? 2 : 0]) ? 1 : -1;
+      const missing = gap === 1 ? Number(shown[0]) + step : Number(shown[gap - 1]) + step;
+      await page
+        .locator(".sequence-choices .sequence-card", { hasText: new RegExp(`^${missing}$`) })
+        .click();
+      await expect(page.locator(".sequence-card.is-gap.is-filled")).toHaveText(String(missing));
+    } else if (kind === "sort") {
+      // 從小到大: each tap takes its place in the row below.
+      const sortCards = page.locator(".sequence-sort .sequence-choices .sequence-card");
+      const values = (await sortCards.allTextContents()).map(Number);
+      const sorted = [...values].sort((a, b) => a - b);
+      await sortCards.nth(values.indexOf(sorted[0])).click();
+      await sortCards.nth(values.indexOf(sorted[1])).click();
+      await expect(
+        sortCards.nth(values.indexOf(sorted[0])).locator(".compare-pick-number"),
+      ).toHaveText("1");
+      await expect(
+        sortCards.nth(values.indexOf(sorted[1])).locator(".compare-pick-number"),
+      ).toHaveText("2");
+      await expect(
+        page.locator(".sequence-numbers.is-tray .sequence-card:not(.is-gap)"),
+      ).toHaveText(sorted.slice(0, 2).map(String));
+      for (const value of sorted.slice(2)) await sortCards.nth(values.indexOf(value)).click();
+    } else if (kind === "left") {
+      // 排在第幾個, from the left: the place counts from the marked end.
+      await items.nth((await said(/第(.)個/)) - 1).click();
+    } else if (kind === "right") {
+      // From the right: the first picture is never the answer, so it is a retry.
+      const fromRight = await said(/第(.)個/);
+      await items.first().click();
+      await expect(status).toHaveText("再想想看");
+      await expect(status).toHaveText("");
+      await items.nth((await items.count()) - fromRight).click();
+    } else if (kind === "group") {
+      // 幾個: the first ones from the left, in any order; then 第幾個: only that one.
+      const count = await said(/點(.)個/);
+      for (let index = count - 1; index >= 0; index--) await items.nth(index).click();
+      await answeredRight(question);
+      question++;
+      asked.push("nth");
+      await spoken(/^從左邊數，點第.個。$/);
+      expect(await said(/第(.)個/)).toBe(count);
+      await items.nth(count - 1).click();
+    } else if (kind === "more" || kind === "less") {
+      // 比多少: two rows and 一樣多.
+      await expect(page.getByRole("button", { name: "一樣多" })).toBeVisible();
+      await tapUntilRight(page.locator(".sequence-rows > button"));
+    } else throw new Error(`an instruction 第三課 does not ask: ${await prompt(page)}`);
+    await answeredRight(question);
+  }
+  expect(asked.sort()).toEqual([...Object.keys(kinds), "nth"].sort());
 
   await expect(page.getByRole("heading", { name: "這一課練完了！" })).toBeVisible();
   await expect(page.locator(".math-result")).toContainText("排在第幾個（從右邊數）");
@@ -654,6 +746,133 @@ test("第三課 排順序、比多少 is tapped: 排數字, 排在第幾個, 第
   );
   expect(records.rounds).toHaveLength(1);
   expect(records.rounds[0]).toMatchObject({ lessonId: 7, total: 8 });
-  expect(records.rounds[0].needsPractice[0]).toEqual({ kind: "排在第幾個（從右邊數）" });
+  expect(records.rounds[0].needsPractice).toContainEqual({ kind: "排在第幾個（從右邊數）" });
+  expect(errors).toEqual([]);
+});
+
+test("第五課 方盒、圓罐、球 is tapped: 分類, 疊疊看、滾滾看, 描下來, 找圖形 and 做造型, each tried until right", async ({
+  page,
+}) => {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("./");
+  await page.getByRole("button", { name: "數學", exact: true }).click();
+  await page.getByRole("button", { name: /數學第五課/ }).click();
+  await expect(page.getByRole("heading", { name: "方盒、圓罐、球" })).toBeVisible();
+  await page.getByRole("button", { name: "開始練習", exact: true }).click();
+
+  const header = page.locator(".math-header small");
+  const audio = page.locator("audio");
+  const status = page.locator(".compare-question [role=status]");
+  const said = async (pattern: RegExp) =>
+    pattern.exec((await audio.getAttribute("data-clip-text")) ?? "")![1];
+  const card = (name: string) =>
+    page.locator(".shape-choices").getByRole("button", { name, exact: true });
+  const thing = async () =>
+    (await page.locator(".shape-thing [role=img]").getAttribute("aria-label")) ?? "";
+  const solids: Record<string, string> = {
+    ...{ 面紙盒: "方盒", 禮物盒: "方盒", 骰子: "方盒" },
+    ...{ 罐頭: "圓罐", 鼓: "圓罐", 餅乾罐: "圓罐" },
+    ...{ 海灘球: "球", 柳丁: "球", 籃球: "球" },
+  };
+  // The shapes a drawing is made of, read from the drawing itself: a 正方形 is a square rect.
+  const drawn = (art: Locator) =>
+    art
+      .locator("rect, circle, polygon")
+      .evaluateAll((shapes) =>
+        shapes.map((shape) =>
+          shape.tagName === "circle"
+            ? "圓形"
+            : shape.tagName === "polygon"
+              ? "三角形"
+              : shape.getAttribute("width") === shape.getAttribute("height")
+                ? "正方形"
+                : "長方形",
+        ),
+      );
+
+  // The kinds come in another order each round.
+  const kinds = {
+    classify: /^這是方盒、圓罐，還是球？點一下。$/,
+    stack: /^哪一個不能疊起來？點一下。$/,
+    roll: /^哪一個不會滾？點一下。$/,
+    trace: /^把有顏色的這一面描下來，是什麼形狀？點一下。$/,
+    find: /^把所有的.+都點出來。$/,
+    build: /^這個造型用了幾個.+？點一下。$/,
+  };
+  const asked: string[] = [];
+  const sorted: string[] = [];
+  const traced: string[] = [];
+  let missed = "";
+  await expect(header).toHaveText("第 1 題 / 9");
+  await expect(audio).toHaveAttribute("src", /math-audio\/[a-z-]+\.m4a/);
+  for (let question = 1; question <= 9; question++) {
+    await expect(header).toHaveText(`第 ${question} 題 / 9`);
+    const kind = kindOf(await prompt(page), kinds);
+    asked.push(kind ?? "?");
+    if (kind === "classify") {
+      // 分類: a thing from home is a 方盒, 圓罐 or 球; the first time, a wrong tap is tried again.
+      const name = await thing();
+      const solid = solids[name];
+      if (!missed) {
+        missed = `堆疊與分類（${name}是${solid}）`;
+        await card(["方盒", "圓罐", "球"].find((other) => other !== solid)!).click();
+        await expect(status).toHaveText("再想想看");
+        await expect(status).toHaveText("");
+      }
+      sorted.push(solid);
+      await card(solid).click();
+    } else if (kind === "stack") {
+      await card("球").click();
+    } else if (kind === "roll") {
+      await card("方盒").click();
+    } else if (kind === "trace") {
+      // 描下來: the coloured face of a box or a can.
+      const name = await thing();
+      traced.push(solids[name]);
+      await card(
+        solids[name] === "圓罐" ? "圓形" : name === "面紙盒" ? "長方形" : "正方形",
+      ).click();
+    } else if (kind === "find") {
+      // 找圖形: every shape of one kind, in any order; each stays marked.
+      const target = await said(/所有的(.+)都/);
+      const pieces = page.locator(".shape-piece");
+      const matching = (await drawn(page.locator(".shape-find"))).flatMap((shape, index) =>
+        shape === target ? [index] : [],
+      );
+      expect(matching.length).toBeGreaterThanOrEqual(2);
+      const [last, ...rest] = matching.reverse();
+      for (const index of rest) {
+        await pieces.nth(index).click();
+        await expect(pieces.nth(index)).toHaveClass(/is-picked/);
+      }
+      await pieces.nth(last).click();
+    } else if (kind === "build") {
+      // 做造型: how many of a shape a picture uses.
+      const named = await said(/幾個(.+)？/);
+      const shapes = await drawn(page.locator(".shape-thing.is-picture"));
+      const count = shapes.filter((shape) => shape === named).length;
+      expect(count).toBeGreaterThanOrEqual(2);
+      await page
+        .locator(".sequence-choices .sequence-card", { hasText: new RegExp(`^${count}$`) })
+        .click();
+    } else throw new Error(`an instruction 第五課 does not ask: ${await prompt(page)}`);
+    await expect(status).toHaveText("答對了！");
+    if (question < 9) await expect(header).toHaveText(`第 ${question + 1} 題 / 9`);
+  }
+  expect(asked.sort()).toEqual(
+    ["classify", "classify", "stack", "roll", "trace", "trace", "find", "build", "build"].sort(),
+  );
+  // 分類 asks about two kinds of solid; 描下來 traces a box and a can.
+  expect(new Set(sorted).size).toBe(2);
+  expect(traced.sort()).toEqual(["圓罐", "方盒"].sort());
+
+  await expect(page.getByRole("heading", { name: "這一課練完了！" })).toBeVisible();
+  await expect(page.locator(".math-result")).toContainText(missed);
+  const records = await page.evaluate(() =>
+    JSON.parse(localStorage.getItem("kid-math-records-v1") ?? "{}"),
+  );
+  expect(records.rounds[0]).toMatchObject({ lessonId: 5, total: 9 });
+  expect(records.rounds[0].needsPractice).toEqual([{ kind: missed }]);
   expect(errors).toEqual([]);
 });
