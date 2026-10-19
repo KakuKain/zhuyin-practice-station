@@ -237,7 +237,8 @@ Layout: `features/<feature>/` holds feature UI and logic, `components/` holds sh
 
 ### Audio
 
-- The 37 basic symbols use Ministry of Education recordings at normal speed. The 22 combined rhymes, lesson readings and words in `gemini/words/` use static Gemini audio. Most other characters and words use older synthesized files.
+- The 37 basic symbols use Ministry of Education recordings at normal speed. 21 combined rhymes, lesson readings and words in `gemini/words/` use static Gemini audio. Most other characters and words use older synthesized files.
+- ㄧㄤ plays the dictionary's 「央」 (`moe-examples/6160.mp3`): the parent heard its Gemini clip as ㄧㄤˊ, has no Gemini key, and the macOS voices may not be published (their license allows personal, non-commercial use only). That recording is CC BY-ND (no adaptations) and goes on to read the radical and strokes, so the file stays byte-identical and `partialClips` in `audio-registry.ts` stops it at 0.7 s with a media fragment (`#t=0,0.7`); `useAudioPlayer` also watches `currentTime`, since 'ended' never fires there. The chart credits it.
 - `lib/audio/audio-index.json` maps text to `[readings, version, folder]`; the folder is `""`, `"gemini/rhymes/"` or `"gemini/words/"`.
 - The listening "聲音準備中" overlay is delayed (`LoadingOverlay delayed`): hidden and click-through for 0.7 s, so a replay or cached clip never flashes over the page or blocks writing.
 - Reference audio with page-relative URLs (see Build and deploy).
