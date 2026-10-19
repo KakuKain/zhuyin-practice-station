@@ -1,8 +1,10 @@
-/* 數學第二課 比一比, loaded with CompareLesson. */
+/* 數學第二、三、五課 (tapped answers), loaded with CompareLesson. */
 
 .compare-question {
   position: relative;
   display: grid;
+  /* One column no wider than the screen, however wide a row of cards would like to be. */
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
   width: min(100%, 980px);
   margin: 0 auto;
@@ -587,6 +589,154 @@
 .sequence-card.is-wrong,
 .sequence-matched.is-wrong,
 .sequence-same.is-wrong {
+  border-color: #e5b46b;
+  background: #fff6e8;
+}
+
+/* 第五課 方盒、圓罐、球: the thing to look at on paper, and picture cards to tap. */
+.shape-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  gap: 16px;
+  width: min(100%, 760px);
+  margin: 0 auto;
+}
+.shape-thing {
+  display: grid;
+  place-items: center;
+  width: min(100%, 420px, calc(100dvh - 600px));
+  min-width: 180px;
+  aspect-ratio: 1;
+  padding: 10px;
+  border: 2px solid #c6dfe7;
+  border-radius: 22px;
+  background: #fffefa;
+}
+.shape-thing.is-picture {
+  width: min(100%, 460px, calc(100dvh - 520px));
+}
+.shape-thing svg {
+  width: 100%;
+  height: 100%;
+}
+/* Cards share one row, however narrow the screen. */
+.shape-choices {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  gap: clamp(6px, 2vw, 14px);
+  width: min(100%, 600px);
+}
+.shape-choices.is-flat,
+.shape-choices.is-large {
+  width: min(100%, 760px);
+}
+.shape-card {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  min-width: 0;
+  padding: 8px 6px 6px;
+  border: 3px solid #c6dfe7;
+  border-radius: 20px;
+  background: #fffefa;
+  color: var(--ref-navy);
+  font: inherit;
+  font-size: clamp(18px, 3vw, 26px);
+  font-weight: 800;
+  box-shadow: 0 3px 0 #d7e6ee;
+  cursor: pointer;
+}
+.shape-card svg {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+}
+.shape-card > span {
+  white-space: nowrap;
+}
+.shape-choices.is-flat .shape-card svg {
+  width: 82%;
+}
+/* 做造型's numbers keep their size inside the centred stage. */
+.shape-stage > .sequence-choices {
+  width: min(100%, 600px);
+}
+/* 找圖形: six pieces, three to a row, all in one row when the screen is wide. */
+.shape-find {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(6px, 2vw, 14px);
+  width: min(100%, 680px, calc((100dvh - 330px) * 1.5));
+  margin: 0 auto;
+}
+.shape-piece {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 3px solid #c6dfe7;
+  border-radius: 20px;
+  background: #fffefa;
+  box-shadow: 0 3px 0 #d7e6ee;
+  cursor: pointer;
+}
+.shape-piece svg {
+  width: 78%;
+  height: 78%;
+}
+/*
+ * Four shape names do not fit side by side on a phone, or beside the thing on a landscape
+ * tablet: the cards go two by two, each picture beside its name.
+ */
+@media (max-width: 599px), (orientation: landscape) and (min-width: 700px) {
+  .shape-choices.is-flat {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .shape-choices.is-flat .shape-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 8px;
+  }
+  .shape-choices.is-flat .shape-card svg {
+    flex: none;
+    width: clamp(44px, 12vw, 84px);
+  }
+}
+/* Wide screens are short: the thing sits beside its cards. */
+@media (orientation: landscape) and (min-width: 700px) {
+  .compare-question:is(.is-classify, .is-trace, .is-build) .shape-stage {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    width: min(100%, 980px);
+  }
+  .shape-thing {
+    width: min(380px, calc(100dvh - 360px));
+  }
+  .shape-thing.is-picture {
+    width: min(420px, calc(100dvh - 330px));
+  }
+  .shape-find {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    width: min(100%, 1100px, calc((100dvh - 280px) * 6));
+  }
+}
+.shape-card.is-picked,
+.shape-piece.is-picked {
+  border-color: #9cc0e8;
+  background: #eef5fd;
+}
+.shape-card.is-correct,
+.shape-piece.is-correct {
+  border-color: #6cc28e;
+  background: #eef9f1;
+}
+.shape-card.is-wrong,
+.shape-piece.is-wrong {
   border-color: #e5b46b;
   background: #fff6e8;
 }

@@ -58,6 +58,19 @@ import {
   startLine,
   type CompareQuestion,
 } from "../../features/math/compare-round";
+import {
+  buildShapeRound,
+  countIn,
+  flatNames,
+  pictures,
+  shapeAnswer,
+  shapeInAnyOrder,
+  shapePromptId,
+  shapeRoundSize,
+  solidNames,
+  things,
+  type PicturePart,
+} from "../../features/math/shape-round";
 import { mathRoundStorageKey, ownsStorageKey, storageKeys } from "../../lib/storage/storage-keys";
 import kidPictures from "../../features/math/kid-pictures.json";
 import { childRecordKeys } from "../../lib/storage/child-profiles";
@@ -341,6 +354,9 @@ test("the math course cards, lesson pages and practice screens show every word i
     ...mathLessons.flatMap((lesson) => lesson.parts),
     ...["這一課", "開始", "開始練習", "從頭開始", "繼續", "繼續練習", "第", "題", "多畫了", "個"],
     ...["一樣多", "左邊", "右邊"],
+    // 第五課's answer cards.
+    ...Object.values(solidNames),
+    ...Object.values(flatNames),
   ];
   for (const text of shown) {
     assert.ok(mathWordReadings[text], `${text} needs its readings`);
@@ -363,6 +379,7 @@ test("the math course cards, lesson pages and practice screens show every word i
     compareRoundSize,
     sequenceRoundSize,
     bondRoundSize,
+    shapeRoundSize,
     additionRoundSize,
   ].map((size) =>
     typeof size === "number" ? size : Object.values(size).reduce((sum, n) => sum + n, 0),
@@ -601,4 +618,83 @@ test("比高矮's classmates share one scale, so heads match, and only bodies st
     });
     assert.ok(Math.abs(scales[0] - scales[1]) < 1e-9);
   }
+});
+
+test("a 第五課 round walks 堆疊與分類, 認識平面圖形 and 做造型, each answer the right tap", () => {
+  for (let run = 0; run < 300; run++) {
+    const round = buildShapeRound();
+    assert.equal(round.length, shapeRoundSize);
+    assert.deepEqual(
+      round.map((question) => question.kind),
+      ["classify", "classify", "stack", "roll", "trace", "trace", "find", "build", "build"],
+    );
+    for (const question of round) {
+      const answer = shapeAnswer(question);
+      const id = shapePromptId(question);
+      assert.ok(mathPrompts[id] && mathPromptReadings[id], id);
+      assert.ok(existsSync(`public/${mathPromptUrl(id).split("?")[0]}`), id);
+      if (question.kind === "find") {
+        // Two or three of the six, tapped in any order; every piece a different colour.
+        assert.equal(question.pieces.length, 6);
+        assert.ok(answer.length >= 2 && answer.length <= 3);
+        for (const [index, piece] of question.pieces.entries())
+          assert.equal(answer.includes(index), piece.flat === question.target);
+        assert.equal(new Set(question.pieces.map((piece) => piece.color)).size, 6);
+        assert.ok(shapeInAnyOrder(question));
+        continue;
+      }
+      assert.equal(answer.length, 1);
+      assert.ok(!shapeInAnyOrder(question));
+      const chosen = question.choices[answer[0]];
+      if (question.kind === "classify") assert.equal(chosen, things[question.thing].solid);
+      else if (question.kind === "stack") assert.equal(chosen, "ball");
+      else if (question.kind === "roll") assert.equal(chosen, "box");
+      else if (question.kind === "trace") {
+        const thing = things[question.thing];
+        assert.ok("face" in thing);
+        assert.equal(chosen, thing.face);
+      } else {
+        // 做造型 counts a shape the picture uses at least twice, among four numbers.
+        const count = countIn(question.picture, question.target);
+        assert.ok(count >= 2);
+        assert.equal(chosen, count);
+        assert.equal(new Set(question.choices).size, 4);
+        assert.deepEqual(
+          question.choices,
+          [...question.choices].sort((a, b) => a - b),
+        );
+      }
+    }
+    const [first, second, , , box, can, , picture, other] = round;
+    // 分類 asks about two different kinds; 描下來 a box, then a can; two different pictures.
+    assert.ok(first.kind === "classify" && second.kind === "classify");
+    assert.notEqual(things[first.thing].solid, things[second.thing].solid);
+    assert.ok(box.kind === "trace" && things[box.thing].solid === "box");
+    assert.ok(can.kind === "trace" && things[can.thing].solid === "can");
+    assert.ok(picture.kind === "build" && other.kind === "build");
+    assert.notEqual(picture.picture, other.picture);
+  }
+  assert.equal(mathPrompts["find-triangle"], "把所有的三角形都點出來。");
+  assert.equal(mathPrompts["build-circle"], "這個造型用了幾個圓形？點一下。");
+});
+
+test("做造型's pictures keep 正方形 square and 長方形 long, inside the picture", () => {
+  for (const [name, { parts }] of Object.entries(pictures))
+    for (const part of parts as readonly PicturePart[]) {
+      if (part.flat === "triangle") {
+        assert.equal(part.points.length, 3);
+        assert.ok(
+          part.points.flat().every((value) => value >= 0 && value <= 100),
+          name,
+        );
+      } else if (part.flat === "circle") {
+        assert.ok(part.cx - part.r >= 0 && part.cx + part.r <= 100, name);
+        assert.ok(part.cy - part.r >= 0 && part.cy + part.r <= 100, name);
+      } else {
+        const [short, long] = [part.w, part.h].sort((a, b) => a - b);
+        if (part.flat === "square") assert.equal(part.w, part.h, name);
+        else assert.ok(long >= 1.5 * short, `${name}: a 長方形 must not look square`);
+        assert.ok(part.x >= 0 && part.y >= 0 && part.x + part.w <= 100 && part.y + part.h <= 100);
+      }
+    }
 });

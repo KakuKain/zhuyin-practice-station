@@ -550,14 +550,16 @@ test("第三課 排順序、比多少 is tapped: 排數字, 排在第幾個, 第
     [1, /第二課.*比長短/],
     [2, /第三課.*排順序、比多少/],
     [3, /第四課.*分與合/],
-    [4, /第五課.*方盒、圓罐、球.*製作中/],
+    [4, /第五課.*方盒、圓罐、球/],
+    [5, /第六課.*30以內的數.*製作中/],
     [6, /第七課.*10以內的加法/],
     [8, /第九課.*幾點鐘.*製作中/],
     [9, /第一課.*50以內的數.*製作中/],
     [17, /第九課.*幾月幾日星期幾.*製作中/],
   ] as const)
     await expect(cards.nth(index)).toHaveText(title);
-  await expect(cards.nth(4)).toBeDisabled();
+  await expect(cards.nth(4)).not.toContainText("製作中");
+  await expect(cards.nth(5)).toBeDisabled();
   await page.getByRole("button", { name: /數學第三課/ }).click();
   await expect(page.getByRole("heading", { name: "排順序、比多少" })).toBeVisible();
   await page.getByRole("button", { name: "開始練習", exact: true }).click();
@@ -655,5 +657,123 @@ test("第三課 排順序、比多少 is tapped: 排數字, 排在第幾個, 第
   expect(records.rounds).toHaveLength(1);
   expect(records.rounds[0]).toMatchObject({ lessonId: 7, total: 8 });
   expect(records.rounds[0].needsPractice[0]).toEqual({ kind: "排在第幾個（從右邊數）" });
+  expect(errors).toEqual([]);
+});
+
+test("第五課 方盒、圓罐、球 is tapped: 分類, 疊疊看、滾滾看, 描下來, 找圖形 and 做造型, each tried until right", async ({
+  page,
+}) => {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("./");
+  await page.getByRole("button", { name: "數學", exact: true }).click();
+  await page.getByRole("button", { name: /數學第五課/ }).click();
+  await expect(page.getByRole("heading", { name: "方盒、圓罐、球" })).toBeVisible();
+  await page.getByRole("button", { name: "開始練習", exact: true }).click();
+
+  const header = page.locator(".math-header small");
+  const audio = page.locator("audio");
+  const status = page.locator(".compare-question [role=status]");
+  const spoken = (sentence: RegExp) => expect(audio).toHaveAttribute("data-clip-text", sentence);
+  const said = async (pattern: RegExp) =>
+    pattern.exec((await audio.getAttribute("data-clip-text")) ?? "")![1];
+  const answeredRight = async (question: number) => {
+    await expect(status).toHaveText("答對了！");
+    if (question < 9) await expect(header).toHaveText(`第 ${question + 1} 題 / 9`);
+  };
+  const card = (name: string) =>
+    page.locator(".shape-choices").getByRole("button", { name, exact: true });
+  const thing = async () =>
+    (await page.locator(".shape-thing [role=img]").getAttribute("aria-label")) ?? "";
+  const kinds: Record<string, string> = {
+    ...{ 面紙盒: "方盒", 禮物盒: "方盒", 骰子: "方盒" },
+    ...{ 罐頭: "圓罐", 鼓: "圓罐", 餅乾罐: "圓罐" },
+    ...{ 海灘球: "球", 柳丁: "球", 籃球: "球" },
+  };
+  // The shapes a drawing is made of, read from the drawing itself: a 正方形 is a square rect.
+  const drawn = (art: Locator) =>
+    art
+      .locator("rect, circle, polygon")
+      .evaluateAll((shapes) =>
+        shapes.map((shape) =>
+          shape.tagName === "circle"
+            ? "圓形"
+            : shape.tagName === "polygon"
+              ? "三角形"
+              : shape.getAttribute("width") === shape.getAttribute("height")
+                ? "正方形"
+                : "長方形",
+        ),
+      );
+
+  // 1–2 分類: a thing from home is a 方盒, 圓罐 or 球; a wrong tap is tried again.
+  await expect(header).toHaveText("第 1 題 / 9");
+  await expect(audio).toHaveAttribute("src", /math-audio\/shape-classify\.m4a/);
+  await spoken(/^這是方盒、圓罐，還是球？點一下。$/);
+  const firstThing = await thing();
+  const first = kinds[firstThing];
+  await card(["方盒", "圓罐", "球"].find((name) => name !== first)!).click();
+  await expect(status).toHaveText("再想想看");
+  await expect(status).toHaveText("");
+  await card(first).click();
+  await answeredRight(1);
+  const second = kinds[await thing()];
+  expect(second).not.toBe(first);
+  await card(second).click();
+  await answeredRight(2);
+
+  // 3 疊疊看 and 4 滾滾看.
+  await spoken(/^哪一個不能疊起來？點一下。$/);
+  await card("球").click();
+  await answeredRight(3);
+  await spoken(/^哪一個不會滾？點一下。$/);
+  await card("方盒").click();
+  await answeredRight(4);
+
+  // 5–6 描下來: the coloured face of a box, then of a can.
+  await spoken(/^把有顏色的這一面描下來，是什麼形狀？點一下。$/);
+  await card((await thing()) === "面紙盒" ? "長方形" : "正方形").click();
+  await answeredRight(5);
+  expect(kinds[await thing()]).toBe("圓罐");
+  await card("圓形").click();
+  await answeredRight(6);
+
+  // 7 找圖形: every shape of one kind, in any order; each stays marked.
+  await spoken(/^把所有的.+都點出來。$/);
+  const target = await said(/所有的(.+)都/);
+  const pieces = page.locator(".shape-piece");
+  const matching = (await drawn(page.locator(".shape-find"))).flatMap((shape, index) =>
+    shape === target ? [index] : [],
+  );
+  expect(matching.length).toBeGreaterThanOrEqual(2);
+  const [last, ...rest] = matching.reverse();
+  for (const index of rest) {
+    await pieces.nth(index).click();
+    await expect(pieces.nth(index)).toHaveClass(/is-picked/);
+  }
+  await pieces.nth(last).click();
+  await answeredRight(7);
+
+  // 8–9 做造型: how many of a shape a picture uses.
+  for (const question of [8, 9]) {
+    await spoken(/^這個造型用了幾個.+？點一下。$/);
+    const asked = await said(/幾個(.+)？/);
+    const shapes = await drawn(page.locator(".shape-thing.is-picture"));
+    const count = shapes.filter((shape) => shape === asked).length;
+    expect(count).toBeGreaterThanOrEqual(2);
+    await page
+      .locator(".sequence-choices .sequence-card", { hasText: new RegExp(`^${count}$`) })
+      .click();
+    await answeredRight(question);
+  }
+
+  await expect(page.getByRole("heading", { name: "這一課練完了！" })).toBeVisible();
+  const missed = `堆疊與分類（${firstThing}是${first}）`;
+  await expect(page.locator(".math-result")).toContainText(missed);
+  const records = await page.evaluate(() =>
+    JSON.parse(localStorage.getItem("kid-math-records-v1") ?? "{}"),
+  );
+  expect(records.rounds[0]).toMatchObject({ lessonId: 5, total: 9 });
+  expect(records.rounds[0].needsPractice).toEqual([{ kind: missed }]);
   expect(errors).toEqual([]);
 });

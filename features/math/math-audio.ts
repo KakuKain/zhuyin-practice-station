@@ -27,6 +27,13 @@ const addPairs = [
   ),
   ...range(1, 9).flatMap((value) => [[value, 0] as const, [0, value] as const]),
 ];
+/** 第五課's flat shapes, with their readings, for 找圖形 and 做造型. */
+const flatShapeNames: Record<string, [string, string]> = {
+  square: ["正方形", "ㄓㄥˋ ㄈㄤ ㄒㄧㄥˊ"],
+  rect: ["長方形", "ㄔㄤˊ ㄈㄤ ㄒㄧㄥˊ"],
+  triangle: ["三角形", "ㄙㄢ ㄐㄧㄠˇ ㄒㄧㄥˊ"],
+  circle: ["圓形", "ㄩㄢˊ ㄒㄧㄥˊ"],
+};
 /** 第三課 排在第幾個: rows of six or seven, never asking for the first or the last. */
 const positionPlaces = range(2, 6);
 /** 第三課 第幾個和幾個: 「點三個」 and 「點第三個」 in a row of seven. */
@@ -95,6 +102,17 @@ export const mathPrompts: Record<string, string> = {
     groupCounts.flatMap((count) => [
       [`group-${count}`, `從左邊數，點${numerals[count]}個。`],
       [`nth-${count}`, `從左邊數，點第${sumNumerals[count]}個。`],
+    ]),
+  ),
+  // 第五課 方盒、圓罐、球
+  "shape-classify": "這是方盒、圓罐，還是球？點一下。",
+  "shape-stack": "哪一個不能疊起來？點一下。",
+  "shape-roll": "哪一個不會滾？點一下。",
+  "shape-trace": "把有顏色的這一面描下來，是什麼形狀？點一下。",
+  ...Object.fromEntries(
+    Object.entries(flatShapeNames).flatMap(([flat, [name]]) => [
+      [`find-${flat}`, `把所有的${name}都點出來。`],
+      [`build-${flat}`, `這個造型用了幾個${name}？點一下。`],
     ]),
   ),
   // 第四課 分與合: numbers are said as in a sum (二, not 兩), and 和 is ㄏㄢˋ as in the lessons.
@@ -178,6 +196,20 @@ export const mathPromptReadings: Record<string, string> = {
     groupCounts.flatMap((count) => [
       [`group-${count}`, `ㄘㄨㄥˊ ㄗㄨㄛˇ ㄅㄧㄢ ㄕㄨˇ ㄉㄧㄢˇ ${numeralReadings[count]} ㄍㄜˋ`],
       [`nth-${count}`, `ㄘㄨㄥˊ ㄗㄨㄛˇ ㄅㄧㄢ ㄕㄨˇ ㄉㄧㄢˇ ㄉㄧˋ ${sumReadings[count]} ㄍㄜˋ`],
+    ]),
+  ),
+  "shape-classify": "ㄓㄜˋ ㄕˋ ㄈㄤ ㄏㄜˊ ㄩㄢˊ ㄍㄨㄢˋ ㄏㄞˊ ㄕˋ ㄑㄧㄡˊ ㄉㄧㄢˇ ㄧ ㄒㄧㄚˋ",
+  "shape-stack": "ㄋㄚˇ ㄧ ㄍㄜˋ ㄅㄨˋ ㄋㄥˊ ㄉㄧㄝˊ ㄑㄧˇ ˙ㄌㄞ ㄉㄧㄢˇ ㄧ ㄒㄧㄚˋ",
+  "shape-roll": "ㄋㄚˇ ㄧ ㄍㄜˋ ㄅㄨˋ ㄏㄨㄟˋ ㄍㄨㄣˇ ㄉㄧㄢˇ ㄧ ㄒㄧㄚˋ",
+  "shape-trace":
+    "ㄅㄚˇ ㄧㄡˇ ㄧㄢˊ ㄙㄜˋ ˙ㄉㄜ ㄓㄜˋ ㄧ ㄇㄧㄢˋ ㄇㄧㄠˊ ㄒㄧㄚˋ ˙ㄌㄞ ㄕˋ ㄕㄣˊ ˙ㄇㄜ ㄒㄧㄥˊ ㄓㄨㄤˋ ㄉㄧㄢˇ ㄧ ㄒㄧㄚˋ",
+  ...Object.fromEntries(
+    Object.entries(flatShapeNames).flatMap(([flat, [, reading]]) => [
+      [`find-${flat}`, `ㄅㄚˇ ㄙㄨㄛˇ ㄧㄡˇ ˙ㄉㄜ ${reading} ㄉㄡ ㄉㄧㄢˇ ㄔㄨ ˙ㄌㄞ`],
+      [
+        `build-${flat}`,
+        `ㄓㄜˋ ㄍㄜˋ ㄗㄠˋ ㄒㄧㄥˊ ㄩㄥˋ ˙ㄌㄜ ㄐㄧˇ ㄍㄜˋ ${reading} ㄉㄧㄢˇ ㄧ ㄒㄧㄚˋ`,
+      ],
     ]),
   ),
   ...Object.fromEntries(

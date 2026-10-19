@@ -26,6 +26,17 @@ import {
 } from "./sequence-round";
 import { SequenceStage, choiceState, type Feedback } from "./SequenceViews";
 import {
+  buildShapeRound,
+  isShapeQuestion,
+  shapeAnswer,
+  shapeInAnyOrder,
+  shapePromptId,
+  shapeSection,
+  shapeTopic,
+  type ShapeQuestion,
+} from "./shape-round";
+import { ShapeStage } from "./ShapeViews";
+import {
   answerOf,
   buildCompareRound,
   kidPicture,
@@ -45,35 +56,46 @@ import {
 
 type CompareApp = Pick<AppController, "speak" | "stopPlayback" | "navigate" | "awardStamp">;
 type BarQuestion = Extract<CompareQuestion, { kind: "compare" }>;
-/** A question answered by tapping: 第二課 比長短's, or 第三課 排順序、比多少's. */
-type TapQuestion = CompareQuestion | SequenceQuestion;
+/** A question answered by tapping: 第二課 比長短's, 第三課 排順序、比多少's or 第五課's. */
+type TapQuestion = CompareQuestion | SequenceQuestion | ShapeQuestion;
 
 /** Each tapped lesson's round, by lesson id. */
 const tapRounds: Record<number, () => TapQuestion[]> = {
   2: buildCompareRound,
   7: buildSequenceRound,
+  5: buildShapeRound,
 };
 
 const correctDelay = 1300;
 const retryDelay = 900;
 
 const sectionOf = (question: TapQuestion) =>
-  isSequenceQuestion(question)
-    ? sequenceSection(question)
-    : question.kind === "compare"
-      ? question.measure === "length"
-        ? "比長短"
-        : "比高矮"
-      : question.kind === "thickness"
-        ? "比厚薄"
-        : "直線和曲線";
+  isShapeQuestion(question)
+    ? shapeSection(question)
+    : isSequenceQuestion(question)
+      ? sequenceSection(question)
+      : question.kind === "compare"
+        ? question.measure === "length"
+          ? "比長短"
+          : "比高矮"
+        : question.kind === "thickness"
+          ? "比厚薄"
+          : "直線和曲線";
 
 const topicOf = (question: TapQuestion) =>
-  isSequenceQuestion(question) ? sequenceTopic(question) : compareTopic(question);
+  isShapeQuestion(question)
+    ? shapeTopic(question)
+    : isSequenceQuestion(question)
+      ? sequenceTopic(question)
+      : compareTopic(question);
 
 /** The instructions read aloud: first how to line things up (比長短 only), then what to answer. */
 const promptsOf = (question: TapQuestion): { lineUp?: string; ask: string } =>
-  isSequenceQuestion(question) ? { ask: sequencePromptId(question) } : comparePromptIds(question);
+  isShapeQuestion(question)
+    ? { ask: shapePromptId(question) }
+    : isSequenceQuestion(question)
+      ? { ask: sequencePromptId(question) }
+      : comparePromptIds(question);
 
 const firstPrompt = (question: TapQuestion) => {
   const ids = promptsOf(question);
@@ -195,7 +217,7 @@ function QuestionView({
 }) {
   const ids = promptsOf(question);
   const [lining, setLining] = useState(
-    () => !isSequenceQuestion(question) && needsLining(question),
+    () => !isShapeQuestion(question) && !isSequenceQuestion(question) && needsLining(question),
   );
   const [picks, setPicks] = useState<number[]>([]);
   const [feedback, setFeedback] = useState<Feedback>(null);
@@ -207,10 +229,16 @@ function QuestionView({
     [],
   );
   const promptId = lining && ids.lineUp ? ids.lineUp : ids.ask;
-  const answer = isSequenceQuestion(question) ? sequenceAnswer(question) : answerOf(question);
+  const answer = isShapeQuestion(question)
+    ? shapeAnswer(question)
+    : isSequenceQuestion(question)
+      ? sequenceAnswer(question)
+      : answerOf(question);
 
-  // 「點三個」 takes the three in any order; 從小到大 must go in order.
-  const anyOrder = isSequenceQuestion(question) && inAnyOrder(question);
+  // 「點三個」 and 「把三角形都點出來」 take their taps in any order; 從小到大 must go in order.
+  const anyOrder = isShapeQuestion(question)
+    ? shapeInAnyOrder(question)
+    : isSequenceQuestion(question) && inAnyOrder(question);
   const pick = (choice: number) => {
     if (feedback || lining || picks.includes(choice)) return;
     if (timer.current !== null) window.clearTimeout(timer.current);
@@ -232,7 +260,9 @@ function QuestionView({
   return (
     <section className={`compare-question is-${question.kind}`}>
       <MathPrompt id={promptId} onPlay={() => say(promptId)} />
-      {isSequenceQuestion(question) ? (
+      {isShapeQuestion(question) ? (
+        <ShapeStage question={question} picks={picks} feedback={feedback} onPick={pick} />
+      ) : isSequenceQuestion(question) ? (
         <SequenceStage question={question} picks={picks} feedback={feedback} onPick={pick} />
       ) : question.kind === "compare" ? (
         <BarStage
