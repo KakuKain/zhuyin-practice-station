@@ -20,3 +20,5 @@
 - 完整公眾授權使用說明原 PDF 保留於 `moe-examples/使用說明.pdf`，來源：https://language.moe.gov.tw/001/Upload/Files/site_content/M0001/respub/conciseddict_10312.pdf
 
 舊的結合韻 `.m4a` 為專案產生的錄音；播放路徑已改為上述官方 MP3，舊檔不再使用。
+
+目前只有「ㄧㄤ」播放上述原始 MP3（`6160.mp3`，「央」）：家長聽 Gemini 版本像 ㄧㄤˊ，因此改用這個錄音。檔案與官方來源位元組相同，沒有裁切或轉檔；播放器在 0.7 秒（「央」唸完、錄音開始唸部首之前的靜音處）停止播放。其餘 21 個結合韻使用 Gemini 靜態音檔。

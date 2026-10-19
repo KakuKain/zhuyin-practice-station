@@ -2,7 +2,11 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { createHash } from "node:crypto";
-import { registeredAudioUrl, registeredLessonAudioUrl } from "../../lib/audio/audio-registry";
+import {
+  clipEnd,
+  registeredAudioUrl,
+  registeredLessonAudioUrl,
+} from "../../lib/audio/audio-registry";
 import { builtinCatalog } from "../../features/courses/materials";
 import { buildListeningSession } from "../../features/listening/listening-data";
 
@@ -45,4 +49,14 @@ test("every playback identity resolves to a shipped file in its folder", () => {
     assert.ok(url.startsWith(`listening-audio/${folder}`), text);
     readFileSync(`public/${url.split("?")[0]}`);
   }
+});
+
+test("ㄧㄤ plays the dictionary's 「央」 unchanged, stopping after the character", () => {
+  // The parent heard the Gemini clip as ㄧㄤˊ. The dictionary's recording is CC BY-ND, so its file
+  // is never cut: playback stops at 0.7 s, in the silence before it reads the radical (1.2 s).
+  const url = registeredAudioUrl("ㄧㄤ")!;
+  assert.equal(url, "listening-audio/moe-examples/6160.mp3#t=0,0.7");
+  assert.equal(registeredAudioUrl("ㄧㄤ", "ㄧㄤ"), url);
+  assert.equal(clipEnd(url), 0.7);
+  assert.equal(clipEnd(registeredAudioUrl("ㄧㄢ")!), null);
 });

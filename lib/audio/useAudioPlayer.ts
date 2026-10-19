@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { RefObject } from "react";
 import type { ListeningQuestion, StateSetter, View } from "../../features/types";
-import { registeredAudioUrl } from "./audio-registry";
+import { clipEnd, registeredAudioUrl } from "./audio-registry";
 import { createAudioPreloader } from "./audio-preload";
 import { clipPolicy, type CustomRecording } from "./custom-audio";
 import {
@@ -51,6 +51,7 @@ export function useAudioPlayer({
   const playbackTokenRef = useRef(0);
   const audioLoadTimeoutRef = useRef<number | null>(null);
   const clipEndedRef = useRef<(() => void) | null>(null);
+  const clipEndTimeoutRef = useRef<number | null>(null);
   const customUrlRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -87,6 +88,8 @@ export function useAudioPlayer({
     clipEndedRef.current = null;
     if (audioLoadTimeoutRef.current !== null) window.clearTimeout(audioLoadTimeoutRef.current);
     audioLoadTimeoutRef.current = null;
+    if (clipEndTimeoutRef.current !== null) window.clearTimeout(clipEndTimeoutRef.current);
+    clipEndTimeoutRef.current = null;
     onStopRepeat();
     if (playbackTailTimeoutRef.current !== null)
       window.clearTimeout(playbackTailTimeoutRef.current);
@@ -106,6 +109,8 @@ export function useAudioPlayer({
 
   const finishPlayback = useCallback(() => {
     const playbackToken = playbackTokenRef.current;
+    if (clipEndTimeoutRef.current !== null) window.clearTimeout(clipEndTimeoutRef.current);
+    clipEndTimeoutRef.current = null;
     setPlayingSymbol(null);
     setAudioLoading(false);
     if (customUrlRef.current) URL.revokeObjectURL(customUrlRef.current);
@@ -174,10 +179,15 @@ export function useAudioPlayer({
         const playbackUrl = url ?? "";
         audio.dataset.clipText = text;
         audioPreloaderRef.current?.cancelWarmup(playbackUrl);
+        const end = custom ? null : clipEnd(playbackUrl);
         if (custom) {
           customUrlRef.current = URL.createObjectURL(custom.blob);
           audio.src = customUrlRef.current;
-        } else audio.src = audioPreloaderRef.current?.playbackUrl(playbackUrl) ?? playbackUrl;
+        } else {
+          const source = audioPreloaderRef.current?.playbackUrl(playbackUrl) ?? playbackUrl;
+          // A cached copy is a blob URL: it keeps the fragment, so the browser stops there too.
+          audio.src = end !== null && !source.includes("#") ? `${source}#t=0,${end}` : source;
+        }
         // Assigning src resets the rate, so normal speed is set afterwards.
         audio.defaultPlaybackRate = 1;
         audio.playbackRate = 1;
@@ -190,6 +200,19 @@ export function useAudioPlayer({
             if (playbackToken !== playbackTokenRef.current) return;
             loaded();
             options.onStarted?.();
+            // A clip played only in part ends where the browser pauses it (the media fragment),
+            // or here if a browser ignores the fragment; 'ended' never fires for it.
+            if (end !== null) {
+              const watch = () => {
+                clipEndTimeoutRef.current = null;
+                if (playbackToken !== playbackTokenRef.current) return;
+                if (audio.paused || audio.ended || audio.currentTime >= end) {
+                  audio.pause();
+                  finishPlayback();
+                } else clipEndTimeoutRef.current = window.setTimeout(watch, 40);
+              };
+              watch();
+            }
             // Retain downloaded official clips for subsequent taps and replay.
             if (!custom) audioPreloaderRef.current?.warm([playbackUrl]);
           })

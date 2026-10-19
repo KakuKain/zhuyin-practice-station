@@ -5,7 +5,7 @@
 公開網站：[一年級注音練習站](https://kakukain.github.io/zhuyin-practice-station/)
 
 - 課文：國字＋注音／純注音直排預覽，課名與課文頁標題都有旁注音，手機支援翻頁。
-- 注音表：下方「注音」導覽，21 個聲符、16 個韻符、22 個結合韻分區；基本符號播放教育部錄音，結合韻使用 Gemini 靜態音檔。
+- 注音表：下方「注音」導覽，21 個聲符、16 個韻符、22 個結合韻分區；基本符號播放教育部錄音，結合韻使用 Gemini 靜態音檔（ㄧㄤ 播放教育部辭典「央」的字音）。
 - 默寫：逐格 Canvas 手寫、草稿續寫、整篇家長對照與錯字收藏重練。
 - 聽寫：每回合抽 4 題符號及該課全部教師圈詞（每題一個單詞，不出句子）；複習僅聽寫。先整輪作答，再全部對照，期間可重聽或返回修改。語詞每字都有直式大格。
 - 家長可調整播放次數與間隔，判定答對／需要補強；收藏題目可單題重練。
@@ -74,6 +74,6 @@ npm run assets:artwork        # 保留 PNG 原稿，產生無損 WebP
 npm run assets:audio-registry # 更新音檔身份、長度與 hash 快取版本
 ```
 
-單個注音符號使用教育部《國語注音符號手冊》F1–F37 錄音，以正常速度播放。九課朗讀及 22 結合韻使用 Gemini Fola 音檔（見 [朗讀製作紀錄](docs/gemini-readings.md)）；其餘生字／語詞仍主要使用舊合成檔。音檔清單記錄 hash、長度及來源，未宣稱全部通過人耳校對。來源、CC BY 4.0 授權與轉檔說明見 [音檔出處](public/listening-audio/ATTRIBUTION.md)。可用 `node scripts/generate-listening-audio.mjs --refresh-symbols` 更新官方錄音。
+單個注音符號使用教育部《國語注音符號手冊》F1–F37 錄音，以正常速度播放。九課朗讀及 21 個結合韻使用 Gemini Fola 音檔（見 [朗讀製作紀錄](docs/gemini-readings.md)），ㄧㄤ 播放教育部《國語辭典簡編本》「央」的原始錄音，唸完字音就停；其餘生字／語詞仍主要使用舊合成檔。音檔清單記錄 hash、長度及來源，未宣稱全部通過人耳校對。來源、CC BY 4.0 授權與轉檔說明見 [音檔出處](public/listening-audio/ATTRIBUTION.md)。可用 `node scripts/generate-listening-audio.mjs --refresh-symbols` 更新官方錄音。
 
 目前仍為 Beta。依賴掃描的已知項目與後續升級界線見 [安全維護說明](docs/security-maintenance.md)。

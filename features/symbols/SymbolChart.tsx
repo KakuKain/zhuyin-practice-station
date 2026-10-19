@@ -104,7 +104,9 @@ export function SymbolChart({
       ))}
       <section className="combined-rhymes" aria-labelledby="combined-rhymes-heading">
         <h2 id="combined-rhymes-heading">結合韻</h2>
-        <p className="symbol-page-note">結合韻使用合成語音，只播放音節。「ㄧㄞ」為第二聲示範。</p>
+        <p className="symbol-page-note">
+          結合韻使用合成語音，只播放音節；「ㄧㄤ」播放教育部辭典「央」的字音。「ㄧㄞ」為第二聲示範。
+        </p>
         {combinedRhymeGroups.map((group, groupIndex) => (
           <section
             className="symbol-group is-combined"
@@ -153,7 +155,19 @@ export function SymbolChart({
         >
           教育部《國語注音符號手冊》
         </a>
-        。結合韻：台灣中文合成語音。
+        。結合韻：台灣中文合成語音；「ㄧㄤ」：
+        <a href="https://dict.concised.moe.edu.tw/" target="_blank" rel="noreferrer noopener">
+          教育部《國語辭典簡編本》
+        </a>
+        「央」字音，
+        <a
+          href="https://creativecommons.org/licenses/by-nd/3.0/tw/"
+          target="_blank"
+          rel="noreferrer noopener"
+        >
+          CC BY-ND 3.0 TW
+        </a>
+        。
       </p>
     </section>
   );
