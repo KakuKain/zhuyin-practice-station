@@ -21,6 +21,7 @@ export const soundGroups: readonly SoundGroup[] = [
     pairs: [
       symbols("zhi-zi", "ㄓ", "ㄗ"),
       symbols("chi-ci", "ㄔ", "ㄘ"),
+      symbols("zi-chi", "ㄗ", "ㄔ"),
       symbols("shi-si", "ㄕ", "ㄙ"),
       symbols("ri-le", "ㄖ", "ㄌ"),
     ],
@@ -29,6 +30,8 @@ export const soundGroups: readonly SoundGroup[] = [
     title: "其他聲母",
     pairs: [
       symbols("de-te", "ㄉ", "ㄊ"),
+      symbols("zi-ci", "ㄗ", "ㄘ"),
+      symbols("ke-ne", "ㄎ", "ㄋ"),
       symbols("zhi-chi", "ㄓ", "ㄔ"),
       symbols("fo-he", "ㄈ", "ㄏ"),
       symbols("ne-le", "ㄋ", "ㄌ"),
