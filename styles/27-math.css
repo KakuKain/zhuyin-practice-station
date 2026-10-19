@@ -294,16 +294,16 @@
   background: #2f9a55;
   color: #fff;
 }
-/* 認識 0: an empty basket. */
+/* 認識 0: the place the pictures would be, empty, with a dashed edge. */
 .math-pictures.is-empty {
   grid-template-columns: minmax(0, 1fr);
-  place-items: center;
   min-height: 160px;
+  border-style: dashed;
+  border-color: #b9cdd6;
 }
 .math-pictures.is-empty.is-small {
-  min-height: 0;
+  min-height: 40px;
   width: 64px;
-  justify-content: center;
 }
 .math-pictures.is-small {
   display: flex;

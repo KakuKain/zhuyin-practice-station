@@ -75,7 +75,7 @@ import { mathRoundStorageKey, ownsStorageKey, storageKeys } from "../../lib/stor
 import kidPictures from "../../features/math/kid-pictures.json";
 import { childRecordKeys } from "../../lib/storage/child-profiles";
 
-test("a 第一課 round counts 1–5 twice, 6–10 twice and an empty basket, then draws 4", () => {
+test("a 第一課 round counts 1–5 twice, 6–10 twice and an empty place, then draws 4", () => {
   for (let run = 0; run < 50; run++) {
     const round = buildCountingRound();
     const count = round.filter((question) => question.kind === "count");

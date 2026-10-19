@@ -2,7 +2,6 @@ import { Fragment } from "react";
 import {
   Acorn,
   Balloon,
-  Basket,
   Bird,
   Butterfly,
   Car,
@@ -78,16 +77,15 @@ export function CountPictures({
   small?: boolean;
 }) {
   const { icon: Picture, color, name } = icons[question.icon];
-  // 認識 0: the basket is there, with nothing in it.
+  // 認識 0: the place the pictures would be, with nothing in it. The prompt names what to count
+  // (「這裡有幾隻小鳥？」); a basket was counted as one thing.
   if (question.target === 0)
     return (
       <div
         className={`math-pictures is-empty${small ? " is-small" : ""}`}
         role="img"
-        aria-label="空的籃子，裡面沒有東西"
-      >
-        <Basket size={small ? 40 : 120} weight="duotone" color="#b08a5a" aria-hidden="true" />
-      </div>
+        aria-label={`這裡沒有${name}`}
+      />
     );
   return (
     <div

@@ -50,9 +50,14 @@ test("第一課 10以內的數 reads each question aloud, keeps the round and en
   for (let i = 0; i < 4; i++)
     await page.getByRole("button", { name: "下一題", exact: true }).click();
 
-  // 認識 0: an empty basket.
+  // 認識 0: the place the pictures would be, empty; the prompt names what to count.
   await expect(page.locator(".math-header")).toContainText("認識 0");
-  await expect(page.getByRole("img", { name: "空的籃子，裡面沒有東西" })).toBeVisible();
+  await expect(page.getByRole("img", { name: /^這裡沒有/ })).toBeVisible();
+  await expect(page.locator("audio")).toHaveAttribute("src", /math-audio\/zero-[a-zA-Z]+\.m4a/);
+  await expect(page.locator("audio")).toHaveAttribute(
+    "data-clip-text",
+    /^這裡有幾.+？用筆寫出數字。$/,
+  );
   await page.getByRole("button", { name: "下一題", exact: true }).click();
 
   // 表示數量: one circle in each cell of a 十格框; filled cells are numbered in reading order.
