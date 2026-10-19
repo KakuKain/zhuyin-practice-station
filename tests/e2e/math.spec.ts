@@ -25,7 +25,7 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
-type SavedQuestion = { kind: string; target: number; parts?: number[] };
+type SavedQuestion = { kind: string; target: number; parts?: number[]; story?: boolean };
 
 /** A written lesson's saved round: its questions, in the order this round asks them. */
 async function savedQuestions(page: Page, key: string): Promise<SavedQuestion[]> {
@@ -537,7 +537,10 @@ test("第四課 分與合 reads 分合圖: the missing part, the total and a way
       (question, index) =>
         question.kind === kind && (question.target === 10) === ten && index !== skip,
     );
-  const split = where("split", false);
+  const split = questions.findIndex(
+    (question) => question.kind === "split" && question.target < 10 && !question.story,
+  );
+  const story = questions.findIndex((question) => question.story);
   const combine = where("combine", false);
 
   // 分一分: the total and one part are given; the other part is written.
@@ -549,6 +552,14 @@ test("第四課 分與合 reads 分合圖: the missing part, the total and a way
   await picture.click();
   await expect(picture).toHaveAttribute("aria-pressed", "true");
   await stroke(page, page.getByLabel("寫答案，在右下"), four);
+
+  // 拿走了: some of the pictures move into the hand's tray; what is left is written.
+  await goToQuestion(page, story);
+  await expect(header).toContainText("分一分");
+  await expect(audio).toHaveAttribute("data-clip-text", /^有.個，拿走了.個，還剩幾個？$/);
+  await expect(page.locator(".math-take-taken > span")).toHaveCount(questions[story].parts![0]);
+  await expect(page.locator(".math-take-left button")).toHaveCount(questions[story].parts![1]);
+  await expect(page.getByRole("group", { name: /^分合圖：\d+ 分成 \d+ 和 ？$/ })).toBeVisible();
 
   // 合一合: both parts are given; the total is written on top.
   await goToQuestion(page, combine);

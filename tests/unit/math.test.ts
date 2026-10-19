@@ -354,7 +354,7 @@ test("the math course cards, lesson pages and practice screens show every word i
     ...mathCourse.flatMap((lesson) => [lesson.number, lesson.title]),
     ...mathLessons.flatMap((lesson) => lesson.parts),
     ...["這一課", "開始", "開始練習", "從頭開始", "繼續", "繼續練習", "第", "題", "多畫了", "個"],
-    ...["一樣多", "左邊", "右邊"],
+    ...["一樣多", "左邊", "右邊", "拿走了"],
     // 第五課's answer cards.
     ...Object.values(solidNames),
     ...Object.values(flatNames),
@@ -431,6 +431,10 @@ test("a 分與合 round reads 分合圖: 分一分 and 合一合 under 10, then 
       assert.ok(mathPrompts[id] && mathPromptReadings[id], id);
       assert.ok(existsSync(`public/${mathPromptUrl(id).split("?")[0]}`), id);
     }
+    // One 分一分 under 10 is told as a story, 拿走了: the first part is taken away.
+    const stories = round.filter((question) => question.kind === "split" && question.story);
+    assert.equal(stories.length, 1);
+    assert.ok(stories[0].target < 10);
     // Each 分一分 (and 分分看) has its own pictures, and so does each 合一合.
     for (const kinds of [["split", "ways"], ["combine"]]) {
       const pictures = round.flatMap((question) =>
@@ -448,6 +452,7 @@ test("a 分與合 round reads 分合圖: 分一分 and 合一合 under 10, then 
       .map((question) => question.kind)
       .sort(),
   );
+  assert.equal(mathPrompts["take-2-3"], "有五個，拿走了兩個，還剩幾個？");
   // 和 reads ㄏㄢˋ beside the prompt, so Meijia is given the homophone 漢.
   assert.equal(mathPrompts["split-3-4"], "七可以分成三和幾？");
   assert.equal(mathPromptSpeech("split-3-4"), "七可以分成三漢幾？");
@@ -497,6 +502,16 @@ test("a 第七課 10以內的加法 round asks 合起來是多少, 0的加法, t
 
 test("a saved 分與合 round keeps 分分看's two numbers, and needs both to count as answered", () => {
   const round = newMathRound(4);
+  // A reload keeps which 分一分 is told as 拿走了; only totals under 10 are.
+  assert.deepEqual(
+    validateMathRound(JSON.parse(JSON.stringify(round)))!.questions,
+    round.questions,
+  );
+  const [ten] = validateMathRound({
+    ...round,
+    questions: [{ kind: "split", target: 10, parts: [3, 7], icon: "fish", story: true }],
+  })!.questions;
+  assert.ok(!("story" in ten));
   const ways = round.questions.findIndex((question) => question.kind === "ways");
   const stroke = [[{ x: 10, y: 10 }]];
   const both = validateMathRound(

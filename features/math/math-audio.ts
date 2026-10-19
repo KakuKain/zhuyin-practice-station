@@ -44,6 +44,8 @@ const groupCounts = range(2, 5);
  * 10的分與合.
  */
 const splitPairs = addPairs.filter(([a, b]) => a > 0 && b > 0);
+/** 拿走了 takes some of 3 to 9 things away. */
+const takePairs = splitPairs.filter(([a, b]) => a + b >= 3 && a + b < 10);
 const combinePairs = [
   ...joinPairs.filter(([a, b]) => a + b >= 3),
   ...range(1, 9)
@@ -145,6 +147,13 @@ export const mathPrompts: Record<string, string> = {
     splitPairs.map(([a, b]) => [
       `split-${a}-${b}`,
       `${sumNumerals[a + b]}可以分成${sumNumerals[a]}和幾？`,
+    ]),
+  ),
+  // 拿走了, 分一分 told as a story: things are counted (兩個), as in 數一數.
+  ...Object.fromEntries(
+    takePairs.map(([a, b]) => [
+      `take-${a}-${b}`,
+      `有${numerals[a + b]}個，拿走了${numerals[a]}個，還剩幾個？`,
     ]),
   ),
   ...Object.fromEntries(
@@ -261,6 +270,12 @@ export const mathPromptReadings: Record<string, string> = {
       `${sumReadings[total]} ㄎㄜˇ ㄧˇ ㄈㄣ ㄔㄥˊ ㄐㄧˇ ㄏㄢˋ ㄐㄧˇ ㄒㄧㄝˇ ㄔㄨ ㄧ ㄓㄨㄥˇ ㄈㄣ ㄈㄚˇ`,
     ]),
   ),
+  ...Object.fromEntries(
+    takePairs.map(([a, b]) => [
+      `take-${a}-${b}`,
+      `ㄧㄡˇ ${numeralReadings[a + b]} ㄍㄜˋ ㄋㄚˊ ㄗㄡˇ ˙ㄌㄜ ${numeralReadings[a]} ㄍㄜˋ ㄏㄞˊ ㄕㄥˋ ㄐㄧˇ ㄍㄜˋ`,
+    ]),
+  ),
 };
 
 /**
@@ -288,16 +303,19 @@ export const mathPromptId = (question: {
   target: number;
   parts?: readonly number[];
   icon?: string;
+  story?: boolean;
 }) =>
-  question.kind === "count"
-    ? question.target === 0
-      ? `zero-${question.icon}`
-      : "count"
-    : question.kind === "ways"
-      ? `ways-${question.target}`
-      : question.parts
-        ? `${question.kind}-${question.parts.join("-")}`
-        : `draw-${question.target}`;
+  question.story
+    ? `take-${question.parts?.join("-")}`
+    : question.kind === "count"
+      ? question.target === 0
+        ? `zero-${question.icon}`
+        : "count"
+      : question.kind === "ways"
+        ? `ways-${question.target}`
+        : question.parts
+          ? `${question.kind}-${question.parts.join("-")}`
+          : `draw-${question.target}`;
 
 /** Clips re-recorded after their sentence changed; the query skips a cached old clip. */
 const promptVersions: Record<string, number> = { count: 2 };

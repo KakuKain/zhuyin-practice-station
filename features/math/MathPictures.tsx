@@ -9,12 +9,14 @@ import {
   Check,
   Fish,
   FlowerTulip,
+  HandGrabbing,
   Heart,
   IceCream,
   Leaf,
   Star,
   type Icon,
 } from "@phosphor-icons/react";
+import { MathWords } from "./MathChrome";
 import type { CountIcon, JoinIcon } from "./math-round";
 
 export const icons: Record<CountIcon, { icon: Icon; color: string; name: string }> = {
@@ -165,6 +167,70 @@ export function JoinPictures({
           </div>
         </Fragment>
       ))}
+    </div>
+  );
+}
+
+/**
+ * 拿走了 (分一分 as a story): all the pictures first; then the ones taken away move into the
+ * hand's tray, so the total splits into what was taken and what is left, the 分合圖's two parts.
+ */
+export function TakePictures({
+  question,
+  marked,
+  onToggle,
+  small = false,
+}: {
+  question: { target: number; parts: readonly [number, number]; icon: CountIcon };
+  marked?: ReadonlySet<number>;
+  onToggle?: (index: number) => void;
+  small?: boolean;
+}) {
+  const { icon: Picture, color, name } = icons[question.icon];
+  const [taken, left] = question.parts;
+  const size = small ? 20 : 44;
+  return (
+    <div
+      className={`math-take${small ? " is-small" : ""}`}
+      role={onToggle ? "group" : "img"}
+      aria-label={`${question.target} 個${name}，拿走了 ${taken} 個${onToggle ? "，點一下做記號" : ""}`}
+    >
+      <div className="math-take-left">
+        {Array.from({ length: small ? left : question.target }, (_, index) =>
+          index >= left ? (
+            // Where a taken picture was: it fades away as its copy reaches the tray.
+            <span key={index} className="math-take-gone" aria-hidden="true">
+              <Picture size={size} weight="fill" color={color} />
+            </span>
+          ) : onToggle ? (
+            <Markable
+              key={index}
+              picture={Picture}
+              color={color}
+              label={`第 ${index + 1} 個${name}`}
+              marked={marked?.has(index) ?? false}
+              onToggle={() => onToggle(index)}
+            />
+          ) : (
+            <span key={index}>
+              <Picture size={size} weight="fill" color={color} aria-hidden="true" />
+            </span>
+          ),
+        )}
+      </div>
+      <div className="math-take-tray" aria-hidden="true">
+        <span className="math-take-label">
+          <HandGrabbing size={small ? 16 : 28} weight="duotone" />
+          {!small && <MathWords text="拿走了" />}
+        </span>
+        <div className="math-take-taken">
+          {Array.from({ length: taken }, (_, index) => (
+            <span key={index}>
+              <Picture size={size} weight="fill" color={color} />
+            </span>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

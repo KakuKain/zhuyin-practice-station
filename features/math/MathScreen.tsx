@@ -19,7 +19,7 @@ import { chineseNumber, mathPromptId, mathPromptUrl, mathPrompts } from "./math-
 import { taskKeys } from "../rewards/stamp-book";
 import { mathLessons, type MathLesson } from "./math-lessons";
 import { MathHeader, MathPrompt, MathResult } from "./MathChrome";
-import { CountPictures, JoinPictures } from "./MathPictures";
+import { CountPictures, JoinPictures, TakePictures } from "./MathPictures";
 import { AdditionWork, DrawFrame, FramePreview, InkSquare } from "./MathInk";
 import { BondPreview, BondWork, bondLabel, type BondQuestion } from "./MathBond";
 
@@ -59,13 +59,19 @@ const sectionOf = (question: MathQuestion) => {
 /** How the result and the parent name a question: 「數一數 7」, 「3＋4」 or 「7 分成 3 和 ？」. */
 const questionName = (question: MathQuestion) =>
   isBond(question)
-    ? bondLabel(question)
+    ? bondName(question)
     : "parts" in question
       ? question.parts.join("＋")
       : `${question.kind === "count" ? "數一數" : "畫圈圈"} ${question.target}`;
 
 const isBond = (question: MathQuestion): question is BondQuestion =>
   question.kind === "split" || question.kind === "combine" || question.kind === "ways";
+
+/** A 分合圖 question for the parent: 「7 分成 3 和 ？」, or as its story 「7 個拿走 3 個，剩 ？」. */
+const bondName = (question: BondQuestion) =>
+  question.kind === "split" && question.story
+    ? `${question.target} 個拿走 ${question.parts[0]} 個，剩 ？`
+    : bondLabel(question);
 
 /** 「畫了 6 格」 for the parent, and in red how many too many or too few. */
 function DrawnCount({ drawn, target }: { drawn: number; target: number }) {
@@ -197,7 +203,7 @@ function WritingLesson({ app, lesson }: { app: MathApp; lesson: MathLesson }) {
                     ) : question.kind === "join" ? (
                       <JoinPictures question={question} small />
                     ) : isBond(question) ? (
-                      <span className="math-check-draw">{bondLabel(question)}</span>
+                      <span className="math-check-draw">{bondName(question)}</span>
                     ) : question.kind === "add" ? (
                       <div className="math-check-add">
                         <span className="math-check-draw">{question.parts.join(" ＋ ")}</span>
@@ -350,6 +356,8 @@ function WritingLesson({ app, lesson }: { app: MathApp; lesson: MathLesson }) {
           <div className="math-bond-question">
             {question.kind === "combine" ? (
               <JoinPictures question={question} marked={marked} onToggle={toggleMark} />
+            ) : question.kind === "split" && question.story ? (
+              <TakePictures question={question} marked={marked} onToggle={toggleMark} />
             ) : (
               <CountPictures question={question} marked={marked} onToggle={toggleMark} />
             )}

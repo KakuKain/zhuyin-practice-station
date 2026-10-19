@@ -183,6 +183,7 @@ export const mathWordReadings: Record<string, string> = {
   加加看: "ㄐㄧㄚ ㄐㄧㄚ ㄎㄢˋ",
   // On the lesson page and practice screens.
   一樣多: "ㄧ ㄧㄤˋ ㄉㄨㄛ",
+  拿走了: "ㄋㄚˊ ㄗㄡˇ ˙ㄌㄜ",
   堆疊與分類: "ㄉㄨㄟ ㄉㄧㄝˊ ㄩˇ ㄈㄣ ㄌㄟˋ",
   認識平面圖形: "ㄖㄣˋ ㄕˋ ㄆㄧㄥˊ ㄇㄧㄢˋ ㄊㄨˊ ㄒㄧㄥˊ",
   做造型: "ㄗㄨㄛˋ ㄗㄠˋ ㄒㄧㄥˊ",
