@@ -1,0 +1,54 @@
+{
+  "batches": [
+    {
+      "id": "2026-10-20-01-math",
+      "createdAt": "2026-10-20",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n讀音照課本：「數」念ㄕㄨˋ、「蔔」念˙ㄅㄛ。\n\n## Transcript:\n這裡有幾條魚？用筆寫出數字。\n[long pause]\n這裡有幾隻小鳥？用筆寫出數字。\n[long pause]\n這裡有幾朵花？用筆寫出數字。\n[long pause]\n這裡有幾顆星星？用筆寫出數字。\n[long pause]\n這裡有幾顆愛心？用筆寫出數字。\n[long pause]\n這裡有幾輛汽車？用筆寫出數字。\n[long pause]\n這裡有幾支冰淇淋？用筆寫出數字。\n[long pause]\n這裡有幾根紅蘿蔔？用筆寫出數字。",
+      "items": [
+        "zero-fish",
+        "zero-bird",
+        "zero-tulip",
+        "zero-star",
+        "zero-heart",
+        "zero-car",
+        "zero-iceCream",
+        "zero-carrot"
+      ]
+    },
+    {
+      "id": "2026-10-20-01-words",
+      "createdAt": "2026-10-20",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師拿語詞卡念給一年級小朋友聽：咬字清楚、語氣親切、速度放慢，句尾念完整。\n逐字稿的每一行是一張語詞卡。每一張都像單獨念出來一樣，用完整、自然的語調，不要念成清單的語調。每一張念完，停頓兩秒再念下一張。\n\n## Transcript:\n筆。\n[long pause]\n笛。\n[long pause]\n刀。\n[long pause]\n皮。\n[long pause]\n包。\n[long pause]\n毛。\n[long pause]\n衣。\n[long pause]\n稻。\n[long pause]\n米。\n[long pause]\n報。\n[long pause]\n抱。\n[long pause]\n豹。\n[long pause]\n皮包。\n[long pause]\n毛衣。\n[long pause]\n稻米。\n[long pause]\n報紙。\n[long pause]\n擁抱。\n[long pause]\n花豹。\n[long pause]\n齒。\n[long pause]\n喝。\n[long pause]\n茶。\n[long pause]\n珠。\n[long pause]\n馬。\n[long pause]\n車。",
+      "items": [
+        "筆",
+        "笛",
+        "刀",
+        "皮",
+        "包",
+        "毛",
+        "衣",
+        "稻",
+        "米",
+        "報",
+        "抱",
+        "豹",
+        "皮包",
+        "毛衣",
+        "稻米",
+        "報紙",
+        "擁抱",
+        "花豹",
+        "齒",
+        "喝",
+        "茶",
+        "珠",
+        "馬",
+        "車"
+      ]
+    }
+  ]
+}

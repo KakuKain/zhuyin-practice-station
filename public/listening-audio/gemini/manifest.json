@@ -105,7 +105,7 @@
       "tone": "第一聲",
       "path": "/listening-audio/gemini/rhymes/3127-3125.m4a",
       "duration": 1.6,
-      "voicedDuration": 1.0,
+      "voicedDuration": 1,
       "sourceRange": [
         25.1,
         26.7
@@ -141,7 +141,7 @@
       "tone": "第一聲",
       "path": "/listening-audio/gemini/rhymes/3128-311e.m4a",
       "duration": 1.6,
-      "voicedDuration": 1.0,
+      "voicedDuration": 1,
       "sourceRange": [
         32.99,
         34.59
@@ -225,7 +225,7 @@
       "tone": "第一聲",
       "path": "/listening-audio/gemini/rhymes/3129-3122.m4a",
       "duration": 1.6,
-      "voicedDuration": 1.0,
+      "voicedDuration": 1,
       "sourceRange": [
         50.64,
         52.24
@@ -325,6 +325,248 @@
         24.01
       ],
       "retired": "2026-10-19：家長聽起來像 ㄧㄤˊ，改播教育部《國語辭典簡編本》「央」原始錄音（listening-audio/moe-examples/6160.mp3），播到 0.7 秒、部首旁白之前就停。"
+    }
+  ],
+  "words": [
+    {
+      "text": "筆",
+      "reading": "ㄅㄧˇ",
+      "path": "/listening-audio/gemini/words/7b46.m4a",
+      "batch": "2026-10-20-01-words",
+      "duration": 1.11,
+      "voicedDuration": 0.51,
+      "createdAt": "2026-10-20",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "笛",
+      "reading": "ㄉㄧˊ",
+      "path": "/listening-audio/gemini/words/7b1b.m4a",
+      "batch": "2026-10-20-01-words",
+      "duration": 1.06,
+      "voicedDuration": 0.46,
+      "createdAt": "2026-10-20",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "刀",
+      "reading": "ㄉㄠ",
+      "path": "/listening-audio/gemini/words/5200.m4a",
+      "batch": "2026-10-20-01-words",
+      "duration": 1.05,
+      "voicedDuration": 0.45,
+      "createdAt": "2026-10-20",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "皮",
+      "reading": "ㄆㄧˊ",
+      "path": "/listening-audio/gemini/words/76ae.m4a",
+      "batch": "2026-10-20-01-words",
+      "duration": 1.29,
+      "voicedDuration": 0.69,
+      "createdAt": "2026-10-20",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "包",
+      "reading": "ㄅㄠ",
+      "path": "/listening-audio/gemini/words/5305.m4a",
+      "batch": "2026-10-20-01-words",
+      "duration": 1.1,
+      "voicedDuration": 0.5,
+      "createdAt": "2026-10-20",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "毛",
+      "reading": "ㄇㄠˊ",
+      "path": "/listening-audio/gemini/words/6bdb.m4a",
+      "batch": "2026-10-20-01-words",
+      "duration": 1.27,
+      "voicedDuration": 0.67,
+      "createdAt": "2026-10-20",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "衣",
+      "reading": "ㄧ",
+      "path": "/listening-audio/gemini/words/8863.m4a",
+      "batch": "2026-10-20-01-words",
+      "duration": 1.08,
+      "voicedDuration": 0.48,
+      "createdAt": "2026-10-20",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "稻",
+      "reading": "ㄉㄠˋ",
+      "path": "/listening-audio/gemini/words/7a3b.m4a",
+      "batch": "2026-10-20-01-words",
+      "duration": 0.95,
+      "voicedDuration": 0.35,
+      "createdAt": "2026-10-20",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "米",
+      "reading": "ㄇㄧˇ",
+      "path": "/listening-audio/gemini/words/7c73.m4a",
+      "batch": "2026-10-20-01-words",
+      "duration": 1.24,
+      "voicedDuration": 0.64,
+      "createdAt": "2026-10-20",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "報",
+      "reading": "ㄅㄠˋ",
+      "path": "/listening-audio/gemini/words/5831.m4a",
+      "batch": "2026-10-20-01-words",
+      "duration": 0.85,
+      "voicedDuration": 0.25,
+      "createdAt": "2026-10-20",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "抱",
+      "reading": "ㄅㄠˋ",
+      "path": "/listening-audio/gemini/words/62b1.m4a",
+      "batch": "2026-10-20-01-words",
+      "duration": 0.83,
+      "voicedDuration": 0.23,
+      "createdAt": "2026-10-20",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "豹",
+      "reading": "ㄅㄠˋ",
+      "path": "/listening-audio/gemini/words/8c79.m4a",
+      "batch": "2026-10-20-01-words",
+      "duration": 0.85,
+      "voicedDuration": 0.25,
+      "createdAt": "2026-10-20",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "皮包",
+      "reading": "ㄆㄧˊ|ㄅㄠ",
+      "path": "/listening-audio/gemini/words/76ae-5305.m4a",
+      "batch": "2026-10-20-01-words",
+      "duration": 1.32,
+      "voicedDuration": 0.72,
+      "createdAt": "2026-10-20",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "毛衣",
+      "reading": "ㄇㄠˊ|ㄧ",
+      "path": "/listening-audio/gemini/words/6bdb-8863.m4a",
+      "batch": "2026-10-20-01-words",
+      "duration": 1.31,
+      "voicedDuration": 0.71,
+      "createdAt": "2026-10-20",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "稻米",
+      "reading": "ㄉㄠˋ|ㄇㄧˇ",
+      "path": "/listening-audio/gemini/words/7a3b-7c73.m4a",
+      "batch": "2026-10-20-01-words",
+      "duration": 1.31,
+      "voicedDuration": 0.71,
+      "createdAt": "2026-10-20",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "報紙",
+      "reading": "ㄅㄠˋ|ㄓˇ",
+      "path": "/listening-audio/gemini/words/5831-7d19.m4a",
+      "batch": "2026-10-20-01-words",
+      "duration": 1.28,
+      "voicedDuration": 0.68,
+      "createdAt": "2026-10-20",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "擁抱",
+      "reading": "ㄩㄥˇ|ㄅㄠˋ",
+      "path": "/listening-audio/gemini/words/64c1-62b1.m4a",
+      "batch": "2026-10-20-01-words",
+      "duration": 1.21,
+      "voicedDuration": 0.61,
+      "createdAt": "2026-10-20",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "花豹",
+      "reading": "ㄏㄨㄚ|ㄅㄠˋ",
+      "path": "/listening-audio/gemini/words/82b1-8c79.m4a",
+      "batch": "2026-10-20-01-words",
+      "duration": 1.24,
+      "voicedDuration": 0.64,
+      "createdAt": "2026-10-20",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "齒",
+      "reading": "ㄔˇ",
+      "path": "/listening-audio/gemini/words/9f52.m4a",
+      "batch": "2026-10-20-01-words",
+      "duration": 1,
+      "voicedDuration": 0.4,
+      "createdAt": "2026-10-20",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "喝",
+      "reading": "ㄏㄜ",
+      "path": "/listening-audio/gemini/words/559d.m4a",
+      "batch": "2026-10-20-01-words",
+      "duration": 1.06,
+      "voicedDuration": 0.46,
+      "createdAt": "2026-10-20",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "茶",
+      "reading": "ㄔㄚˊ",
+      "path": "/listening-audio/gemini/words/8336.m4a",
+      "batch": "2026-10-20-01-words",
+      "duration": 1.09,
+      "voicedDuration": 0.49,
+      "createdAt": "2026-10-20",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "珠",
+      "reading": "ㄓㄨ",
+      "path": "/listening-audio/gemini/words/73e0.m4a",
+      "batch": "2026-10-20-01-words",
+      "duration": 1.06,
+      "voicedDuration": 0.46,
+      "createdAt": "2026-10-20",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "馬",
+      "reading": "ㄇㄚˇ",
+      "path": "/listening-audio/gemini/words/99ac.m4a",
+      "batch": "2026-10-20-01-words",
+      "duration": 0.98,
+      "voicedDuration": 0.38,
+      "createdAt": "2026-10-20",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "車",
+      "reading": "ㄔㄜ",
+      "path": "/listening-audio/gemini/words/8eca.m4a",
+      "batch": "2026-10-20-01-words",
+      "duration": 1.16,
+      "voicedDuration": 0.56,
+      "createdAt": "2026-10-20",
+      "origin": "Gemini API"
     }
   ]
 }

@@ -43,5 +43,77 @@
     "voicedDuration": 4.06,
     "createdAt": "2026-10-13",
     "origin": "Gemini API"
+  },
+  "zero-bird": {
+    "version": 1,
+    "text": "這裡有幾隻小鳥？用筆寫出數字。",
+    "batch": "2026-10-20-01-math",
+    "duration": 4.14,
+    "voicedDuration": 3.54,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "zero-car": {
+    "version": 1,
+    "text": "這裡有幾輛汽車？用筆寫出數字。",
+    "batch": "2026-10-20-01-math",
+    "duration": 4.25,
+    "voicedDuration": 3.65,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "zero-carrot": {
+    "version": 1,
+    "text": "這裡有幾根紅蘿蔔？用筆寫出數字。",
+    "batch": "2026-10-20-01-math",
+    "duration": 4.54,
+    "voicedDuration": 3.94,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "zero-fish": {
+    "version": 1,
+    "text": "這裡有幾條魚？用筆寫出數字。",
+    "batch": "2026-10-20-01-math",
+    "duration": 3.78,
+    "voicedDuration": 3.18,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "zero-heart": {
+    "version": 1,
+    "text": "這裡有幾顆愛心？用筆寫出數字。",
+    "batch": "2026-10-20-01-math",
+    "duration": 4.12,
+    "voicedDuration": 3.52,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "zero-iceCream": {
+    "version": 1,
+    "text": "這裡有幾支冰淇淋？用筆寫出數字。",
+    "batch": "2026-10-20-01-math",
+    "duration": 4.38,
+    "voicedDuration": 3.78,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "zero-star": {
+    "version": 1,
+    "text": "這裡有幾顆星星？用筆寫出數字。",
+    "batch": "2026-10-20-01-math",
+    "duration": 4.09,
+    "voicedDuration": 3.49,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "zero-tulip": {
+    "version": 1,
+    "text": "這裡有幾朵花？用筆寫出數字。",
+    "batch": "2026-10-20-01-math",
+    "duration": 3.95,
+    "voicedDuration": 3.35,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
   }
 }

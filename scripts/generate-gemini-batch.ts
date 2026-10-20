@@ -9,6 +9,7 @@
  *   GEMINI_API_KEY=… npx tsx scripts/generate-gemini-batch.ts --only words --requests 1
  *   npx tsx scripts/generate-gemini-batch.ts --plan                           # no requests
  *   npx tsx scripts/generate-gemini-batch.ts --prompts --requests 2           # what would be sent
+ *   npx tsx scripts/generate-gemini-batch.ts --reuse 2026-10-20-01-words      # cut a saved batch again
  *
  * The queue starts with what children hear most: the math instructions without a number, then
  * each lesson's 生字 and circled words in lesson order, then the numbered math questions, then
@@ -23,7 +24,17 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { builtinCatalog } from "../features/courses/materials";
 import { isHan, mathPromptReadings, mathPrompts } from "../features/math/math-audio";
-import { generate, model, QuotaError, split, voice, wav, writeM4a } from "./gemini-audio";
+import {
+  type Audio,
+  generate,
+  model,
+  parseWav,
+  QuotaError,
+  split,
+  voice,
+  wav,
+  writeM4a,
+} from "./gemini-audio";
 
 const root = process.cwd();
 const listeningDir = join(root, "public/listening-audio");
@@ -190,7 +201,7 @@ function prompt(batch: Item[]) {
 /** A calm reading runs about 2.5–5 syllables a second; far outside means a wrong piece. */
 function checkLength(item: Item, voiced: number) {
   const n = item.readings.length;
-  const [low, high] = item.kind === "math" ? [n * 0.15, n * 0.45 + 1.5] : [0.25, n * 0.9 + 0.6];
+  const [low, high] = item.kind === "math" ? [n * 0.15, n * 0.45 + 1.5] : [0.18, n * 0.9 + 0.6];
   return voiced >= low && voiced <= high
     ? undefined
     : `${item.text}: ${voiced.toFixed(2)} s of speech for ${n} syllables`;
@@ -201,13 +212,76 @@ if (process.argv.includes("--prompts")) {
   process.exit(0);
 }
 
-const apiKey = process.env.GEMINI_API_KEY;
-if (!apiKey) throw new Error("Set GEMINI_API_KEY, or pass --plan or --prompts.");
 const today = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Taipei" });
 const round = (value: number) => Math.round(value * 100) / 100;
 mkdirSync(rawDir, { recursive: true });
 mkdirSync(wordsDir, { recursive: true });
 const temporary = mkdtempSync(join(tmpdir(), "gemini-batch-"));
+
+/** Cuts one batch, writes its clips and records, or says why it was rejected. */
+function keep(batch: Item[], audio: Audio, id: string, text: string) {
+  const pieces = split(audio, batch.length);
+  const problems =
+    typeof pieces === "string"
+      ? [pieces]
+      : pieces.flatMap((piece, i) => checkLength(batch[i], piece.voiced) ?? []);
+  if (typeof pieces === "string" || problems.length) {
+    console.log(`Rejected ${id} (outputs/gemini-batch/${id}.wav):\n  ${problems.join("\n  ")}`);
+    process.exitCode = 1;
+    return false;
+  }
+  const createdAt = id.slice(0, 10);
+  batch.forEach((item, i) => {
+    const { clip, voiced } = pieces[i];
+    const fields = {
+      batch: id,
+      duration: round(clip.samples.length / clip.rate),
+      voicedDuration: round(voiced),
+      createdAt,
+      origin: "Gemini API",
+    };
+    if (item.kind === "math") {
+      writeM4a(clip, join(temporary, `${item.key}.wav`), join(mathDir, `${item.key}.m4a`));
+      mathManifest[item.key] = {
+        version: (mathManifest[item.key]?.version ?? 0) + 1,
+        text: item.text,
+        ...fields,
+      };
+    } else {
+      const name = fileName(item.text);
+      writeM4a(clip, join(temporary, `${name}.wav`), join(wordsDir, `${name}.m4a`));
+      rmSync(join(listeningDir, `${name}.m4a`), { force: true });
+      wordsManifest.words = wordsManifest.words.filter(
+        (word: { text: string }) => word.text !== item.text,
+      );
+      wordsManifest.words.push({
+        text: item.text,
+        reading: item.readings.join("|"),
+        path: `/listening-audio/gemini/words/${name}.m4a`,
+        ...fields,
+      });
+    }
+  });
+  batchLog.batches = batchLog.batches.filter((logged) => logged.id !== id);
+  batchLog.batches.push({
+    id,
+    createdAt,
+    model,
+    voice,
+    prompt: text,
+    items: batch.map((item) => item.key),
+  });
+  // Saved after every batch, so a stop mid-run keeps what was made.
+  const sorted = Object.fromEntries(
+    Object.entries(mathManifest).sort(([a], [b]) => a.localeCompare(b)),
+  );
+  writeFileSync(mathManifestPath, JSON.stringify(sorted, null, 2) + "\n");
+  writeFileSync(wordsManifestPath, JSON.stringify(wordsManifest, null, 2) + "\n");
+  writeFileSync(batchesPath, JSON.stringify(batchLog, null, 2) + "\n");
+  console.log(`Kept ${id}: ${batch.map((item) => item.text).join(" ")}`);
+  return true;
+}
+
 /** 2026-10-20-03-words: the third request that day, numbered past any earlier raw batch. */
 function nextId(kind: string) {
   for (let n = 1; ; n++) {
@@ -215,84 +289,45 @@ function nextId(kind: string) {
     if (!existsSync(join(rawDir, `${id}.wav`))) return id;
   }
 }
+
+const reuse = option("--reuse");
 let made = 0;
 let kept = 0;
 try {
-  for (const batch of queue.slice(0, requests)) {
-    const text = prompt(batch);
-    const kind = batch[0].kind;
-    const id = nextId(kind);
-    let audio;
-    try {
-      audio = await generate(text, apiKey);
-    } catch (error) {
-      if (error instanceof QuotaError) {
-        console.log(`The free quota is used up for now (${error.message}). Run again tomorrow.`);
-        break;
-      }
-      throw error;
-    }
-    made++;
-    writeFileSync(join(rawDir, `${id}.wav`), wav(audio));
-    writeFileSync(join(rawDir, `${id}.txt`), text + "\n");
-    const pieces = split(audio, batch.length);
-    const problems =
-      typeof pieces === "string"
-        ? [pieces]
-        : pieces.flatMap((piece, i) => checkLength(batch[i], piece.voiced) ?? []);
-    if (typeof pieces === "string" || problems.length) {
-      console.log(`Rejected ${id} (outputs/gemini-batch/${id}.wav):\n  ${problems.join("\n  ")}`);
-      process.exitCode = 1;
-      break;
-    }
-    batch.forEach((item, i) => {
-      const { clip, voiced } = pieces[i];
-      const fields = {
-        batch: id,
-        duration: round(clip.samples.length / clip.rate),
-        voicedDuration: round(voiced),
-        createdAt: today,
-        origin: "Gemini API",
-      };
-      if (item.kind === "math") {
-        writeM4a(clip, join(temporary, `${item.key}.wav`), join(mathDir, `${item.key}.m4a`));
-        mathManifest[item.key] = {
-          version: (mathManifest[item.key]?.version ?? 0) + 1,
-          text: item.text,
-          ...fields,
-        };
-      } else {
-        const name = fileName(item.text);
-        writeM4a(clip, join(temporary, `${name}.wav`), join(wordsDir, `${name}.m4a`));
-        rmSync(join(listeningDir, `${name}.m4a`), { force: true });
-        wordsManifest.words = wordsManifest.words.filter(
-          (word: { text: string }) => word.text !== item.text,
-        );
-        wordsManifest.words.push({
-          text: item.text,
-          reading: item.readings.join("|"),
-          path: `/listening-audio/gemini/words/${name}.m4a`,
-          ...fields,
-        });
-      }
+  if (reuse) {
+    // A batch rejected by a rule since loosened is cut again without asking Gemini again.
+    const text = readFileSync(join(rawDir, `${reuse}.txt`), "utf8").trimEnd();
+    const lines = text.split("## Transcript:\n")[1].split("\n[long pause]\n");
+    const batch = lines.map((line) => {
+      const id = Object.keys(mathPrompts).find((key) => mathPrompts[key] === line);
+      const item = id ? mathItem(id) : wordItem(line.replace(/。$/, ""));
+      if (!item) throw new Error(`${line} is no longer waiting for a Gemini clip`);
+      return item;
     });
-    batchLog.batches.push({
-      id,
-      createdAt: today,
-      model,
-      voice,
-      prompt: text,
-      items: batch.map((item) => item.key),
-    });
-    // Saved after every batch, so a stop mid-run keeps what was made.
-    const sorted = Object.fromEntries(
-      Object.entries(mathManifest).sort(([a], [b]) => a.localeCompare(b)),
-    );
-    writeFileSync(mathManifestPath, JSON.stringify(sorted, null, 2) + "\n");
-    writeFileSync(wordsManifestPath, JSON.stringify(wordsManifest, null, 2) + "\n");
-    writeFileSync(batchesPath, JSON.stringify(batchLog, null, 2) + "\n");
-    kept++;
-    console.log(`Kept ${id}: ${batch.map((item) => item.text).join(" ")}`);
+    const audio = parseWav(readFileSync(join(rawDir, `${reuse}.wav`)), reuse);
+    if (keep(batch, audio, reuse, text)) kept++;
+  } else {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) throw new Error("Set GEMINI_API_KEY, or pass --plan, --prompts or --reuse.");
+    for (const batch of queue.slice(0, requests)) {
+      const text = prompt(batch);
+      const id = nextId(batch[0].kind);
+      let audio;
+      try {
+        audio = await generate(text, apiKey);
+      } catch (error) {
+        if (error instanceof QuotaError) {
+          console.log(`The free quota is used up for now (${error.message}). Run again tomorrow.`);
+          break;
+        }
+        throw error;
+      }
+      made++;
+      writeFileSync(join(rawDir, `${id}.wav`), wav(audio));
+      writeFileSync(join(rawDir, `${id}.txt`), text + "\n");
+      if (!keep(batch, audio, id, text)) break;
+      kept++;
+    }
   }
 } finally {
   rmSync(temporary, { recursive: true, force: true });
