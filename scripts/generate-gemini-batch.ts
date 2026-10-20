@@ -1,11 +1,11 @@
 /**
  * Replaces the macOS Meijia clips with Gemini (`gemini-3.8-flash-tts`, voice Fola, as the other
- * Gemini clips), many clips per request: the free quota (about 10 requests a day) is far too
- * small for one request per clip. Each request reads one batch with a long pause between items;
+ * Gemini clips), many clips per request: the free quota allows far fewer requests a day than
+ * there are clips. Each request reads one batch with a long pause between items;
  * the batch is cut at its longest pauses and kept only when every item gets one piece of a
  * plausible length.
  *
- *   GEMINI_API_KEY=… npx tsx scripts/generate-gemini-batch.ts                 # up to 10 requests
+ *   GEMINI_API_KEY=… npx tsx scripts/generate-gemini-batch.ts                 # until the quota ends
  *   GEMINI_API_KEY=… npx tsx scripts/generate-gemini-batch.ts --only words --requests 1
  *   npx tsx scripts/generate-gemini-batch.ts --plan                           # no requests
  *   npx tsx scripts/generate-gemini-batch.ts --prompts --requests 2           # what would be sent
@@ -14,9 +14,9 @@
  * The queue starts with what children hear most: the math instructions without a number, then
  * each lesson's 生字 and circled words in lesson order, then the numbered math questions, then
  * the other characters of the lesson texts. Clips that only old records use stay Meijia. A
- * rerun continues where the quota stopped. A rejected batch waits for the next run, and two in a
- * row stop this one, so a bad prompt does not use up the day. Each kept batch's prompt goes to assets/gemini-batches.json; the raw
- * audio stays in the git-ignored outputs/gemini-batch/. Run `npm run assets:audio-registry`
+ * rerun continues where the quota stopped; a per-minute limit is waited out. A rejected batch
+ * waits for the next run, and two in a row stop this one, so a bad prompt does not use up the
+ * day. Each kept batch's prompt goes to assets/gemini-batches.json; the raw audio stays in the git-ignored outputs/gemini-batch/. Run `npm run assets:audio-registry`
  * afterwards, and listen before committing.
  */
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -51,7 +51,7 @@ const option = (name: string) => {
 };
 const planOnly = process.argv.includes("--plan");
 const only = option("--only");
-const requests = Number(option("--requests") ?? 10);
+const requests = Number(option("--requests") ?? Infinity);
 if (only && only !== "math" && only !== "words") throw new Error("--only takes math or words");
 
 type Item = { kind: "math" | "words"; key: string; text: string; readings: string[] };
@@ -314,14 +314,20 @@ try {
       const text = prompt(batch);
       const id = nextId(batch[0].kind);
       let audio;
-      try {
-        audio = await generate(text, apiKey);
-      } catch (error) {
-        if (error instanceof QuotaError) {
-          console.log(`The free quota is used up for now (${error.message}). Run again tomorrow.`);
-          break;
+      // A 429 may be the per-minute limit: wait a minute, twice, before calling it a day.
+      for (let attempt = 1; !audio; attempt++) {
+        try {
+          audio = await generate(text, apiKey);
+        } catch (error) {
+          if (!(error instanceof QuotaError)) throw error;
+          if (attempt === 3) break;
+          console.log(`Quota reached (${error.message}); waiting a minute.`);
+          await new Promise((resolve) => setTimeout(resolve, 65_000));
         }
-        throw error;
+      }
+      if (!audio) {
+        console.log("The free quota is used up for today. Run again tomorrow.");
+        break;
       }
       made++;
       writeFileSync(join(rawDir, `${id}.wav`), wav(audio));
