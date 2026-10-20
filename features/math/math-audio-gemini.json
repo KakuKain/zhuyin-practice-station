@@ -17,6 +17,42 @@
     "createdAt": "2026-10-20",
     "origin": "Gemini API"
   },
+  "build-circle": {
+    "version": 1,
+    "text": "這個造型用了幾個圓形？點一下。",
+    "batch": "2026-10-20-06-math",
+    "duration": 4.55,
+    "voicedDuration": 3.95,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "build-rect": {
+    "version": 1,
+    "text": "這個造型用了幾個長方形？點一下。",
+    "batch": "2026-10-20-05-math",
+    "duration": 4.43,
+    "voicedDuration": 3.83,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "build-square": {
+    "version": 1,
+    "text": "這個造型用了幾個正方形？點一下。",
+    "batch": "2026-10-20-05-math",
+    "duration": 4.37,
+    "voicedDuration": 3.77,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "build-triangle": {
+    "version": 1,
+    "text": "這個造型用了幾個三角形？點一下。",
+    "batch": "2026-10-20-06-math",
+    "duration": 4.43,
+    "voicedDuration": 3.84,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
   "correct": {
     "version": 1,
     "text": "答對了！",
@@ -33,6 +69,42 @@
     "duration": 5.23,
     "voicedDuration": 4.66,
     "createdAt": "2026-10-13",
+    "origin": "Gemini API"
+  },
+  "find-circle": {
+    "version": 1,
+    "text": "把所有的圓形都點出來。",
+    "batch": "2026-10-20-06-math",
+    "duration": 3.64,
+    "voicedDuration": 3.04,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "find-rect": {
+    "version": 1,
+    "text": "把所有的長方形都點出來。",
+    "batch": "2026-10-20-05-math",
+    "duration": 3.56,
+    "voicedDuration": 2.96,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "find-square": {
+    "version": 1,
+    "text": "把所有的正方形都點出來。",
+    "batch": "2026-10-20-05-math",
+    "duration": 3.55,
+    "voicedDuration": 2.95,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "find-triangle": {
+    "version": 1,
+    "text": "把所有的三角形都點出來。",
+    "batch": "2026-10-20-05-math",
+    "duration": 3.56,
+    "voicedDuration": 2.99,
+    "createdAt": "2026-10-20",
     "origin": "Gemini API"
   },
   "height-less": {
@@ -149,6 +221,33 @@
     "batch": "2026-10-20-03-math",
     "duration": 4.23,
     "voicedDuration": 3.63,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "shape-roll": {
+    "version": 1,
+    "text": "哪一個不會滾？點一下。",
+    "batch": "2026-10-20-05-math",
+    "duration": 3.39,
+    "voicedDuration": 2.79,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "shape-stack": {
+    "version": 1,
+    "text": "哪一個不能疊起來？點一下。",
+    "batch": "2026-10-20-05-math",
+    "duration": 3.84,
+    "voicedDuration": 3.27,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "shape-trace": {
+    "version": 1,
+    "text": "把有顏色的這一面描下來，是什麼形狀？點一下。",
+    "batch": "2026-10-20-05-math",
+    "duration": 5.8,
+    "voicedDuration": 5.2,
     "createdAt": "2026-10-20",
     "origin": "Gemini API"
   },
