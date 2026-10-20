@@ -49,6 +49,42 @@
         "馬",
         "車"
       ]
+    },
+    {
+      "id": "2026-10-20-02-math",
+      "createdAt": "2026-10-20",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n讀音照課本：「數」念ㄕㄨˋ、「子」念˙ㄗ、「哪」念ㄋㄚˇ、「薄」念ㄅㄛˊ、「地」念ㄉㄧˋ。\n\n## Transcript:\n這裡有幾顆氣球？用筆寫出數字。\n[long pause]\n這裡有幾隻蝴蝶？用筆寫出數字。\n[long pause]\n這裡有幾顆橡實？用筆寫出數字。\n[long pause]\n這裡有幾片葉子？用筆寫出數字。\n[long pause]\n哪一本書比較厚？點一下。\n[long pause]\n哪一本書比較薄？點一下。\n[long pause]\n鉛筆沒有對齊。先把每一枝鉛筆拉到紅線。\n[long pause]\n有人站在箱子上。先把小朋友拉到地上。",
+      "items": [
+        "zero-balloon",
+        "zero-butterfly",
+        "zero-acorn",
+        "zero-leaf",
+        "thick-more",
+        "thick-less",
+        "align-length",
+        "align-height"
+      ]
+    },
+    {
+      "id": "2026-10-20-03-math",
+      "createdAt": "2026-10-20",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n讀音照課本：「哪」念ㄋㄚˇ、「曲」念ㄑㄩ、「子」念˙ㄗ、「蔔」念˙ㄅㄛ、「了」念˙ㄌㄜ、「數」念ㄕㄨˋ。\n\n## Transcript:\n哪一條是直線？點一下。\n[long pause]\n哪一條是曲線？點一下。\n[long pause]\n小兔子要去拿紅蘿蔔。哪一條路最近？點一下。\n[long pause]\n答對了！\n[long pause]\n再想想看。\n[long pause]\n中間少了哪一個數？點一下。\n[long pause]\n從小到大，依順序點數字。\n[long pause]\n哪一排比較多？如果一樣多，就點一樣多。\n[long pause]\n哪一排比較少？如果一樣多，就點一樣多。\n[long pause]\n這是方盒、圓罐，還是球？點一下。",
+      "items": [
+        "line-straight",
+        "line-curve",
+        "route",
+        "correct",
+        "retry",
+        "missing",
+        "sequence",
+        "rows-more",
+        "rows-less",
+        "shape-classify"
+      ]
     }
   ]
 }

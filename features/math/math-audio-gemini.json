@@ -1,4 +1,31 @@
 {
+  "align-height": {
+    "version": 1,
+    "text": "有人站在箱子上。先把小朋友拉到地上。",
+    "batch": "2026-10-20-02-math",
+    "duration": 4.79,
+    "voicedDuration": 4.19,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "align-length": {
+    "version": 1,
+    "text": "鉛筆沒有對齊。先把每一枝鉛筆拉到紅線。",
+    "batch": "2026-10-20-02-math",
+    "duration": 4.71,
+    "voicedDuration": 4.11,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "correct": {
+    "version": 1,
+    "text": "答對了！",
+    "batch": "2026-10-20-03-math",
+    "duration": 1.26,
+    "voicedDuration": 0.66,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
   "count": {
     "version": 4,
     "text": "數一數，有幾個？用筆寫出數字。",
@@ -44,12 +71,138 @@
     "createdAt": "2026-10-13",
     "origin": "Gemini API"
   },
+  "line-curve": {
+    "version": 1,
+    "text": "哪一條是曲線？點一下。",
+    "batch": "2026-10-20-03-math",
+    "duration": 3.05,
+    "voicedDuration": 2.45,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "line-straight": {
+    "version": 1,
+    "text": "哪一條是直線？點一下。",
+    "batch": "2026-10-20-03-math",
+    "duration": 2.86,
+    "voicedDuration": 2.31,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "missing": {
+    "version": 1,
+    "text": "中間少了哪一個數？點一下。",
+    "batch": "2026-10-20-03-math",
+    "duration": 3.16,
+    "voicedDuration": 2.56,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "retry": {
+    "version": 1,
+    "text": "再想想看。",
+    "batch": "2026-10-20-03-math",
+    "duration": 1.35,
+    "voicedDuration": 0.75,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "route": {
+    "version": 1,
+    "text": "小兔子要去拿紅蘿蔔。哪一條路最近？點一下。",
+    "batch": "2026-10-20-03-math",
+    "duration": 5.4,
+    "voicedDuration": 4.8,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "rows-less": {
+    "version": 1,
+    "text": "哪一排比較少？如果一樣多，就點一樣多。",
+    "batch": "2026-10-20-03-math",
+    "duration": 4.81,
+    "voicedDuration": 4.21,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "rows-more": {
+    "version": 1,
+    "text": "哪一排比較多？如果一樣多，就點一樣多。",
+    "batch": "2026-10-20-03-math",
+    "duration": 4.62,
+    "voicedDuration": 4.02,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "sequence": {
+    "version": 1,
+    "text": "從小到大，依順序點數字。",
+    "batch": "2026-10-20-03-math",
+    "duration": 3.3,
+    "voicedDuration": 2.7,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "shape-classify": {
+    "version": 1,
+    "text": "這是方盒、圓罐，還是球？點一下。",
+    "batch": "2026-10-20-03-math",
+    "duration": 4.23,
+    "voicedDuration": 3.63,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "thick-less": {
+    "version": 1,
+    "text": "哪一本書比較薄？點一下。",
+    "batch": "2026-10-20-02-math",
+    "duration": 3.24,
+    "voicedDuration": 2.64,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "thick-more": {
+    "version": 1,
+    "text": "哪一本書比較厚？點一下。",
+    "batch": "2026-10-20-02-math",
+    "duration": 3.34,
+    "voicedDuration": 2.74,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "zero-acorn": {
+    "version": 1,
+    "text": "這裡有幾顆橡實？用筆寫出數字。",
+    "batch": "2026-10-20-02-math",
+    "duration": 4.39,
+    "voicedDuration": 3.79,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "zero-balloon": {
+    "version": 1,
+    "text": "這裡有幾顆氣球？用筆寫出數字。",
+    "batch": "2026-10-20-02-math",
+    "duration": 4.38,
+    "voicedDuration": 3.82,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
   "zero-bird": {
     "version": 1,
     "text": "這裡有幾隻小鳥？用筆寫出數字。",
     "batch": "2026-10-20-01-math",
     "duration": 4.14,
     "voicedDuration": 3.54,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "zero-butterfly": {
+    "version": 1,
+    "text": "這裡有幾隻蝴蝶？用筆寫出數字。",
+    "batch": "2026-10-20-02-math",
+    "duration": 4.24,
+    "voicedDuration": 3.64,
     "createdAt": "2026-10-20",
     "origin": "Gemini API"
   },
@@ -95,6 +248,15 @@
     "batch": "2026-10-20-01-math",
     "duration": 4.38,
     "voicedDuration": 3.78,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "zero-leaf": {
+    "version": 1,
+    "text": "這裡有幾片葉子？用筆寫出數字。",
+    "batch": "2026-10-20-02-math",
+    "duration": 4.09,
+    "voicedDuration": 3.49,
     "createdAt": "2026-10-20",
     "origin": "Gemini API"
   },
