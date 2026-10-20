@@ -31,8 +31,6 @@ export type ChildProfile = {
   avatar: ChildAvatar;
   /** The material this child practises; unset follows the family's last choice. */
   materialId?: string;
-  /** The subject the course list shows: 注音 unless the child last chose 數學. */
-  subject?: "zhuyin" | "math";
 };
 export type ChildProfiles = { version: 1; activeId: string; children: ChildProfile[] };
 
@@ -57,7 +55,6 @@ export function validateChildProfiles(raw: unknown): ChildProfiles {
       ...(typeof item.materialId === "string" && item.materialId.length <= 80
         ? { materialId: item.materialId }
         : {}),
-      ...(item.subject === "math" ? { subject: "math" as const } : {}),
     });
   }
   if (!children.length) return initialProfiles;
@@ -169,7 +166,7 @@ export function addChild(name: string, avatar: ChildAvatar, materialId?: string)
 
 export function updateChild(
   id: string,
-  change: Partial<Pick<ChildProfile, "name" | "avatar" | "materialId" | "subject">>,
+  change: Partial<Pick<ChildProfile, "name" | "avatar" | "materialId">>,
 ) {
   const profiles = childProfiles();
   save({
@@ -183,7 +180,6 @@ export function updateChild(
               : {}),
             ...(change.avatar !== undefined ? { avatar: change.avatar } : {}),
             ...(change.materialId !== undefined ? { materialId: change.materialId } : {}),
-            ...(change.subject !== undefined ? { subject: change.subject } : {}),
           }
         : child,
     ),

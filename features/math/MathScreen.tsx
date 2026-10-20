@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { Loading } from "../../components/Loading";
 import type { AppController } from "../usePracticeApp";
 import type { InkStroke } from "../types";
 import { InkPreview } from "../../components/AppChrome";
@@ -94,9 +95,7 @@ export function MathScreen({ app }: { app: MathApp }) {
       <Suspense
         fallback={
           <main className="math-shell">
-            <p className="feature-loading" role="status">
-              正在準備練習…
-            </p>
+            <Loading />
           </main>
         }
       >

@@ -52,8 +52,7 @@
   border: 0;
 }
 
-.zhuyin-stack,
-.logo-mark span {
+.zhuyin-stack {
   font-family: var(--font-syllable);
   font-weight: 400;
 }

@@ -1,25 +1,30 @@
 import { useEffect, useRef, useState, type ImgHTMLAttributes } from "react";
 import previews from "./artwork-previews.json";
 
-type ArtworkProps = Omit<ImgHTMLAttributes<HTMLImageElement>, "src"> & { src?: string };
+type ArtworkProps = Omit<ImgHTMLAttributes<HTMLImageElement>, "src"> & {
+  src?: string;
+  /** A smaller copy to show instead (a course card's thumbnail); the blur-up preview is src's. */
+  thumb?: string;
+};
 
 export function ProgressiveImage(props: ArtworkProps) {
   // A new source gets its own loading state, including when switching lessons.
   return <ArtworkImage key={props.src} {...props} />;
 }
 
-function ArtworkImage({ src, style, loading, ...props }: ArtworkProps) {
+function ArtworkImage({ src, thumb, style, loading, ...props }: ArtworkProps) {
   const preview = src
     ? (previews as Record<string, { src: string; width: number; height: number }>)[src]
     : undefined;
+  const shown = thumb ?? src;
   const [ready, setReady] = useState(!preview);
   const ref = useRef<HTMLImageElement>(null);
   useEffect(() => {
-    if (!preview || !src) return;
+    if (!preview || !shown) return;
     let canceled = false;
     const load = () => {
       const image = new Image();
-      image.src = src;
+      image.src = shown;
       void image
         .decode()
         .then(() => {
@@ -46,13 +51,13 @@ function ArtworkImage({ src, style, loading, ...props }: ArtworkProps) {
       canceled = true;
       observer?.disconnect();
     };
-  }, [src, preview, loading]);
+  }, [shown, preview, loading]);
   return (
     <img
       {...props}
       alt={props.alt ?? ""}
       ref={ref}
-      src={ready ? src : preview?.src}
+      src={ready ? shown : preview?.src}
       loading={loading}
       width={props.width ?? preview?.width}
       height={props.height ?? preview?.height}

@@ -1,6 +1,6 @@
 {
   "name": "zhuyin-practice-station",
-  "version": "0.2.0-beta.17",
+  "version": "0.2.0-beta.18",
   "private": true,
   "engines": {
     "node": ">=22.13.0"
@@ -19,6 +19,7 @@
     "format:check": "prettier --check app components features lib styles tests scripts *.ts *.mjs *.json",
     "assets:artwork": "node scripts/optimize-artwork.mjs",
     "assets:progressive": "node scripts/prepare-progressive-artwork.mjs",
+    "assets:thumbs": "tsx scripts/build-card-thumbs.ts",
     "assets:audio-registry": "tsx scripts/build-audio-registry.ts"
   },
   "dependencies": {
