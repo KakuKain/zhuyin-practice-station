@@ -14,8 +14,8 @@
  * The queue starts with what children hear most: the math instructions without a number, then
  * each lesson's 生字 and circled words in lesson order, then the numbered math questions, then
  * the other characters of the lesson texts. Clips that only old records use stay Meijia. A
- * rerun continues where the quota stopped, and a rejected batch stops the run so a bad prompt
- * does not use up the day. Each kept batch's prompt goes to assets/gemini-batches.json; the raw
+ * rerun continues where the quota stopped. A rejected batch waits for the next run, and two in a
+ * row stop this one, so a bad prompt does not use up the day. Each kept batch's prompt goes to assets/gemini-batches.json; the raw
  * audio stays in the git-ignored outputs/gemini-batch/. Run `npm run assets:audio-registry`
  * afterwards, and listen before committing.
  */
@@ -293,6 +293,7 @@ function nextId(kind: string) {
 const reuse = option("--reuse");
 let made = 0;
 let kept = 0;
+let rejected = 0;
 try {
   if (reuse) {
     // A batch rejected by a rule since loosened is cut again without asking Gemini again.
@@ -325,8 +326,11 @@ try {
       made++;
       writeFileSync(join(rawDir, `${id}.wav`), wav(audio));
       writeFileSync(join(rawDir, `${id}.txt`), text + "\n");
-      if (!keep(batch, audio, id, text)) break;
-      kept++;
+      // The voice now and then adds a word between items; one such batch is only retried later.
+      if (keep(batch, audio, id, text)) {
+        kept++;
+        rejected = 0;
+      } else if (++rejected === 2) break;
     }
   }
 } finally {
