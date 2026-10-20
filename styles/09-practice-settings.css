@@ -271,13 +271,6 @@
   margin: 0;
   font-weight: 700;
 }
-.feature-loading {
-  min-height: 200px;
-  display: grid;
-  place-items: center;
-  color: #526b7f;
-}
-
 /* 更多 → 版本: the running build, how the app was opened, and manual update. */
 .version-status {
   margin-block: 8px 20px;

@@ -110,7 +110,13 @@ test("第一課 10以內的數 reads each question aloud, keeps the round and en
   await stroke(page, cells.nth(1), circle(50, 50));
 
   // A reload continues the same round where it was.
+  // The app opens on 國語 again (the parent asked); 數學 is one tap away.
   await page.reload();
+  await expect(page.getByRole("button", { name: "國語", exact: true })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  await page.getByRole("button", { name: "數學", exact: true }).click();
   await page.getByRole("button", { name: /數學第一課/ }).click();
   await page.getByRole("button", { name: "繼續上次的練習" }).click();
   await expect(header).toContainText(`第 ${draw + 1} 題 / 9`);
@@ -137,7 +143,7 @@ test("第一課 10以內的數 reads each question aloud, keeps the round and en
   expect(records.rounds[0].needsPractice.length).toBe(8);
   expect(await page.evaluate(() => localStorage.getItem("kid-math-round-v1"))).toBeNull();
 
-  // Back to the lesson page, then the course list, which stays on 數學 for this child.
+  // Back to the lesson page, then the course list, which stays on 數學 while the app is open.
   await page.getByRole("button", { name: "回到這一課" }).click();
   await expect(page.getByRole("button", { name: "開始練習", exact: true })).toBeVisible();
   await page.getByRole("button", { name: "回到課程" }).click();
@@ -474,6 +480,7 @@ test("第七課 10以內的加法 adds with pictures, 0 and circles, keeps 第�
 
   // A reload continues 第七課 with its circles.
   await page.reload();
+  await page.getByRole("button", { name: "數學", exact: true }).click();
   await page.getByRole("button", { name: /數學第七課/ }).click();
   await page.getByRole("button", { name: "繼續上次的練習" }).click();
   await expect(header).toContainText(`第 ${add + 1} 題 / 8`);
@@ -570,6 +577,7 @@ test("第四課 分與合 reads 分合圖: the missing part, the total and a way
 
   // A reload continues 第四課 where it was, with what was written.
   await page.reload();
+  await page.getByRole("button", { name: "數學", exact: true }).click();
   await page.getByRole("button", { name: /數學第四課/ }).click();
   await page.getByRole("button", { name: "繼續上次的練習" }).click();
   await expect(header).toContainText(`第 ${combine + 1} 題 / 8`);

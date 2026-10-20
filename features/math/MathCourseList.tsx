@@ -1,5 +1,6 @@
 import { ArrowRight } from "@phosphor-icons/react";
 import { ProgressiveImage } from "../../components/ProgressiveImage";
+import { cardThumb } from "../../components/card-thumbs";
 import { mathCourse, mathTerms } from "./math-lessons";
 import { MathWords as Words } from "./MathChrome";
 
@@ -51,6 +52,7 @@ export function MathCourseList({ onOpen }: { onOpen: (id: number) => void }) {
                       <ProgressiveImage
                         className="journey-art"
                         src={`course-art/${lesson.art}.webp`}
+                        thumb={cardThumb(`course-art/${lesson.art}.webp`)}
                         alt=""
                         aria-hidden="true"
                       />

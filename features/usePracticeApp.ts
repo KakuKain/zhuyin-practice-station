@@ -193,8 +193,12 @@ export function usePracticeApp() {
   // opens on its page, like a 注音 lesson, and its practice starts from there.
   const [mathLessonId, setMathLessonId] = useState(1);
   const [mathStart, setMathStart] = useState<"new" | "continue">("new");
+  // The course list's 國語｜數學 switch: 國語 whenever the app opens (the parent asked), and kept
+  // while it stays open, so coming back from a math lesson shows 數學's list again.
+  const [subject, setSubject] = useState<"zhuyin" | "math">("zhuyin");
   const openMathLesson = (id: number) => {
     setMathLessonId(id);
+    setSubject("math");
     setView("math-lesson");
   };
   const startMathPractice = (start: "new" | "continue") => {
@@ -312,6 +316,8 @@ export function usePracticeApp() {
     mathStart,
     startMathPractice,
     openMathLesson,
+    subject,
+    setSubject,
     morePanel,
     setMorePanel,
     selectedLesson,

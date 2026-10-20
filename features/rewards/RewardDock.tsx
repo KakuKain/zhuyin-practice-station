@@ -1,4 +1,6 @@
 import {
+  lazy,
+  Suspense,
   useEffect,
   useRef,
   useState,
@@ -7,8 +9,7 @@ import {
 } from "react";
 import { AnnotatedText } from "../../components/AnnotatedText";
 import { storageKeys } from "../../lib/storage/storage-keys";
-import { Say, StampCardDialog } from "./StampCard";
-import { TasksDialog } from "./TodayTasks";
+import { Say } from "./Say";
 import {
   visibleTasks,
   type CardProgress,
@@ -16,6 +17,12 @@ import {
   type RewardSettings,
   type StampBook,
 } from "./stamp-book";
+
+// The sheets load when first opened (and in the background once the course list is up).
+const StampCardDialog = lazy(() =>
+  import("./StampCard").then((m) => ({ default: m.StampCardDialog })),
+);
+const TasksDialog = lazy(() => import("./TodayTasks").then((m) => ({ default: m.TasksDialog })));
 
 /** Where the button rests: against the left or right edge, and how far down the free space. */
 type Place = { side: "left" | "right"; y: number };
@@ -239,26 +246,28 @@ export function RewardDock({
           {news && <i className="reward-dock-dot" aria-hidden="true" />}
         </button>
       </div>
-      {open === "card" && (
-        <StampCardDialog
-          name={name}
-          progress={progress}
-          book={book}
-          settings={settings}
-          onChoose={onChoose}
-          onClose={() => setOpen(null)}
-        />
-      )}
-      {open === "tasks" && (
-        <TasksDialog
-          tasks={tasks}
-          onGo={(task) => {
-            setOpen(null);
-            onGo(task);
-          }}
-          onClose={() => setOpen(null)}
-        />
-      )}
+      <Suspense fallback={null}>
+        {open === "card" && (
+          <StampCardDialog
+            name={name}
+            progress={progress}
+            book={book}
+            settings={settings}
+            onChoose={onChoose}
+            onClose={() => setOpen(null)}
+          />
+        )}
+        {open === "tasks" && (
+          <TasksDialog
+            tasks={tasks}
+            onGo={(task) => {
+              setOpen(null);
+              onGo(task);
+            }}
+            onClose={() => setOpen(null)}
+          />
+        )}
+      </Suspense>
     </>
   );
 }

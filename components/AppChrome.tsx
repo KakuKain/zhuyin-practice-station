@@ -39,10 +39,30 @@ export function InkPreview({ strokes }: { strokes: InkStroke[] }) {
   );
 }
 
+/**
+ * KidLessonYoOnly's ㄅ as a path (its 1024-unit em, baseline at 900), so the header shows it
+ * without that font: the logo is on every first screen, and loading the font for one glyph
+ * added 50 KB before the course list could finish.
+ */
+const logoGlyph =
+  "M451 -9Q425 38 378 72L392 90L429 69Q461 49 480.5 39.5Q500 30 514 30Q600 30 687 181Q724 241 753.0 320.0Q782 399 797 471Q798 474 798 480Q798 496 784.0 507.5Q770 519 753 519Q689 516 614 509L526 500Q319 478 299 476Q281 474 263.5 469.5Q246 465 240 464Q222 458 204 455Q186 454 166 477Q149 498 149 515Q149 519 151 523Q152 527 156.0 531.0Q160 535 161 537L179 552Q208 580 227.5 602.0Q247 624 272 662Q297 699 307.0 726.5Q317 754 324 789Q325 799 328.0 806.5Q331 814 337 814Q342 814 347 810Q365 802 381 788Q395 777 400.0 768.0Q405 759 402 748Q400 739 388.5 722.0Q377 705 367.5 693.0Q358 681 354 676L329 644L262 552Q254 543 254 536Q254 527 277 529Q329 535 412.5 543.0Q496 551 544 555L699 567L757 573Q765 574 776.5 576.0Q788 578 796 579Q809 580 847 537Q865 517 872.5 505.0Q880 493 880 482Q866 442 868 450Q868 450 848 394Q839 365 819 310Q772 194 734.5 125.0Q697 56 651 20Q609 -15 576.5 -29.0Q544 -43 497 -42Q486 -41 472.5 -32.0Q459 -23 451 -9Z";
+
 export function Logo() {
   return (
     <span className="logo-mark" aria-hidden="true">
-      <span>ㄅ</span>
+      <span>
+        <svg viewBox="0 0 1024 1024" width="1em" height="1em">
+          {/* A thin outline matches how the browser draws the font's text, a little heavier. */}
+          <path
+            transform="matrix(1 0 0 -1 0 900)"
+            d={logoGlyph}
+            fill="currentColor"
+            stroke="currentColor"
+            strokeWidth={20}
+            strokeLinejoin="round"
+          />
+        </svg>
+      </span>
       <i />
     </span>
   );

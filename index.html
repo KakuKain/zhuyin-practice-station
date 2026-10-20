@@ -13,9 +13,76 @@
     <meta name="apple-mobile-web-app-title" content="注音小練習" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
     <title>一年級注音練習站｜注音小練習</title>
+    <!-- Shown until the app draws its first screen (React replaces #root's contents). -->
+    <style>
+      html {
+        background: #fffaf3;
+      }
+      .boot {
+        min-height: 100dvh;
+        margin: 0;
+        display: grid;
+        place-content: center;
+        justify-items: center;
+        gap: 16px;
+        color: #23486e;
+        font:
+          700 18px/1.4 system-ui,
+          sans-serif;
+        letter-spacing: 0.06em;
+      }
+      .boot-dots {
+        display: flex;
+        gap: 10px;
+        height: 36px;
+        align-items: center;
+      }
+      .boot-dots i {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: #2b82e8;
+        animation: boot-hop 1s ease-in-out infinite;
+      }
+      .boot-dots i:nth-child(2) {
+        background: #69b996;
+        animation-delay: 0.15s;
+      }
+      .boot-dots i:nth-child(3) {
+        background: #f0b452;
+        animation-delay: 0.3s;
+      }
+      @keyframes boot-hop {
+        0%,
+        60%,
+        100% {
+          transform: translateY(0) scale(1);
+          opacity: 0.6;
+        }
+        30% {
+          transform: translateY(-14px) scale(1.1);
+          opacity: 1;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .boot-dots i {
+          animation-name: boot-glow;
+        }
+        @keyframes boot-glow {
+          50% {
+            opacity: 0.45;
+          }
+        }
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <p class="boot" role="status">
+        <span class="boot-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>注音小練習 準備中…</span>
+      </p>
+    </div>
     <noscript>請開啟 JavaScript，使用注音與手寫練習。</noscript>
     <script type="module" src="/app/main.tsx"></script>
   </body>

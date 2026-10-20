@@ -13,7 +13,8 @@ import { AnnotatedText } from "../../components/AnnotatedText";
 import { readingVariants } from "../lesson/reading-variants";
 import type { CardProgress, RewardSettings, StampBook, StampKind } from "./stamp-book";
 import type { StampNews } from "./useStampBook";
-import { fillWord, rewardReadings, stampWords, type StampWord } from "./stamp-words";
+import { Say } from "./Say";
+import { rewardReadings, type StampWord } from "./stamp-words";
 
 export const stampLooks: Record<StampKind, { icon: Icon; label: string; word: StampWord }> = {
   practice: { icon: SealCheck, label: "練習章", word: "practice" },
@@ -22,11 +23,7 @@ export const stampLooks: Record<StampKind, { icon: Icon; label: string; word: St
   task: { icon: Medal, label: "任務章", word: "task" },
 };
 
-/** A sentence for the child, in 國字注音. */
-export function Say({ word, n, m }: { word: StampWord; n?: number; m?: number }) {
-  const text = fillWord(word, n, m);
-  return <AnnotatedText text={text} variants={readingVariants(text, stampWords[word][1])} />;
-}
+export { Say };
 
 /** A suggested reward in 國字注音; one the parent wrote is shown as typed. */
 function RewardName({ reward }: { reward: string }) {

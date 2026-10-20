@@ -1,6 +1,8 @@
+import { lazy, Suspense } from "react";
 import { ProgressiveImage } from "../../components/ProgressiveImage";
-import { MathCourseList } from "../math/MathCourseList";
-import { updateChild, useChildProfiles } from "../../lib/storage/child-profiles";
+import { cardThumb } from "../../components/card-thumbs";
+import { Loading } from "../../components/Loading";
+import { useChildProfiles } from "../../lib/storage/child-profiles";
 import { ChildGreeting, childLabel } from "../../components/ChildPicker";
 import { RewardDock } from "../rewards/RewardDock";
 import { taskDestination } from "../rewards/daily-tasks";
@@ -11,6 +13,11 @@ import { builtinMaterialId } from "./materials";
 import { ArrowRight } from "@phosphor-icons/react";
 import { AnnotatedText } from "../../components/AnnotatedText";
 import { lessonTitleGroups, lessonTitleVariants } from "../lesson/annotated-text";
+
+// 數學's list loads when a child picks 數學 (and in the background once the course list is up).
+const MathCourseList = lazy(() =>
+  import("../math/MathCourseList").then((m) => ({ default: m.MathCourseList })),
+);
 
 export function CourseList({
   app,
@@ -30,13 +37,14 @@ export function CourseList({
     | "chooseReward"
     | "dismissStampNews"
     | "navigate"
+    | "subject"
+    | "setSubject"
   >;
 }) {
   const { openLesson, practiceState } = app;
   const profiles = useChildProfiles();
   const child = profiles.children.find((item) => item.id === profiles.activeId);
-  const subject =
-    profiles.children.find((child) => child.id === profiles.activeId)?.subject ?? "zhuyin";
+  const { subject, setSubject } = app;
   const material = app.materialsState.materials.find(
     (item) => item.id === app.materialsState.activeId,
   );
@@ -68,14 +76,16 @@ export function CourseList({
             type="button"
             key={value}
             aria-pressed={subject === value}
-            onClick={() => updateChild(profiles.activeId, { subject: value })}
+            onClick={() => setSubject(value)}
           >
             {label}
           </button>
         ))}
       </div>
       {subject === "math" ? (
-        <MathCourseList onOpen={app.openMathLesson} />
+        <Suspense fallback={<Loading label="正在準備課程…" />}>
+          <MathCourseList onOpen={app.openMathLesson} />
+        </Suspense>
       ) : (
         <>
           {lessons.length === 0 && (
@@ -129,6 +139,7 @@ export function CourseList({
                       <ProgressiveImage
                         className="journey-art"
                         src={`course-art/${item.artwork}-watercolor.webp`}
+                        thumb={cardThumb(`course-art/${item.artwork}-watercolor.webp`)}
                         alt=""
                         aria-hidden="true"
                         loading={index > 3 ? "lazy" : "eager"}

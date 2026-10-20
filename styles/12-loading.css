@@ -76,3 +76,71 @@
 .focus-shell > .loading-overlay {
   position: absolute;
 }
+
+/* 正在準備…: a screen or a list on its way (Loading), with the same dots, larger. */
+.feature-loading {
+  min-height: 200px;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 14px;
+  margin: 0;
+  color: #526b7f;
+  font-weight: 700;
+}
+
+.feature-loading.is-page {
+  min-height: 100dvh;
+  background: var(--paper);
+}
+
+.loading-orbit.is-large {
+  gap: 10px;
+  height: 36px;
+}
+
+.loading-orbit.is-large i {
+  width: 14px;
+  height: 14px;
+  animation-name: loading-hop;
+  animation-duration: 1s;
+}
+
+.loading-orbit.is-large i:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.loading-orbit.is-large i:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes loading-hop {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.6;
+  }
+  30% {
+    transform: translateY(-14px) scale(1.1);
+    opacity: 1;
+  }
+}
+
+/* No hopping when the tablet asks for less motion: the dots only brighten in turn. */
+@media (prefers-reduced-motion: reduce) {
+  .loading-orbit i,
+  .loading-orbit.is-large i {
+    animation-name: loading-glow;
+  }
+}
+
+@keyframes loading-glow {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 1;
+  }
+}

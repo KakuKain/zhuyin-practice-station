@@ -36,7 +36,7 @@ Playwright always starts a fresh `npm run preview` on port 4176 (`PLAYWRIGHT_POR
 Asset pipelines:
 
 - After adding or replacing any audio file, run `npm run assets:audio-registry`. It rewrites `public/listening-audio/registry.json` and `lib/audio/audio-index.json` with hashes, durations, and cache-busting URLs.
-- `npm run assets:artwork` generates lossless WebP files in `public/course-art/` from the PNG originals in `assets/artwork/`; `npm run assets:progressive` regenerates the blur-up previews in `components/artwork-previews.json`.
+- `npm run assets:artwork` generates lossless WebP files in `public/course-art/` from the PNG originals in `assets/artwork/`; `npm run assets:progressive` regenerates the blur-up previews in `components/artwork-previews.json`; `npm run assets:thumbs` writes the 256 px course-card copies in `public/course-art/thumbs/` (cards show their picture at about 80 px; run it after adding or replacing a lesson's picture).
 - New words in `circled-vocabulary.ts` need clips: `node scripts/generate-listening-audio.mjs` (macOS, Meijia voice) creates missing ones, then run `npm run assets:audio-registry`. A word must have a single reading across all content, or no clip can serve it.
 - To re-voice a word with Gemini (`gemini-3.8-flash-tts`, voice Fola), run `GEMINI_API_KEY=… npx tsx scripts/generate-gemini-words.ts <words…>` (or `--from <folder>` with `<word>.wav` files saved from AI Studio; `--prompts` prints the prompts). It writes `public/listening-audio/gemini/words/`, removes the old Meijia clip, and records the prompt in `gemini/manifest.json`; then run `npm run assets:audio-registry`. The Meijia script skips words that have a Gemini clip.
 - `node scripts/build-app-icons.mjs` regenerates the home-screen icons in `public/icons/` from `public/favicon.svg`.
@@ -94,7 +94,7 @@ There is one build: a static Vite SPA. `index.html` → `app/main.tsx` → `crea
     - `RewardsPanel` holds the guide, 今天的任務, 鼓勵章, log and settings.
   - Google sign-in and cloud sync were discussed but are not built. They would change the hard constraints above.
 - `features/math/` is self-contained.
-  - The course list's 國語｜數學 switch (not 注音, which would clash with the 注音 symbol-chart tab) is remembered per child (`ChildProfile.subject`).
+  - The course list's 國語｜數學 switch (not 注音, which would clash with the 注音 symbol-chart tab) starts on 國語 every time the app opens (the parent asked) and is kept in the coordinator (`subject`) while it stays open, so coming back from a math lesson shows 數學's list. It is no longer saved on the child.
   - `mathCourse` in `math-lessons.ts` is the textbook's contents (康軒 一上 and 一下), in its order. A lesson not built yet is a `ComingLesson`: listed as 製作中 under 上學期 or 下學期, never opened. `mathLessons` is the built ones.
     - A lesson's `id` is permanent: saved rounds, records and tasks name it. The child sees the list position and `number`; the course card's station shows the position, not the id.
     - Id 3 has always been 加法, now 第七課 10以內的加法, so 第三課 排順序、比多少 is id 7. Other lessons use the id of their place (第四課 分與合 is 4, and so on); 下學期 is 10–18.
@@ -160,7 +160,13 @@ There is one build: a static Vite SPA. `index.html` → `app/main.tsx` → `crea
     - 做造型: how many of a shape a picture made of shapes uses, asked only for shapes it uses at least twice. A 正方形 is exactly square and a 長方形 at least 1.5 times as long as it is wide.
     - The questions were written before the user had the textbook pages; they may change to match the photos.
     - The course picture `shapes-solids.webp` is `SolidArt` rendered to PNG (original in `assets/artwork/`).
-- `PracticeList`, `SettingsScreen`, `SymbolChart`, and their heavy sub-panels are `React.lazy` chunks. Keep them out of the initial bundle.
+- First load is kept small: the course list needs only the main bundle.
+  - `PracticeList`, `SettingsScreen`, `SymbolChart`, and their heavy sub-panels are `React.lazy` chunks; so are the screens past the course list (`screens` in `PracticeApp.tsx`: 默寫's sheet and review, 聽寫's result, math, the stamp sheets) and 數學's course list. Keep them out of the initial bundle.
+  - Not the writing screens (默寫's cell and practice, 聽寫's `ListeningScreen`): the coordinator's ink hooks (`useFillCanvas`, `useListeningCanvas`) look for their canvas once, as the cell opens. A lazy canvas would still be loading then and stay blank, without the child's saved ink (a reload, then opening a cell, showed it).
+  - `prefetchScreens` loads those chunks in the background once the first screen has loaded, its fonts too, while the tablet is idle (never on a data saver), so opening one stays instant.
+  - Suspense fallbacks use `components/Loading` (three hopping dots, 正在準備…; `page` fills the screen); `index.html` shows the same dots with 注音小練習 準備中… until the app draws.
+  - Course cards load 256 px thumbnails (`thumb` on `ProgressiveImage`).
+  - The header logo's ㄅ is a path of KidLessonYoOnly's glyph, so the first screen does not load that font for one character.
 - One `<audio>` element is mounted at the app root for every screen, so iOS keeps the playback a tap unlocked.
 - Answer zhuyin (`ZhuyinStack`) is drawn by the `KidLessonYoOnly` font, which puts each syllable on a Han character (`syllableGlyphs` in `features/lesson/zhuyin-glyphs.ts`; ㄏㄨˊ is 蝴). Until that font has loaded (`lib/loading/font-ready.ts`), the syllable is spelled out in the UI font so a stand-in character never shows. A polyphone needs its variation selector there (`"奶\u{E01E1}"` for ˙ㄋㄞ); `tests/unit/zhuyin-glyphs.test.ts` fails if a glyph is missing from the subset or shows another reading.
 - The system back gesture stays inside the app (`features/navigation/useBackGesture.ts`): one history guard entry absorbs each back and runs `goBack` in `usePracticeApp`, the same step as each screen's back button. On the home screen an installed app stays open; a browser tab leaves as usual.
