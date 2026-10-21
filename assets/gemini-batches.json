@@ -378,6 +378,248 @@
         "跳繩",
         "精神"
       ]
+    },
+    {
+      "id": "2026-10-21-01-words",
+      "createdAt": "2026-10-21",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師拿語詞卡念給一年級小朋友聽：咬字清楚、語氣親切、速度放慢，句尾念完整。\n逐字稿的每一行是一張語詞卡。每一張都像單獨念出來一樣，用完整、自然的語調，不要念成清單的語調。每一張念完，停頓兩秒再念下一張。\n讀音照課本：「不怕」念ㄅㄨˊ ㄆㄚˋ、「蘿蔔」念ㄌㄨㄛˊ ˙ㄅㄛ。\n\n## Transcript:\n烏龜。\n[long pause]\n走路。\n[long pause]\n不怕。\n[long pause]\n青蛙。\n[long pause]\n蝴蝶。\n[long pause]\n後面。\n[long pause]\n炒。\n[long pause]\n煮。\n[long pause]\n切。\n[long pause]\n蘿。\n[long pause]\n紅。\n[long pause]\n燒。\n[long pause]\n清。\n[long pause]\n蒸。\n[long pause]\n大。\n[long pause]\n家。\n[long pause]\n蘿蔔。\n[long pause]\n紅燒。\n[long pause]\n清蒸。\n[long pause]\n大家。\n[long pause]\n崖。\n[long pause]\n雀。\n[long pause]\n蚓。\n[long pause]\n豚。",
+      "items": [
+        "烏龜",
+        "走路",
+        "不怕",
+        "青蛙",
+        "蝴蝶",
+        "後面",
+        "炒",
+        "煮",
+        "切",
+        "蘿",
+        "紅",
+        "燒",
+        "清",
+        "蒸",
+        "大",
+        "家",
+        "蘿蔔",
+        "紅燒",
+        "清蒸",
+        "大家",
+        "崖",
+        "雀",
+        "蚓",
+        "豚"
+      ]
+    },
+    {
+      "id": "2026-10-21-02-words",
+      "createdAt": "2026-10-21",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師拿語詞卡念給一年級小朋友聽：咬字清楚、語氣親切、速度放慢，句尾念完整。\n逐字稿的每一行是一張語詞卡。每一張都像單獨念出來一樣，用完整、自然的語調，不要念成清單的語調。每一張念完，停頓兩秒再念下一張。\n讀音照課本：「轉圈」念ㄓㄨㄢˋ ㄑㄩㄢ。\n\n## Transcript:\n小山羊。\n[long pause]\n山崖。\n[long pause]\n小麻雀。\n[long pause]\n吱吱喳喳。\n[long pause]\n合唱。\n[long pause]\n小蚯蚓。\n[long pause]\n泥巴。\n[long pause]\n躲迷藏。\n[long pause]\n小海豚。\n[long pause]\n跳水。\n[long pause]\n轉圈。\n[long pause]\n肉。\n[long pause]\n乳。\n[long pause]\n蠶。\n[long pause]\n唷。\n[long pause]\n金。\n[long pause]\n眼。\n[long pause]\n睛。\n[long pause]\n回。\n[long pause]\n開。\n[long pause]\n人。\n[long pause]\n運。\n[long pause]\n王。\n[long pause]\n泳。",
+      "items": [
+        "小山羊",
+        "山崖",
+        "小麻雀",
+        "吱吱喳喳",
+        "合唱",
+        "小蚯蚓",
+        "泥巴",
+        "躲迷藏",
+        "小海豚",
+        "跳水",
+        "轉圈",
+        "肉",
+        "乳",
+        "蠶",
+        "唷",
+        "金",
+        "眼",
+        "睛",
+        "回",
+        "開",
+        "人",
+        "運",
+        "王",
+        "泳"
+      ]
+    },
+    {
+      "id": "2026-10-21-03-words",
+      "createdAt": "2026-10-21",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師拿語詞卡念給一年級小朋友聽：咬字清楚、語氣親切、速度放慢，句尾念完整。\n逐字稿的每一行是一張語詞卡。每一張都像單獨念出來一樣，用完整、自然的語調，不要念成清單的語調。每一張念完，停頓兩秒再念下一張。\n\n## Transcript:\n鍊。\n[long pause]\n圈。\n[long pause]\n選。\n[long pause]\n圓。\n[long pause]\n月。\n[long pause]\n熊。\n[long pause]\n裙。\n[long pause]\n粉。\n[long pause]\n統。\n[long pause]\n英。\n[long pause]\n雄。\n[long pause]\n滷肉。\n[long pause]\n乳酪。\n[long pause]\n蟬。\n[long pause]\n蠶寶寶。\n[long pause]\n哎唷。\n[long pause]\n優秀。\n[long pause]\n金魚。\n[long pause]\n眼睛。\n[long pause]\n小雞。\n[long pause]\n小鴨。\n[long pause]\n回家。\n[long pause]\n小豬。\n[long pause]\n開車。",
+      "items": [
+        "鍊",
+        "圈",
+        "選",
+        "圓",
+        "月",
+        "熊",
+        "裙",
+        "粉",
+        "統",
+        "英",
+        "雄",
+        "滷肉",
+        "乳酪",
+        "蟬",
+        "蠶寶寶",
+        "哎唷",
+        "優秀",
+        "金魚",
+        "眼睛",
+        "小雞",
+        "小鴨",
+        "回家",
+        "小豬",
+        "開車"
+      ]
+    },
+    {
+      "id": "2026-10-21-04-words",
+      "createdAt": "2026-10-21",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師拿語詞卡念給一年級小朋友聽：咬字清楚、語氣親切、速度放慢，句尾念完整。\n逐字稿的每一行是一張語詞卡。每一張都像單獨念出來一樣，用完整、自然的語調，不要念成清單的語調。每一張念完，停頓兩秒再念下一張。\n讀音照課本：「橘子」念ㄐㄩˊ ˙ㄗ。\n\n## Transcript:\n巨人。\n[long pause]\n運動。\n[long pause]\n舞獅。\n[long pause]\n雨傘。\n[long pause]\n王子。\n[long pause]\n泳池。\n[long pause]\n米粒。\n[long pause]\n樹木。\n[long pause]\n橘子。\n[long pause]\n項鍊。\n[long pause]\n花朵。\n[long pause]\n圈選。\n[long pause]\n圓圓。\n[long pause]\n美麗。\n[long pause]\n圓盤。\n[long pause]\n小黑熊。\n[long pause]\n漂亮。\n[long pause]\n短裙。\n[long pause]\n街舞。\n[long pause]\n小老鼠。\n[long pause]\n洗澡。\n[long pause]\n左手。\n[long pause]\n粉筆。",
+      "items": [
+        "巨人",
+        "運動",
+        "舞獅",
+        "雨傘",
+        "王子",
+        "泳池",
+        "米粒",
+        "樹木",
+        "橘子",
+        "項鍊",
+        "花朵",
+        "圈選",
+        "圓圓",
+        "美麗",
+        "圓盤",
+        "小黑熊",
+        "漂亮",
+        "短裙",
+        "街舞",
+        "小老鼠",
+        "洗澡",
+        "左手",
+        "粉筆"
+      ]
+    },
+    {
+      "id": "2026-10-21-05-words",
+      "createdAt": "2026-10-21",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師拿語詞卡念給一年級小朋友聽：咬字清楚、語氣親切、速度放慢，句尾念完整。\n逐字稿的每一行是一張語詞卡。每一張都像單獨念出來一樣，用完整、自然的語調，不要念成清單的語調。每一張念完，停頓兩秒再念下一張。\n\n## Transcript:\n你好。\n[long pause]\n總統府。\n[long pause]\n英雄。\n[long pause]\n好漢。\n[long pause]\n蕃茄。\n[long pause]\n炒蛋。\n[long pause]\n蝸牛。",
+      "items": [
+        "你好",
+        "總統府",
+        "英雄",
+        "好漢",
+        "蕃茄",
+        "炒蛋",
+        "蝸牛"
+      ]
+    },
+    {
+      "id": "2026-10-21-01-math",
+      "createdAt": "2026-10-21",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n\n## Transcript:\n畫出一個圈圈。\n[long pause]\n畫出兩個圈圈。\n[long pause]\n畫出三個圈圈。\n[long pause]\n畫出四個圈圈。\n[long pause]\n畫出五個圈圈。\n[long pause]\n畫出六個圈圈。\n[long pause]\n畫出七個圈圈。\n[long pause]\n畫出八個圈圈。\n[long pause]\n畫出九個圈圈。\n[long pause]\n畫出十個圈圈。",
+      "items": [
+        "draw-1",
+        "draw-2",
+        "draw-3",
+        "draw-4",
+        "draw-5",
+        "draw-6",
+        "draw-7",
+        "draw-8",
+        "draw-9",
+        "draw-10"
+      ]
+    },
+    {
+      "id": "2026-10-21-02-math",
+      "createdAt": "2026-10-21",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n\n## Transcript:\n左邊有一個，右邊有一個，合在一起有幾個？\n[long pause]\n左邊有一個，右邊有兩個，合在一起有幾個？\n[long pause]\n左邊有一個，右邊有三個，合在一起有幾個？\n[long pause]\n左邊有一個，右邊有四個，合在一起有幾個？\n[long pause]\n左邊有一個，右邊有五個，合在一起有幾個？\n[long pause]\n左邊有兩個，右邊有一個，合在一起有幾個？",
+      "items": [
+        "join-1-1",
+        "join-1-2",
+        "join-1-3",
+        "join-1-4",
+        "join-1-5",
+        "join-2-1"
+      ]
+    },
+    {
+      "id": "2026-10-21-03-math",
+      "createdAt": "2026-10-21",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n\n## Transcript:\n左邊有兩個，右邊有兩個，合在一起有幾個？\n[long pause]\n左邊有兩個，右邊有三個，合在一起有幾個？\n[long pause]\n左邊有兩個，右邊有四個，合在一起有幾個？\n[long pause]\n左邊有兩個，右邊有五個，合在一起有幾個？\n[long pause]\n左邊有三個，右邊有一個，合在一起有幾個？\n[long pause]\n左邊有三個，右邊有兩個，合在一起有幾個？",
+      "items": [
+        "join-2-2",
+        "join-2-3",
+        "join-2-4",
+        "join-2-5",
+        "join-3-1",
+        "join-3-2"
+      ]
+    },
+    {
+      "id": "2026-10-21-04-math",
+      "createdAt": "2026-10-21",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n\n## Transcript:\n左邊有三個，右邊有三個，合在一起有幾個？\n[long pause]\n左邊有三個，右邊有四個，合在一起有幾個？\n[long pause]\n左邊有三個，右邊有五個，合在一起有幾個？\n[long pause]\n左邊有四個，右邊有一個，合在一起有幾個？\n[long pause]\n左邊有四個，右邊有兩個，合在一起有幾個？\n[long pause]\n左邊有四個，右邊有三個，合在一起有幾個？",
+      "items": [
+        "join-3-3",
+        "join-3-4",
+        "join-3-5",
+        "join-4-1",
+        "join-4-2",
+        "join-4-3"
+      ]
+    },
+    {
+      "id": "2026-10-21-05-math",
+      "createdAt": "2026-10-21",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n\n## Transcript:\n左邊有四個，右邊有四個，合在一起有幾個？\n[long pause]\n左邊有四個，右邊有五個，合在一起有幾個？\n[long pause]\n左邊有五個，右邊有一個，合在一起有幾個？\n[long pause]\n左邊有五個，右邊有兩個，合在一起有幾個？\n[long pause]\n左邊有五個，右邊有三個，合在一起有幾個？\n[long pause]\n左邊有五個，右邊有四個，合在一起有幾個？",
+      "items": [
+        "join-4-4",
+        "join-4-5",
+        "join-5-1",
+        "join-5-2",
+        "join-5-3",
+        "join-5-4"
+      ]
+    },
+    {
+      "id": "2026-10-21-06-math",
+      "createdAt": "2026-10-21",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n\n## Transcript:\n左邊有五個，右邊有五個，合在一起有幾個？\n[long pause]\n一加二等於多少？先畫圈圈，再寫答案。\n[long pause]\n一加三等於多少？先畫圈圈，再寫答案。\n[long pause]\n一加四等於多少？先畫圈圈，再寫答案。\n[long pause]\n一加五等於多少？先畫圈圈，再寫答案。\n[long pause]\n一加六等於多少？先畫圈圈，再寫答案。\n[long pause]\n一加七等於多少？先畫圈圈，再寫答案。",
+      "items": [
+        "join-5-5",
+        "add-1-2",
+        "add-1-3",
+        "add-1-4",
+        "add-1-5",
+        "add-1-6",
+        "add-1-7"
+      ]
     }
   ]
 }
