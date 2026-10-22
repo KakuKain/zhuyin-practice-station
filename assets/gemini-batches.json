@@ -620,6 +620,232 @@
         "add-1-6",
         "add-1-7"
       ]
+    },
+    {
+      "id": "2026-10-22-01-math",
+      "createdAt": "2026-10-22",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n\n## Transcript:\n一加八等於多少？先畫圈圈，再寫答案。\n[long pause]\n一加九等於多少？先畫圈圈，再寫答案。\n[long pause]\n二加一等於多少？先畫圈圈，再寫答案。\n[long pause]\n二加二等於多少？先畫圈圈，再寫答案。\n[long pause]\n二加三等於多少？先畫圈圈，再寫答案。\n[long pause]\n二加四等於多少？先畫圈圈，再寫答案。\n[long pause]\n二加五等於多少？先畫圈圈，再寫答案。",
+      "items": [
+        "add-1-8",
+        "add-1-9",
+        "add-2-1",
+        "add-2-2",
+        "add-2-3",
+        "add-2-4",
+        "add-2-5"
+      ]
+    },
+    {
+      "id": "2026-10-22-03-math",
+      "createdAt": "2026-10-22",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n\n## Transcript:\n三加五等於多少？先畫圈圈，再寫答案。\n[long pause]\n三加六等於多少？先畫圈圈，再寫答案。\n[long pause]\n三加七等於多少？先畫圈圈，再寫答案。\n[long pause]\n四加一等於多少？先畫圈圈，再寫答案。\n[long pause]\n四加二等於多少？先畫圈圈，再寫答案。\n[long pause]\n四加三等於多少？先畫圈圈，再寫答案。\n[long pause]\n四加四等於多少？先畫圈圈，再寫答案。",
+      "items": [
+        "add-3-5",
+        "add-3-6",
+        "add-3-7",
+        "add-4-1",
+        "add-4-2",
+        "add-4-3",
+        "add-4-4"
+      ]
+    },
+    {
+      "id": "2026-10-22-04-math",
+      "createdAt": "2026-10-22",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n\n## Transcript:\n四加五等於多少？先畫圈圈，再寫答案。\n[long pause]\n四加六等於多少？先畫圈圈，再寫答案。\n[long pause]\n五加一等於多少？先畫圈圈，再寫答案。\n[long pause]\n五加二等於多少？先畫圈圈，再寫答案。\n[long pause]\n五加三等於多少？先畫圈圈，再寫答案。\n[long pause]\n五加四等於多少？先畫圈圈，再寫答案。\n[long pause]\n五加五等於多少？先畫圈圈，再寫答案。",
+      "items": [
+        "add-4-5",
+        "add-4-6",
+        "add-5-1",
+        "add-5-2",
+        "add-5-3",
+        "add-5-4",
+        "add-5-5"
+      ]
+    },
+    {
+      "id": "2026-10-22-05-math",
+      "createdAt": "2026-10-22",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n\n## Transcript:\n六加一等於多少？先畫圈圈，再寫答案。\n[long pause]\n六加二等於多少？先畫圈圈，再寫答案。\n[long pause]\n六加三等於多少？先畫圈圈，再寫答案。\n[long pause]\n六加四等於多少？先畫圈圈，再寫答案。\n[long pause]\n七加一等於多少？先畫圈圈，再寫答案。\n[long pause]\n七加二等於多少？先畫圈圈，再寫答案。\n[long pause]\n七加三等於多少？先畫圈圈，再寫答案。",
+      "items": [
+        "add-6-1",
+        "add-6-2",
+        "add-6-3",
+        "add-6-4",
+        "add-7-1",
+        "add-7-2",
+        "add-7-3"
+      ]
+    },
+    {
+      "id": "2026-10-22-06-math",
+      "createdAt": "2026-10-22",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n\n## Transcript:\n八加一等於多少？先畫圈圈，再寫答案。\n[long pause]\n八加二等於多少？先畫圈圈，再寫答案。\n[long pause]\n九加一等於多少？先畫圈圈，再寫答案。\n[long pause]\n一加零等於多少？先畫圈圈，再寫答案。\n[long pause]\n零加一等於多少？先畫圈圈，再寫答案。\n[long pause]\n二加零等於多少？先畫圈圈，再寫答案。\n[long pause]\n零加二等於多少？先畫圈圈，再寫答案。",
+      "items": [
+        "add-8-1",
+        "add-8-2",
+        "add-9-1",
+        "add-1-0",
+        "add-0-1",
+        "add-2-0",
+        "add-0-2"
+      ]
+    },
+    {
+      "id": "2026-10-22-07-math",
+      "createdAt": "2026-10-22",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n\n## Transcript:\n三加零等於多少？先畫圈圈，再寫答案。\n[long pause]\n零加三等於多少？先畫圈圈，再寫答案。\n[long pause]\n四加零等於多少？先畫圈圈，再寫答案。\n[long pause]\n零加四等於多少？先畫圈圈，再寫答案。\n[long pause]\n五加零等於多少？先畫圈圈，再寫答案。\n[long pause]\n零加五等於多少？先畫圈圈，再寫答案。\n[long pause]\n六加零等於多少？先畫圈圈，再寫答案。",
+      "items": [
+        "add-3-0",
+        "add-0-3",
+        "add-4-0",
+        "add-0-4",
+        "add-5-0",
+        "add-0-5",
+        "add-6-0"
+      ]
+    },
+    {
+      "id": "2026-10-22-09-math",
+      "createdAt": "2026-10-22",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n讀音照課本：「數」念ㄕㄨˇ、「哪」念ㄋㄚˇ。\n\n## Transcript:\n從左邊數，第二個是哪一個？點一下。\n[long pause]\n從右邊數，第二個是哪一個？點一下。\n[long pause]\n從左邊數，第三個是哪一個？點一下。\n[long pause]\n從右邊數，第三個是哪一個？點一下。\n[long pause]\n從左邊數，第四個是哪一個？點一下。\n[long pause]\n從右邊數，第四個是哪一個？點一下。\n[long pause]\n從左邊數，第五個是哪一個？點一下。",
+      "items": [
+        "position-left-2",
+        "position-right-2",
+        "position-left-3",
+        "position-right-3",
+        "position-left-4",
+        "position-right-4",
+        "position-left-5"
+      ]
+    },
+    {
+      "id": "2026-10-22-10-math",
+      "createdAt": "2026-10-22",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n讀音照課本：「數」念ㄕㄨˇ、「哪」念ㄋㄚˇ。\n\n## Transcript:\n從右邊數，第五個是哪一個？點一下。\n[long pause]\n從左邊數，第六個是哪一個？點一下。\n[long pause]\n從右邊數，第六個是哪一個？點一下。\n[long pause]\n從左邊數，點兩個。\n[long pause]\n從左邊數，點第二個。\n[long pause]\n從左邊數，點三個。\n[long pause]\n從左邊數，點第三個。\n[long pause]\n從左邊數，點四個。\n[long pause]\n從左邊數，點第四個。\n[long pause]\n從左邊數，點五個。",
+      "items": [
+        "position-right-5",
+        "position-left-6",
+        "position-right-6",
+        "group-2",
+        "nth-2",
+        "group-3",
+        "nth-3",
+        "group-4",
+        "nth-4",
+        "group-5"
+      ]
+    },
+    {
+      "id": "2026-10-22-11-math",
+      "createdAt": "2026-10-22",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n讀音照課本：「數」念ㄕㄨˇ、「和」念ㄏㄢˋ。\n\n## Transcript:\n從左邊數，點第五個。\n[long pause]\n三可以分成一和幾？\n[long pause]\n四可以分成一和幾？\n[long pause]\n五可以分成一和幾？\n[long pause]\n六可以分成一和幾？\n[long pause]\n七可以分成一和幾？\n[long pause]\n八可以分成一和幾？\n[long pause]\n九可以分成一和幾？\n[long pause]\n十可以分成一和幾？\n[long pause]\n三可以分成二和幾？",
+      "items": [
+        "nth-5",
+        "split-1-2",
+        "split-1-3",
+        "split-1-4",
+        "split-1-5",
+        "split-1-6",
+        "split-1-7",
+        "split-1-8",
+        "split-1-9",
+        "split-2-1"
+      ]
+    },
+    {
+      "id": "2026-10-22-12-math",
+      "createdAt": "2026-10-22",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n讀音照課本：「和」念ㄏㄢˋ。\n\n## Transcript:\n四可以分成二和幾？\n[long pause]\n五可以分成二和幾？\n[long pause]\n六可以分成二和幾？\n[long pause]\n七可以分成二和幾？\n[long pause]\n八可以分成二和幾？\n[long pause]\n九可以分成二和幾？\n[long pause]\n十可以分成二和幾？\n[long pause]\n四可以分成三和幾？\n[long pause]\n五可以分成三和幾？\n[long pause]\n六可以分成三和幾？",
+      "items": [
+        "split-2-2",
+        "split-2-3",
+        "split-2-4",
+        "split-2-5",
+        "split-2-6",
+        "split-2-7",
+        "split-2-8",
+        "split-3-1",
+        "split-3-2",
+        "split-3-3"
+      ]
+    },
+    {
+      "id": "2026-10-22-13-math",
+      "createdAt": "2026-10-22",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n讀音照課本：「和」念ㄏㄢˋ。\n\n## Transcript:\n七可以分成三和幾？\n[long pause]\n八可以分成三和幾？\n[long pause]\n九可以分成三和幾？\n[long pause]\n十可以分成三和幾？\n[long pause]\n五可以分成四和幾？\n[long pause]\n六可以分成四和幾？\n[long pause]\n七可以分成四和幾？\n[long pause]\n八可以分成四和幾？\n[long pause]\n九可以分成四和幾？\n[long pause]\n十可以分成四和幾？",
+      "items": [
+        "split-3-4",
+        "split-3-5",
+        "split-3-6",
+        "split-3-7",
+        "split-4-1",
+        "split-4-2",
+        "split-4-3",
+        "split-4-4",
+        "split-4-5",
+        "split-4-6"
+      ]
+    },
+    {
+      "id": "2026-10-22-14-math",
+      "createdAt": "2026-10-22",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n讀音照課本：「和」念ㄏㄢˋ。\n\n## Transcript:\n六可以分成五和幾？\n[long pause]\n七可以分成五和幾？\n[long pause]\n八可以分成五和幾？\n[long pause]\n九可以分成五和幾？\n[long pause]\n十可以分成五和幾？\n[long pause]\n七可以分成六和幾？\n[long pause]\n八可以分成六和幾？\n[long pause]\n九可以分成六和幾？\n[long pause]\n十可以分成六和幾？\n[long pause]\n八可以分成七和幾？",
+      "items": [
+        "split-5-1",
+        "split-5-2",
+        "split-5-3",
+        "split-5-4",
+        "split-5-5",
+        "split-6-1",
+        "split-6-2",
+        "split-6-3",
+        "split-6-4",
+        "split-7-1"
+      ]
+    },
+    {
+      "id": "2026-10-22-15-math",
+      "createdAt": "2026-10-22",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n讀音照課本：「和」念ㄏㄢˋ、「了」念˙ㄌㄜ。\n\n## Transcript:\n九可以分成七和幾？\n[long pause]\n十可以分成七和幾？\n[long pause]\n九可以分成八和幾？\n[long pause]\n十可以分成八和幾？\n[long pause]\n十可以分成九和幾？\n[long pause]\n有三個，拿走了一個，還剩幾個？\n[long pause]\n有四個，拿走了一個，還剩幾個？\n[long pause]\n有五個，拿走了一個，還剩幾個？\n[long pause]\n有六個，拿走了一個，還剩幾個？\n[long pause]\n有七個，拿走了一個，還剩幾個？",
+      "items": [
+        "split-7-2",
+        "split-7-3",
+        "split-8-1",
+        "split-8-2",
+        "split-9-1",
+        "take-1-2",
+        "take-1-3",
+        "take-1-4",
+        "take-1-5",
+        "take-1-6"
+      ]
     }
   ]
 }
