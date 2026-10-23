@@ -110,13 +110,17 @@ const groups: [string, Item[]][] = [
   ["other lesson characters", words(lessonText.filter((text) => !heard.includes(text)))],
 ];
 
-/** Batches stay short enough that the voice keeps its pace and the pauses stay clear. */
+/**
+ * Batches stay short enough that the voice keeps its pace and the pauses stay clear. Seven
+ * near-identical sums (二加六… 三加四) twice came back with one skipped, so long sentences go
+ * five at a time.
+ */
 function batches(items: Item[]) {
   const result: Item[][] = [];
   let current: Item[] = [];
   let size = 0;
   for (const item of items) {
-    const [maxItems, maxSize] = item.kind === "math" ? [10, 110] : [24, 48];
+    const [maxItems, maxSize] = item.kind === "math" ? [10, 80] : [24, 48];
     if (current.length && (current.length >= maxItems || size + item.readings.length > maxSize)) {
       result.push(current);
       current = [];
