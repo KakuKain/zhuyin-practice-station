@@ -44,6 +44,42 @@
     "createdAt": "2026-10-22",
     "origin": "Gemini API"
   },
+  "add-0-6": {
+    "version": 1,
+    "text": "零加六等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-23-02-math",
+    "duration": 6.18,
+    "voicedDuration": 5.58,
+    "createdAt": "2026-10-23",
+    "origin": "Gemini API"
+  },
+  "add-0-7": {
+    "version": 1,
+    "text": "零加七等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-23-02-math",
+    "duration": 6.25,
+    "voicedDuration": 5.65,
+    "createdAt": "2026-10-23",
+    "origin": "Gemini API"
+  },
+  "add-0-8": {
+    "version": 1,
+    "text": "零加八等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-23-02-math",
+    "duration": 6.22,
+    "voicedDuration": 5.62,
+    "createdAt": "2026-10-23",
+    "origin": "Gemini API"
+  },
+  "add-0-9": {
+    "version": 1,
+    "text": "零加九等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-23-02-math",
+    "duration": 5.98,
+    "voicedDuration": 5.38,
+    "createdAt": "2026-10-23",
+    "origin": "Gemini API"
+  },
   "add-1-0": {
     "version": 1,
     "text": "一加零等於多少？先畫圈圈，再寫答案。",
@@ -377,6 +413,15 @@
     "createdAt": "2026-10-22",
     "origin": "Gemini API"
   },
+  "add-7-0": {
+    "version": 1,
+    "text": "七加零等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-23-02-math",
+    "duration": 6.18,
+    "voicedDuration": 5.58,
+    "createdAt": "2026-10-23",
+    "origin": "Gemini API"
+  },
   "add-7-1": {
     "version": 1,
     "text": "七加一等於多少？先畫圈圈，再寫答案。",
@@ -404,6 +449,15 @@
     "createdAt": "2026-10-22",
     "origin": "Gemini API"
   },
+  "add-8-0": {
+    "version": 1,
+    "text": "八加零等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-23-02-math",
+    "duration": 5.99,
+    "voicedDuration": 5.39,
+    "createdAt": "2026-10-23",
+    "origin": "Gemini API"
+  },
   "add-8-1": {
     "version": 1,
     "text": "八加一等於多少？先畫圈圈，再寫答案。",
@@ -420,6 +474,15 @@
     "duration": 5.38,
     "voicedDuration": 4.78,
     "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-9-0": {
+    "version": 1,
+    "text": "九加零等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-23-02-math",
+    "duration": 5.96,
+    "voicedDuration": 5.36,
+    "createdAt": "2026-10-23",
     "origin": "Gemini API"
   },
   "add-9-1": {
@@ -1599,6 +1662,87 @@
     "duration": 4.42,
     "voicedDuration": 3.82,
     "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "take-1-7": {
+    "version": 1,
+    "text": "有八個，拿走了一個，還剩幾個？",
+    "batch": "2026-10-23-03-math",
+    "duration": 4.18,
+    "voicedDuration": 3.61,
+    "createdAt": "2026-10-23",
+    "origin": "Gemini API"
+  },
+  "take-1-8": {
+    "version": 1,
+    "text": "有九個，拿走了一個，還剩幾個？",
+    "batch": "2026-10-23-03-math",
+    "duration": 4.48,
+    "voicedDuration": 3.88,
+    "createdAt": "2026-10-23",
+    "origin": "Gemini API"
+  },
+  "take-2-1": {
+    "version": 1,
+    "text": "有三個，拿走了兩個，還剩幾個？",
+    "batch": "2026-10-23-03-math",
+    "duration": 4.58,
+    "voicedDuration": 3.98,
+    "createdAt": "2026-10-23",
+    "origin": "Gemini API"
+  },
+  "take-2-2": {
+    "version": 1,
+    "text": "有四個，拿走了兩個，還剩幾個？",
+    "batch": "2026-10-23-03-math",
+    "duration": 4.5,
+    "voicedDuration": 3.9,
+    "createdAt": "2026-10-23",
+    "origin": "Gemini API"
+  },
+  "take-2-3": {
+    "version": 1,
+    "text": "有五個，拿走了兩個，還剩幾個？",
+    "batch": "2026-10-23-03-math",
+    "duration": 4.63,
+    "voicedDuration": 4.03,
+    "createdAt": "2026-10-23",
+    "origin": "Gemini API"
+  },
+  "take-2-4": {
+    "version": 1,
+    "text": "有六個，拿走了兩個，還剩幾個？",
+    "batch": "2026-10-23-03-math",
+    "duration": 4.39,
+    "voicedDuration": 3.79,
+    "createdAt": "2026-10-23",
+    "origin": "Gemini API"
+  },
+  "take-2-5": {
+    "version": 1,
+    "text": "有七個，拿走了兩個，還剩幾個？",
+    "batch": "2026-10-23-03-math",
+    "duration": 4.53,
+    "voicedDuration": 3.93,
+    "createdAt": "2026-10-23",
+    "origin": "Gemini API"
+  },
+  "take-2-6": {
+    "version": 1,
+    "text": "有八個，拿走了兩個，還剩幾個？",
+    "batch": "2026-10-23-03-math",
+    "duration": 4.39,
+    "voicedDuration": 3.79,
+    "createdAt": "2026-10-23",
+    "origin": "Gemini API"
+  },
+  "take-2-7": {
+    "version": 1,
+    "text": "有九個，拿走了兩個，還剩幾個？",
+    "batch": "2026-10-23-03-math",
+    "duration": 4.58,
+    "voicedDuration": 3.98,
+    "createdAt": "2026-10-23",
     "origin": "Gemini API"
   },
   "thick-less": {
