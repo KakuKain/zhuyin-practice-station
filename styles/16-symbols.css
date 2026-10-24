@@ -13,16 +13,18 @@
   background: #fffefa;
 }
 
+/* The scene is painted for one screen, so it stays put while the long chart scrolls over it. */
 .symbol-page-watercolor {
-  position: absolute;
+  position: fixed;
   z-index: -1;
-  top: 0;
+  top: 56px;
   left: 50%;
   width: min(100vw, var(--container-manage));
   max-width: none;
-  height: max(720px, calc(100vh - 64px));
+  /* Between the header and the bottom navigation, so the meadow stays in sight. */
+  height: calc(100dvh - 56px - 67px - env(safe-area-inset-bottom, 0px));
   object-fit: cover;
-  object-position: 85% top;
+  object-position: 85% bottom;
   transform: translateX(-50%);
   pointer-events: none;
 }
