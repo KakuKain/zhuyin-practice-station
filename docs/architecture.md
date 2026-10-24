@@ -74,7 +74,7 @@ public/                    靜態部署素材與完整語音 registry
 
 ## 語音與載入
 
-37 基本符號使用教育部錄音；ㄧㄤ 播放教育部《國語辭典簡編本》「央」的原始錄音（禁止改作，所以檔案不裁切，用 `#t=0,0.7` 在字音唸完、部首旁白之前停止，`audio-registry.ts` 的 `partialClips`）；其餘 21 個結合韻、九課朗讀與 `gemini/words/` 的語詞使用 Gemini Fola 靜態音檔（語詞以 `scripts/generate-gemini-words.ts` 產生，見 `gemini-readings.md`）。聽寫的「聲音準備中」遮罩延遲 0.7 秒才出現、之前可穿透點擊，重播或已快取的音檔不會閃過整頁或擋住書寫。生字／語詞多數仍是舊 macOS Meijia 合成檔，未宣稱全部通過人耳校對。正式站不呼叫 AI API、不需要語音服務金鑰。
+37 基本符號使用教育部錄音；ㄧㄤ 播放教育部《國語辭典簡編本》「央」的原始錄音（禁止改作，所以檔案不裁切，用 `#t=0,0.7` 在字音唸完、部首旁白之前停止，`audio-registry.ts` 的 `partialClips`）；其餘 21 個結合韻、九課朗讀與 `gemini/words/` 的語詞使用 Gemini Fola 靜態音檔（語詞以 `scripts/generate-gemini-words.ts` 產生，見 `gemini-readings.md`）。聽寫的「聲音準備中」遮罩延遲 0.7 秒才出現、之前可穿透點擊，重播或已快取的音檔不會閃過整頁或擋住書寫。各課的生字與圈詞語詞、課文的大部分單字，以及全部數學題目，都用 `scripts/generate-gemini-batch.ts` 換成 Gemini Fola（一次請求念一批，依長停頓切開，段數或長度不對就整批不收；見 `gemini-readings.md`）。其餘約 100 個課文字與只有舊紀錄會用到的字詞仍是舊 macOS Meijia 合成檔：macOS 語音的授權只允許個人、非商業使用，不能公開發布，所以會陸續換掉。未宣稱全部通過人耳校對。正式站不呼叫 AI API、不需要語音服務金鑰。
 
 `public/listening-audio/registry.json` 記錄檔案來源、指定讀音、長度、SHA-256 與校對狀態；`lib/audio/audio-index.json` 是精簡的播放索引（文字 → 讀音、版本、所在資料夾）。更新任何音檔後執行 `npm run assets:audio-registry`，播放 URL 以檔案 hash 更新快取版本。已知文字與指定讀音不符時不借用另一聲調的音檔；可使用指定讀音的自訂錄音。未知自訂字詞仍保留瀏覽器合成備援。registry 的時間／hash 驗證不代表聽感與發音正確。
 

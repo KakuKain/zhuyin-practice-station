@@ -74,6 +74,6 @@ npm run assets:artwork        # 保留 PNG 原稿，產生無損 WebP
 npm run assets:audio-registry # 更新音檔身份、長度與 hash 快取版本
 ```
 
-單個注音符號使用教育部《國語注音符號手冊》F1–F37 錄音，以正常速度播放。九課朗讀及 21 個結合韻使用 Gemini Fola 音檔（見 [朗讀製作紀錄](docs/gemini-readings.md)），ㄧㄤ 播放教育部《國語辭典簡編本》「央」的原始錄音，唸完字音就停；其餘生字／語詞仍主要使用舊合成檔。音檔清單記錄 hash、長度及來源，未宣稱全部通過人耳校對。來源、CC BY 4.0 授權與轉檔說明見 [音檔出處](public/listening-audio/ATTRIBUTION.md)。可用 `node scripts/generate-listening-audio.mjs --refresh-symbols` 更新官方錄音。
+單個注音符號使用教育部《國語注音符號手冊》F1–F37 錄音，以正常速度播放。九課朗讀及 21 個結合韻使用 Gemini Fola 音檔（見 [朗讀製作紀錄](docs/gemini-readings.md)），ㄧㄤ 播放教育部《國語辭典簡編本》「央」的原始錄音，唸完字音就停。目前課程用到的生字、圈詞語詞與全部數學題目也是 Gemini Fola 合成語音（批次產生，見製作紀錄）；其餘少數課文字與只有舊紀錄會用到的字詞仍是舊合成檔。音檔清單記錄 hash、長度及來源，未宣稱全部通過人耳校對。來源、CC BY 4.0 授權與轉檔說明見 [音檔出處](public/listening-audio/ATTRIBUTION.md)。可用 `node scripts/generate-listening-audio.mjs --refresh-symbols` 更新官方錄音。
 
 目前仍為 Beta。依賴掃描的已知項目與後續升級界線見 [安全維護說明](docs/security-maintenance.md)。

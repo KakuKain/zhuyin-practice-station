@@ -8,6 +8,12 @@
 
 本站將原始 WAV 轉為 AAC/M4A，以便瀏覽器播放；單個注音符號使用正常速度（1 倍速），沒有把兩次朗讀合併成同一段音檔。唸完後會留 650 毫秒空白，再依使用者設定安排下一次播放。其餘生字、語詞音檔由本專案產生，並非教育部錄音。
 
+## Gemini 合成語音
+
+九課朗讀、21 個結合韻、各課的生字與圈詞語詞（`gemini/words/`），以及全部數學題目（`math-audio/`），是用 Google Gemini 文字轉語音（`gemini-3.8-flash-tts`，Fola 聲音）事先產生的合成語音，不是真人錄音。網站只播放這些靜態音檔，執行時不呼叫 Gemini。每個音檔的產生日期與批次記錄在 `gemini/manifest.json`、`features/math/math-audio-gemini.json` 與 `assets/gemini-batches.json`。
+
+其餘少數課文字與只有舊紀錄會用到的字詞，仍是較早以 macOS 產生的合成檔，之後會陸續換成 Gemini。
+
 ## 結合韻例字完整錄音
 
 中華民國教育部（Ministry of Education, R.O.C.）。《國語辭典簡編本》（版本編號：2014_20260929）。網址：https://dict.concised.moe.edu.tw/

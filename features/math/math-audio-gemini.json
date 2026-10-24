@@ -1,4 +1,913 @@
 {
+  "add-0-1": {
+    "version": 1,
+    "text": "零加一等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-06-math",
+    "duration": 5.37,
+    "voicedDuration": 4.77,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-0-2": {
+    "version": 1,
+    "text": "零加二等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-06-math",
+    "duration": 5.31,
+    "voicedDuration": 4.71,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-0-3": {
+    "version": 1,
+    "text": "零加三等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-07-math",
+    "duration": 5.58,
+    "voicedDuration": 4.98,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-0-4": {
+    "version": 1,
+    "text": "零加四等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-07-math",
+    "duration": 5.56,
+    "voicedDuration": 4.96,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-0-5": {
+    "version": 1,
+    "text": "零加五等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-07-math",
+    "duration": 5.66,
+    "voicedDuration": 5.06,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-0-6": {
+    "version": 1,
+    "text": "零加六等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-23-02-math",
+    "duration": 6.18,
+    "voicedDuration": 5.58,
+    "createdAt": "2026-10-23",
+    "origin": "Gemini API"
+  },
+  "add-0-7": {
+    "version": 1,
+    "text": "零加七等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-23-02-math",
+    "duration": 6.25,
+    "voicedDuration": 5.65,
+    "createdAt": "2026-10-23",
+    "origin": "Gemini API"
+  },
+  "add-0-8": {
+    "version": 1,
+    "text": "零加八等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-23-02-math",
+    "duration": 6.22,
+    "voicedDuration": 5.62,
+    "createdAt": "2026-10-23",
+    "origin": "Gemini API"
+  },
+  "add-0-9": {
+    "version": 1,
+    "text": "零加九等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-23-02-math",
+    "duration": 5.98,
+    "voicedDuration": 5.38,
+    "createdAt": "2026-10-23",
+    "origin": "Gemini API"
+  },
+  "add-1-0": {
+    "version": 1,
+    "text": "一加零等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-06-math",
+    "duration": 5.36,
+    "voicedDuration": 4.76,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-1-2": {
+    "version": 1,
+    "text": "一加二等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-21-06-math",
+    "duration": 5.94,
+    "voicedDuration": 5.34,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "add-1-3": {
+    "version": 1,
+    "text": "一加三等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-21-06-math",
+    "duration": 5.76,
+    "voicedDuration": 5.16,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "add-1-4": {
+    "version": 1,
+    "text": "一加四等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-21-06-math",
+    "duration": 5.02,
+    "voicedDuration": 4.42,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "add-1-5": {
+    "version": 1,
+    "text": "一加五等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-21-06-math",
+    "duration": 5,
+    "voicedDuration": 4.4,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "add-1-6": {
+    "version": 1,
+    "text": "一加六等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-21-06-math",
+    "duration": 4.9,
+    "voicedDuration": 4.3,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "add-1-7": {
+    "version": 1,
+    "text": "一加七等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-21-06-math",
+    "duration": 4.81,
+    "voicedDuration": 4.25,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "add-1-8": {
+    "version": 1,
+    "text": "一加八等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-01-math",
+    "duration": 5.46,
+    "voicedDuration": 4.93,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-1-9": {
+    "version": 1,
+    "text": "一加九等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-01-math",
+    "duration": 5.55,
+    "voicedDuration": 4.95,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-2-0": {
+    "version": 1,
+    "text": "二加零等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-06-math",
+    "duration": 5.31,
+    "voicedDuration": 4.71,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-2-1": {
+    "version": 1,
+    "text": "二加一等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-01-math",
+    "duration": 5.52,
+    "voicedDuration": 4.92,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-2-2": {
+    "version": 1,
+    "text": "二加二等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-01-math",
+    "duration": 5.49,
+    "voicedDuration": 4.89,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-2-3": {
+    "version": 1,
+    "text": "二加三等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-01-math",
+    "duration": 5.21,
+    "voicedDuration": 4.61,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-2-4": {
+    "version": 1,
+    "text": "二加四等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-01-math",
+    "duration": 5.24,
+    "voicedDuration": 4.64,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-2-5": {
+    "version": 1,
+    "text": "二加五等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-01-math",
+    "duration": 5.29,
+    "voicedDuration": 4.69,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-2-6": {
+    "version": 1,
+    "text": "二加六等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-24-01-math",
+    "duration": 5.41,
+    "voicedDuration": 4.81,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "add-2-7": {
+    "version": 1,
+    "text": "二加七等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-24-01-math",
+    "duration": 5.77,
+    "voicedDuration": 5.17,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "add-2-8": {
+    "version": 1,
+    "text": "二加八等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-24-01-math",
+    "duration": 5.56,
+    "voicedDuration": 4.96,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "add-3-0": {
+    "version": 1,
+    "text": "三加零等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-07-math",
+    "duration": 6,
+    "voicedDuration": 5.49,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-3-1": {
+    "version": 1,
+    "text": "三加一等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-24-01-math",
+    "duration": 5.49,
+    "voicedDuration": 4.89,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "add-3-2": {
+    "version": 1,
+    "text": "三加二等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-24-01-math",
+    "duration": 5.8,
+    "voicedDuration": 5.2,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "add-3-3": {
+    "version": 1,
+    "text": "三加三等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-24-02-math",
+    "duration": 5.88,
+    "voicedDuration": 5.35,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "add-3-4": {
+    "version": 1,
+    "text": "三加四等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-24-02-math",
+    "duration": 5.97,
+    "voicedDuration": 5.37,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "add-3-5": {
+    "version": 1,
+    "text": "三加五等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-03-math",
+    "duration": 5.63,
+    "voicedDuration": 5.19,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-3-6": {
+    "version": 1,
+    "text": "三加六等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-03-math",
+    "duration": 5.55,
+    "voicedDuration": 4.95,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-3-7": {
+    "version": 1,
+    "text": "三加七等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-03-math",
+    "duration": 5.48,
+    "voicedDuration": 4.88,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-4-0": {
+    "version": 1,
+    "text": "四加零等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-07-math",
+    "duration": 5.7,
+    "voicedDuration": 5.1,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-4-1": {
+    "version": 1,
+    "text": "四加一等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-03-math",
+    "duration": 5.26,
+    "voicedDuration": 4.66,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-4-2": {
+    "version": 1,
+    "text": "四加二等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-03-math",
+    "duration": 5.5,
+    "voicedDuration": 4.9,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-4-3": {
+    "version": 1,
+    "text": "四加三等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-03-math",
+    "duration": 5.15,
+    "voicedDuration": 4.55,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-4-4": {
+    "version": 1,
+    "text": "四加四等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-03-math",
+    "duration": 5.09,
+    "voicedDuration": 4.49,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-4-5": {
+    "version": 1,
+    "text": "四加五等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-04-math",
+    "duration": 4.99,
+    "voicedDuration": 4.46,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-4-6": {
+    "version": 1,
+    "text": "四加六等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-04-math",
+    "duration": 5.39,
+    "voicedDuration": 4.79,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-5-0": {
+    "version": 1,
+    "text": "五加零等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-07-math",
+    "duration": 5.59,
+    "voicedDuration": 4.99,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-5-1": {
+    "version": 1,
+    "text": "五加一等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-04-math",
+    "duration": 5.65,
+    "voicedDuration": 5.05,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-5-2": {
+    "version": 1,
+    "text": "五加二等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-04-math",
+    "duration": 5.84,
+    "voicedDuration": 5.24,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-5-3": {
+    "version": 1,
+    "text": "五加三等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-04-math",
+    "duration": 5.98,
+    "voicedDuration": 5.38,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-5-4": {
+    "version": 1,
+    "text": "五加四等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-04-math",
+    "duration": 5.93,
+    "voicedDuration": 5.33,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-5-5": {
+    "version": 1,
+    "text": "五加五等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-04-math",
+    "duration": 5.88,
+    "voicedDuration": 5.28,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-6-0": {
+    "version": 1,
+    "text": "六加零等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-07-math",
+    "duration": 5.6,
+    "voicedDuration": 5,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-6-1": {
+    "version": 1,
+    "text": "六加一等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-05-math",
+    "duration": 5.18,
+    "voicedDuration": 4.58,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-6-2": {
+    "version": 1,
+    "text": "六加二等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-05-math",
+    "duration": 6.33,
+    "voicedDuration": 5.73,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-6-3": {
+    "version": 1,
+    "text": "六加三等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-05-math",
+    "duration": 5.26,
+    "voicedDuration": 4.66,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-6-4": {
+    "version": 1,
+    "text": "六加四等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-05-math",
+    "duration": 5.18,
+    "voicedDuration": 4.58,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-7-0": {
+    "version": 1,
+    "text": "七加零等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-23-02-math",
+    "duration": 6.18,
+    "voicedDuration": 5.58,
+    "createdAt": "2026-10-23",
+    "origin": "Gemini API"
+  },
+  "add-7-1": {
+    "version": 1,
+    "text": "七加一等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-05-math",
+    "duration": 5.41,
+    "voicedDuration": 4.81,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-7-2": {
+    "version": 1,
+    "text": "七加二等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-05-math",
+    "duration": 5.6,
+    "voicedDuration": 5,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-7-3": {
+    "version": 1,
+    "text": "七加三等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-05-math",
+    "duration": 5.55,
+    "voicedDuration": 4.95,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-8-0": {
+    "version": 1,
+    "text": "八加零等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-23-02-math",
+    "duration": 5.99,
+    "voicedDuration": 5.39,
+    "createdAt": "2026-10-23",
+    "origin": "Gemini API"
+  },
+  "add-8-1": {
+    "version": 1,
+    "text": "八加一等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-06-math",
+    "duration": 5.24,
+    "voicedDuration": 4.65,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-8-2": {
+    "version": 1,
+    "text": "八加二等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-06-math",
+    "duration": 5.38,
+    "voicedDuration": 4.78,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "add-9-0": {
+    "version": 1,
+    "text": "九加零等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-23-02-math",
+    "duration": 5.96,
+    "voicedDuration": 5.36,
+    "createdAt": "2026-10-23",
+    "origin": "Gemini API"
+  },
+  "add-9-1": {
+    "version": 1,
+    "text": "九加一等於多少？先畫圈圈，再寫答案。",
+    "batch": "2026-10-22-06-math",
+    "duration": 5.53,
+    "voicedDuration": 4.93,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "align-height": {
+    "version": 1,
+    "text": "有人站在箱子上。先把小朋友拉到地上。",
+    "batch": "2026-10-20-02-math",
+    "duration": 4.79,
+    "voicedDuration": 4.19,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "align-length": {
+    "version": 1,
+    "text": "鉛筆沒有對齊。先把每一枝鉛筆拉到紅線。",
+    "batch": "2026-10-20-02-math",
+    "duration": 4.71,
+    "voicedDuration": 4.11,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "build-circle": {
+    "version": 1,
+    "text": "這個造型用了幾個圓形？點一下。",
+    "batch": "2026-10-20-06-math",
+    "duration": 4.55,
+    "voicedDuration": 3.95,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "build-rect": {
+    "version": 1,
+    "text": "這個造型用了幾個長方形？點一下。",
+    "batch": "2026-10-20-05-math",
+    "duration": 4.43,
+    "voicedDuration": 3.83,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "build-square": {
+    "version": 1,
+    "text": "這個造型用了幾個正方形？點一下。",
+    "batch": "2026-10-20-05-math",
+    "duration": 4.37,
+    "voicedDuration": 3.77,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "build-triangle": {
+    "version": 1,
+    "text": "這個造型用了幾個三角形？點一下。",
+    "batch": "2026-10-20-06-math",
+    "duration": 4.43,
+    "voicedDuration": 3.84,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "combine-1-2": {
+    "version": 1,
+    "text": "一和二合在一起是幾？",
+    "batch": "2026-10-24-05-math",
+    "duration": 3.86,
+    "voicedDuration": 3.26,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "combine-1-3": {
+    "version": 1,
+    "text": "一和三合在一起是幾？",
+    "batch": "2026-10-24-05-math",
+    "duration": 3.71,
+    "voicedDuration": 3.11,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "combine-1-4": {
+    "version": 1,
+    "text": "一和四合在一起是幾？",
+    "batch": "2026-10-24-06-math",
+    "duration": 3.5,
+    "voicedDuration": 2.97,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "combine-1-5": {
+    "version": 1,
+    "text": "一和五合在一起是幾？",
+    "batch": "2026-10-24-06-math",
+    "duration": 3.45,
+    "voicedDuration": 2.85,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "combine-1-9": {
+    "version": 1,
+    "text": "一和九合在一起是幾？",
+    "batch": "2026-10-24-08-math",
+    "duration": 3.62,
+    "voicedDuration": 3.02,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "combine-2-1": {
+    "version": 1,
+    "text": "二和一合在一起是幾？",
+    "batch": "2026-10-24-06-math",
+    "duration": 3.44,
+    "voicedDuration": 2.84,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "combine-2-2": {
+    "version": 1,
+    "text": "二和二合在一起是幾？",
+    "batch": "2026-10-24-06-math",
+    "duration": 3.61,
+    "voicedDuration": 3.01,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "combine-2-3": {
+    "version": 1,
+    "text": "二和三合在一起是幾？",
+    "batch": "2026-10-24-06-math",
+    "duration": 3.56,
+    "voicedDuration": 2.96,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "combine-2-4": {
+    "version": 1,
+    "text": "二和四合在一起是幾？",
+    "batch": "2026-10-24-06-math",
+    "duration": 3.57,
+    "voicedDuration": 2.97,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "combine-2-5": {
+    "version": 1,
+    "text": "二和五合在一起是幾？",
+    "batch": "2026-10-24-06-math",
+    "duration": 3.53,
+    "voicedDuration": 2.93,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "combine-2-8": {
+    "version": 1,
+    "text": "二和八合在一起是幾？",
+    "batch": "2026-10-24-08-math",
+    "duration": 3.37,
+    "voicedDuration": 2.98,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "combine-3-1": {
+    "version": 1,
+    "text": "三和一合在一起是幾？",
+    "batch": "2026-10-24-06-math",
+    "duration": 3.93,
+    "voicedDuration": 3.33,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "combine-3-2": {
+    "version": 1,
+    "text": "三和二合在一起是幾？",
+    "batch": "2026-10-24-07-math",
+    "duration": 4.03,
+    "voicedDuration": 3.43,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "combine-3-3": {
+    "version": 1,
+    "text": "三和三合在一起是幾？",
+    "batch": "2026-10-24-07-math",
+    "duration": 3.95,
+    "voicedDuration": 3.35,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "combine-3-4": {
+    "version": 1,
+    "text": "三和四合在一起是幾？",
+    "batch": "2026-10-24-07-math",
+    "duration": 3.88,
+    "voicedDuration": 3.28,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "combine-3-5": {
+    "version": 1,
+    "text": "三和五合在一起是幾？",
+    "batch": "2026-10-24-07-math",
+    "duration": 3.8,
+    "voicedDuration": 3.2,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "combine-3-7": {
+    "version": 1,
+    "text": "三和七合在一起是幾？",
+    "batch": "2026-10-24-09-math",
+    "duration": 3.27,
+    "voicedDuration": 2.68,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "combine-4-1": {
+    "version": 1,
+    "text": "四和一合在一起是幾？",
+    "batch": "2026-10-24-07-math",
+    "duration": 3.88,
+    "voicedDuration": 3.28,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "combine-4-2": {
+    "version": 1,
+    "text": "四和二合在一起是幾？",
+    "batch": "2026-10-24-07-math",
+    "duration": 3.83,
+    "voicedDuration": 3.23,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "combine-4-3": {
+    "version": 1,
+    "text": "四和三合在一起是幾？",
+    "batch": "2026-10-24-07-math",
+    "duration": 3.73,
+    "voicedDuration": 3.13,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "combine-4-4": {
+    "version": 1,
+    "text": "四和四合在一起是幾？",
+    "batch": "2026-10-24-07-math",
+    "duration": 3.45,
+    "voicedDuration": 3.15,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "combine-4-5": {
+    "version": 1,
+    "text": "四和五合在一起是幾？",
+    "batch": "2026-10-24-08-math",
+    "duration": 4.26,
+    "voicedDuration": 3.72,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "combine-4-6": {
+    "version": 1,
+    "text": "四和六合在一起是幾？",
+    "batch": "2026-10-24-09-math",
+    "duration": 3.12,
+    "voicedDuration": 2.52,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "combine-5-1": {
+    "version": 1,
+    "text": "五和一合在一起是幾？",
+    "batch": "2026-10-24-08-math",
+    "duration": 4.26,
+    "voicedDuration": 3.66,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "combine-5-2": {
+    "version": 1,
+    "text": "五和二合在一起是幾？",
+    "batch": "2026-10-24-08-math",
+    "duration": 3.88,
+    "voicedDuration": 3.28,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "combine-5-3": {
+    "version": 1,
+    "text": "五和三合在一起是幾？",
+    "batch": "2026-10-24-08-math",
+    "duration": 3.73,
+    "voicedDuration": 3.13,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "combine-5-4": {
+    "version": 1,
+    "text": "五和四合在一起是幾？",
+    "batch": "2026-10-24-08-math",
+    "duration": 3.6,
+    "voicedDuration": 3,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "combine-5-5": {
+    "version": 1,
+    "text": "五和五合在一起是幾？",
+    "batch": "2026-10-24-08-math",
+    "duration": 3.8,
+    "voicedDuration": 3.2,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "combine-6-4": {
+    "version": 1,
+    "text": "六和四合在一起是幾？",
+    "batch": "2026-10-24-09-math",
+    "duration": 3.02,
+    "voicedDuration": 2.42,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "combine-7-3": {
+    "version": 1,
+    "text": "七和三合在一起是幾？",
+    "batch": "2026-10-24-09-math",
+    "duration": 2.97,
+    "voicedDuration": 2.37,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "combine-8-2": {
+    "version": 1,
+    "text": "八和二合在一起是幾？",
+    "batch": "2026-10-24-09-math",
+    "duration": 2.86,
+    "voicedDuration": 2.26,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "combine-9-1": {
+    "version": 1,
+    "text": "九和一合在一起是幾？",
+    "batch": "2026-10-24-09-math",
+    "duration": 3.02,
+    "voicedDuration": 2.42,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "correct": {
+    "version": 1,
+    "text": "答對了！",
+    "batch": "2026-10-20-03-math",
+    "duration": 1.26,
+    "voicedDuration": 0.66,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
   "count": {
     "version": 4,
     "text": "數一數，有幾個？用筆寫出數字。",
@@ -6,6 +915,168 @@
     "duration": 5.23,
     "voicedDuration": 4.66,
     "createdAt": "2026-10-13",
+    "origin": "Gemini API"
+  },
+  "draw-1": {
+    "version": 1,
+    "text": "畫出一個圈圈。",
+    "batch": "2026-10-21-01-math",
+    "duration": 2.41,
+    "voicedDuration": 1.81,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "draw-10": {
+    "version": 1,
+    "text": "畫出十個圈圈。",
+    "batch": "2026-10-21-01-math",
+    "duration": 2.69,
+    "voicedDuration": 2.1,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "draw-2": {
+    "version": 1,
+    "text": "畫出兩個圈圈。",
+    "batch": "2026-10-21-01-math",
+    "duration": 2.4,
+    "voicedDuration": 1.8,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "draw-3": {
+    "version": 1,
+    "text": "畫出三個圈圈。",
+    "batch": "2026-10-21-01-math",
+    "duration": 2.42,
+    "voicedDuration": 1.82,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "draw-4": {
+    "version": 1,
+    "text": "畫出四個圈圈。",
+    "batch": "2026-10-21-01-math",
+    "duration": 2.47,
+    "voicedDuration": 1.87,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "draw-5": {
+    "version": 1,
+    "text": "畫出五個圈圈。",
+    "batch": "2026-10-21-01-math",
+    "duration": 2.52,
+    "voicedDuration": 1.92,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "draw-6": {
+    "version": 1,
+    "text": "畫出六個圈圈。",
+    "batch": "2026-10-21-01-math",
+    "duration": 2.39,
+    "voicedDuration": 1.79,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "draw-7": {
+    "version": 1,
+    "text": "畫出七個圈圈。",
+    "batch": "2026-10-21-01-math",
+    "duration": 2.6,
+    "voicedDuration": 2,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "draw-8": {
+    "version": 1,
+    "text": "畫出八個圈圈。",
+    "batch": "2026-10-21-01-math",
+    "duration": 2.44,
+    "voicedDuration": 1.84,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "draw-9": {
+    "version": 1,
+    "text": "畫出九個圈圈。",
+    "batch": "2026-10-21-01-math",
+    "duration": 2.49,
+    "voicedDuration": 1.89,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "find-circle": {
+    "version": 1,
+    "text": "把所有的圓形都點出來。",
+    "batch": "2026-10-20-06-math",
+    "duration": 3.64,
+    "voicedDuration": 3.04,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "find-rect": {
+    "version": 1,
+    "text": "把所有的長方形都點出來。",
+    "batch": "2026-10-20-05-math",
+    "duration": 3.56,
+    "voicedDuration": 2.96,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "find-square": {
+    "version": 1,
+    "text": "把所有的正方形都點出來。",
+    "batch": "2026-10-20-05-math",
+    "duration": 3.55,
+    "voicedDuration": 2.95,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "find-triangle": {
+    "version": 1,
+    "text": "把所有的三角形都點出來。",
+    "batch": "2026-10-20-05-math",
+    "duration": 3.56,
+    "voicedDuration": 2.99,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "group-2": {
+    "version": 1,
+    "text": "從左邊數，點兩個。",
+    "batch": "2026-10-22-10-math",
+    "duration": 3.07,
+    "voicedDuration": 2.47,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "group-3": {
+    "version": 1,
+    "text": "從左邊數，點三個。",
+    "batch": "2026-10-22-10-math",
+    "duration": 3.09,
+    "voicedDuration": 2.49,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "group-4": {
+    "version": 1,
+    "text": "從左邊數，點四個。",
+    "batch": "2026-10-22-10-math",
+    "duration": 3.09,
+    "voicedDuration": 2.49,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "group-5": {
+    "version": 1,
+    "text": "從左邊數，點五個。",
+    "batch": "2026-10-22-10-math",
+    "duration": 3.16,
+    "voicedDuration": 2.56,
+    "createdAt": "2026-10-22",
     "origin": "Gemini API"
   },
   "height-less": {
@@ -26,6 +1097,231 @@
     "createdAt": "2026-10-14",
     "origin": "Gemini API"
   },
+  "join-1-1": {
+    "version": 1,
+    "text": "左邊有一個，右邊有一個，合在一起有幾個？",
+    "batch": "2026-10-21-02-math",
+    "duration": 6.53,
+    "voicedDuration": 5.94,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "join-1-2": {
+    "version": 1,
+    "text": "左邊有一個，右邊有兩個，合在一起有幾個？",
+    "batch": "2026-10-21-02-math",
+    "duration": 6.24,
+    "voicedDuration": 5.64,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "join-1-3": {
+    "version": 1,
+    "text": "左邊有一個，右邊有三個，合在一起有幾個？",
+    "batch": "2026-10-21-02-math",
+    "duration": 6.31,
+    "voicedDuration": 5.71,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "join-1-4": {
+    "version": 1,
+    "text": "左邊有一個，右邊有四個，合在一起有幾個？",
+    "batch": "2026-10-21-02-math",
+    "duration": 6.27,
+    "voicedDuration": 5.67,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "join-1-5": {
+    "version": 1,
+    "text": "左邊有一個，右邊有五個，合在一起有幾個？",
+    "batch": "2026-10-21-02-math",
+    "duration": 6.34,
+    "voicedDuration": 5.74,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "join-2-1": {
+    "version": 1,
+    "text": "左邊有兩個，右邊有一個，合在一起有幾個？",
+    "batch": "2026-10-21-02-math",
+    "duration": 6.28,
+    "voicedDuration": 5.71,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "join-2-2": {
+    "version": 1,
+    "text": "左邊有兩個，右邊有兩個，合在一起有幾個？",
+    "batch": "2026-10-21-03-math",
+    "duration": 5.09,
+    "voicedDuration": 4.49,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "join-2-3": {
+    "version": 1,
+    "text": "左邊有兩個，右邊有三個，合在一起有幾個？",
+    "batch": "2026-10-21-03-math",
+    "duration": 5.03,
+    "voicedDuration": 4.43,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "join-2-4": {
+    "version": 1,
+    "text": "左邊有兩個，右邊有四個，合在一起有幾個？",
+    "batch": "2026-10-21-03-math",
+    "duration": 5.27,
+    "voicedDuration": 4.67,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "join-2-5": {
+    "version": 1,
+    "text": "左邊有兩個，右邊有五個，合在一起有幾個？",
+    "batch": "2026-10-21-03-math",
+    "duration": 5.06,
+    "voicedDuration": 4.46,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "join-3-1": {
+    "version": 1,
+    "text": "左邊有三個，右邊有一個，合在一起有幾個？",
+    "batch": "2026-10-21-03-math",
+    "duration": 4.84,
+    "voicedDuration": 4.24,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "join-3-2": {
+    "version": 1,
+    "text": "左邊有三個，右邊有兩個，合在一起有幾個？",
+    "batch": "2026-10-21-03-math",
+    "duration": 4.96,
+    "voicedDuration": 4.36,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "join-3-3": {
+    "version": 1,
+    "text": "左邊有三個，右邊有三個，合在一起有幾個？",
+    "batch": "2026-10-21-04-math",
+    "duration": 5.1,
+    "voicedDuration": 4.52,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "join-3-4": {
+    "version": 1,
+    "text": "左邊有三個，右邊有四個，合在一起有幾個？",
+    "batch": "2026-10-21-04-math",
+    "duration": 5.06,
+    "voicedDuration": 4.46,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "join-3-5": {
+    "version": 1,
+    "text": "左邊有三個，右邊有五個，合在一起有幾個？",
+    "batch": "2026-10-21-04-math",
+    "duration": 4.96,
+    "voicedDuration": 4.36,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "join-4-1": {
+    "version": 1,
+    "text": "左邊有四個，右邊有一個，合在一起有幾個？",
+    "batch": "2026-10-21-04-math",
+    "duration": 4.8,
+    "voicedDuration": 4.2,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "join-4-2": {
+    "version": 1,
+    "text": "左邊有四個，右邊有兩個，合在一起有幾個？",
+    "batch": "2026-10-21-04-math",
+    "duration": 4.82,
+    "voicedDuration": 4.22,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "join-4-3": {
+    "version": 1,
+    "text": "左邊有四個，右邊有三個，合在一起有幾個？",
+    "batch": "2026-10-21-04-math",
+    "duration": 4.87,
+    "voicedDuration": 4.27,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "join-4-4": {
+    "version": 1,
+    "text": "左邊有四個，右邊有四個，合在一起有幾個？",
+    "batch": "2026-10-21-05-math",
+    "duration": 4.75,
+    "voicedDuration": 4.16,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "join-4-5": {
+    "version": 1,
+    "text": "左邊有四個，右邊有五個，合在一起有幾個？",
+    "batch": "2026-10-21-05-math",
+    "duration": 4.87,
+    "voicedDuration": 4.27,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "join-5-1": {
+    "version": 1,
+    "text": "左邊有五個，右邊有一個，合在一起有幾個？",
+    "batch": "2026-10-21-05-math",
+    "duration": 4.72,
+    "voicedDuration": 4.12,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "join-5-2": {
+    "version": 1,
+    "text": "左邊有五個，右邊有兩個，合在一起有幾個？",
+    "batch": "2026-10-21-05-math",
+    "duration": 4.54,
+    "voicedDuration": 3.94,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "join-5-3": {
+    "version": 1,
+    "text": "左邊有五個，右邊有三個，合在一起有幾個？",
+    "batch": "2026-10-21-05-math",
+    "duration": 4.68,
+    "voicedDuration": 4.08,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "join-5-4": {
+    "version": 1,
+    "text": "左邊有五個，右邊有四個，合在一起有幾個？",
+    "batch": "2026-10-21-05-math",
+    "duration": 4.51,
+    "voicedDuration": 3.94,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
+  "join-5-5": {
+    "version": 1,
+    "text": "左邊有五個，右邊有五個，合在一起有幾個？",
+    "batch": "2026-10-21-06-math",
+    "duration": 5.59,
+    "voicedDuration": 5.05,
+    "createdAt": "2026-10-21",
+    "origin": "Gemini API"
+  },
   "length-less": {
     "version": 1,
     "text": "哪一枝鉛筆比較短？點一下。",
@@ -42,6 +1338,1086 @@
     "duration": 4.62,
     "voicedDuration": 4.06,
     "createdAt": "2026-10-13",
+    "origin": "Gemini API"
+  },
+  "line-curve": {
+    "version": 1,
+    "text": "哪一條是曲線？點一下。",
+    "batch": "2026-10-20-03-math",
+    "duration": 3.05,
+    "voicedDuration": 2.45,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "line-straight": {
+    "version": 1,
+    "text": "哪一條是直線？點一下。",
+    "batch": "2026-10-20-03-math",
+    "duration": 2.86,
+    "voicedDuration": 2.31,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "missing": {
+    "version": 1,
+    "text": "中間少了哪一個數？點一下。",
+    "batch": "2026-10-20-03-math",
+    "duration": 3.16,
+    "voicedDuration": 2.56,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "nth-2": {
+    "version": 1,
+    "text": "從左邊數，點第二個。",
+    "batch": "2026-10-22-10-math",
+    "duration": 3.27,
+    "voicedDuration": 2.67,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "nth-3": {
+    "version": 1,
+    "text": "從左邊數，點第三個。",
+    "batch": "2026-10-22-10-math",
+    "duration": 3.17,
+    "voicedDuration": 2.57,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "nth-4": {
+    "version": 1,
+    "text": "從左邊數，點第四個。",
+    "batch": "2026-10-22-10-math",
+    "duration": 3.31,
+    "voicedDuration": 2.71,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "nth-5": {
+    "version": 1,
+    "text": "從左邊數，點第五個。",
+    "batch": "2026-10-22-11-math",
+    "duration": 3.2,
+    "voicedDuration": 2.61,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "position-left-2": {
+    "version": 1,
+    "text": "從左邊數，第二個是哪一個？點一下。",
+    "batch": "2026-10-22-09-math",
+    "duration": 5.05,
+    "voicedDuration": 4.58,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "position-left-3": {
+    "version": 1,
+    "text": "從左邊數，第三個是哪一個？點一下。",
+    "batch": "2026-10-22-09-math",
+    "duration": 5.23,
+    "voicedDuration": 4.63,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "position-left-4": {
+    "version": 1,
+    "text": "從左邊數，第四個是哪一個？點一下。",
+    "batch": "2026-10-22-09-math",
+    "duration": 5.07,
+    "voicedDuration": 4.47,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "position-left-5": {
+    "version": 1,
+    "text": "從左邊數，第五個是哪一個？點一下。",
+    "batch": "2026-10-22-09-math",
+    "duration": 5.32,
+    "voicedDuration": 4.75,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "position-left-6": {
+    "version": 1,
+    "text": "從左邊數，第六個是哪一個？點一下。",
+    "batch": "2026-10-22-10-math",
+    "duration": 5.06,
+    "voicedDuration": 4.46,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "position-right-2": {
+    "version": 1,
+    "text": "從右邊數，第二個是哪一個？點一下。",
+    "batch": "2026-10-22-09-math",
+    "duration": 5.11,
+    "voicedDuration": 4.51,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "position-right-3": {
+    "version": 1,
+    "text": "從右邊數，第三個是哪一個？點一下。",
+    "batch": "2026-10-22-09-math",
+    "duration": 5.14,
+    "voicedDuration": 4.54,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "position-right-4": {
+    "version": 1,
+    "text": "從右邊數，第四個是哪一個？點一下。",
+    "batch": "2026-10-22-09-math",
+    "duration": 5.08,
+    "voicedDuration": 4.48,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "position-right-5": {
+    "version": 1,
+    "text": "從右邊數，第五個是哪一個？點一下。",
+    "batch": "2026-10-22-10-math",
+    "duration": 4.81,
+    "voicedDuration": 4.21,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "position-right-6": {
+    "version": 1,
+    "text": "從右邊數，第六個是哪一個？點一下。",
+    "batch": "2026-10-22-10-math",
+    "duration": 5.29,
+    "voicedDuration": 4.69,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "retry": {
+    "version": 1,
+    "text": "再想想看。",
+    "batch": "2026-10-20-03-math",
+    "duration": 1.35,
+    "voicedDuration": 0.75,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "route": {
+    "version": 1,
+    "text": "小兔子要去拿紅蘿蔔。哪一條路最近？點一下。",
+    "batch": "2026-10-20-03-math",
+    "duration": 5.4,
+    "voicedDuration": 4.8,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "rows-less": {
+    "version": 1,
+    "text": "哪一排比較少？如果一樣多，就點一樣多。",
+    "batch": "2026-10-20-03-math",
+    "duration": 4.81,
+    "voicedDuration": 4.21,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "rows-more": {
+    "version": 1,
+    "text": "哪一排比較多？如果一樣多，就點一樣多。",
+    "batch": "2026-10-20-03-math",
+    "duration": 4.62,
+    "voicedDuration": 4.02,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "sequence": {
+    "version": 1,
+    "text": "從小到大，依順序點數字。",
+    "batch": "2026-10-20-03-math",
+    "duration": 3.3,
+    "voicedDuration": 2.7,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "shape-classify": {
+    "version": 1,
+    "text": "這是方盒、圓罐，還是球？點一下。",
+    "batch": "2026-10-20-03-math",
+    "duration": 4.23,
+    "voicedDuration": 3.63,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "shape-roll": {
+    "version": 1,
+    "text": "哪一個不會滾？點一下。",
+    "batch": "2026-10-20-05-math",
+    "duration": 3.39,
+    "voicedDuration": 2.79,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "shape-stack": {
+    "version": 1,
+    "text": "哪一個不能疊起來？點一下。",
+    "batch": "2026-10-20-05-math",
+    "duration": 3.84,
+    "voicedDuration": 3.27,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "shape-trace": {
+    "version": 1,
+    "text": "把有顏色的這一面描下來，是什麼形狀？點一下。",
+    "batch": "2026-10-20-05-math",
+    "duration": 5.8,
+    "voicedDuration": 5.2,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "split-1-2": {
+    "version": 1,
+    "text": "三可以分成一和幾？",
+    "batch": "2026-10-22-11-math",
+    "duration": 3.33,
+    "voicedDuration": 2.73,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-1-3": {
+    "version": 1,
+    "text": "四可以分成一和幾？",
+    "batch": "2026-10-22-11-math",
+    "duration": 2.85,
+    "voicedDuration": 2.25,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-1-4": {
+    "version": 1,
+    "text": "五可以分成一和幾？",
+    "batch": "2026-10-22-11-math",
+    "duration": 2.76,
+    "voicedDuration": 2.16,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-1-5": {
+    "version": 1,
+    "text": "六可以分成一和幾？",
+    "batch": "2026-10-22-11-math",
+    "duration": 2.7,
+    "voicedDuration": 2.1,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-1-6": {
+    "version": 1,
+    "text": "七可以分成一和幾？",
+    "batch": "2026-10-22-11-math",
+    "duration": 2.78,
+    "voicedDuration": 2.18,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-1-7": {
+    "version": 1,
+    "text": "八可以分成一和幾？",
+    "batch": "2026-10-22-11-math",
+    "duration": 2.59,
+    "voicedDuration": 1.99,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-1-8": {
+    "version": 1,
+    "text": "九可以分成一和幾？",
+    "batch": "2026-10-22-11-math",
+    "duration": 2.68,
+    "voicedDuration": 2.08,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-1-9": {
+    "version": 1,
+    "text": "十可以分成一和幾？",
+    "batch": "2026-10-22-11-math",
+    "duration": 2.71,
+    "voicedDuration": 2.11,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-2-1": {
+    "version": 1,
+    "text": "三可以分成二和幾？",
+    "batch": "2026-10-22-11-math",
+    "duration": 2.67,
+    "voicedDuration": 2.07,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-2-2": {
+    "version": 1,
+    "text": "四可以分成二和幾？",
+    "batch": "2026-10-22-12-math",
+    "duration": 3.52,
+    "voicedDuration": 2.95,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-2-3": {
+    "version": 1,
+    "text": "五可以分成二和幾？",
+    "batch": "2026-10-22-12-math",
+    "duration": 3.35,
+    "voicedDuration": 2.75,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-2-4": {
+    "version": 1,
+    "text": "六可以分成二和幾？",
+    "batch": "2026-10-22-12-math",
+    "duration": 3.31,
+    "voicedDuration": 2.71,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-2-5": {
+    "version": 1,
+    "text": "七可以分成二和幾？",
+    "batch": "2026-10-22-12-math",
+    "duration": 3.48,
+    "voicedDuration": 2.88,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-2-6": {
+    "version": 1,
+    "text": "八可以分成二和幾？",
+    "batch": "2026-10-22-12-math",
+    "duration": 3.32,
+    "voicedDuration": 2.72,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-2-7": {
+    "version": 1,
+    "text": "九可以分成二和幾？",
+    "batch": "2026-10-22-12-math",
+    "duration": 3.48,
+    "voicedDuration": 2.88,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-2-8": {
+    "version": 1,
+    "text": "十可以分成二和幾？",
+    "batch": "2026-10-22-12-math",
+    "duration": 3.54,
+    "voicedDuration": 2.94,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-3-1": {
+    "version": 1,
+    "text": "四可以分成三和幾？",
+    "batch": "2026-10-22-12-math",
+    "duration": 3.53,
+    "voicedDuration": 2.93,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-3-2": {
+    "version": 1,
+    "text": "五可以分成三和幾？",
+    "batch": "2026-10-22-12-math",
+    "duration": 3.43,
+    "voicedDuration": 2.83,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-3-3": {
+    "version": 1,
+    "text": "六可以分成三和幾？",
+    "batch": "2026-10-22-12-math",
+    "duration": 3.46,
+    "voicedDuration": 2.87,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-3-4": {
+    "version": 1,
+    "text": "七可以分成三和幾？",
+    "batch": "2026-10-22-13-math",
+    "duration": 3.12,
+    "voicedDuration": 2.59,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-3-5": {
+    "version": 1,
+    "text": "八可以分成三和幾？",
+    "batch": "2026-10-22-13-math",
+    "duration": 3.06,
+    "voicedDuration": 2.46,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-3-6": {
+    "version": 1,
+    "text": "九可以分成三和幾？",
+    "batch": "2026-10-22-13-math",
+    "duration": 3.17,
+    "voicedDuration": 2.57,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-3-7": {
+    "version": 1,
+    "text": "十可以分成三和幾？",
+    "batch": "2026-10-22-13-math",
+    "duration": 3.39,
+    "voicedDuration": 2.79,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-4-1": {
+    "version": 1,
+    "text": "五可以分成四和幾？",
+    "batch": "2026-10-22-13-math",
+    "duration": 3.15,
+    "voicedDuration": 2.55,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-4-2": {
+    "version": 1,
+    "text": "六可以分成四和幾？",
+    "batch": "2026-10-22-13-math",
+    "duration": 3.21,
+    "voicedDuration": 2.61,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-4-3": {
+    "version": 1,
+    "text": "七可以分成四和幾？",
+    "batch": "2026-10-22-13-math",
+    "duration": 3.22,
+    "voicedDuration": 2.62,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-4-4": {
+    "version": 1,
+    "text": "八可以分成四和幾？",
+    "batch": "2026-10-22-13-math",
+    "duration": 3.18,
+    "voicedDuration": 2.58,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-4-5": {
+    "version": 1,
+    "text": "九可以分成四和幾？",
+    "batch": "2026-10-22-13-math",
+    "duration": 3.16,
+    "voicedDuration": 2.56,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-4-6": {
+    "version": 1,
+    "text": "十可以分成四和幾？",
+    "batch": "2026-10-22-13-math",
+    "duration": 3.35,
+    "voicedDuration": 2.75,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-5-1": {
+    "version": 1,
+    "text": "六可以分成五和幾？",
+    "batch": "2026-10-22-14-math",
+    "duration": 3.04,
+    "voicedDuration": 2.44,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-5-2": {
+    "version": 1,
+    "text": "七可以分成五和幾？",
+    "batch": "2026-10-22-14-math",
+    "duration": 2.94,
+    "voicedDuration": 2.34,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-5-3": {
+    "version": 1,
+    "text": "八可以分成五和幾？",
+    "batch": "2026-10-22-14-math",
+    "duration": 2.95,
+    "voicedDuration": 2.35,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-5-4": {
+    "version": 1,
+    "text": "九可以分成五和幾？",
+    "batch": "2026-10-22-14-math",
+    "duration": 2.97,
+    "voicedDuration": 2.37,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-5-5": {
+    "version": 1,
+    "text": "十可以分成五和幾？",
+    "batch": "2026-10-22-14-math",
+    "duration": 3.1,
+    "voicedDuration": 2.5,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-6-1": {
+    "version": 1,
+    "text": "七可以分成六和幾？",
+    "batch": "2026-10-22-14-math",
+    "duration": 2.95,
+    "voicedDuration": 2.35,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-6-2": {
+    "version": 1,
+    "text": "八可以分成六和幾？",
+    "batch": "2026-10-22-14-math",
+    "duration": 2.81,
+    "voicedDuration": 2.21,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-6-3": {
+    "version": 1,
+    "text": "九可以分成六和幾？",
+    "batch": "2026-10-22-14-math",
+    "duration": 2.71,
+    "voicedDuration": 2.11,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-6-4": {
+    "version": 1,
+    "text": "十可以分成六和幾？",
+    "batch": "2026-10-22-14-math",
+    "duration": 2.89,
+    "voicedDuration": 2.29,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-7-1": {
+    "version": 1,
+    "text": "八可以分成七和幾？",
+    "batch": "2026-10-22-14-math",
+    "duration": 2.78,
+    "voicedDuration": 2.18,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-7-2": {
+    "version": 1,
+    "text": "九可以分成七和幾？",
+    "batch": "2026-10-22-15-math",
+    "duration": 3.47,
+    "voicedDuration": 2.87,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-7-3": {
+    "version": 1,
+    "text": "十可以分成七和幾？",
+    "batch": "2026-10-22-15-math",
+    "duration": 3.86,
+    "voicedDuration": 3.26,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-8-1": {
+    "version": 1,
+    "text": "九可以分成八和幾？",
+    "batch": "2026-10-22-15-math",
+    "duration": 3.78,
+    "voicedDuration": 3.18,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-8-2": {
+    "version": 1,
+    "text": "十可以分成八和幾？",
+    "batch": "2026-10-22-15-math",
+    "duration": 3.3,
+    "voicedDuration": 2.7,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "split-9-1": {
+    "version": 1,
+    "text": "十可以分成九和幾？",
+    "batch": "2026-10-22-15-math",
+    "duration": 3.19,
+    "voicedDuration": 2.59,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "take-1-2": {
+    "version": 1,
+    "text": "有三個，拿走了一個，還剩幾個？",
+    "batch": "2026-10-22-15-math",
+    "duration": 3.88,
+    "voicedDuration": 3.28,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "take-1-3": {
+    "version": 1,
+    "text": "有四個，拿走了一個，還剩幾個？",
+    "batch": "2026-10-22-15-math",
+    "duration": 4.48,
+    "voicedDuration": 3.88,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "take-1-4": {
+    "version": 1,
+    "text": "有五個，拿走了一個，還剩幾個？",
+    "batch": "2026-10-22-15-math",
+    "duration": 4.27,
+    "voicedDuration": 3.67,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "take-1-5": {
+    "version": 1,
+    "text": "有六個，拿走了一個，還剩幾個？",
+    "batch": "2026-10-22-15-math",
+    "duration": 4.45,
+    "voicedDuration": 3.85,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "take-1-6": {
+    "version": 1,
+    "text": "有七個，拿走了一個，還剩幾個？",
+    "batch": "2026-10-22-15-math",
+    "duration": 4.42,
+    "voicedDuration": 3.82,
+    "createdAt": "2026-10-22",
+    "origin": "Gemini API"
+  },
+  "take-1-7": {
+    "version": 1,
+    "text": "有八個，拿走了一個，還剩幾個？",
+    "batch": "2026-10-23-03-math",
+    "duration": 4.18,
+    "voicedDuration": 3.61,
+    "createdAt": "2026-10-23",
+    "origin": "Gemini API"
+  },
+  "take-1-8": {
+    "version": 1,
+    "text": "有九個，拿走了一個，還剩幾個？",
+    "batch": "2026-10-23-03-math",
+    "duration": 4.48,
+    "voicedDuration": 3.88,
+    "createdAt": "2026-10-23",
+    "origin": "Gemini API"
+  },
+  "take-2-1": {
+    "version": 1,
+    "text": "有三個，拿走了兩個，還剩幾個？",
+    "batch": "2026-10-23-03-math",
+    "duration": 4.58,
+    "voicedDuration": 3.98,
+    "createdAt": "2026-10-23",
+    "origin": "Gemini API"
+  },
+  "take-2-2": {
+    "version": 1,
+    "text": "有四個，拿走了兩個，還剩幾個？",
+    "batch": "2026-10-23-03-math",
+    "duration": 4.5,
+    "voicedDuration": 3.9,
+    "createdAt": "2026-10-23",
+    "origin": "Gemini API"
+  },
+  "take-2-3": {
+    "version": 1,
+    "text": "有五個，拿走了兩個，還剩幾個？",
+    "batch": "2026-10-23-03-math",
+    "duration": 4.63,
+    "voicedDuration": 4.03,
+    "createdAt": "2026-10-23",
+    "origin": "Gemini API"
+  },
+  "take-2-4": {
+    "version": 1,
+    "text": "有六個，拿走了兩個，還剩幾個？",
+    "batch": "2026-10-23-03-math",
+    "duration": 4.39,
+    "voicedDuration": 3.79,
+    "createdAt": "2026-10-23",
+    "origin": "Gemini API"
+  },
+  "take-2-5": {
+    "version": 1,
+    "text": "有七個，拿走了兩個，還剩幾個？",
+    "batch": "2026-10-23-03-math",
+    "duration": 4.53,
+    "voicedDuration": 3.93,
+    "createdAt": "2026-10-23",
+    "origin": "Gemini API"
+  },
+  "take-2-6": {
+    "version": 1,
+    "text": "有八個，拿走了兩個，還剩幾個？",
+    "batch": "2026-10-23-03-math",
+    "duration": 4.39,
+    "voicedDuration": 3.79,
+    "createdAt": "2026-10-23",
+    "origin": "Gemini API"
+  },
+  "take-2-7": {
+    "version": 1,
+    "text": "有九個，拿走了兩個，還剩幾個？",
+    "batch": "2026-10-23-03-math",
+    "duration": 4.58,
+    "voicedDuration": 3.98,
+    "createdAt": "2026-10-23",
+    "origin": "Gemini API"
+  },
+  "take-3-1": {
+    "version": 1,
+    "text": "有四個，拿走了三個，還剩幾個？",
+    "batch": "2026-10-24-02-math",
+    "duration": 4.66,
+    "voicedDuration": 4.06,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "take-3-2": {
+    "version": 1,
+    "text": "有五個，拿走了三個，還剩幾個？",
+    "batch": "2026-10-24-02-math",
+    "duration": 4.33,
+    "voicedDuration": 3.73,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "take-3-3": {
+    "version": 1,
+    "text": "有六個，拿走了三個，還剩幾個？",
+    "batch": "2026-10-24-02-math",
+    "duration": 4.39,
+    "voicedDuration": 3.79,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "take-3-4": {
+    "version": 1,
+    "text": "有七個，拿走了三個，還剩幾個？",
+    "batch": "2026-10-24-02-math",
+    "duration": 4.47,
+    "voicedDuration": 3.88,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "take-3-5": {
+    "version": 1,
+    "text": "有八個，拿走了三個，還剩幾個？",
+    "batch": "2026-10-24-03-math",
+    "duration": 4.42,
+    "voicedDuration": 3.82,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "take-3-6": {
+    "version": 1,
+    "text": "有九個，拿走了三個，還剩幾個？",
+    "batch": "2026-10-24-03-math",
+    "duration": 4.31,
+    "voicedDuration": 3.71,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "take-4-1": {
+    "version": 1,
+    "text": "有五個，拿走了四個，還剩幾個？",
+    "batch": "2026-10-24-03-math",
+    "duration": 4.4,
+    "voicedDuration": 3.8,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "take-4-2": {
+    "version": 1,
+    "text": "有六個，拿走了四個，還剩幾個？",
+    "batch": "2026-10-24-03-math",
+    "duration": 4.3,
+    "voicedDuration": 3.7,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "take-4-3": {
+    "version": 1,
+    "text": "有七個，拿走了四個，還剩幾個？",
+    "batch": "2026-10-24-03-math",
+    "duration": 4.39,
+    "voicedDuration": 3.79,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "take-4-4": {
+    "version": 1,
+    "text": "有八個，拿走了四個，還剩幾個？",
+    "batch": "2026-10-24-03-math",
+    "duration": 4.17,
+    "voicedDuration": 3.57,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "take-4-5": {
+    "version": 1,
+    "text": "有九個，拿走了四個，還剩幾個？",
+    "batch": "2026-10-24-04-math",
+    "duration": 3.71,
+    "voicedDuration": 3.14,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "take-5-1": {
+    "version": 1,
+    "text": "有六個，拿走了五個，還剩幾個？",
+    "batch": "2026-10-24-04-math",
+    "duration": 4.22,
+    "voicedDuration": 3.62,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "take-5-2": {
+    "version": 1,
+    "text": "有七個，拿走了五個，還剩幾個？",
+    "batch": "2026-10-24-04-math",
+    "duration": 4.27,
+    "voicedDuration": 3.67,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "take-5-3": {
+    "version": 1,
+    "text": "有八個，拿走了五個，還剩幾個？",
+    "batch": "2026-10-24-04-math",
+    "duration": 4.16,
+    "voicedDuration": 3.56,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "take-5-4": {
+    "version": 1,
+    "text": "有九個，拿走了五個，還剩幾個？",
+    "batch": "2026-10-24-04-math",
+    "duration": 4.23,
+    "voicedDuration": 3.63,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "take-6-1": {
+    "version": 1,
+    "text": "有七個，拿走了六個，還剩幾個？",
+    "batch": "2026-10-24-04-math",
+    "duration": 4.16,
+    "voicedDuration": 3.56,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "take-6-2": {
+    "version": 1,
+    "text": "有八個，拿走了六個，還剩幾個？",
+    "batch": "2026-10-24-05-math",
+    "duration": 4.9,
+    "voicedDuration": 4.3,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "take-6-3": {
+    "version": 1,
+    "text": "有九個，拿走了六個，還剩幾個？",
+    "batch": "2026-10-24-05-math",
+    "duration": 4.83,
+    "voicedDuration": 4.23,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "take-7-1": {
+    "version": 1,
+    "text": "有八個，拿走了七個，還剩幾個？",
+    "batch": "2026-10-24-05-math",
+    "duration": 4.9,
+    "voicedDuration": 4.3,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "take-7-2": {
+    "version": 1,
+    "text": "有九個，拿走了七個，還剩幾個？",
+    "batch": "2026-10-24-05-math",
+    "duration": 4.78,
+    "voicedDuration": 4.18,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "take-8-1": {
+    "version": 1,
+    "text": "有九個，拿走了八個，還剩幾個？",
+    "batch": "2026-10-24-05-math",
+    "duration": 4.74,
+    "voicedDuration": 4.14,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "thick-less": {
+    "version": 1,
+    "text": "哪一本書比較薄？點一下。",
+    "batch": "2026-10-20-02-math",
+    "duration": 3.24,
+    "voicedDuration": 2.64,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "thick-more": {
+    "version": 1,
+    "text": "哪一本書比較厚？點一下。",
+    "batch": "2026-10-20-02-math",
+    "duration": 3.34,
+    "voicedDuration": 2.74,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "ways-10": {
+    "version": 1,
+    "text": "十可以分成幾和幾？寫出一種分法。",
+    "batch": "2026-10-24-09-math",
+    "duration": 4.26,
+    "voicedDuration": 3.66,
+    "createdAt": "2026-10-24",
+    "origin": "Gemini API"
+  },
+  "zero-acorn": {
+    "version": 1,
+    "text": "這裡有幾顆橡實？用筆寫出數字。",
+    "batch": "2026-10-20-02-math",
+    "duration": 4.39,
+    "voicedDuration": 3.79,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "zero-balloon": {
+    "version": 1,
+    "text": "這裡有幾顆氣球？用筆寫出數字。",
+    "batch": "2026-10-20-02-math",
+    "duration": 4.38,
+    "voicedDuration": 3.82,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "zero-bird": {
+    "version": 1,
+    "text": "這裡有幾隻小鳥？用筆寫出數字。",
+    "batch": "2026-10-20-01-math",
+    "duration": 4.14,
+    "voicedDuration": 3.54,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "zero-butterfly": {
+    "version": 1,
+    "text": "這裡有幾隻蝴蝶？用筆寫出數字。",
+    "batch": "2026-10-20-02-math",
+    "duration": 4.24,
+    "voicedDuration": 3.64,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "zero-car": {
+    "version": 1,
+    "text": "這裡有幾輛汽車？用筆寫出數字。",
+    "batch": "2026-10-20-01-math",
+    "duration": 4.25,
+    "voicedDuration": 3.65,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "zero-carrot": {
+    "version": 1,
+    "text": "這裡有幾根紅蘿蔔？用筆寫出數字。",
+    "batch": "2026-10-20-01-math",
+    "duration": 4.54,
+    "voicedDuration": 3.94,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "zero-fish": {
+    "version": 1,
+    "text": "這裡有幾條魚？用筆寫出數字。",
+    "batch": "2026-10-20-01-math",
+    "duration": 3.78,
+    "voicedDuration": 3.18,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "zero-heart": {
+    "version": 1,
+    "text": "這裡有幾顆愛心？用筆寫出數字。",
+    "batch": "2026-10-20-01-math",
+    "duration": 4.12,
+    "voicedDuration": 3.52,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "zero-iceCream": {
+    "version": 1,
+    "text": "這裡有幾支冰淇淋？用筆寫出數字。",
+    "batch": "2026-10-20-01-math",
+    "duration": 4.38,
+    "voicedDuration": 3.78,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "zero-leaf": {
+    "version": 1,
+    "text": "這裡有幾片葉子？用筆寫出數字。",
+    "batch": "2026-10-20-02-math",
+    "duration": 4.09,
+    "voicedDuration": 3.49,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "zero-star": {
+    "version": 1,
+    "text": "這裡有幾顆星星？用筆寫出數字。",
+    "batch": "2026-10-20-01-math",
+    "duration": 4.09,
+    "voicedDuration": 3.49,
+    "createdAt": "2026-10-20",
+    "origin": "Gemini API"
+  },
+  "zero-tulip": {
+    "version": 1,
+    "text": "這裡有幾朵花？用筆寫出數字。",
+    "batch": "2026-10-20-01-math",
+    "duration": 3.95,
+    "voicedDuration": 3.35,
+    "createdAt": "2026-10-20",
     "origin": "Gemini API"
   }
 }

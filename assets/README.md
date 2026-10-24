@@ -3,5 +3,6 @@
 - `artwork/`：目前使用的原始 PNG；由 optimize-artwork.mjs 產生 public 的無損 WebP。
 - `font-sources/`：原始 OFL TTF；授權與修改 notice 保留在 public/fonts。
 - `archive/`：未使用的 starter／舊插圖，保留供追溯。
+- `gemini-batches.json`：`scripts/generate-gemini-batch.ts` 每一批 Gemini 語音送出的完整提示與題目清單（網站不載入）。
 
 不要將此資料夾複製進 public。所有移出的原始素材仍可恢復。
