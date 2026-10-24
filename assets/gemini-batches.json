@@ -880,6 +880,148 @@
         "take-2-6",
         "take-2-7"
       ]
+    },
+    {
+      "id": "2026-10-24-01-math",
+      "createdAt": "2026-10-24",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n\n## Transcript:\n二加六等於多少？先畫圈圈，再寫答案。\n[long pause]\n二加七等於多少？先畫圈圈，再寫答案。\n[long pause]\n二加八等於多少？先畫圈圈，再寫答案。\n[long pause]\n三加一等於多少？先畫圈圈，再寫答案。\n[long pause]\n三加二等於多少？先畫圈圈，再寫答案。",
+      "items": [
+        "add-2-6",
+        "add-2-7",
+        "add-2-8",
+        "add-3-1",
+        "add-3-2"
+      ]
+    },
+    {
+      "id": "2026-10-24-02-math",
+      "createdAt": "2026-10-24",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n讀音照課本：「了」念˙ㄌㄜ。\n\n## Transcript:\n三加三等於多少？先畫圈圈，再寫答案。\n[long pause]\n三加四等於多少？先畫圈圈，再寫答案。\n[long pause]\n有四個，拿走了三個，還剩幾個？\n[long pause]\n有五個，拿走了三個，還剩幾個？\n[long pause]\n有六個，拿走了三個，還剩幾個？\n[long pause]\n有七個，拿走了三個，還剩幾個？",
+      "items": [
+        "add-3-3",
+        "add-3-4",
+        "take-3-1",
+        "take-3-2",
+        "take-3-3",
+        "take-3-4"
+      ]
+    },
+    {
+      "id": "2026-10-24-03-math",
+      "createdAt": "2026-10-24",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n讀音照課本：「了」念˙ㄌㄜ。\n\n## Transcript:\n有八個，拿走了三個，還剩幾個？\n[long pause]\n有九個，拿走了三個，還剩幾個？\n[long pause]\n有五個，拿走了四個，還剩幾個？\n[long pause]\n有六個，拿走了四個，還剩幾個？\n[long pause]\n有七個，拿走了四個，還剩幾個？\n[long pause]\n有八個，拿走了四個，還剩幾個？",
+      "items": [
+        "take-3-5",
+        "take-3-6",
+        "take-4-1",
+        "take-4-2",
+        "take-4-3",
+        "take-4-4"
+      ]
+    },
+    {
+      "id": "2026-10-24-04-math",
+      "createdAt": "2026-10-24",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n讀音照課本：「了」念˙ㄌㄜ。\n\n## Transcript:\n有九個，拿走了四個，還剩幾個？\n[long pause]\n有六個，拿走了五個，還剩幾個？\n[long pause]\n有七個，拿走了五個，還剩幾個？\n[long pause]\n有八個，拿走了五個，還剩幾個？\n[long pause]\n有九個，拿走了五個，還剩幾個？\n[long pause]\n有七個，拿走了六個，還剩幾個？",
+      "items": [
+        "take-4-5",
+        "take-5-1",
+        "take-5-2",
+        "take-5-3",
+        "take-5-4",
+        "take-6-1"
+      ]
+    },
+    {
+      "id": "2026-10-24-05-math",
+      "createdAt": "2026-10-24",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n讀音照課本：「了」念˙ㄌㄜ、「和」念ㄏㄢˋ。\n\n## Transcript:\n有八個，拿走了六個，還剩幾個？\n[long pause]\n有九個，拿走了六個，還剩幾個？\n[long pause]\n有八個，拿走了七個，還剩幾個？\n[long pause]\n有九個，拿走了七個，還剩幾個？\n[long pause]\n有九個，拿走了八個，還剩幾個？\n[long pause]\n一和二合在一起是幾？\n[long pause]\n一和三合在一起是幾？",
+      "items": [
+        "take-6-2",
+        "take-6-3",
+        "take-7-1",
+        "take-7-2",
+        "take-8-1",
+        "combine-1-2",
+        "combine-1-3"
+      ]
+    },
+    {
+      "id": "2026-10-24-06-math",
+      "createdAt": "2026-10-24",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n讀音照課本：「和」念ㄏㄢˋ。\n\n## Transcript:\n一和四合在一起是幾？\n[long pause]\n一和五合在一起是幾？\n[long pause]\n二和一合在一起是幾？\n[long pause]\n二和二合在一起是幾？\n[long pause]\n二和三合在一起是幾？\n[long pause]\n二和四合在一起是幾？\n[long pause]\n二和五合在一起是幾？\n[long pause]\n三和一合在一起是幾？",
+      "items": [
+        "combine-1-4",
+        "combine-1-5",
+        "combine-2-1",
+        "combine-2-2",
+        "combine-2-3",
+        "combine-2-4",
+        "combine-2-5",
+        "combine-3-1"
+      ]
+    },
+    {
+      "id": "2026-10-24-07-math",
+      "createdAt": "2026-10-24",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n讀音照課本：「和」念ㄏㄢˋ。\n\n## Transcript:\n三和二合在一起是幾？\n[long pause]\n三和三合在一起是幾？\n[long pause]\n三和四合在一起是幾？\n[long pause]\n三和五合在一起是幾？\n[long pause]\n四和一合在一起是幾？\n[long pause]\n四和二合在一起是幾？\n[long pause]\n四和三合在一起是幾？\n[long pause]\n四和四合在一起是幾？",
+      "items": [
+        "combine-3-2",
+        "combine-3-3",
+        "combine-3-4",
+        "combine-3-5",
+        "combine-4-1",
+        "combine-4-2",
+        "combine-4-3",
+        "combine-4-4"
+      ]
+    },
+    {
+      "id": "2026-10-24-08-math",
+      "createdAt": "2026-10-24",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n讀音照課本：「和」念ㄏㄢˋ。\n\n## Transcript:\n四和五合在一起是幾？\n[long pause]\n五和一合在一起是幾？\n[long pause]\n五和二合在一起是幾？\n[long pause]\n五和三合在一起是幾？\n[long pause]\n五和四合在一起是幾？\n[long pause]\n五和五合在一起是幾？\n[long pause]\n一和九合在一起是幾？\n[long pause]\n二和八合在一起是幾？",
+      "items": [
+        "combine-4-5",
+        "combine-5-1",
+        "combine-5-2",
+        "combine-5-3",
+        "combine-5-4",
+        "combine-5-5",
+        "combine-1-9",
+        "combine-2-8"
+      ]
+    },
+    {
+      "id": "2026-10-24-09-math",
+      "createdAt": "2026-10-24",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n讀音照課本：「和」念ㄏㄢˋ。\n\n## Transcript:\n三和七合在一起是幾？\n[long pause]\n四和六合在一起是幾？\n[long pause]\n六和四合在一起是幾？\n[long pause]\n七和三合在一起是幾？\n[long pause]\n八和二合在一起是幾？\n[long pause]\n九和一合在一起是幾？\n[long pause]\n十可以分成幾和幾？寫出一種分法。",
+      "items": [
+        "combine-3-7",
+        "combine-4-6",
+        "combine-6-4",
+        "combine-7-3",
+        "combine-8-2",
+        "combine-9-1",
+        "ways-10"
+      ]
     }
   ]
 }
