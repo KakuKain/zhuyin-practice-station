@@ -1022,6 +1022,76 @@
         "combine-9-1",
         "ways-10"
       ]
+    },
+    {
+      "id": "2026-10-24-01-words",
+      "createdAt": "2026-10-24",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師拿語詞卡念給一年級小朋友聽：咬字清楚、語氣親切、速度放慢，句尾念完整。\n逐字稿的每一行是一張語詞卡。每一張都像單獨念出來一樣，用完整、自然的語調，不要念成清單的語調。每一張念完，停頓兩秒再念下一張。\n讀音照課本：「弟弟」念ㄉㄧˋ ˙ㄉㄧ、「寶寶」念ㄅㄠˇ ˙ㄅㄠ。\n\n## Transcript:\n咪。\n[long pause]\n逼。\n[long pause]\n貓。\n[long pause]\n弟。\n[long pause]\n跑。\n[long pause]\n第。\n[long pause]\n一。\n[long pause]\n貓咪。\n[long pause]\n弟弟。\n[long pause]\n哈。\n[long pause]\n得。\n[long pause]\n意。\n[long pause]\n孵。\n[long pause]\n出。\n[long pause]\n五。\n[long pause]\n隻。\n[long pause]\n寶。\n[long pause]\n寶寶。\n[long pause]\n孵出。\n[long pause]\n要。\n[long pause]\n去。\n[long pause]\n泡。\n[long pause]\n澡。\n[long pause]\n半。",
+      "items": [
+        "咪",
+        "逼",
+        "貓",
+        "弟",
+        "跑",
+        "第",
+        "一",
+        "貓咪",
+        "弟弟",
+        "哈",
+        "意",
+        "孵",
+        "出",
+        "五",
+        "隻",
+        "寶",
+        "寶寶",
+        "孵出",
+        "要",
+        "去",
+        "泡",
+        "澡",
+        "半"
+      ],
+      "skipped": [
+        "得"
+      ]
+    },
+    {
+      "id": "2026-10-24-02-words",
+      "createdAt": "2026-10-24",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師拿語詞卡念給一年級小朋友聽：咬字清楚、語氣親切、速度放慢，句尾念完整。\n逐字稿的每一行是一張語詞卡。每一張都像單獨念出來一樣，用完整、自然的語調，不要念成清單的語調。每一張念完，停頓兩秒再念下一張。\n讀音照課本：「和」念ㄏㄢˋ、「背」念ㄅㄟ。\n\n## Transcript:\n路。\n[long pause]\n遇。\n[long pause]\n到。\n[long pause]\n喔。\n[long pause]\n忙。\n[long pause]\n著。\n[long pause]\n築。\n[long pause]\n巢。\n[long pause]\n和。\n[long pause]\n河馬。\n[long pause]\n河狸。\n[long pause]\n背。\n[long pause]\n書。\n[long pause]\n拉。\n[long pause]\n笑。\n[long pause]\n嘻。\n[long pause]\n歡。\n[long pause]\n喜。\n[long pause]\n書包。\n[long pause]\n歡喜。\n[long pause]\n朋。\n[long pause]\n友。\n[long pause]\n起。\n[long pause]\n來。",
+      "items": [
+        "路",
+        "遇",
+        "到",
+        "喔",
+        "忙",
+        "築",
+        "巢",
+        "和",
+        "河馬",
+        "河狸",
+        "背",
+        "書",
+        "拉",
+        "笑",
+        "嘻",
+        "歡",
+        "喜",
+        "書包",
+        "歡喜",
+        "朋",
+        "友",
+        "起",
+        "來"
+      ],
+      "skipped": [
+        "著"
+      ]
     }
   ]
 }

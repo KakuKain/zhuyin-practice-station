@@ -10,6 +10,7 @@
  *   npx tsx scripts/generate-gemini-batch.ts --plan                           # no requests
  *   npx tsx scripts/generate-gemini-batch.ts --prompts --requests 2           # what would be sent
  *   npx tsx scripts/generate-gemini-batch.ts --reuse 2026-10-20-01-words      # cut a saved batch again
+ *   npx tsx scripts/generate-gemini-batch.ts --reuse 2026-10-24-01-words --skip 得  # all but 得
  *
  * The queue starts with what children hear most: the math instructions without a number, then
  * each lesson's 生字 and circled words in lesson order, then the numbered math questions, then
@@ -144,18 +145,28 @@ if (planOnly) {
   process.exit(0);
 }
 
+/** Characters the lesson font shows with more than one reading. */
+const fontPolyphones = new Set(
+  Object.keys(fontReadings)
+    .filter((key) => [...key].length > 1)
+    .map((key) => [...key][0]),
+);
+
 /** Characters the voice may misread in math; the rest follow the font's reading. */
 const mathPolyphones = new Set([..."數長薄曲蔔了哪和地"]);
 
 /**
- * 「長」念ㄔㄤˊ for each character read other than the usual way. Where one character has two
+ * 「長」念ㄔㄤˊ for each character read other than the usual way, and for each polyphone read on
+ * its own: 「得」 alone came back as ˙ㄉㄜ instead of ㄉㄜˊ. Where one character has two
  * readings in the batch, each hint names the words around it, as in 「數一數」 and 「出數字」.
  */
 function readingHints(batch: Item[]) {
   if (batch[0].kind === "words")
     return batch.flatMap((item) => {
       const chars = [...item.text];
-      const unusual = chars.some((c, i) => fontReadings[c] && fontReadings[c] !== item.readings[i]);
+      const unusual =
+        chars.some((c, i) => fontReadings[c] && fontReadings[c] !== item.readings[i]) ||
+        (chars.length === 1 && fontPolyphones.has(chars[0]));
       return unusual && chars.length === item.readings.length
         ? [`「${item.text}」念${item.readings.join(" ")}`]
         : [];
@@ -202,10 +213,15 @@ function prompt(batch: Item[]) {
   ].join("\n");
 }
 
-/** A calm reading runs about 2.5–5 syllables a second; far outside means a wrong piece. */
+/**
+ * A calm reading runs about 2.5–5 syllables a second; far outside means a wrong piece. A neutral
+ * tone on its own (著 ˙ㄓㄜ) is about 0.15 s.
+ */
 function checkLength(item: Item, voiced: number) {
   const n = item.readings.length;
-  const [low, high] = item.kind === "math" ? [n * 0.15, n * 0.45 + 1.5] : [0.18, n * 0.9 + 0.6];
+  const neutral = item.readings.every((reading) => reading.startsWith("˙"));
+  const [low, high] =
+    item.kind === "math" ? [n * 0.15, n * 0.45 + 1.5] : [neutral ? 0.1 : 0.18, n * 0.9 + 0.6];
   return voiced >= low && voiced <= high
     ? undefined
     : `${item.text}: ${voiced.toFixed(2)} s of speech for ${n} syllables`;
@@ -222,13 +238,18 @@ mkdirSync(rawDir, { recursive: true });
 mkdirSync(wordsDir, { recursive: true });
 const temporary = mkdtempSync(join(tmpdir(), "gemini-batch-"));
 
-/** Cuts one batch, writes its clips and records, or says why it was rejected. */
-function keep(batch: Item[], audio: Audio, id: string, text: string) {
+/**
+ * Cuts one batch, writes its clips and records, or says why it was rejected. Items in `skip`
+ * are cut but not kept, and wait for a later batch.
+ */
+function keep(batch: Item[], audio: Audio, id: string, text: string, skip = new Set<string>()) {
   const pieces = split(audio, batch.length);
   const problems =
     typeof pieces === "string"
       ? [pieces]
-      : pieces.flatMap((piece, i) => checkLength(batch[i], piece.voiced) ?? []);
+      : pieces.flatMap((piece, i) =>
+          skip.has(batch[i].text) ? [] : (checkLength(batch[i], piece.voiced) ?? []),
+        );
   if (typeof pieces === "string" || problems.length) {
     console.log(`Rejected ${id} (outputs/gemini-batch/${id}.wav):\n  ${problems.join("\n  ")}`);
     process.exitCode = 1;
@@ -236,6 +257,7 @@ function keep(batch: Item[], audio: Audio, id: string, text: string) {
   }
   const createdAt = id.slice(0, 10);
   batch.forEach((item, i) => {
+    if (skip.has(item.text)) return;
     const { clip, voiced } = pieces[i];
     const fields = {
       batch: id,
@@ -273,7 +295,8 @@ function keep(batch: Item[], audio: Audio, id: string, text: string) {
     model,
     voice,
     prompt: text,
-    items: batch.map((item) => item.key),
+    items: batch.filter((item) => !skip.has(item.text)).map((item) => item.key),
+    ...(skip.size ? { skipped: [...skip] } : {}),
   });
   // Saved after every batch, so a stop mid-run keeps what was made.
   const sorted = Object.fromEntries(
@@ -282,7 +305,12 @@ function keep(batch: Item[], audio: Audio, id: string, text: string) {
   writeFileSync(mathManifestPath, JSON.stringify(sorted, null, 2) + "\n");
   writeFileSync(wordsManifestPath, JSON.stringify(wordsManifest, null, 2) + "\n");
   writeFileSync(batchesPath, JSON.stringify(batchLog, null, 2) + "\n");
-  console.log(`Kept ${id}: ${batch.map((item) => item.text).join(" ")}`);
+  console.log(
+    `Kept ${id}: ${batch
+      .filter((item) => !skip.has(item.text))
+      .map((item) => item.text)
+      .join(" ")}${skip.size ? ` (skipped ${[...skip].join(" ")})` : ""}`,
+  );
   return true;
 }
 
@@ -310,7 +338,11 @@ try {
       return item;
     });
     const audio = parseWav(readFileSync(join(rawDir, `${reuse}.wav`)), reuse);
-    if (keep(batch, audio, reuse, text)) kept++;
+    const skip = new Set(option("--skip")?.split(",") ?? []);
+    for (const word of skip)
+      if (!lines.some((line) => line.replace(/。$/, "") === word))
+        throw new Error(`${word} is not in ${reuse}`);
+    if (keep(batch, audio, reuse, text, skip)) kept++;
   } else {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) throw new Error("Set GEMINI_API_KEY, or pass --plan, --prompts or --reuse.");
