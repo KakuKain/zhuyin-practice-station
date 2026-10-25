@@ -134,8 +134,19 @@ function batches(items: Item[]) {
   return result;
 }
 
-const queue = groups.flatMap(([, items]) =>
-  batches(items.filter((item) => !only || item.kind === only)),
+/**
+ * Characters taken in text order read like a clipped sentence (兔、子、比、賽 gave 比 0.16 s), so
+ * each batch of them is read half a batch apart.
+ */
+function spread(batch: Item[]) {
+  const half = Math.ceil(batch.length / 2);
+  return batch.slice(0, half).flatMap((item, i) => [item, ...batch.slice(half + i, half + i + 1)]);
+}
+
+const queue = groups.flatMap(([name, items]) =>
+  batches(items.filter((item) => !only || item.kind === only)).map((batch) =>
+    name === "other lesson characters" ? spread(batch) : batch,
+  ),
 );
 
 if (planOnly) {

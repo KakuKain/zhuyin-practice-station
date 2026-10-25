@@ -316,7 +316,7 @@ test("device backup previews, restores and preserves unrelated browser storage",
         mimeType: "audio/mp4",
         duration: 1,
         updatedAt: 2,
-        base64: readFileSync("public/listening-audio/6559.m4a").toString("base64"),
+        base64: readFileSync("public/listening-audio/gemini/words/6559.m4a").toString("base64"),
       },
     ],
   };
