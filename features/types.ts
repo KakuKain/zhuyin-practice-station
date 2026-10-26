@@ -9,7 +9,9 @@ export type View =
   | "listen"
   | "result"
   | "math-lesson"
-  | "math";
+  | "math"
+  | "english-lesson"
+  | "english";
 
 export type ListenPhase =
   | "ready"

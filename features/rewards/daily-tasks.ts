@@ -1,5 +1,6 @@
 import type { CatalogLesson } from "../courses/materials";
 import { mathLessons } from "../math/math-lessons";
+import { englishLessons } from "../english/english-lessons";
 import { taskKeys, type DailyTask } from "./stamp-book";
 
 /** How a lesson is named in tasks and the stamp log: 「第五課」, 「複習一」, or the parent's name. */
@@ -10,7 +11,7 @@ export type TaskOption = Omit<DailyTask, "id" | "at" | "doneAt"> & { group: stri
 
 /**
  * Everything a parent can set as 今天的任務: each lesson's 聽寫 and 默寫 (reviews only listen),
- * 辨音, correcting a question, and each math lesson.
+ * 辨音, correcting a question, each math lesson, and each English lesson's 認一認 and 寫一寫.
  */
 export function taskOptions(catalog: readonly CatalogLesson[]): TaskOption[] {
   const lessons = catalog.filter((lesson) => !lesson.archived);
@@ -51,6 +52,15 @@ export function taskOptions(catalog: readonly CatalogLesson[]): TaskOption[] {
         annotate: true,
         group: "數學",
       })),
+    ...englishLessons.flatMap((lesson) =>
+      (["tap", "write"] as const).map((mode) => ({
+        key: taskKeys.english(lesson.id, mode),
+        place: `英語${lesson.number}`,
+        activity: mode === "tap" ? "認一認" : "寫一寫",
+        annotate: true,
+        group: "英語",
+      })),
+    ),
   ];
 }
 
@@ -58,6 +68,7 @@ export function taskOptions(catalog: readonly CatalogLesson[]): TaskOption[] {
 export type TaskDestination =
   | { kind: "lesson"; lessonIndex: number }
   | { kind: "math"; lessonId: number }
+  | { kind: "english"; lessonId: number }
   | { kind: "practice" };
 
 export function taskDestination(key: string): TaskDestination {
@@ -65,6 +76,8 @@ export function taskDestination(key: string): TaskDestination {
   if (lesson) return { kind: "lesson", lessonIndex: Number(lesson[1]) };
   const math = /^math:(\d+)$/.exec(key);
   if (math) return { kind: "math", lessonId: Number(math[1]) };
+  const english = /^english:(\d+):/.exec(key);
+  if (english) return { kind: "english", lessonId: Number(english[1]) };
   return { kind: "practice" };
 }
 
@@ -96,4 +109,8 @@ export const taskPhraseReadings: Record<string, string> = {
   "排順序、比多少": "ㄆㄞˊ ㄕㄨㄣˋ ㄒㄩˋ ㄅㄧˇ ㄉㄨㄛ ㄕㄠˇ",
   加法: "ㄐㄧㄚ ㄈㄚˇ",
   分與合: "ㄈㄣ ㄩˇ ㄏㄜˊ",
+  英語第一課: "ㄧㄥ ㄩˇ ㄉㄧˋ ㄧ ㄎㄜˋ",
+  英語第二課: "ㄧㄥ ㄩˇ ㄉㄧˋ ㄦˋ ㄎㄜˋ",
+  認一認: "ㄖㄣˋ ㄧ ㄖㄣˋ",
+  寫一寫: "ㄒㄧㄝˇ ㄧ ㄒㄧㄝˇ",
 };

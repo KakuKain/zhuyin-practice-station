@@ -18,6 +18,9 @@ import { lessonTitleGroups, lessonTitleVariants } from "../lesson/annotated-text
 const MathCourseList = lazy(() =>
   import("../math/MathCourseList").then((m) => ({ default: m.MathCourseList })),
 );
+const EnglishCourseList = lazy(() =>
+  import("../english/EnglishCourseList").then((m) => ({ default: m.EnglishCourseList })),
+);
 
 export function CourseList({
   app,
@@ -26,6 +29,7 @@ export function CourseList({
     AppController,
     | "openLesson"
     | "openMathLesson"
+    | "openEnglishLesson"
     | "practiceState"
     | "catalog"
     | "materialsState"
@@ -60,7 +64,11 @@ export function CourseList({
       <PageHeading
         title="選擇課程"
         description={
-          subject === "math" ? "數一數、比一比，一起玩數學！" : "跟著注音，一步一步探索吧！"
+          subject === "math"
+            ? "數一數、比一比，一起玩數學！"
+            : subject === "english"
+              ? "聽一聽、寫一寫，認識英文字母！"
+              : "跟著注音，一步一步探索吧！"
         }
         artwork="course-art/course-journey-hero-v2.webp"
       />
@@ -70,6 +78,7 @@ export function CourseList({
           [
             ["zhuyin", "國語"],
             ["math", "數學"],
+            ["english", "英語"],
           ] as const
         ).map(([value, label]) => (
           <button
@@ -85,6 +94,10 @@ export function CourseList({
       {subject === "math" ? (
         <Suspense fallback={<Loading label="正在準備課程…" />}>
           <MathCourseList onOpen={app.openMathLesson} />
+        </Suspense>
+      ) : subject === "english" ? (
+        <Suspense fallback={<Loading label="正在準備課程…" />}>
+          <EnglishCourseList onOpen={app.openEnglishLesson} />
         </Suspense>
       ) : (
         <>
@@ -170,6 +183,7 @@ export function CourseList({
             const destination = taskDestination(task.key);
             if (destination.kind === "lesson") openLesson(destination.lessonIndex);
             else if (destination.kind === "math") app.openMathLesson(destination.lessonId);
+            else if (destination.kind === "english") app.openEnglishLesson(destination.lessonId);
             // 辨音 and 待補強 are both on the 練習 page.
             else app.navigate("practice");
           }}

@@ -13,7 +13,15 @@ export type Audio = { samples: Float32Array; rate: number };
 /** The free quota ran out (HTTP 429); a rerun tomorrow continues. */
 export class QuotaError extends Error {}
 
-export async function generate(text: string, apiKey: string): Promise<Audio> {
+/**
+ * One request. `speakers` voices a dialogue: each name is how its lines start in the transcript
+ * (「Speaker 1: Hello!」), with the voice that reads them.
+ */
+export async function generate(
+  text: string,
+  apiKey: string,
+  speakers?: { speaker: string; voice: string }[],
+): Promise<Audio> {
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
     {
@@ -23,7 +31,16 @@ export async function generate(text: string, apiKey: string): Promise<Audio> {
         contents: [{ parts: [{ text }] }],
         generationConfig: {
           responseModalities: ["AUDIO"],
-          speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voice } } },
+          speechConfig: speakers
+            ? {
+                multiSpeakerVoiceConfig: {
+                  speakerVoiceConfigs: speakers.map((item) => ({
+                    speaker: item.speaker,
+                    voiceConfig: { prebuiltVoiceConfig: { voiceName: item.voice } },
+                  })),
+                },
+              }
+            : { voiceConfig: { prebuiltVoiceConfig: { voiceName: voice } } },
         },
       }),
     },
