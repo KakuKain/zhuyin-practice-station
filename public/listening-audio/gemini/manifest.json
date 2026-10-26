@@ -4687,6 +4687,246 @@
       "voicedDuration": 0.7,
       "createdAt": "2026-10-24",
       "origin": "Gemini API"
+    },
+    {
+      "text": "老師",
+      "reading": "ㄌㄠˇ|ㄕ",
+      "path": "/listening-audio/gemini/words/8001-5e2b.m4a",
+      "batch": "2026-10-26-01-words",
+      "duration": 1.52,
+      "voicedDuration": 0.94,
+      "createdAt": "2026-10-26",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "先",
+      "reading": "ㄒㄧㄢ",
+      "path": "/listening-audio/gemini/words/5148.m4a",
+      "batch": "2026-10-26-01-words",
+      "duration": 1.26,
+      "voicedDuration": 0.66,
+      "createdAt": "2026-10-26",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "紅花",
+      "reading": "ㄏㄨㄥˊ|ㄏㄨㄚ",
+      "path": "/listening-audio/gemini/words/7d05-82b1.m4a",
+      "batch": "2026-10-26-01-words",
+      "duration": 1.53,
+      "voicedDuration": 0.93,
+      "createdAt": "2026-10-26",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "睡",
+      "reading": "ㄕㄨㄟˋ",
+      "path": "/listening-audio/gemini/words/7761.m4a",
+      "batch": "2026-10-26-01-words",
+      "duration": 1.1,
+      "voicedDuration": 0.5,
+      "createdAt": "2026-10-26",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "謝謝",
+      "reading": "ㄒㄧㄝˋ|˙ㄒㄧㄝ",
+      "path": "/listening-audio/gemini/words/8b1d-8b1d.m4a",
+      "batch": "2026-10-26-01-words",
+      "duration": 1.15,
+      "voicedDuration": 0.55,
+      "createdAt": "2026-10-26",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "午",
+      "reading": "ㄨˇ",
+      "path": "/listening-audio/gemini/words/5348.m4a",
+      "batch": "2026-10-26-01-words",
+      "duration": 1.27,
+      "voicedDuration": 0.67,
+      "createdAt": "2026-10-26",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "讀書",
+      "reading": "ㄉㄨˊ|ㄕㄨ",
+      "path": "/listening-audio/gemini/words/8b80-66f8.m4a",
+      "batch": "2026-10-26-01-words",
+      "duration": 1.42,
+      "voicedDuration": 0.82,
+      "createdAt": "2026-10-26",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "覺",
+      "reading": "ㄐㄧㄠˋ",
+      "path": "/listening-audio/gemini/words/89ba.m4a",
+      "batch": "2026-10-26-01-words",
+      "duration": 0.98,
+      "voicedDuration": 0.38,
+      "createdAt": "2026-10-26",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "兔",
+      "reading": "ㄊㄨˋ",
+      "path": "/listening-audio/gemini/words/5154.m4a",
+      "batch": "2026-10-26-01-words",
+      "duration": 0.97,
+      "voicedDuration": 0.37,
+      "createdAt": "2026-10-26",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "落",
+      "reading": "ㄌㄨㄛˋ",
+      "path": "/listening-audio/gemini/words/843d.m4a",
+      "batch": "2026-10-26-01-words",
+      "duration": 0.99,
+      "voicedDuration": 0.39,
+      "createdAt": "2026-10-26",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "子",
+      "reading": "˙ㄗ",
+      "path": "/listening-audio/gemini/words/5b50.m4a",
+      "batch": "2026-10-26-01-words",
+      "duration": 0.98,
+      "voicedDuration": 0.38,
+      "createdAt": "2026-10-26",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "後",
+      "reading": "ㄏㄡˋ",
+      "path": "/listening-audio/gemini/words/5f8c.m4a",
+      "batch": "2026-10-26-01-words",
+      "duration": 0.96,
+      "voicedDuration": 0.36,
+      "createdAt": "2026-10-26",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "比",
+      "reading": "ㄅㄧˇ",
+      "path": "/listening-audio/gemini/words/6bd4.m4a",
+      "batch": "2026-10-26-01-words",
+      "duration": 1.17,
+      "voicedDuration": 0.57,
+      "createdAt": "2026-10-26",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "不",
+      "reading": "ㄅㄨˊ",
+      "path": "/listening-audio/gemini/words/4e0d.m4a",
+      "batch": "2026-10-26-01-words",
+      "duration": 0.87,
+      "voicedDuration": 0.27,
+      "createdAt": "2026-10-26",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "賽",
+      "reading": "ㄙㄞˋ",
+      "path": "/listening-audio/gemini/words/8cfd.m4a",
+      "batch": "2026-10-26-01-words",
+      "duration": 0.99,
+      "voicedDuration": 0.39,
+      "createdAt": "2026-10-26",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "氣",
+      "reading": "ㄑㄧˋ",
+      "path": "/listening-audio/gemini/words/6c23.m4a",
+      "batch": "2026-10-26-01-words",
+      "duration": 1.04,
+      "voicedDuration": 0.44,
+      "createdAt": "2026-10-26",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "看",
+      "reading": "ㄎㄢˋ",
+      "path": "/listening-audio/gemini/words/770b.m4a",
+      "batch": "2026-10-26-01-words",
+      "duration": 0.95,
+      "voicedDuration": 0.35,
+      "createdAt": "2026-10-26",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "餒",
+      "reading": "ㄋㄟˇ",
+      "path": "/listening-audio/gemini/words/9912.m4a",
+      "batch": "2026-10-26-01-words",
+      "duration": 1.24,
+      "voicedDuration": 0.64,
+      "createdAt": "2026-10-26",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "誰",
+      "reading": "ㄕㄟˊ",
+      "path": "/listening-audio/gemini/words/8ab0.m4a",
+      "batch": "2026-10-26-01-words",
+      "duration": 1.22,
+      "voicedDuration": 0.62,
+      "createdAt": "2026-10-26",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "跟",
+      "reading": "ㄍㄣ",
+      "path": "/listening-audio/gemini/words/8ddf.m4a",
+      "batch": "2026-10-26-01-words",
+      "duration": 1.02,
+      "voicedDuration": 0.42,
+      "createdAt": "2026-10-26",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "快",
+      "reading": "ㄎㄨㄞˋ",
+      "path": "/listening-audio/gemini/words/5feb.m4a",
+      "batch": "2026-10-26-01-words",
+      "duration": 1.01,
+      "voicedDuration": 0.41,
+      "createdAt": "2026-10-26",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "在",
+      "reading": "ㄗㄞˋ",
+      "path": "/listening-audio/gemini/words/5728.m4a",
+      "batch": "2026-10-26-01-words",
+      "duration": 0.93,
+      "voicedDuration": 0.33,
+      "createdAt": "2026-10-26",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "領",
+      "reading": "ㄌㄧㄥˇ",
+      "path": "/listening-audio/gemini/words/9818.m4a",
+      "batch": "2026-10-26-01-words",
+      "duration": 1.08,
+      "voicedDuration": 0.48,
+      "createdAt": "2026-10-26",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "追",
+      "reading": "ㄓㄨㄟ",
+      "path": "/listening-audio/gemini/words/8ffd.m4a",
+      "batch": "2026-10-26-01-words",
+      "duration": 1.07,
+      "voicedDuration": 0.47,
+      "createdAt": "2026-10-26",
+      "origin": "Gemini API"
     }
   ]
 }
