@@ -1,6 +1,7 @@
 import { ArrowRight, CheckCircle, X } from "@phosphor-icons/react";
 import { AnnotatedText } from "../../components/AnnotatedText";
 import { mathLessons } from "../math/math-lessons";
+import { englishLessons } from "../english/english-lessons";
 import { taskKeys, type DailyTask } from "./stamp-book";
 
 export const taskName = (task: DailyTask) =>
@@ -12,6 +13,12 @@ function taskLook(task: DailyTask): { art: string; tone: string } {
   if (task.key.endsWith(":listening")) return { art: "sound-headphone-cat", tone: "leaf" };
   if (task.key === taskKeys.sound) return { art: "sound-complete-cat", tone: "sun" };
   if (task.key === taskKeys.fix) return { art: "teacher-watercolor", tone: "rose" };
+  const english = englishLessons.find(
+    (lesson) =>
+      task.key === taskKeys.english(lesson.id, "tap") ||
+      task.key === taskKeys.english(lesson.id, "write"),
+  );
+  if (english) return { art: english.art, tone: "sky" };
   const math = mathLessons.find((lesson) => task.key === taskKeys.math(lesson.id));
   return { art: math?.art ?? "course-flag-grass-v1", tone: "peach" };
 }

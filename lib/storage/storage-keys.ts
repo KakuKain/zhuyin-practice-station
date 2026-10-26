@@ -26,6 +26,10 @@ export const storageKeys = {
   mathRecords: "kid-math-records-v1",
   /** What each math lesson's last round showed, so the next avoids those numbers and pictures. */
   mathRecent: "kid-math-recent-v1",
+  /** Finished English rounds and what to practise again. */
+  englishRecords: "kid-english-records-v1",
+  /** What each English lesson's last round asked, so the next asks other letters and words. */
+  englishRecent: "kid-english-recent-v1",
   /** 集章卡: each child's stamps, the log of what earned them and the rewards chosen. */
   stamps: "kid-stamps-v1",
   /** 集章卡 settings the family shares: on or off, card size, daily stamps and rewards. */
@@ -48,6 +52,8 @@ export const childScopedKeys: ReadonlySet<string> = new Set([
   storageKeys.mathRound,
   storageKeys.mathRecords,
   storageKeys.mathRecent,
+  storageKeys.englishRecords,
+  storageKeys.englishRecent,
   storageKeys.stamps,
 ]);
 const childSuffixPattern = /@([a-z0-9]{1,12})$/;
@@ -85,10 +91,18 @@ export const mathRoundStorageKey = (lessonId: number) =>
   lessonId === 1 ? storageKeys.mathRound : `${storageKeys.mathRound}-${lessonId}`;
 const mathRoundKeyPattern = /^kid-math-round-v1-\d+$/;
 
-/** Keys made per lesson (fill drafts, math rounds), for any child. */
+/** One unfinished 寫一寫 round per English lesson and child. */
+export const englishRoundStorageKey = (lessonId: number) => `kid-english-round-v1-${lessonId}`;
+const englishRoundKeyPattern = /^kid-english-round-v1-\d+$/;
+
+/** Keys made per lesson (fill drafts, math and English rounds), for any child. */
 export const isLessonRecordKey = (key: string) => {
   const shared = splitChildKey(key).key;
-  return fillDraftKeyIndex(shared) !== null || mathRoundKeyPattern.test(shared);
+  return (
+    fillDraftKeyIndex(shared) !== null ||
+    mathRoundKeyPattern.test(shared) ||
+    englishRoundKeyPattern.test(shared)
+  );
 };
 
 const fixedKeys: ReadonlySet<string> = new Set(Object.values(storageKeys));
