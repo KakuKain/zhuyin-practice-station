@@ -106,8 +106,8 @@ export const wordPicture = (word: string) =>
   paintedWords.has(word) ? `course-art/words/${word}.webp` : null;
 
 /**
- * Each dialogue: what the two people say, and a stand-in scene until the watercolor scenes are
- * painted. Two goodbyes never share a question (`group`).
+ * Each dialogue: what the two people say, and an emoji scene for one not painted yet. Two
+ * goodbyes never share a question (`group`).
  */
 export const englishDialogues: Record<
   string,
@@ -125,7 +125,13 @@ export const englishDialogues: Record<
     group: "goodbye",
   },
   "sit-down": { lines: ["Sit down, please."], scene: "👩‍🏫🪑🧒", name: "請坐下" },
+  // 第三、四課's, painted with the others.
+  "thank-you": { lines: ["Thank you.", "You're welcome."], scene: "👩‍🏫📚🧒", name: "謝謝" },
+  "my-turn": { lines: ["Who's next?", "It's my turn."], scene: "🎲🧒👧", name: "輪到我" },
 };
+
+/** Dialogues whose painted scene is in public/course-art/scenes/ (scripts/slice-scenes.py). */
+export const paintedScenes: ReadonlySet<string> = new Set(Object.keys(englishDialogues));
 
 /** The workbook's writing tips, shown on the parent's check beside the letter they are about. */
 export const writingTips: Record<string, string> = {
