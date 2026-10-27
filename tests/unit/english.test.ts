@@ -10,6 +10,7 @@ import {
   englishWordReadings,
   englishWords,
   lettersTaught,
+  paintedScenes,
   paintedWords,
   writingTips,
 } from "../../features/english/english-lessons";
@@ -321,12 +322,16 @@ test("every clip a lesson plays is voiced, on this Mac or by Gemini", () => {
   assert.deepEqual(missing, []);
 });
 
-test("painted word pictures are shipped, and the writing tips name real letters", () => {
+test("painted word pictures and scenes are shipped, and the writing tips name real letters", () => {
   for (const word of paintedWords) {
     assert.ok(englishWords[word], word);
     assert.ok(existsSync(`public/course-art/words/${word}.webp`), word);
   }
   for (const letter of Object.keys(writingTips)) assert.ok(letterShape(letter), letter);
+  for (const id of paintedScenes) {
+    assert.ok(englishDialogues[id], id);
+    assert.ok(existsSync(`public/course-art/scenes/${id}.webp`), id);
+  }
 });
 
 test("each English lesson's 認一認 and 寫一寫 can be today's task, and 去做 opens it", () => {

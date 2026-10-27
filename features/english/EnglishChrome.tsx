@@ -2,7 +2,13 @@ import { useCallback, useEffect, useRef } from "react";
 import { SpeakerHigh } from "@phosphor-icons/react";
 import { AnnotatedText } from "../../components/AnnotatedText";
 import type { AppController } from "../usePracticeApp";
-import { englishDialogues, englishWord, englishWords, wordPicture } from "./english-lessons";
+import {
+  englishDialogues,
+  englishWord,
+  englishWords,
+  paintedScenes,
+  wordPicture,
+} from "./english-lessons";
 import {
   englishClipUrl,
   englishClips,
@@ -187,10 +193,14 @@ export function WordPicture({ word, className }: { word: string; className?: str
 export function DialogueScene({ id }: { id: string }) {
   const dialogue = englishDialogues[id];
   return (
-    <span className="english-scene">
-      <span className="english-scene-art" aria-hidden="true">
-        {dialogue.scene}
-      </span>
+    <span className={`english-scene${paintedScenes.has(id) ? " is-painted" : ""}`}>
+      {paintedScenes.has(id) ? (
+        <img className="english-scene-picture" src={`course-art/scenes/${id}.webp`} alt="" />
+      ) : (
+        <span className="english-scene-art" aria-hidden="true">
+          {dialogue.scene}
+        </span>
+      )}
       {dialogue.lines.map((line, index) => (
         <span key={index} className={`english-bubble is-${index === 0 ? "first" : "second"}`}>
           {line}
