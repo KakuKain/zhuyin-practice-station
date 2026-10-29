@@ -347,6 +347,11 @@ export const exercises: Record<number, LessonExercise> = {
 
 export const siteReleaseNotes = [
   [
+    "0.2.0-beta.23",
+    "課文生字全部換成新的聲音",
+    "最後 24 個課文裡的字和語詞也換成和課文朗讀同一個清楚的聲音，例如「老師」、「謝謝」、「讀書」、「午覺」的「覺」。國語各課練習用到的字，現在都是新的聲音了。",
+  ],
+  [
     "0.2.0-beta.22",
     "英語對話換上情境圖",
     "英語課的對話（Hello!、Good morning.、Listen!、Look!、Goodbye.、Sit down, please. 等）從表情符號換成畫好的情境圖，三個小朋友和老師在學校、家裡打招呼，對話框疊在圖的角落。",

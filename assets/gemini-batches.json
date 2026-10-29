@@ -1191,6 +1191,39 @@
         "馴鹿",
         "精彩"
       ]
+    },
+    {
+      "id": "2026-10-26-01-words",
+      "createdAt": "2026-10-26",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師拿語詞卡念給一年級小朋友聽：咬字清楚、語氣親切、速度放慢，句尾念完整。\n逐字稿的每一行是一張語詞卡。每一張都像單獨念出來一樣，用完整、自然的語調，不要念成清單的語調。每一張念完，停頓兩秒再念下一張。\n讀音照課本：「謝謝」念ㄒㄧㄝˋ ˙ㄒㄧㄝ、「午」念ㄨˇ、「覺」念ㄐㄧㄠˋ、「落」念ㄌㄨㄛˋ、「子」念˙ㄗ、「比」念ㄅㄧˇ、「不」念ㄅㄨˊ、「看」念ㄎㄢˋ、「追」念ㄓㄨㄟ。\n\n## Transcript:\n老師。\n[long pause]\n先。\n[long pause]\n紅花。\n[long pause]\n睡。\n[long pause]\n謝謝。\n[long pause]\n午。\n[long pause]\n讀書。\n[long pause]\n覺。\n[long pause]\n兔。\n[long pause]\n落。\n[long pause]\n子。\n[long pause]\n後。\n[long pause]\n比。\n[long pause]\n不。\n[long pause]\n賽。\n[long pause]\n氣。\n[long pause]\n看。\n[long pause]\n餒。\n[long pause]\n誰。\n[long pause]\n跟。\n[long pause]\n快。\n[long pause]\n在。\n[long pause]\n領。\n[long pause]\n追。",
+      "items": [
+        "老師",
+        "先",
+        "紅花",
+        "睡",
+        "謝謝",
+        "午",
+        "讀書",
+        "覺",
+        "兔",
+        "落",
+        "子",
+        "後",
+        "比",
+        "不",
+        "賽",
+        "氣",
+        "看",
+        "餒",
+        "誰",
+        "跟",
+        "快",
+        "在",
+        "領",
+        "追"
+      ]
     }
   ]
 }
