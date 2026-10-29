@@ -522,11 +522,13 @@ test("a saved 分與合 round keeps 分分看's two numbers, and needs both to c
   assert.ok(!isAnswered({ ...both, work: { [ways]: [stroke, []] } }, ways));
   // The wrong number of squares is dropped rather than misread.
   assert.deepEqual(validateMathRound({ ...round, work: { [ways]: [stroke] } })!.work, {});
-  // 分一分 and 合一合 keep their answer as the question's ink.
-  assert.ok(isAnswered({ ...both, ink: { 0: stroke } }, 0));
-  assert.ok(!isAnswered(both, 0));
+  // 分一分 and 合一合 keep their answer as the question's ink. The round is shuffled, so 分分看
+  // may come first; take a 分一分 wherever it is.
+  const split = round.questions.findIndex((question) => question.kind === "split");
+  assert.ok(isAnswered({ ...both, ink: { [split]: stroke } }, split));
+  assert.ok(!isAnswered(both, split));
   // A 分一分 whose parts do not make its total is not restored.
-  const broken = { ...round.questions[0], parts: [1, 1] };
+  const broken = { ...round.questions[split], parts: [1, 1] };
   assert.equal(validateMathRound({ ...round, questions: [broken] }), null);
 });
 
