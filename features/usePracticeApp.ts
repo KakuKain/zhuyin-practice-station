@@ -29,6 +29,7 @@ import { useFillFlow } from "./fill/useFillFlow";
 import { useStampBook } from "./rewards/useStampBook";
 import { taskKeys, type AwardLessonStamp } from "./rewards/stamp-book";
 import { lessonPlace } from "./rewards/daily-tasks";
+import type { EnglishMode } from "./english/english-lessons";
 
 /**
  * Cross-feature coordinator: the current view and lesson, shared stores, audio, the course
@@ -193,9 +194,9 @@ export function usePracticeApp() {
   // opens on its page, like a 注音 lesson, and its practice starts from there.
   const [mathLessonId, setMathLessonId] = useState(1);
   const [mathStart, setMathStart] = useState<"new" | "continue">("new");
-  // The course list's 國語｜數學 switch: 國語 whenever the app opens (the parent asked), and kept
-  // while it stays open, so coming back from a math lesson shows 數學's list again.
-  const [subject, setSubject] = useState<"zhuyin" | "math">("zhuyin");
+  // The course list's 國語｜數學｜英語 switch: 國語 whenever the app opens (the parent asked), and
+  // kept while it stays open, so coming back from a math lesson shows 數學's list again.
+  const [subject, setSubject] = useState<"zhuyin" | "math" | "english">("zhuyin");
   const openMathLesson = (id: number) => {
     setMathLessonId(id);
     setSubject("math");
@@ -204,6 +205,22 @@ export function usePracticeApp() {
   const startMathPractice = (start: "new" | "continue") => {
     setMathStart(start);
     setView("math");
+  };
+
+  // English lessons work like math: a page per lesson, then 認一認 (taps) or 寫一寫 (four lines).
+  const [englishLessonId, setEnglishLessonId] = useState(1);
+  const [englishPractice, setEnglishPractice] = useState<{
+    mode: EnglishMode;
+    start: "new" | "continue";
+  }>({ mode: "tap", start: "new" });
+  const openEnglishLesson = (id: number) => {
+    setEnglishLessonId(id);
+    setSubject("english");
+    setView("english-lesson");
+  };
+  const startEnglishPractice = (mode: EnglishMode, start: "new" | "continue" = "new") => {
+    setEnglishPractice({ mode, start });
+    setView("english");
   };
 
   const openLesson = (index: number) => {
@@ -255,6 +272,10 @@ export function usePracticeApp() {
       case "math":
         return navigate("math-lesson");
       case "math-lesson":
+        return navigate("courses");
+      case "english":
+        return navigate("english-lesson");
+      case "english-lesson":
         return navigate("courses");
       default:
         return navigate("courses");
@@ -316,6 +337,10 @@ export function usePracticeApp() {
     mathStart,
     startMathPractice,
     openMathLesson,
+    englishLessonId,
+    englishPractice,
+    openEnglishLesson,
+    startEnglishPractice,
     subject,
     setSubject,
     morePanel,

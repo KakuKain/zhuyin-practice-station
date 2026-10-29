@@ -12,7 +12,7 @@ export type StampEntry = {
   id: string;
   at: number;
   kind: StampKind;
-  subject: "zhuyin" | "math" | "family";
+  subject: "zhuyin" | "math" | "english" | "family";
   /** What was practised, for the parent's log: 「第五課 聽寫」. */
   detail: string;
   /** Questions marked 需要補強 in that practice, so a parent can see where to help. */
@@ -21,7 +21,7 @@ export type StampEntry = {
   note?: string;
   /** Set for practices stamped once a day, such as re-confirming the same 默寫 check. */
   key?: string;
-  /** Which 今天的任務 this practice finishes: 「zhuyin:4:listening」, 「math:2」, 「fix」. */
+  /** Which 今天的任務 this practice finishes: 「zhuyin:4:listening」, 「math:2」, 「english:1:tap」. */
   taskKey?: string;
   /** False when the day's stamps were used up: the practice is logged, but fills no slot. */
   stamped: boolean;
@@ -116,7 +116,7 @@ function validEntry(raw: unknown): StampEntry | null {
     id: item.id,
     at: item.at as number,
     kind: item.kind as StampKind,
-    subject: ["zhuyin", "math", "family"].includes(item.subject as string)
+    subject: ["zhuyin", "math", "english", "family"].includes(item.subject as string)
       ? (item.subject as StampEntry["subject"])
       : "zhuyin",
     detail: text(item.detail, 60),
@@ -372,6 +372,7 @@ export type AwardLessonStamp = (stamp: LessonStamp) => void;
 export const taskKeys = {
   lesson: (lessonIndex: number, task: "listening" | "fill") => `zhuyin:${lessonIndex}:${task}`,
   math: (lessonId: number) => `math:${lessonId}`,
+  english: (lessonId: number, mode: "tap" | "write") => `english:${lessonId}:${mode}`,
   sound: "sound",
   fix: "fix",
 } as const;

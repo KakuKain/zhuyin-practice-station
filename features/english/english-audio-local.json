@@ -1,0 +1,207 @@
+{
+  "dialogue-good-morning": {
+    "version": 1,
+    "text": "Good morning. / Good morning.",
+    "voice": "Samantha, Reed (英文（美國）)"
+  },
+  "dialogue-goodbye-bye": {
+    "version": 1,
+    "text": "Goodbye. / Bye.",
+    "voice": "Samantha, Reed (英文（美國）)"
+  },
+  "dialogue-goodbye-see-you": {
+    "version": 1,
+    "text": "Goodbye. / See you.",
+    "voice": "Samantha, Reed (英文（美國）)"
+  },
+  "dialogue-hello": {
+    "version": 1,
+    "text": "Hello! / Hi!",
+    "voice": "Samantha, Reed (英文（美國）)"
+  },
+  "dialogue-listen": {
+    "version": 1,
+    "text": "Listen!",
+    "voice": "Samantha"
+  },
+  "dialogue-look": {
+    "version": 1,
+    "text": "Look!",
+    "voice": "Samantha"
+  },
+  "dialogue-sit-down": {
+    "version": 1,
+    "text": "Sit down, please.",
+    "voice": "Samantha"
+  },
+  "letter-a": {
+    "version": 1,
+    "text": "A",
+    "voice": "Samantha"
+  },
+  "letter-b": {
+    "version": 1,
+    "text": "B",
+    "voice": "Samantha"
+  },
+  "letter-c": {
+    "version": 1,
+    "text": "C",
+    "voice": "Samantha"
+  },
+  "letter-d": {
+    "version": 1,
+    "text": "D",
+    "voice": "Samantha"
+  },
+  "letter-e": {
+    "version": 1,
+    "text": "E",
+    "voice": "Samantha"
+  },
+  "letter-f": {
+    "version": 1,
+    "text": "F",
+    "voice": "Samantha"
+  },
+  "prompt-dialogue": {
+    "version": 1,
+    "text": "聽對話，點出對的圖。",
+    "voice": "Meijia"
+  },
+  "prompt-find-all": {
+    "version": 1,
+    "text": "把這個字母的小寫都點出來。",
+    "voice": "Meijia"
+  },
+  "prompt-hear-initial": {
+    "version": 1,
+    "text": "聽單字，點出第一個字母。",
+    "voice": "Meijia"
+  },
+  "prompt-hear-lower": {
+    "version": 1,
+    "text": "聽字母，點出小寫。",
+    "voice": "Meijia"
+  },
+  "prompt-hear-upper": {
+    "version": 1,
+    "text": "聽字母，點出大寫。",
+    "voice": "Meijia"
+  },
+  "prompt-hear-word": {
+    "version": 1,
+    "text": "聽單字，點出對的圖。",
+    "voice": "Meijia"
+  },
+  "prompt-see-initial": {
+    "version": 1,
+    "text": "看圖，點出第一個字母。",
+    "voice": "Meijia"
+  },
+  "prompt-to-lower": {
+    "version": 1,
+    "text": "點出這個字母的小寫。",
+    "voice": "Meijia"
+  },
+  "prompt-to-upper": {
+    "version": 1,
+    "text": "點出這個字母的大寫。",
+    "voice": "Meijia"
+  },
+  "prompt-trace": {
+    "version": 1,
+    "text": "描一描，從藍點開始寫。",
+    "voice": "Meijia"
+  },
+  "prompt-word-order": {
+    "version": 1,
+    "text": "聽一聽，照順序點圖。",
+    "voice": "Meijia"
+  },
+  "prompt-write-initial": {
+    "version": 1,
+    "text": "聽單字，寫出第一個字母。",
+    "voice": "Meijia"
+  },
+  "prompt-write-lower": {
+    "version": 1,
+    "text": "聽字母，寫出小寫。",
+    "voice": "Meijia"
+  },
+  "prompt-write-missing": {
+    "version": 1,
+    "text": "照順序，寫出少了的字母。",
+    "voice": "Meijia"
+  },
+  "prompt-write-upper": {
+    "version": 1,
+    "text": "聽字母，寫出大寫。",
+    "voice": "Meijia"
+  },
+  "word-ant": {
+    "version": 1,
+    "text": "ant",
+    "voice": "Samantha"
+  },
+  "word-apple": {
+    "version": 1,
+    "text": "apple",
+    "voice": "Samantha"
+  },
+  "word-bag": {
+    "version": 1,
+    "text": "bag",
+    "voice": "Samantha"
+  },
+  "word-banana": {
+    "version": 1,
+    "text": "banana",
+    "voice": "Samantha"
+  },
+  "word-bear": {
+    "version": 1,
+    "text": "bear",
+    "voice": "Samantha"
+  },
+  "word-bed": {
+    "version": 1,
+    "text": "bed",
+    "voice": "Samantha"
+  },
+  "word-cake": {
+    "version": 1,
+    "text": "cake",
+    "voice": "Samantha"
+  },
+  "word-cat": {
+    "version": 1,
+    "text": "cat",
+    "voice": "Samantha"
+  },
+  "word-duck": {
+    "version": 1,
+    "text": "duck",
+    "voice": "Samantha"
+  },
+  "word-egg": {
+    "version": 1,
+    "text": "egg",
+    "voice": "Samantha"
+  },
+  "word-elephant": {
+    "version": 1,
+    "text": "elephant",
+    "voice": "Samantha"
+  },
+  "word-fan": {
+    "version": 1,
+    "text": "fan",
+    "voice": "Samantha"
+  },
+  "word-fish": {
+    "version": 1,
+    "text": "fish",
+    "voice": "Samantha"
+  }
+}

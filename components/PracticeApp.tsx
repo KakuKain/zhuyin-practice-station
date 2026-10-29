@@ -42,6 +42,9 @@ const screens = {
   stamps: () => import("../features/rewards/StampCard"),
   tasks: () => import("../features/rewards/TodayTasks"),
   mathCourses: () => import("../features/math/MathCourseList"),
+  english: () => import("../features/english/EnglishScreen"),
+  englishLesson: () => import("../features/english/EnglishLessonPage"),
+  englishCourses: () => import("../features/english/EnglishCourseList"),
 };
 const FillBlank = lazy(() => screens.fillBlank().then((m) => ({ default: m.FillBlank })));
 const FillReview = lazy(() => screens.fillReview().then((m) => ({ default: m.FillReview })));
@@ -51,6 +54,10 @@ const ListeningResult = lazy(() =>
 const MathScreen = lazy(() => screens.math().then((m) => ({ default: m.MathScreen })));
 const MathLessonPage = lazy(() =>
   screens.mathLesson().then((m) => ({ default: m.MathLessonPage })),
+);
+const EnglishScreen = lazy(() => screens.english().then((m) => ({ default: m.EnglishScreen })));
+const EnglishLessonPage = lazy(() =>
+  screens.englishLesson().then((m) => ({ default: m.EnglishLessonPage })),
 );
 const StampNewsToast = lazy(() => screens.stamps().then((m) => ({ default: m.StampNewsToast })));
 
@@ -177,6 +184,8 @@ function PracticeContent({ app }: { app: ReturnType<typeof usePracticeApp> }) {
         return <ListeningResult app={app} />;
       case "math-lesson":
         return <MathLessonPage app={app} />;
+      case "english-lesson":
+        return <EnglishLessonPage app={app} />;
       default:
         return <CourseList app={app} />;
     }
@@ -186,6 +195,12 @@ function PracticeContent({ app }: { app: ReturnType<typeof usePracticeApp> }) {
     return (
       <FullScreen>
         <MathScreen app={app} />
+      </FullScreen>
+    );
+  if (view === "english")
+    return (
+      <FullScreen>
+        <EnglishScreen app={app} />
       </FullScreen>
     );
   if (isFocusMode)
@@ -217,14 +232,16 @@ function PracticeContent({ app }: { app: ReturnType<typeof usePracticeApp> }) {
 
   return (
     <HeaderBackSlot.Provider value={backSlot}>
-      <div className={`app-shell is-${view}${view === "math-lesson" ? " is-lesson" : ""}`}>
+      <div
+        className={`app-shell is-${view}${view === "math-lesson" || view === "english-lesson" ? " is-lesson" : ""}`}
+      >
         <AppHeader
           backSlotRef={setBackSlot}
           title={view === "practice" ? "練習" : undefined}
           materialSelector={view === "courses" ? <MaterialSelector app={app} /> : undefined}
           onCourses={() => navigate("courses")}
           onBack={
-            view === "lesson" || view === "math-lesson"
+            view === "lesson" || view === "math-lesson" || view === "english-lesson"
               ? () => navigate("courses")
               : view === "fill"
                 ? () => navigate("lesson")
@@ -240,7 +257,11 @@ function PracticeContent({ app }: { app: ReturnType<typeof usePracticeApp> }) {
         </main>
         <BottomNav
           active={
-            view === "lesson" || view === "fill" || view === "result" || view === "math-lesson"
+            view === "lesson" ||
+            view === "fill" ||
+            view === "result" ||
+            view === "math-lesson" ||
+            view === "english-lesson"
               ? "courses"
               : view
           }
