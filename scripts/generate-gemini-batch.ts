@@ -366,8 +366,15 @@ try {
         try {
           audio = await generate(text, apiKey);
         } catch (error) {
+          // A dropped connection (fetch failed) is tried again after a pause, twice.
+          if (error instanceof TypeError && attempt < 3) {
+            console.log(`The connection dropped (${error.message}); trying again.`);
+            await new Promise((resolve) => setTimeout(resolve, 20_000));
+            continue;
+          }
           if (!(error instanceof QuotaError)) throw error;
-          if (attempt === 3) break;
+          // The daily limit names itself; only the per-minute one is worth waiting out.
+          if (attempt === 3 || /per day/.test(error.message)) break;
           console.log(`Quota reached (${error.message}); waiting a minute.`);
           await new Promise((resolve) => setTimeout(resolve, 65_000));
         }
