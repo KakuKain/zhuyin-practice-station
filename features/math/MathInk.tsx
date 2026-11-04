@@ -8,21 +8,29 @@ import { filledCells, frameCells } from "./math-round";
 import { MathWords } from "./MathChrome";
 
 /**
- * How a frame's circles compare with the number asked for, counted in reading order like the
- * numbers on the cells: the circles after the target are extra, and when there are too few,
- * the next empty cells are the missing ones.
+ * How a frame's circles (or several frames', `size` cells) compare with the number asked for,
+ * counted in reading order like the numbers on the cells: the circles after the target are extra,
+ * and when there are too few, the next empty cells are the missing ones.
  */
-const frameMarks = (cells: InkStroke[][], start: number, target: number) => {
+const frameMarks = (cells: InkStroke[][], start: number, target: number, size = frameCells) => {
   const extra = new Set<number>();
   const missing = new Set<number>();
   const used = (offset: number) => (cells[start + offset]?.length ?? 0) > 0;
   let count = 0;
-  for (let offset = 0; offset < frameCells; offset++)
+  for (let offset = 0; offset < size; offset++)
     if (used(offset) && ++count > target) extra.add(offset);
-  for (let offset = 0; offset < frameCells && count + missing.size < target; offset++)
+  for (let offset = 0; offset < size && count + missing.size < target; offset++)
     if (!used(offset)) missing.add(offset);
   return { extra, missing };
 };
+
+/** The offsets of one frame among several frames' marks. */
+const inFrame = (marks: Set<number>, frame: number) =>
+  new Set(
+    [...marks]
+      .filter((offset) => Math.floor(offset / frameCells) === frame)
+      .map((offset) => offset % frameCells),
+  );
 
 /** One square to write or draw in, with the same pen, eraser and undo as dictation. */
 export function InkSquare({
@@ -121,14 +129,16 @@ function useFrameOrder(initial: (index: number) => InkStroke[], count: number) {
  * circle is never stretched, and the frame shows at a glance how many there are. Filled cells
  * are numbered in reading order. Circles past the target get a red box, 多畫了 shows in the tool
  * bar (so the frame never moves) and 復原 is pointed out. Too few is left for the parent's check.
- * The eraser takes away the one circle tapped next, then the pen is back.
+ * The eraser takes away the one circle tapped next, then the pen is back. Several frames for one
+ * number count on from the frame before (`numberFrom`), and `extra` is this frame's share.
  */
 function TenFrame({
   ink,
   canvases,
   start,
   cells,
-  target,
+  extra,
+  numberFrom = 0,
   label,
   onUndo,
   onClear,
@@ -138,7 +148,8 @@ function TenFrame({
   canvases: React.RefObject<(HTMLCanvasElement | null)[]>;
   start: number;
   cells: InkStroke[][];
-  target: number;
+  extra: Set<number>;
+  numberFrom?: number;
   label: string;
   onUndo: () => void;
   onClear: () => void;
@@ -146,7 +157,6 @@ function TenFrame({
 }) {
   const [erasing, setErasing] = useState(false);
   const filled = filledCells(cells, start);
-  const { extra } = frameMarks(cells, start, target);
   const hasInk = Array.from({ length: frameCells }, (_, offset) => ink.ink[start + offset]).some(
     Boolean,
   );
@@ -165,7 +175,7 @@ function TenFrame({
     }
     ink.begin(event);
   };
-  let number = 0;
+  let number = numberFrom;
   return (
     <div className="math-ink math-frame-ink">
       <div
@@ -260,25 +270,32 @@ function TenFrame({
   );
 }
 
-/** 畫圈圈: one 十格框 for the number shown. */
+/**
+ * 畫圈圈: one 十格框 for the number shown, or three for a number past 10 (第六課, up to 30).
+ * Three frames number their circles on from one frame to the next, and what is extra counts
+ * all of them in reading order.
+ */
 export function DrawFrame({
   scope,
   target,
+  frames = 1,
   cells,
   onCell,
 }: {
   scope: string;
   target: number;
+  frames?: number;
   cells: InkStroke[][];
   onCell: (index: number, strokes: InkStroke[]) => void;
 }) {
+  const size = frames * frameCells;
   const canvases = useRef<(HTMLCanvasElement | null)[]>([]);
-  const order = useFrameOrder((index) => cells[index] ?? [], frameCells);
+  const order = useFrameOrder((index) => cells[index] ?? [], size);
   const ink = useInkCanvas({
     scope,
     mounted: true,
     enabled: true,
-    count: frameCells,
+    count: size,
     getCanvas: (index) => canvases.current[index] ?? null,
     readInitial: (index) => cells[index] ?? [],
     onChange: (index, strokes) => {
@@ -286,19 +303,26 @@ export function DrawFrame({
       onCell(index, strokes);
     },
   });
+  const { extra } = frameMarks(cells, 0, target, size);
+  const tenFrames = Array.from({ length: frames }, (_, frame) => (
+    <TenFrame
+      key={frame}
+      ink={ink}
+      canvases={canvases}
+      start={frame * frameCells}
+      cells={cells}
+      extra={inFrame(extra, frame)}
+      numberFrom={filledCells(cells, 0, frame * frameCells)}
+      label={frames > 1 ? `畫出 ${target} 個圈圈，第 ${frame + 1} 框` : `畫出 ${target} 個圈圈`}
+      onUndo={() => order.undo(ink, frame * frameCells)}
+      onClear={() => order.clear(ink, frame * frameCells)}
+      onErase={(index) => order.erase(ink, index)}
+    />
+  ));
   return (
     <>
-      <TenFrame
-        ink={ink}
-        canvases={canvases}
-        start={0}
-        cells={cells}
-        target={target}
-        label={`畫出 ${target} 個圈圈`}
-        onUndo={() => order.undo(ink, 0)}
-        onClear={() => order.clear(ink, 0)}
-        onErase={(index) => order.erase(ink, index)}
-      />
+      {/* One frame stays a direct child, where the layout places the square. */}
+      {frames > 1 ? <div className="math-frames">{tenFrames}</div> : tenFrames}
       <InkStatus message={ink.notice} />
     </>
   );
@@ -352,7 +376,7 @@ export function AdditionWork({
         canvases={canvases}
         start={side * frameCells}
         cells={cells}
-        target={parts[side]}
+        extra={frameMarks(cells, side * frameCells, parts[side]).extra}
         label={`${side ? "右邊" : "左邊"}畫 ${parts[side]} 個圈圈`}
         onUndo={() => order.undo(ink, side * frameCells)}
         onClear={() => order.clear(ink, side * frameCells)}
@@ -415,29 +439,47 @@ export function AdditionWork({
 /**
  * For the parent's check: the frame in miniature, each cell as it was drawn. Extra circles get a
  * red box; when there are too few, a red dashed circle shows where each missing one would go.
+ * Several frames for one number are marked together, in reading order.
  */
 export function FramePreview({
   cells,
   start = 0,
   target,
+  frames = 1,
 }: {
   cells: InkStroke[][];
   start?: number;
   target: number;
+  frames?: number;
 }) {
-  const { extra, missing } = frameMarks(cells, start, target);
+  const marks = frameMarks(cells, start, target, frames * frameCells);
+  const frame = (index: number) => {
+    const extra = inFrame(marks.extra, index);
+    const missing = inFrame(marks.missing, index);
+    const from = start + index * frameCells;
+    return (
+      <div
+        key={index}
+        className={`math-frame is-preview${extra.size ? " is-over" : ""}`}
+        aria-hidden="true"
+      >
+        {Array.from({ length: frameCells }, (_, offset) => (
+          <div
+            className={`math-frame-cell${extra.has(offset) ? " is-extra" : ""}${missing.has(offset) ? " is-missing" : ""}`}
+            key={offset}
+          >
+            {(cells[from + offset]?.length ?? 0) > 0 && (
+              <InkPreview strokes={cells[from + offset]} />
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  };
+  if (frames === 1) return frame(0);
   return (
-    <div className={`math-frame is-preview${extra.size ? " is-over" : ""}`} aria-hidden="true">
-      {Array.from({ length: frameCells }, (_, offset) => (
-        <div
-          className={`math-frame-cell${extra.has(offset) ? " is-extra" : ""}${missing.has(offset) ? " is-missing" : ""}`}
-          key={offset}
-        >
-          {(cells[start + offset]?.length ?? 0) > 0 && (
-            <InkPreview strokes={cells[start + offset]} />
-          )}
-        </div>
-      ))}
+    <div className="math-frames is-preview">
+      {Array.from({ length: frames }, (_, index) => frame(index))}
     </div>
   );
 }

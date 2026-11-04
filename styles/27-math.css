@@ -269,7 +269,8 @@
 }
 .math-pictures button,
 .math-join-group button,
-.math-take-left button {
+.math-take-left button,
+.math-tray button {
   position: relative;
   display: grid;
   place-items: center;
@@ -280,7 +281,8 @@
 }
 .math-pictures button.is-marked,
 .math-join-group button.is-marked,
-.math-take-left button.is-marked {
+.math-take-left button.is-marked,
+.math-tray button.is-marked {
   border-color: #73b98a;
   background: #eef9f1;
 }
@@ -1024,6 +1026,299 @@
   height: 64px;
 }
 
+/* 第六課 30以內的數. Ten things to a tray, two rows of five, as the textbook packs them. */
+.math-trays {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+.math-tray {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 4px;
+  width: min(100%, 300px);
+  padding: 8px;
+  border: 2px solid #e6cfa6;
+  border-radius: 18px;
+  background: #fff8ea;
+}
+.math-tray > span {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+}
+/* The pictures shrink with a narrow tray. */
+.math-tray svg {
+  width: 100%;
+  max-width: 34px;
+  height: auto;
+}
+.math-tray-empty {
+  border: 2px dashed #ecdcbf;
+  border-radius: 12px;
+}
+.math-step {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+}
+.math-step .math-trays {
+  width: 100%;
+}
+.math-thirty-given {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 0;
+  color: #18375d;
+  font-size: 22px;
+}
+.math-thirty-given strong {
+  font-size: 44px;
+  line-height: 1;
+}
+.math-step-change {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 6px 18px;
+  border-radius: 999px;
+  font-size: 22px;
+  font-weight: 700;
+}
+.math-step-change.is-more {
+  background: #e7f5ec;
+  color: #2c7547;
+}
+.math-step-change.is-less {
+  background: #fdeceb;
+  color: #a8392f;
+}
+.math-straws {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 16px;
+  padding: 16px;
+  border: 2px solid #c6dfe7;
+  border-radius: 22px;
+  background: #fffefa;
+}
+.math-straws svg {
+  width: auto;
+  height: 130px;
+}
+.math-straws.is-small {
+  gap: 4px;
+  padding: 4px;
+  border-radius: 10px;
+}
+.math-straws.is-small svg {
+  height: 44px;
+}
+/* A number the question gives, on a washed card like 分合圖's. */
+.math-number-card {
+  display: grid;
+  place-items: center;
+  min-width: 64px;
+  aspect-ratio: 1;
+  padding: 0 6px;
+  border-radius: 18px;
+  background: #eef6ff;
+  box-shadow: inset 0 0 0 2px #c6dcef;
+  color: #18375d;
+}
+.math-number-card strong {
+  font-size: clamp(30px, 6vw, 48px);
+  line-height: 1;
+}
+.math-fill {
+  display: grid;
+  gap: 8px;
+}
+/* Phones put the five in rows of three, so each square keeps room for its tools. */
+.math-fill-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+  gap: 10px;
+  width: min(100%, 860px);
+  margin: 0 auto;
+}
+@media (min-width: 600px) {
+  .math-fill-row {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+.math-fill-row .math-number-card {
+  min-width: 0;
+}
+/* Tablets: the squares to write in are wider than the numbers given. */
+@media (min-width: 600px) {
+  .math-fill-row:not(.is-preview) {
+    display: flex;
+  }
+  .math-fill-row:not(.is-preview) .math-number-card {
+    flex: 1 1 0;
+  }
+  .math-fill-row:not(.is-preview) .math-fill-blank {
+    flex: 1.8 1 0;
+  }
+}
+.math-fill-blank {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.math-fill-row.is-preview {
+  grid-template-columns: repeat(5, 44px);
+  gap: 4px;
+  width: auto;
+  margin: 0;
+}
+.math-fill-row.is-preview .math-number-card {
+  border-radius: 8px;
+}
+.math-fill-row.is-preview .math-number-card strong {
+  font-size: 18px;
+}
+.math-fill-row.is-preview .math-bond-ink {
+  width: 44px;
+  height: 44px;
+}
+.math-queue {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px;
+  border: 2px solid #c6dfe7;
+  border-radius: 22px;
+  background: #fffefa;
+}
+.math-queue-ahead,
+.math-queue-child {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+}
+.math-queue-bracket,
+.math-queue-tag {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  font-size: 20px;
+}
+.math-queue-bracket {
+  padding: 2px 14px 8px;
+  border: 3px solid #8eaac2;
+  border-bottom: 0;
+  border-radius: 14px 14px 0 0;
+  color: #35546f;
+}
+.math-queue-tag {
+  padding: 2px 12px;
+  border-radius: 999px;
+  background: #fde7ee;
+  color: #a3284f;
+}
+.math-queue-bracket strong,
+.math-queue-tag strong {
+  font-size: 30px;
+  line-height: 1;
+}
+.math-queue-people {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+}
+.math-queue-gap {
+  padding: 0 4px;
+  color: #7d9bb6;
+  font-size: 28px;
+}
+.math-larger {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+}
+.math-larger .math-number-card {
+  width: min(36vw, 160px);
+}
+.math-larger .math-number-card strong {
+  font-size: 72px;
+}
+.math-enough {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+  width: fit-content;
+  margin: 0 auto;
+  padding: 14px 22px;
+  border: 2px solid #c6dfe7;
+  border-radius: 22px;
+  background: #fffefa;
+}
+.math-enough-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  color: #18375d;
+  font-size: 24px;
+}
+.math-enough-row strong {
+  font-size: 44px;
+  line-height: 1;
+}
+/* 夠 and 不夠 under the ink, for the child to circle one. */
+.math-enough-choices {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  place-items: center;
+  color: #18375d;
+  font-size: clamp(34px, 7vw, 60px);
+  pointer-events: none;
+}
+.math-check-ink.is-enough {
+  position: relative;
+  width: 132px;
+  height: 132px;
+}
+.math-check-ink.is-enough .math-enough-choices {
+  font-size: 22px;
+}
+.math-check-ink.is-enough .ink-preview {
+  position: relative;
+  z-index: 2;
+}
+/* 表示數量 past 10: three 十格框, stacked, or in a row on a landscape tablet. */
+.math-frames {
+  display: grid;
+  gap: 12px;
+  width: min(100%, 470px);
+  margin: 0 auto;
+}
+.math-draw .math-frames .math-ink {
+  width: 100%;
+}
+.math-frames.is-preview {
+  display: flex;
+  gap: 4px;
+  width: auto;
+  margin: 0;
+}
+.math-frames.is-preview .math-frame.is-preview {
+  width: 84px;
+}
+
 /* Landscape tablets: the question, pictures and buttons on the left, the square on the right. */
 @media (min-width: 900px) and (orientation: landscape) {
   .math-question {
@@ -1082,6 +1377,28 @@
   .math-add-side,
   .math-add-side.is-answer {
     width: 100%;
+  }
+  /* 第六課: three frames, or 填填看's row, across the screen. */
+  .math-question.is-many,
+  .math-question.is-fill {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .math-question.is-many .math-frames {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: 100%;
+  }
+  .math-question.is-many .math-ink {
+    grid-column: auto;
+    grid-row: auto;
+    width: 100%;
+  }
+  .math-question.is-many .math-draw-target {
+    justify-content: center;
+  }
+  /* Two trays to a row in the narrow column, so three still leave room for the buttons. */
+  .math-tray {
+    width: calc(50% - 5px);
+    padding: 5px;
   }
 }
 

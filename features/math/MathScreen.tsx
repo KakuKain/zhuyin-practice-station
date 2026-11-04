@@ -5,9 +5,11 @@ import type { InkStroke } from "../types";
 import { InkPreview } from "../../components/AppChrome";
 import {
   clearMathRound,
+  drawFrames,
   filledCells,
   frameCells,
   isAnswered,
+  maxCount,
   workCells,
   newMathRound,
   readMathRound,
@@ -23,6 +25,19 @@ import { MathHeader, MathPrompt, MathResult } from "./MathChrome";
 import { CountPictures, JoinPictures, TakePictures } from "./MathPictures";
 import { AdditionWork, DrawFrame, FramePreview, InkSquare } from "./MathInk";
 import { BondPreview, BondWork, bondLabel, type BondQuestion } from "./MathBond";
+import {
+  EnoughCards,
+  EnoughChoices,
+  FillPreview,
+  FillWork,
+  LargerCards,
+  QueuePicture,
+  StepPictures,
+  Straws,
+  TrayPictures,
+  thirtyAnswer,
+  thirtyName,
+} from "./ThirtyViews";
 
 type MathApp = Pick<
   AppController,
@@ -39,7 +54,13 @@ const CompareLesson = lazy(() =>
 const sectionOf = (question: MathQuestion) => {
   switch (question.kind) {
     case "count":
-      return question.target === 0 ? "認識 0" : question.target <= 5 ? "認識 1～5" : "認識 6～10";
+      return question.target === 0
+        ? "認識 0"
+        : question.target <= 5
+          ? "認識 1～5"
+          : question.target <= maxCount
+            ? "認識 6～10"
+            : "數到20";
     case "draw":
       return "表示數量";
     case "join":
@@ -54,6 +75,17 @@ const sectionOf = (question: MathQuestion) => {
         : question.kind === "split"
           ? "分一分"
           : "合一合";
+    // 第六課 30以內的數
+    case "step":
+      return Math.max(question.from, question.target) <= 20 ? "數到20" : "數到30";
+    case "bundle":
+    case "fill":
+      return "數到30";
+    case "queue":
+      return "排在第幾個";
+    case "larger":
+    case "enough":
+      return "比大小";
   }
 };
 
@@ -63,7 +95,56 @@ const questionName = (question: MathQuestion) =>
     ? bondName(question)
     : "parts" in question
       ? question.parts.join("＋")
-      : `${question.kind === "count" ? "數一數" : "畫圈圈"} ${question.target}`;
+      : question.kind === "count" || question.kind === "draw"
+        ? `${question.kind === "count" ? "數一數" : "畫圈圈"} ${question.target}`
+        : thirtyName(question);
+
+/**
+ * 第六課's questions with one written answer: what the question shows beside the square. 數一數
+ * past 10 packs ten in a tray, as the textbook does.
+ */
+function AnswerPictures({
+  question,
+  marked,
+  onToggle,
+}: {
+  question: MathQuestion;
+  marked: ReadonlySet<number>;
+  onToggle: (index: number) => void;
+}) {
+  switch (question.kind) {
+    case "count":
+      return (
+        <TrayPictures
+          count={question.target}
+          icon={question.icon}
+          marked={marked}
+          onToggle={onToggle}
+        />
+      );
+    case "step":
+      return <StepPictures question={question} />;
+    case "bundle":
+      return <Straws target={question.target} />;
+    case "queue":
+      return <QueuePicture question={question} />;
+    case "larger":
+      return <LargerCards question={question} />;
+    case "enough":
+      return <EnoughCards question={question} />;
+    default:
+      return null;
+  }
+}
+
+/** Which questions write one answer beside AnswerPictures. */
+const answersBeside = (question: MathQuestion) =>
+  (question.kind === "count" && question.target > maxCount) ||
+  question.kind === "step" ||
+  question.kind === "bundle" ||
+  question.kind === "queue" ||
+  question.kind === "larger" ||
+  question.kind === "enough";
 
 const isBond = (question: MathQuestion): question is BondQuestion =>
   question.kind === "split" || question.kind === "combine" || question.kind === "ways";
@@ -106,7 +187,7 @@ export function MathScreen({ app }: { app: MathApp }) {
 }
 
 /**
- * 第一課 認識 1～10 and 第三課 加法: the child writes and draws, then the parent checks the
+ * The written lessons (第一、四、六、七課): the child writes and draws, then the parent checks the
  * round. Each lesson keeps its own unfinished round.
  */
 function WritingLesson({ app, lesson }: { app: MathApp; lesson: MathLesson }) {
@@ -199,6 +280,13 @@ function WritingLesson({ app, lesson }: { app: MathApp; lesson: MathLesson }) {
                   <div className="math-check-question">
                     {question.kind === "count" ? (
                       <CountPictures question={question} small />
+                    ) : question.kind === "bundle" ? (
+                      <>
+                        <Straws target={question.target} small />
+                        <span className="math-check-draw">{thirtyName(question)}</span>
+                      </>
+                    ) : question.kind !== "draw" && thirtyName(question) ? (
+                      <span className="math-check-draw">{thirtyName(question)}</span>
                     ) : question.kind === "join" ? (
                       <JoinPictures question={question} small />
                     ) : isBond(question) ? (
@@ -235,17 +323,30 @@ function WritingLesson({ app, lesson }: { app: MathApp; lesson: MathLesson }) {
                     </span>
                     {isBond(question) ? (
                       <BondPreview question={question} answer={strokes} cells={circles} />
+                    ) : question.kind === "fill" ? (
+                      <FillPreview question={question} cells={circles} />
                     ) : question.kind === "draw" && circles.length ? (
                       <>
-                        <FramePreview cells={circles} target={question.target} />
+                        <FramePreview
+                          cells={circles}
+                          target={question.target}
+                          frames={drawFrames(question.target)}
+                        />
                         <small>
-                          <DrawnCount drawn={filledCells(circles)} target={question.target} />
+                          <DrawnCount
+                            drawn={filledCells(circles, 0, workCells(question))}
+                            target={question.target}
+                          />
                         </small>
                       </>
                     ) : (
                       <>
                         {/* 畫圈圈 drawn before 十格框 shows as it was drawn. */}
-                        <div className="math-check-ink">
+                        <div
+                          className={`math-check-ink${question.kind === "enough" ? " is-enough" : ""}`}
+                        >
+                          {/* What the child circled shows over 夠 and 不夠. */}
+                          {question.kind === "enough" && <EnoughChoices />}
                           {strokes.length ? (
                             <InkPreview strokes={strokes} />
                           ) : (
@@ -267,7 +368,11 @@ function WritingLesson({ app, lesson }: { app: MathApp; lesson: MathLesson }) {
                       </small>
                     ) : (
                       <strong>
-                        {question.kind === "split" ? question.parts[1] : question.target}
+                        {question.kind === "split"
+                          ? question.parts[1]
+                          : thirtyName(question)
+                            ? thirtyAnswer(question)
+                            : question.target}
                       </strong>
                     )}
                   </div>
@@ -339,9 +444,31 @@ function WritingLesson({ app, lesson }: { app: MathApp; lesson: MathLesson }) {
         `${lesson.number} · ${sectionOf(question)}`,
         `第 ${round.index + 1} 題 / ${round.questions.length}`,
       )}
-      <section className={`math-question is-${question.kind}`}>
+      <section
+        className={`math-question is-${question.kind}${question.kind === "draw" && question.target > maxCount ? " is-many" : ""}`}
+      >
         <MathPrompt id={mathPromptId(question)} onPlay={() => play(question)} />
-        {question.kind === "count" ? (
+        {answersBeside(question) ? (
+          <div className="math-count">
+            <AnswerPictures question={question} marked={marked} onToggle={toggleMark} />
+            <InkSquare
+              scope={scope}
+              initial={strokes}
+              onChange={setInk}
+              label={question.kind === "enough" ? "圈出夠或不夠" : "寫數字"}
+              plain={question.kind === "enough"}
+            >
+              {question.kind === "enough" && <EnoughChoices />}
+            </InkSquare>
+          </div>
+        ) : question.kind === "fill" ? (
+          <FillWork
+            scope={scope}
+            question={question}
+            cells={round.work[round.index] ?? []}
+            onCell={setWorkCell}
+          />
+        ) : question.kind === "count" ? (
           <div className="math-count">
             <CountPictures question={question} marked={marked} onToggle={toggleMark} />
             <InkSquare scope={scope} initial={strokes} onChange={setInk} label="寫數字" />
@@ -387,6 +514,7 @@ function WritingLesson({ app, lesson }: { app: MathApp; lesson: MathLesson }) {
             <DrawFrame
               scope={scope}
               target={question.target}
+              frames={drawFrames(question.target)}
               cells={round.work[round.index] ?? []}
               onCell={setWorkCell}
             />
