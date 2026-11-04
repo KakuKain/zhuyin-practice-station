@@ -1148,6 +1148,12 @@
   width: min(100%, 860px);
   margin: 0 auto;
 }
+/* The narrowest phones: two to a row, or a square's tools would not fit. */
+@media (max-width: 379px) {
+  .math-fill-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
 @media (min-width: 600px) {
   .math-fill-row {
     grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -1309,11 +1315,17 @@
 .math-draw .math-frames .math-ink {
   width: 100%;
 }
+/* The parent's check: stacked on phones, side by side on tablets. */
 .math-frames.is-preview {
-  display: flex;
+  display: grid;
   gap: 4px;
   width: auto;
   margin: 0;
+}
+@media (min-width: 600px) {
+  .math-frames.is-preview {
+    display: flex;
+  }
 }
 .math-frames.is-preview .math-frame.is-preview {
   width: 84px;
