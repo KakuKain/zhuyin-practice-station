@@ -361,15 +361,20 @@ try {
       const text = prompt(batch);
       const id = nextId(batch[0].kind);
       let audio;
+      let hiccups = 0;
       // A 429 may be the per-minute limit: wait a minute, twice, before calling it a day.
       for (let attempt = 1; !audio; attempt++) {
         try {
           audio = await generate(text, apiKey);
         } catch (error) {
-          // A dropped connection (fetch failed) is tried again after a pause, twice.
-          if (error instanceof TypeError && attempt < 3) {
-            console.log(`The connection dropped (${error.message}); trying again.`);
-            await new Promise((resolve) => setTimeout(resolve, 20_000));
+          // A dropped connection (fetch failed) or a busy server (Gemini 503) is tried again after
+          // a pause, four times.
+          const busy = error instanceof Error && /^Gemini 5\d\d/.test(error.message);
+          if ((error instanceof TypeError || busy) && hiccups < 4) {
+            hiccups++;
+            attempt--;
+            console.log(`The request failed (${(error as Error).message}); trying again.`);
+            await new Promise((resolve) => setTimeout(resolve, 30_000 * hiccups));
             continue;
           }
           if (!(error instanceof QuotaError)) throw error;
