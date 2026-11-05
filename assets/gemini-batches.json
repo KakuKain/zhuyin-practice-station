@@ -1224,6 +1224,145 @@
         "領",
         "追"
       ]
+    },
+    {
+      "id": "2026-11-05-01-math",
+      "createdAt": "2026-11-05",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n讀音照課本：「數」念ㄕㄨˋ、「了」念˙ㄌㄜ、「哪」念ㄋㄚˇ。\n\n## Transcript:\n再多一個，共有幾個？用筆寫出數字。\n[long pause]\n拿走一個，還剩幾個？用筆寫出數字。\n[long pause]\n十根吸管綁成一束，共有幾根？用筆寫出數字。\n[long pause]\n填填看，少了哪兩個數？用筆寫出數字。\n[long pause]\n看數字，畫出一樣多的圈圈。",
+      "items": [
+        "step-more",
+        "step-less",
+        "bundle",
+        "fill",
+        "draw-many"
+      ]
+    },
+    {
+      "id": "2026-11-05-02-math",
+      "createdAt": "2026-11-05",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n讀音照課本：「哪」念ㄋㄚˇ、「數」念ㄕㄨˋ。\n\n## Transcript:\n哪一個數比較大？用筆寫出數字。\n[long pause]\n哪一個數比較小？用筆寫出數字。\n[long pause]\n一個人拿一把剪刀，剪刀夠不夠？圈出答案。\n[long pause]\n一個人拿一張色紙，色紙夠不夠？圈出答案。",
+      "items": [
+        "larger-more",
+        "larger-less",
+        "enough-scissors",
+        "enough-paper"
+      ]
+    },
+    {
+      "id": "2026-11-05-03-math",
+      "createdAt": "2026-11-05",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n讀音照課本：「了」念˙ㄌㄜ。\n\n## Transcript:\n前面排了十個人，他排第幾個？\n[long pause]\n前面排了十一個人，他排第幾個？\n[long pause]\n前面排了十二個人，他排第幾個？\n[long pause]\n前面排了十三個人，他排第幾個？\n[long pause]\n前面排了十四個人，他排第幾個？\n[long pause]\n前面排了十五個人，他排第幾個？",
+      "items": [
+        "queue-place-10",
+        "queue-place-11",
+        "queue-place-12",
+        "queue-place-13",
+        "queue-place-14",
+        "queue-place-15"
+      ]
+    },
+    {
+      "id": "2026-11-05-04-math",
+      "createdAt": "2026-11-05",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n讀音照課本：「了」念˙ㄌㄜ。\n\n## Transcript:\n前面排了十六個人，他排第幾個？\n[long pause]\n前面排了十七個人，他排第幾個？\n[long pause]\n前面排了十八個人，他排第幾個？\n[long pause]\n前面排了十九個人，他排第幾個？\n[long pause]\n前面排了二十個人，他排第幾個？\n[long pause]\n前面排了二十一個人，他排第幾個？",
+      "items": [
+        "queue-place-16",
+        "queue-place-17",
+        "queue-place-18",
+        "queue-place-19",
+        "queue-place-20",
+        "queue-place-21"
+      ]
+    },
+    {
+      "id": "2026-11-05-05-math",
+      "createdAt": "2026-11-05",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n讀音照課本：「了」念˙ㄌㄜ。\n\n## Transcript:\n前面排了二十二個人，他排第幾個？\n[long pause]\n前面排了二十三個人，他排第幾個？\n[long pause]\n前面排了二十四個人，他排第幾個？\n[long pause]\n前面排了二十五個人，他排第幾個？\n[long pause]\n前面排了二十六個人，他排第幾個？",
+      "items": [
+        "queue-place-22",
+        "queue-place-23",
+        "queue-place-24",
+        "queue-place-25",
+        "queue-place-26"
+      ]
+    },
+    {
+      "id": "2026-11-05-06-math",
+      "createdAt": "2026-11-05",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n讀音照課本：「了」念˙ㄌㄜ。\n\n## Transcript:\n前面排了二十七個人，他排第幾個？\n[long pause]\n前面排了二十八個人，他排第幾個？\n[long pause]\n前面排了二十九個人，他排第幾個？\n[long pause]\n他排在第十一個，前面有幾個人？\n[long pause]\n他排在第十二個，前面有幾個人？",
+      "items": [
+        "queue-place-27",
+        "queue-place-28",
+        "queue-place-29",
+        "queue-ahead-11",
+        "queue-ahead-12"
+      ]
+    },
+    {
+      "id": "2026-11-05-07-math",
+      "createdAt": "2026-11-05",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n\n## Transcript:\n他排在第十三個，前面有幾個人？\n[long pause]\n他排在第十四個，前面有幾個人？\n[long pause]\n他排在第十五個，前面有幾個人？\n[long pause]\n他排在第十六個，前面有幾個人？\n[long pause]\n他排在第十七個，前面有幾個人？\n[long pause]\n他排在第十八個，前面有幾個人？",
+      "items": [
+        "queue-ahead-13",
+        "queue-ahead-14",
+        "queue-ahead-15",
+        "queue-ahead-16",
+        "queue-ahead-17",
+        "queue-ahead-18"
+      ]
+    },
+    {
+      "id": "2026-11-05-08-math",
+      "createdAt": "2026-11-05",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n\n## Transcript:\n他排在第十九個，前面有幾個人？\n[long pause]\n他排在第二十個，前面有幾個人？\n[long pause]\n他排在第二十一個，前面有幾個人？\n[long pause]\n他排在第二十二個，前面有幾個人？\n[long pause]\n他排在第二十三個，前面有幾個人？",
+      "items": [
+        "queue-ahead-19",
+        "queue-ahead-20",
+        "queue-ahead-21",
+        "queue-ahead-22",
+        "queue-ahead-23"
+      ]
+    },
+    {
+      "id": "2026-11-05-09-math",
+      "createdAt": "2026-11-05",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n\n## Transcript:\n他排在第二十四個，前面有幾個人？\n[long pause]\n他排在第二十五個，前面有幾個人？\n[long pause]\n他排在第二十六個，前面有幾個人？\n[long pause]\n他排在第二十七個，前面有幾個人？\n[long pause]\n他排在第二十八個，前面有幾個人？",
+      "items": [
+        "queue-ahead-24",
+        "queue-ahead-25",
+        "queue-ahead-26",
+        "queue-ahead-27",
+        "queue-ahead-28"
+      ]
+    },
+    {
+      "id": "2026-11-05-10-math",
+      "createdAt": "2026-11-05",
+      "model": "gemini-3.8-flash-tts",
+      "voice": "Fola",
+      "prompt": "## Director's notes:\n台灣華語。像溫柔的國小老師對一年級小朋友說話：咬字清楚、語氣親切，速度比平常說話稍慢，開頭不要拖長，標點的地方自然停頓，句尾念完整。\n逐字稿的每一行是一句獨立的話。每一句都像單獨說出來一樣，用完整、自然的語調，不要念成清單的語調。每一句念完，停頓兩秒再念下一句。\n\n## Transcript:\n他排在第二十九個，前面有幾個人？\n[long pause]\n他排在第三十個，前面有幾個人？",
+      "items": [
+        "queue-ahead-29",
+        "queue-ahead-30"
+      ]
     }
   ]
 }
