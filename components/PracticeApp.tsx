@@ -238,7 +238,11 @@ function PracticeContent({ app }: { app: ReturnType<typeof usePracticeApp> }) {
         <AppHeader
           backSlotRef={setBackSlot}
           title={view === "practice" ? "練習" : undefined}
-          materialSelector={view === "courses" ? <MaterialSelector app={app} /> : undefined}
+          materialSelector={
+            view === "courses" && app.subject === "zhuyin" ? (
+              <MaterialSelector app={app} />
+            ) : undefined
+          }
           onCourses={() => navigate("courses")}
           onBack={
             view === "lesson" || view === "math-lesson" || view === "english-lesson"

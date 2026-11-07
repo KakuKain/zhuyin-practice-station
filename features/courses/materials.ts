@@ -56,7 +56,7 @@ export const initialMaterials: MaterialsState = {
   nextIndex: firstCustomLessonIndex,
   materials: [],
 };
-export const builtinMaterialName = "康軒一年級上";
+export const builtinMaterialName = "康軒一上 首冊";
 const titleReadings = [
   ["ㄇㄠ", "ㄇㄧ"],
   ["ㄜˊ", "ㄅㄠˇ", "˙ㄅㄠ"],
