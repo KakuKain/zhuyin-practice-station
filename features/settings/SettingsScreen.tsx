@@ -48,7 +48,7 @@ function updateMessage({ status, latestBuild, checkedAt }: UpdateState) {
 const MaterialsPanel = lazy(() =>
   import("./MaterialsPanel").then((module) => ({ default: module.MaterialsPanel })),
 );
-import { builtinMaterialName } from "../courses/materials";
+import { activeMaterialName } from "../courses/materials";
 // Feature styles load with the chunk (after every eager stylesheet), not on first paint.
 const CustomAudioPanel = lazy(() =>
   Promise.all([import("./CustomAudioPanel"), import("../../styles/lazy/custom-audio.css")]).then(
@@ -208,12 +208,7 @@ export function SettingsScreen({
               </span>
               <span>
                 <strong>教材與題庫</strong>
-                <small>
-                  {app.materialsState.materials.find(
-                    (item) => item.id === app.materialsState.activeId && !item.archived,
-                  )?.name ?? builtinMaterialName}{" "}
-                  · 選擇或匯入
-                </small>
+                <small>{activeMaterialName(app.materialsState)} · 選擇或匯入</small>
               </span>
               <span className="more-arrow" aria-hidden="true">
                 <ArrowRight size={21} weight="bold" />

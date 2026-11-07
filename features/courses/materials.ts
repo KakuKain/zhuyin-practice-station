@@ -8,6 +8,8 @@ import { builtinLessonIndex, firstCustomLessonIndex, isCustomLessonIndex } from 
 
 export const materialsStorageKey = storageKeys.materials;
 export const builtinMaterialId = "kang-hsuan-grade1-semester1";
+/** 第一冊, the book after 首冊: its 生字 are practised in features/hanzi, not as 注音 lessons. */
+export const book1MaterialId = "kang-hsuan-grade1-book1";
 export type CustomLesson = {
   index: number;
   title: string;
@@ -57,6 +59,19 @@ export const initialMaterials: MaterialsState = {
   materials: [],
 };
 export const builtinMaterialName = "康軒一上 首冊";
+export const book1MaterialName = "康軒一上 第一冊";
+/** The materials every family has, in the order the pickers list them. */
+export const builtinMaterials = [
+  { id: builtinMaterialId, name: builtinMaterialName, lessons: 9 },
+  { id: book1MaterialId, name: book1MaterialName, lessons: 7 },
+] as const;
+export const isBuiltinMaterial = (id: unknown) =>
+  builtinMaterials.some((material) => material.id === id);
+/** The name of the open material. */
+export const activeMaterialName = (state: MaterialsState) =>
+  builtinMaterials.find((material) => material.id === state.activeId)?.name ??
+  state.materials.find((item) => item.id === state.activeId && !item.archived)?.name ??
+  builtinMaterialName;
 const titleReadings = [
   ["ㄇㄠ", "ㄇㄧ"],
   ["ㄜˊ", "ㄅㄠˇ", "˙ㄅㄠ"],
@@ -169,7 +184,7 @@ export function validateMaterials(raw: unknown): MaterialsState {
     const name = shortText(item.name);
     if (
       !id ||
-      id === builtinMaterialId ||
+      isBuiltinMaterial(id) ||
       ids.has(id) ||
       !name ||
       !Array.isArray(item.lessons) ||
@@ -207,9 +222,11 @@ export function validateMaterials(raw: unknown): MaterialsState {
   return {
     version: 1,
     materials,
-    activeId: materials.some((item) => item.id === value.activeId && !item.archived)
-      ? value.activeId
-      : builtinMaterialId,
+    activeId:
+      isBuiltinMaterial(value.activeId) ||
+      materials.some((item) => item.id === value.activeId && !item.archived)
+        ? value.activeId
+        : builtinMaterialId,
     nextIndex: Math.max(
       firstCustomLessonIndex,
       isCustomLessonIndex(value.nextIndex) ? value.nextIndex : firstCustomLessonIndex,

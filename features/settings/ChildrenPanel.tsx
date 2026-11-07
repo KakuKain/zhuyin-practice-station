@@ -2,7 +2,7 @@ import { useState } from "react";
 import { BookOpenText, Plus, Trash } from "@phosphor-icons/react";
 import { ConfirmDialog } from "../../components/ConfirmDialog";
 import { ChildAvatar, avatarImage, childLabel } from "../../components/ChildPicker";
-import { builtinMaterialId, builtinMaterialName, type MaterialsState } from "../courses/materials";
+import { builtinMaterials, type MaterialsState } from "../courses/materials";
 import { withChildMaterial } from "../courses/useMaterials";
 import {
   addChild,
@@ -66,7 +66,11 @@ function MaterialChoice({
     <label className="child-material">
       <BookOpenText size={20} aria-hidden="true" />
       <select aria-label={label} value={value} onChange={(event) => onChange(event.target.value)}>
-        <option value={builtinMaterialId}>{builtinMaterialName}</option>
+        {builtinMaterials.map((material) => (
+          <option key={material.id} value={material.id}>
+            {material.name}
+          </option>
+        ))}
         {materials.materials
           .filter((material) => !material.archived)
           .map((material) => (

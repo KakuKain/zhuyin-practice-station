@@ -30,3 +30,20 @@ export const book1Facts: Record<string, { radical: string; strokes: number }> = 
       return [character, { radical, strokes: Number(count.join("")) }];
     }),
 );
+
+/** Each 生字's reading as 本冊生字 prints it, one syllable per character, in the book's order. */
+const readings = [
+  "ㄧ ㄦˋ ㄙㄢ ㄙˋ ㄨˇ ㄌㄧㄡˋ ㄑㄧ ㄅㄚ ㄐㄧㄡˇ ㄕˊ",
+  "ㄆㄞ ㄕㄡˇ ㄗㄨㄛˇ ㄧㄡˋ ㄋㄧˇ ㄊㄚ ㄧㄝˇ ㄕㄤˋ ㄒㄧㄚˋ",
+  "ㄓㄜˋ ㄕˋ ㄕㄟˊ ˙ㄉㄜ ㄨㄛˇ ㄈㄣ ㄏㄠˇ ˙ㄌㄜ ㄚ ㄉㄨㄛ ㄍㄜˋ",
+  "ㄑㄧㄡ ㄑㄧㄢ ㄏㄢˋ ㄨㄢˊ ㄆㄟˊ ㄍㄠ ㄕㄢ ㄉㄠˋ ㄉㄚˋ ㄏㄞˇ ㄆㄥˊ ㄧㄡˇ ˙ㄇㄣ ㄑㄧˇ",
+  "˙ㄗ ㄒㄧㄠˇ ㄎㄜˋ ㄌㄧㄤˇ ㄖㄣˊ ㄌㄚ ㄎㄢˋ ㄓㄠˇ ㄓ ㄑㄧㄥ ㄨㄚ ㄎㄞ ㄒㄧㄣ",
+  "ㄅㄧˇ ㄇㄣˊ ㄌㄧˇ ㄨㄞˋ ㄧㄡˇ ㄕㄣˊ ˙ㄇㄜ ㄅㄨˋ ㄊㄨㄥˊ ㄗㄠˇ ㄨㄢˇ ㄨㄤˊ ㄓㄨˇ ㄧㄡˋ",
+  "ㄌㄨˋ ㄔㄤˊ ㄅㄞˊ ㄏㄨㄚ ㄏㄨㄥˊ ㄗㄡˇ ㄗㄞˋ ㄒㄧㄤˋ ㄕㄨㄛ ㄉㄨㄛˇ ㄘㄨㄥˊ ㄊㄡˊ ㄋㄚˋ",
+];
+export const book1Readings: Record<string, string> = Object.fromEntries(
+  book1Lessons.flatMap((lesson, i) => {
+    const syllables = readings[i].split(" ");
+    return [...lesson.characters].map((character, k) => [character, syllables[k]]);
+  }),
+);

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ShowMsg } from "../../components/ShowMsg";
 import type { AppController } from "../usePracticeApp";
-import { builtinMaterialId, builtinMaterialName } from "./materials";
+import { builtinMaterials } from "./materials";
 
 export function MaterialSelector({
   app,
@@ -25,7 +25,11 @@ export function MaterialSelector({
           );
         }}
       >
-        <option value={builtinMaterialId}>{builtinMaterialName}</option>
+        {builtinMaterials.map((material) => (
+          <option key={material.id} value={material.id}>
+            {material.name}
+          </option>
+        ))}
         {app.materialsState.materials
           .filter((material) => !material.archived)
           .map((material) => (
