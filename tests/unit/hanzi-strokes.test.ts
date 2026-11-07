@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
-import { book1Facts, book1Lessons } from "../../features/hanzi/book1-characters";
+import { book1Facts, book1Lessons, book1Readings } from "../../features/hanzi/book1-characters";
+import { hanziWordReadings } from "../../features/hanzi/HanziChrome";
+import { isHan, readingVariants } from "../../features/lesson/reading-variants";
 import strokes from "../../features/hanzi/strokes.json";
 import { judgeStroke, screenMedian, type Point } from "../../features/hanzi/stroke-match";
 
@@ -70,4 +73,29 @@ test("a long stroke written backwards, or somewhere else, does not match", () =>
   assert.equal(judgeStroke([...medians[0]].reverse(), medians, 0), "miss");
   const elsewhere = medians[0].map((p) => ({ x: p.x, y: p.y + 380 }));
   assert.equal(judgeStroke(elsewhere, medians, 0), "miss");
+});
+
+test("every word a child reads in 第一冊, and every 生字, shows its reading in the font", () => {
+  const annotated = JSON.parse(
+    readFileSync("assets/font-sources/KidLessonYoSans-readings.json", "utf8"),
+  ) as Record<string, string>;
+  const words = { ...hanziWordReadings, ...book1Readings };
+  const shown = [
+    ...book1Lessons.flatMap((lesson) => [lesson.number, lesson.title, ...lesson.characters]),
+    ...Object.keys(hanziWordReadings),
+  ];
+  for (const text of shown) {
+    assert.ok(words[text], `${text} needs its readings`);
+    const readings = words[text].split(" ");
+    const characters = Array.from(text);
+    assert.equal(readings.length, characters.filter(isHan).length, `${text}: one per character`);
+    const variants = readingVariants(text, words[text]);
+    let syllable = 0;
+    characters.forEach((character, index) => {
+      if (!isHan(character)) return;
+      const glyph = character + (variants[index] ?? "");
+      assert.ok(glyph in annotated, `${text}: ${character} is missing from the font`);
+      assert.equal(annotated[glyph], readings[syllable++], `${text}: ${character}`);
+    });
+  }
 });

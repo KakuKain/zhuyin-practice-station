@@ -9,7 +9,7 @@ import { taskDestination } from "../rewards/daily-tasks";
 
 import { PageHeading } from "../../components/PageHeading";
 import type { AppController } from "../usePracticeApp";
-import { builtinMaterialId } from "./materials";
+import { book1MaterialId, builtinMaterialId } from "./materials";
 import { ArrowRight } from "@phosphor-icons/react";
 import { AnnotatedText } from "../../components/AnnotatedText";
 import { lessonTitleGroups, lessonTitleVariants } from "../lesson/annotated-text";
@@ -17,6 +17,10 @@ import { lessonTitleGroups, lessonTitleVariants } from "../lesson/annotated-text
 // 數學's list loads when a child picks 數學 (and in the background once the course list is up).
 const MathCourseList = lazy(() =>
   import("../math/MathCourseList").then((m) => ({ default: m.MathCourseList })),
+);
+// 第一冊's list, when a child's material is 第一冊 rather than 首冊.
+const HanziCourseList = lazy(() =>
+  import("../hanzi/HanziCourseList").then((m) => ({ default: m.HanziCourseList })),
 );
 const EnglishCourseList = lazy(() =>
   import("../english/EnglishCourseList").then((m) => ({ default: m.EnglishCourseList })),
@@ -30,6 +34,7 @@ export function CourseList({
     | "openLesson"
     | "openMathLesson"
     | "openEnglishLesson"
+    | "openHanziLesson"
     | "practiceState"
     | "catalog"
     | "materialsState"
@@ -98,6 +103,10 @@ export function CourseList({
       ) : subject === "english" ? (
         <Suspense fallback={<Loading label="正在準備課程…" />}>
           <EnglishCourseList onOpen={app.openEnglishLesson} />
+        </Suspense>
+      ) : app.materialsState.activeId === book1MaterialId ? (
+        <Suspense fallback={<Loading label="正在準備課程…" />}>
+          <HanziCourseList onOpen={app.openHanziLesson} />
         </Suspense>
       ) : (
         <>

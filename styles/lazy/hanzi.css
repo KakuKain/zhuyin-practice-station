@@ -1,0 +1,301 @@
+/* 第一冊's 生字 (course list, lesson page and 筆順 practice), loaded with those screens. */
+
+/* Course cards: the lesson's first 生字 where the 注音 lessons have a picture. */
+.hanzi-card-characters {
+  display: flex;
+  flex: none;
+  gap: 2px;
+  margin-left: auto;
+  color: #b4544b;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1;
+}
+.hanzi-card-characters span {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1.5px dashed #e8b7af;
+  border-radius: 8px;
+  background: #fffdf7;
+}
+
+/* Lesson page */
+.hanzi-modes {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+.hanzi-parts-note {
+  margin: -4px 0 12px;
+  color: var(--ink-soft);
+}
+.hanzi-character-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.hanzi-character-card {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 10px 6px 8px;
+  border: 1.5px solid #ecd9c7;
+  border-radius: 16px;
+  background: #fffdf7;
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+.hanzi-character-card:focus-visible {
+  outline: 3px solid #2868b9;
+  outline-offset: 2px;
+}
+.hanzi-card-glyph {
+  display: block;
+  width: 64px;
+  height: 64px;
+}
+.hanzi-card-glyph .hanzi-glyph {
+  position: static;
+}
+.hanzi-card-reading {
+  font-size: 18px;
+}
+
+/* The 生字 drawn from its strokes. */
+.hanzi-glyph {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.hanzi-model.is-trace {
+  fill: #e6dfd6;
+}
+.hanzi-model.is-trace.is-next {
+  fill: #f4c3bb;
+}
+.hanzi-model.is-faint {
+  fill: #f1ece5;
+}
+.hanzi-ink {
+  fill: #3b3f58;
+  animation: hanzi-ink-in 0.25s ease-out;
+}
+.hanzi-glyph.is-finished {
+  animation: hanzi-hop 0.7s ease-out;
+}
+.hanzi-glyph.is-finished .hanzi-ink {
+  fill: #2f7d5b;
+  transition: fill 0.3s;
+}
+.hanzi-demo {
+  fill: none;
+  stroke: #e0706a;
+  stroke-width: 150;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  animation-name: hanzi-draw;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+.hanzi-hint-path {
+  fill: none;
+  stroke: #2f7fd6;
+  stroke-width: 16;
+  stroke-linecap: round;
+  stroke-dasharray: 34 28;
+  opacity: 0.85;
+}
+.hanzi-arrow-head {
+  fill: #2f7fd6;
+}
+.hanzi-start circle {
+  fill: #2f7fd6;
+  stroke: #fff;
+  stroke-width: 8;
+}
+.hanzi-start text {
+  fill: #fff;
+  font: 700 54px var(--font-ui, sans-serif);
+}
+@keyframes hanzi-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes hanzi-ink-in {
+  from {
+    opacity: 0.2;
+  }
+}
+@keyframes hanzi-hop {
+  30% {
+    transform: translateY(-4%) scale(1.04);
+  }
+  60% {
+    transform: translateY(1%) scale(0.99);
+  }
+}
+
+/* Practice */
+.hanzi-practice {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  width: min(100%, 720px);
+  margin: 0 auto;
+  padding: 12px 16px 24px;
+}
+.hanzi-prompt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px 16px;
+  padding: 10px 16px;
+  border-radius: 20px;
+  background: rgb(255 253 247 / 0.86);
+  box-shadow: 0 4px 16px rgb(110 82 52 / 0.1);
+}
+.hanzi-say {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border: 0;
+  border-radius: 50%;
+  background: #2f7fd6;
+  color: #fff;
+  cursor: pointer;
+}
+.hanzi-say:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.hanzi-character {
+  margin: 0;
+  font-size: 44px;
+  line-height: 1.1;
+}
+.hanzi-count {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 22px;
+}
+.hanzi-replay {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 48px;
+  padding: 6px 16px;
+  border: 1.5px solid #e8b7af;
+  border-radius: 999px;
+  background: #fff;
+  color: #9c4038;
+  font: inherit;
+  font-size: 18px;
+  cursor: pointer;
+}
+.hanzi-square {
+  position: relative;
+  width: min(100%, calc(100dvh - 300px), 620px);
+  min-width: 240px;
+  aspect-ratio: 1;
+  border-radius: 18px;
+  background: #fffdf7;
+  box-shadow: 0 6px 22px rgb(110 82 52 / 0.14);
+}
+.hanzi-square > .hanzi-glyph,
+.hanzi-grid,
+.hanzi-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.hanzi-grid rect {
+  fill: none;
+  stroke: #e3a49b;
+  stroke-width: 0.8;
+}
+.hanzi-grid path {
+  fill: none;
+  stroke: #ecbdb5;
+  stroke-width: 0.45;
+  stroke-dasharray: 2 2;
+}
+.hanzi-canvas {
+  touch-action: none;
+}
+.hanzi-mark {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.15);
+  color: #e2453c;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  animation: hanzi-mark 1.2s ease-out forwards;
+}
+@keyframes hanzi-mark {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.4);
+  }
+  15% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+  70% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+.hanzi-feedback {
+  min-height: 42px;
+  margin: 0;
+  color: #9c4038;
+  font-size: 22px;
+}
+
+/* Landscape tablets: the 生字 and its buttons beside the square. */
+@media (min-width: 900px) and (orientation: landscape) {
+  .hanzi-practice {
+    grid-template-columns: minmax(220px, 300px) auto;
+    align-items: center;
+    column-gap: 40px;
+    width: min(100%, 1100px);
+  }
+  .hanzi-prompt {
+    flex-direction: column;
+    grid-column: 1;
+  }
+  .hanzi-square {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    width: min(calc(100dvh - 120px), 640px);
+  }
+  .hanzi-feedback {
+    grid-column: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hanzi-glyph.is-finished,
+  .hanzi-ink {
+    animation: none;
+  }
+}

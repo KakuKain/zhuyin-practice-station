@@ -373,6 +373,7 @@ export const taskKeys = {
   lesson: (lessonIndex: number, task: "listening" | "fill") => `zhuyin:${lessonIndex}:${task}`,
   math: (lessonId: number) => `math:${lessonId}`,
   english: (lessonId: number, mode: "tap" | "write") => `english:${lessonId}:${mode}`,
+  hanzi: (lessonId: number) => `hanzi:${lessonId}`,
   sound: "sound",
   fix: "fix",
 } as const;

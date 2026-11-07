@@ -30,6 +30,7 @@ import { useStampBook } from "./rewards/useStampBook";
 import { taskKeys, type AwardLessonStamp } from "./rewards/stamp-book";
 import { lessonPlace } from "./rewards/daily-tasks";
 import type { EnglishMode } from "./english/english-lessons";
+import type { StrokeLevel } from "./hanzi/hanzi-round";
 
 /**
  * Cross-feature coordinator: the current view and lesson, shared stores, audio, the course
@@ -223,6 +224,22 @@ export function usePracticeApp() {
     setView("english");
   };
 
+  // 第一冊's 生字: a page per lesson, then 筆順 practice at the level the child picks.
+  const [hanziLessonId, setHanziLessonId] = useState(1);
+  const [hanziPractice, setHanziPractice] = useState<{
+    level: StrokeLevel;
+    /** One 生字 tapped on the lesson page, or a round chosen from the lesson's. */
+    character?: string;
+  }>({ level: "trace" });
+  const openHanziLesson = (id: number) => {
+    setHanziLessonId(id);
+    setView("hanzi-lesson");
+  };
+  const startHanziPractice = (level: StrokeLevel, character?: string) => {
+    setHanziPractice({ level, character });
+    setView("hanzi");
+  };
+
   const openLesson = (index: number) => {
     const nextLesson = catalog.find((item) => item.index === index);
     setSelectedLesson(index);
@@ -276,6 +293,10 @@ export function usePracticeApp() {
       case "english":
         return navigate("english-lesson");
       case "english-lesson":
+        return navigate("courses");
+      case "hanzi":
+        return navigate("hanzi-lesson");
+      case "hanzi-lesson":
         return navigate("courses");
       default:
         return navigate("courses");
@@ -341,6 +362,10 @@ export function usePracticeApp() {
     englishPractice,
     openEnglishLesson,
     startEnglishPractice,
+    hanziLessonId,
+    hanziPractice,
+    openHanziLesson,
+    startHanziPractice,
     subject,
     setSubject,
     morePanel,
