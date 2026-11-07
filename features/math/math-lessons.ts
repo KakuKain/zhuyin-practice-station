@@ -92,8 +92,18 @@ export const mathCourse: (MathLesson | ComingLesson)[] = [
     questions: 9,
     parts: ["堆疊與分類", "認識平面圖形", "做造型"],
   },
-  // 比大小 here compares numbers up to 30.
-  coming(6, "上", "第六課", "30以內的數", ["數到20", "數到30", "表示數量", "排在第幾個", "比大小"]),
+  {
+    id: 6,
+    term: "上",
+    number: "第六課",
+    title: "30以內的數",
+    ready: true,
+    practice: "write",
+    art: "thirty-straws",
+    questions: 9,
+    // 比大小 here compares numbers up to 30.
+    parts: ["數到20", "數到30", "表示數量", "排在第幾個", "比大小"],
+  },
   {
     id: 3,
     term: "上",
@@ -179,6 +189,9 @@ export const mathWordReadings: Record<string, string> = {
   合一合: "ㄏㄜˊ ㄧ ㄏㄜˊ",
   "10的分與合": "˙ㄉㄜ ㄈㄣ ㄩˇ ㄏㄜˊ",
   合起來是多少: "ㄏㄜˊ ㄑㄧˇ ˙ㄌㄞ ㄕˋ ㄉㄨㄛ ㄕㄠˇ",
+  數到20: "ㄕㄨˇ ㄉㄠˋ",
+  數到30: "ㄕㄨˇ ㄉㄠˋ",
+  比大小: "ㄅㄧˇ ㄉㄚˋ ㄒㄧㄠˇ",
   "0的加法": "˙ㄉㄜ ㄐㄧㄚ ㄈㄚˇ",
   加加看: "ㄐㄧㄚ ㄐㄧㄚ ㄎㄢˋ",
   // On the lesson page and practice screens.
@@ -206,6 +219,21 @@ export const mathWordReadings: Record<string, string> = {
   題: "ㄊㄧˊ",
   多畫了: "ㄉㄨㄛ ㄏㄨㄚˋ ˙ㄌㄜ",
   個: "ㄍㄜˋ",
+  // 第六課's pictures.
+  有: "ㄧㄡˇ",
+  再多: "ㄗㄞˋ ㄉㄨㄛ",
+  拿走: "ㄋㄚˊ ㄗㄡˇ",
+  根: "ㄍㄣ",
+  束: "ㄕㄨˋ",
+  前面: "ㄑㄧㄢˊ ㄇㄧㄢˋ",
+  人: "ㄖㄣˊ",
+  小朋友: "ㄒㄧㄠˇ ㄆㄥˊ ㄧㄡˇ",
+  剪刀: "ㄐㄧㄢˇ ㄉㄠ",
+  色紙: "ㄙㄜˋ ㄓˇ",
+  把: "ㄅㄚˇ",
+  張: "ㄓㄤ",
+  夠: "ㄍㄡˋ",
+  不夠: "ㄅㄨˋ ㄍㄡˋ",
 };
 
 /** A math word with the selectors that make it show its reading. */

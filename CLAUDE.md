@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-A login-free Zhuyin (注音) practice site for Taiwanese first graders and their parents: lessons 1–9 plus three review sets, a symbol chart, handwriting dictation, listening dictation, and sound discrimination. It also has 數學 (康軒 115, first grade), following the textbook's contents: 上學期 lessons 1 (10以內的數), 2 (比長短), 3 (排順序、比多少), 4 (分與合), 5 (方盒、圓罐、球) and 7 (10以內的加法) are built; 上學期 6, 8, 9 and all of 下學期 are listed as 製作中. 英語 follows the school's first-grade workbook: 第一課 Go to School (Aa Bb Cc) and 第二課 After School (Dd Ee Ff) are built; 複習一, 第三課 (Gg–Jj), 第四課 (Kk–Mm), 複習二 and 總複習 are 製作中. An optional 集章卡 (stamp card) rewards finished practice; it stays on the device and needs no login. UI copy and all docs are in Traditional Chinese (zh-Hant). `docs/architecture.md` is the detailed reference for feature boundaries and invariants. Read it before changing state, storage, audio, or ink behavior.
+A login-free Zhuyin (注音) practice site for Taiwanese first graders and their parents: lessons 1–9 plus three review sets, a symbol chart, handwriting dictation, listening dictation, and sound discrimination. It also has 數學 (康軒 115, first grade), following the textbook's contents: 上學期 lessons 1 (10以內的數), 2 (比長短), 3 (排順序、比多少), 4 (分與合), 5 (方盒、圓罐、球), 6 (30以內的數) and 7 (10以內的加法) are built; 上學期 8, 9 and all of 下學期 are listed as 製作中. 英語 follows the school's first-grade workbook: 第一課 Go to School (Aa Bb Cc) and 第二課 After School (Dd Ee Ff) are built; 複習一, 第三課 (Gg–Jj), 第四課 (Kk–Mm), 複習二 and 總複習 are 製作中. An optional 集章卡 (stamp card) rewards finished practice; it stays on the device and needs no login. UI copy and all docs are in Traditional Chinese (zh-Hant). `docs/architecture.md` is the detailed reference for feature boundaries and invariants. Read it before changing state, storage, audio, or ink behavior.
 
 Hard product constraints: no login, no DB, no cloud sync, no service worker or offline cache, no runtime AI or speech API calls, and no changes to the teacher-defined lesson scope. A web app manifest so the site can be added to the home screen (full screen, portrait-locked, no browser UI) is fine.
 
@@ -117,9 +117,9 @@ There is one build: a static Vite SPA. `index.html` → `app/main.tsx` → `crea
   - `mathCourse` in `math-lessons.ts` is the textbook's contents (康軒 一上 and 一下), in its order. A lesson not built yet is a `ComingLesson`: listed as 製作中 under 上學期 or 下學期, never opened. `mathLessons` is the built ones.
     - A lesson's `id` is permanent: saved rounds, records and tasks name it. The child sees the list position and `number`; the course card's station shows the position, not the id.
     - Id 3 has always been 加法, now 第七課 10以內的加法, so 第三課 排順序、比多少 is id 7. Other lessons use the id of their place (第四課 分與合 is 4, and so on); 下學期 is 10–18.
-    - `practice: "tap"` lessons (第二、三、五課) run in `CompareLesson`; `"write"` lessons (第一、四、七課) in `WritingLesson`.
+    - `practice: "tap"` lessons (第二、三、五課) run in `CompareLesson`; `"write"` lessons (第一、四、六、七課) in `WritingLesson`.
     - Each built lesson's `parts` are the textbook's sections, which the header names (`sectionOf`). The builders list a round in textbook order; `newVariedRound` (`math-variety.ts`) then mixes the order and, of 400 candidate rounds, keeps the one sharing the fewest numbers and pictures with that lesson's last round (`kid-math-recent-v1`, per child). The parent asked for both. A question that refers to the one before (「點第三個」 after 「點三個」) stays right after it.
-    - 第六課 30以內的數 will need 比大小 with numbers up to 30; the user moved 比大小 there from 第三課.
+    - The user moved 比大小 from 第三課 to 第六課, where it compares numbers up to 30.
   - Math is drawn like 國語 so the two subjects feel like one site:
     - `MathCourseList` uses the 注音 journey cards, with each lesson's watercolor picture (`MathLesson.art`).
     - `openMathLesson` sets `mathLessonId` and opens the `math-lesson` view. `MathLessonPage` is a 國語 lesson page inside the app shell: the heading over the picture, a 開始練習 mode card (plus 繼續上次的練習 when a round is saved, which turns the other card into 從頭開始), and 這一課's parts.
@@ -146,9 +146,12 @@ There is one build: a static Vite SPA. `index.html` → `app/main.tsx` → `crea
   - 第七課 10以內的加法 (id 3) asks 8: 3 合起來是多少 (two groups of up to 5 markable pictures; write the total), 2 0的加法 (a number and 0, then 0 and a number), then 3 加加看.
     - 0的加法 and 加加看 draw in a 十格框 for each number (cells 0–9 and 10–19), then write in an answer square (canvas 20). The 0's frame stays empty, and a circle there is extra. Each frame numbers its own circles; counting them together is the child's part. Tablets put the two frames side by side with ＝ and the answer below, landscape tablets in one row, and phones stack them.
     - Only 0的加法 may have a 0 part (`validParts`).
+  - 第六課 30以內的數 (id 6) follows the textbook's pages 84–103 (photos in the main checkout's git-ignored `outputs/textbook-photos/`). `buildThirtyRound` asks 9, all written: 數一數 11–15 and 16–20 (ten to a tray, `TrayPictures`), one more or one fewer (`step`, from 10 to 30), straws tied in tens (`bundle`, 21–30), 填填看 (five numbers up or down, two blank squares in `work`), 畫圈圈 for 11–30 in three 十格框 (`drawFrames`; circles numbered on from frame to frame, extra ones counted across all three), 排在第幾個 (`queue`: 「前面排了十六個人，他排第幾個？」 or 「他排在第二十三個，前面有幾個人？」), 比大小 (write the larger or smaller of two numbers) and 夠不夠 (circle 夠 or 不夠 drawn under the ink).
+    - Numbers past 10 are shown on the screen, so its prompts have none except 排在第幾個's (`queue-place-10…29`, `queue-ahead-11…30`); the rest are fixed clips (`step-more`, `bundle`, `fill`, `draw-many`, `larger-more`, `enough-scissors`…).
+    - Its pictures are in `ThirtyViews.tsx`; the course picture `thirty-straws.webp` is drawn in code (original in `assets/artwork/`), like 第五課's.
   - Each question has its own clip (`split-…`, `combine-…`, `ways-10`, `join-a-b`, `add-a-b`, `add-3-0`). Counting says 兩個, but a sum says 二加三 and 三加零.
   - Questions say 和 (ㄏㄢˋ) and 合在一起. The fonts now also show 來 as ˙ㄌㄞ (for the section 合起來是多少), so a prompt could say 合起來, though no clip does yet.
-  - 第一、四、七課 share `WritingLesson` in `MathScreen.tsx`. The ink pieces live in `MathInk.tsx` and the pictures in `MathPictures.tsx`.
+  - 第一、四、六、七課 share `WritingLesson` in `MathScreen.tsx`. The ink pieces live in `MathInk.tsx` and the pictures in `MathPictures.tsx`.
   - The parent checks the round at the end.
     - Each lesson's unfinished round persists per child: lesson 1 in `kid-math-round-v1`, others in `kid-math-round-v1-<lesson>` (`mathRoundStorageKey`). Starting one lesson never replaces another's.
     - The circles live in `MathRound.work`. Finished rounds go to `kid-math-records-v1`.

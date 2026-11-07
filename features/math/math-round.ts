@@ -40,7 +40,29 @@ export type MathQuestion =
   /** 合一合：both parts are given in a 分合圖; write the total on top. */
   | { kind: "combine"; target: number; parts: [number, number]; icon: JoinIcon }
   /** 分分看：only the total is given; write any two numbers that make it. */
-  | { kind: "ways"; target: number; icon: CountIcon };
+  | { kind: "ways"; target: number; icon: CountIcon }
+  /** 多一個、少一個 (第六課): things in trays of ten, then one more or one taken; write how many. */
+  | { kind: "step"; target: number; from: number; icon: CountIcon }
+  /** 10根一束 (第六課): straws tied in tens and loose ones; write how many in all. */
+  | { kind: "bundle"; target: number }
+  /** 填填看 (第六課): five numbers in order, up or down, two left blank; write both. */
+  | { kind: "fill"; target: number; numbers: number[]; blanks: [number, number] }
+  /**
+   * 排在第幾個 (第六課): 「前面排了十六個人，他排第幾個？」 (ask `place`, the answer is one more) or
+   * 「他排在第二十三個，前面有幾個人？」 (ask `ahead`, one fewer).
+   */
+  | { kind: "queue"; target: number; given: number; ask: "place" | "ahead" }
+  /** 比大小 (第六課): two numbers; write the larger, or the smaller. */
+  | { kind: "larger"; target: number; numbers: [number, number]; ask: "more" | "less" }
+  /**
+   * 夠不夠 (第六課): one each for so many people; are the things enough? The child circles 夠 or
+   * 不夠. `target` is how many things there are.
+   */
+  | { kind: "enough"; target: number; people: number; thing: EnoughThing };
+
+/** What 夠不夠 hands out, one to each person, as the textbook's 剪刀 and 色紙. */
+export const enoughThings = ["scissors", "paper"] as const;
+export type EnoughThing = (typeof enoughThings)[number];
 
 export type MathRound = {
   version: 1;
@@ -49,9 +71,9 @@ export type MathRound = {
   /** Strokes per question, in the 0–100 coordinates of its square. */
   ink: Record<number, InkStroke[]>;
   /**
-   * Circles drawn in 十格框 (5 × 2 cells, one circle each): 畫圈圈 has one frame, 畫圈圈算加法
-   * one per number (cells 0–9 and 10–19). 分分看 writes its two numbers here (cells 0 and 1).
-   * Any other written answer stays in ink.
+   * Circles drawn in 十格框 (5 × 2 cells, one circle each): 畫圈圈 has one frame (three for a
+   * number past 10), 畫圈圈算加法 one per number (cells 0–9 and 10–19). 分分看 and 填填看 write
+   * their two numbers here (cells 0 and 1). Any other written answer stays in ink.
    */
   work: Record<number, InkStroke[][]>;
   index: number;
@@ -67,13 +89,15 @@ export type MathRound = {
 export const mathRoundSize = { count: 5, draw: 4 } as const;
 /** A 十格框: two rows of five, the way a child lines up circles to count them. */
 export const frameCells = 10;
-/** How many cells a question keeps in `work`: 十格框 cells, or 分分看's two squares. */
+/** 畫圈圈 past 10 (第六課 表示數量, up to 30) has three 十格框, whatever the number. */
+export const drawFrames = (target: number) => (target > frameCells ? 3 : 1);
+/** How many cells a question keeps in `work`: 十格框 cells, or two written numbers. */
 export const workCells = (question: MathQuestion) =>
   question.kind === "draw"
-    ? frameCells
+    ? drawFrames(question.target) * frameCells
     : question.kind === "add"
       ? 2 * frameCells
-      : question.kind === "ways"
+      : question.kind === "ways" || question.kind === "fill"
         ? 2
         : 0;
 /** 第四課 分與合: 分一分, 合一合, then 10的分與合 (one of each, all making 10). */
@@ -81,6 +105,22 @@ export const bondRoundSize = { split: 3, combine: 2, ten: 3 } as const;
 /** 第七課 10以內的加法: 合起來是多少, 0的加法, 加加看. */
 export const additionRoundSize = { join: 3, zero: 2, add: 3 } as const;
 export const maxCount = 10;
+/**
+ * 第六課 30以內的數, in the textbook's order: 數到20 (數一數 11–15 and 16–20, one more or one
+ * fewer), 數到30 (tens of straws, 填填看), 表示數量 (畫圈圈 in three 十格框), 排在第幾個 and 比大小
+ * (which is larger, then 夠不夠).
+ */
+export const thirtyRoundSize = {
+  count: 2,
+  step: 1,
+  bundle: 1,
+  fill: 1,
+  draw: 1,
+  queue: 1,
+  larger: 1,
+  enough: 1,
+} as const;
+export const maxThirty = 30;
 
 const shuffle = <T>(items: readonly T[], random: () => number) => {
   const result = [...items];
@@ -199,9 +239,69 @@ export function buildAdditionRound(random = Math.random): MathQuestion[] {
   ];
 }
 
+const between = (from: number, to: number, random: () => number) =>
+  from + Math.floor(random() * (to - from + 1));
+
+/**
+ * 第六課 30以內的數 (lesson id 6), in the textbook's order. Numbers come from the pages: 數一數
+ * 11–20 with ten in a tray, one more up to 30 or one fewer from 30, straws in tens past 20, five
+ * numbers in order (up or down) with two to fill, circles for 11–30, a queue of up to 30, and
+ * comparing numbers that cross a ten (26 和 15) or are close (27 和 23).
+ */
+export function buildThirtyRound(random = Math.random): MathQuestion[] {
+  const pictures = shuffle(countIcons, random);
+  const up = random() < 0.5;
+  const from = up ? between(10, 29, random) : between(11, 30, random);
+  const start = up ? between(1, 26, random) : between(5, 30, random);
+  const numbers = Array.from({ length: 5 }, (_, index) => start + (up ? index : -index));
+  // The first number is always shown, and one of the next two, so the direction is clear.
+  const blanks = shuffle(
+    [
+      [1, 3],
+      [1, 4],
+      [2, 3],
+      [2, 4],
+      [3, 4],
+    ] as [number, number][],
+    random,
+  )[0];
+  const ahead = random() < 0.5;
+  const given = ahead ? between(11, 30, random) : between(10, 29, random);
+  const first = between(5, 30, random);
+  let second = between(1, 30, random);
+  while (Math.abs(second - first) < 2) second = between(1, 30, random);
+  const people = between(11, 25, random);
+  let things = people + between(-4, 4, random);
+  if (things === people) things += random() < 0.5 ? 1 : -1;
+  const larger: [number, number] = [first, second];
+  const more = random() < 0.5;
+  return [
+    { kind: "count", target: between(11, 15, random), icon: pictures[0] },
+    { kind: "count", target: between(16, 20, random), icon: pictures[1] },
+    { kind: "step", target: from + (up ? 1 : -1), from, icon: pictures[2] },
+    { kind: "bundle", target: between(21, 30, random) },
+    { kind: "fill", target: numbers[0], numbers, blanks },
+    { kind: "draw", target: between(11, 30, random) },
+    { kind: "queue", target: ahead ? given - 1 : given + 1, given, ask: ahead ? "ahead" : "place" },
+    {
+      kind: "larger",
+      target: more ? Math.max(...larger) : Math.min(...larger),
+      numbers: larger,
+      ask: more ? "more" : "less",
+    },
+    {
+      kind: "enough",
+      target: things,
+      people,
+      thing: enoughThings[Math.floor(random() * enoughThings.length)],
+    },
+  ];
+}
+
 const roundBuilders: Record<number, (random?: () => number) => MathQuestion[]> = {
   3: buildAdditionRound,
   4: buildBondRound,
+  6: buildThirtyRound,
 };
 
 export function newMathRound(lessonId: number, now = Date.now()): MathRound {
@@ -219,8 +319,9 @@ export function newMathRound(lessonId: number, now = Date.now()): MathRound {
   };
 }
 
-const validTarget = (value: unknown) =>
-  Number.isInteger(value) && (value as number) >= 0 && (value as number) <= maxCount;
+const validNumber = (value: unknown, most = maxThirty) =>
+  Number.isInteger(value) && (value as number) >= 0 && (value as number) <= most;
+const validTarget = (value: unknown) => validNumber(value, maxCount);
 
 /** Two parts that make the total; 0的加法 lets one of them be 0. */
 function validParts(value: unknown, target: number, zero = false): [number, number] | null {
@@ -237,9 +338,83 @@ function validParts(value: unknown, target: number, zero = false): [number, numb
     : null;
 }
 
+/** 第六課's questions, with numbers up to 30. */
+function validThirty(item: Partial<Record<string, unknown>>): MathQuestion | null {
+  if (!validNumber(item.target)) return null;
+  const target = item.target as number;
+  const icon = item.icon as CountIcon;
+  if (item.kind === "count" && target > maxCount && countIcons.includes(icon))
+    return { kind: "count", target, icon };
+  if (item.kind === "draw" && target > maxCount) return { kind: "draw", target };
+  if (item.kind === "bundle" && target >= 1) return { kind: "bundle", target };
+  if (
+    item.kind === "step" &&
+    validNumber(item.from) &&
+    Math.abs(target - (item.from as number)) === 1 &&
+    countIcons.includes(icon)
+  )
+    return { kind: "step", target, from: item.from as number, icon };
+  if (item.kind === "fill") {
+    const numbers = item.numbers;
+    const blanks = item.blanks;
+    if (
+      Array.isArray(numbers) &&
+      numbers.length === 5 &&
+      numbers.every((value) => validNumber(value)) &&
+      numbers[0] === target &&
+      Math.abs(numbers[1] - numbers[0]) === 1 &&
+      numbers.every((value, index) => value === numbers[0] + index * (numbers[1] - numbers[0])) &&
+      Array.isArray(blanks) &&
+      blanks.length === 2 &&
+      blanks.every((value) => Number.isInteger(value) && value >= 1 && value <= 4) &&
+      blanks[0] < blanks[1]
+    )
+      return {
+        kind: "fill",
+        target,
+        numbers: [...numbers] as number[],
+        blanks: [blanks[0], blanks[1]],
+      };
+  }
+  if (
+    item.kind === "queue" &&
+    validNumber(item.given) &&
+    (item.ask === "place" || item.ask === "ahead") &&
+    target === (item.given as number) + (item.ask === "place" ? 1 : -1)
+  )
+    return { kind: "queue", target, given: item.given as number, ask: item.ask };
+  if (item.kind === "larger") {
+    const numbers = item.numbers;
+    if (
+      Array.isArray(numbers) &&
+      numbers.length === 2 &&
+      numbers.every((value) => validNumber(value)) &&
+      numbers[0] !== numbers[1] &&
+      (item.ask === "more" || item.ask === "less") &&
+      target === (item.ask === "more" ? Math.max(...numbers) : Math.min(...numbers))
+    )
+      return { kind: "larger", target, numbers: [numbers[0], numbers[1]], ask: item.ask };
+  }
+  if (
+    item.kind === "enough" &&
+    validNumber(item.people) &&
+    (item.people as number) > 0 &&
+    enoughThings.includes(item.thing as EnoughThing)
+  )
+    return {
+      kind: "enough",
+      target,
+      people: item.people as number,
+      thing: item.thing as EnoughThing,
+    };
+  return null;
+}
+
 function validQuestion(raw: unknown): MathQuestion | null {
   if (!raw || typeof raw !== "object") return null;
   const item = raw as Partial<Record<string, unknown>>;
+  const thirty = validThirty(item);
+  if (thirty) return thirty;
   if (!validTarget(item.target)) return null;
   const target = item.target as number;
   if (item.kind === "draw") return { kind: "draw", target };
@@ -354,19 +529,22 @@ export function clearMathRound(lessonId: number) {
   }
 }
 
-/** Cells of a 十格框 with a circle in them. */
-export const filledCells = (cells: InkStroke[][] | undefined, from = 0) =>
-  (cells ?? []).slice(from, from + frameCells).filter((strokes) => strokes.length > 0).length;
+/** Cells of a 十格框 (or of `size` cells, such as three frames) with a circle in them. */
+export const filledCells = (cells: InkStroke[][] | undefined, from = 0, size = frameCells) =>
+  (cells ?? []).slice(from, from + size).filter((strokes) => strokes.length > 0).length;
 
 /**
- * A question counts as answered once it has a written answer, or, for 畫圈圈, a circle in the
- * frame (or ink from before the frame). 分分看 needs both of its numbers.
+ * A question counts as answered once it has a written answer, or, for 畫圈圈, a circle in a
+ * frame (or ink from before the frame). 分分看 and 填填看 need both of their numbers.
  */
 export const isAnswered = (round: MathRound, index: number) => {
-  const kind = round.questions[index]?.kind;
-  if (kind === "ways") return filledCells(round.work[index]) === 2;
+  const question = round.questions[index];
+  if (!question) return false;
+  const cells = round.work[index];
+  if (question.kind === "ways" || question.kind === "fill") return filledCells(cells) === 2;
   return (
-    (round.ink[index]?.length ?? 0) > 0 || (kind === "draw" && filledCells(round.work[index]) > 0)
+    (round.ink[index]?.length ?? 0) > 0 ||
+    (question.kind === "draw" && filledCells(cells, 0, workCells(question)) > 0)
   );
 };
 

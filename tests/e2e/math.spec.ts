@@ -641,15 +641,16 @@ test("第三課 排順序、比多少 is tapped: 排數字, 排在第幾個, 第
     [2, /第三課.*排順序、比多少/],
     [3, /第四課.*分與合/],
     [4, /第五課.*方盒、圓罐、球/],
-    [5, /第六課.*30以內的數.*製作中/],
+    [5, /第六課.*30以內的數/],
     [6, /第七課.*10以內的加法/],
+    [7, /第八課.*10以內的減法.*製作中/],
     [8, /第九課.*幾點鐘.*製作中/],
     [9, /第一課.*50以內的數.*製作中/],
     [17, /第九課.*幾月幾日星期幾.*製作中/],
   ] as const)
     await expect(cards.nth(index)).toHaveText(title);
-  await expect(cards.nth(4)).not.toContainText("製作中");
-  await expect(cards.nth(5)).toBeDisabled();
+  await expect(cards.nth(5)).not.toContainText("製作中");
+  await expect(cards.nth(7)).toBeDisabled();
   await page.getByRole("button", { name: /數學第三課/ }).click();
   await expect(page.getByRole("heading", { name: "排順序、比多少" })).toBeVisible();
   await page.getByRole("button", { name: "開始練習", exact: true }).click();
@@ -882,5 +883,97 @@ test("第五課 方盒、圓罐、球 is tapped: 分類, 疊疊看、滾滾看, 
   );
   expect(records.rounds[0]).toMatchObject({ lessonId: 5, total: 9 });
   expect(records.rounds[0].needsPractice).toEqual([{ kind: missed }]);
+  expect(errors).toEqual([]);
+});
+
+test("第六課 30以內的數 counts by tens, fills the missing numbers, draws in three 十格框 and compares, then the parent checks", async ({
+  page,
+}) => {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("./");
+  await page.getByRole("button", { name: "數學", exact: true }).click();
+  await page.getByRole("button", { name: /數學第六課/ }).click();
+  await expect(page.getByRole("heading", { name: "30以內的數" })).toBeVisible();
+  await page.getByRole("button", { name: "開始練習", exact: true }).click();
+  const header = page.locator(".math-header");
+  const audio = page.locator("audio");
+  await expect(header).toContainText("第 1 題 / 9");
+  const questions = await savedQuestions(page, "kid-math-round-v1-6");
+  const at = (kind: string) => questions.findIndex((question) => question.kind === kind);
+
+  // 數到20: ten to a tray, so 13 is a full tray and three more.
+  const count = at("count");
+  await goToQuestion(page, count);
+  await expect(header).toContainText("數到20");
+  await expect(audio).toHaveAttribute("data-clip-text", "數一數，有幾個？用筆寫出數字。");
+  await expect(page.locator(".math-tray")).toHaveCount(2);
+  await expect(page.locator(".math-tray button")).toHaveCount(questions[count].target);
+  const picture = page.locator(".math-tray button").first();
+  await picture.click();
+  await expect(picture).toHaveAttribute("aria-pressed", "true");
+  await stroke(page, page.getByLabel("寫數字"), [
+    [30, 25],
+    [70, 25],
+    [45, 80],
+  ]);
+
+  // 填填看: two squares in the row; only one is written, so the parent sees it unanswered.
+  await goToQuestion(page, at("fill"));
+  await expect(header).toContainText("數到30");
+  await expect(audio).toHaveAttribute("data-clip-text", "填填看，少了哪兩個數？用筆寫出數字。");
+  await expect(page.locator(".math-fill-row .math-number-card")).toHaveCount(3);
+  await stroke(page, page.getByLabel("寫第一個空格的數"), [
+    [40, 20],
+    [40, 80],
+  ]);
+  await expect(page.getByLabel("寫第二個空格的數")).toBeVisible();
+
+  // 表示數量: three 十格框 whatever the number; circles are numbered on from frame to frame.
+  const draw = at("draw");
+  await goToQuestion(page, draw);
+  await expect(header).toContainText("表示數量");
+  await expect(audio).toHaveAttribute("data-clip-text", "看數字，畫出一樣多的圈圈。");
+  const cells = page.locator(".math-draw .math-frame canvas");
+  await expect(cells).toHaveCount(30);
+  await stroke(page, cells.nth(20), circle(50, 50));
+  await stroke(page, cells.nth(0), circle(50, 50));
+  await expect(page.locator(".math-frame-number")).toHaveText(["1", "2"]);
+
+  // 排在第幾個 says its number; 夠不夠 is circled.
+  await goToQuestion(page, at("queue"));
+  await expect(header).toContainText("排在第幾個");
+  await expect(audio).toHaveAttribute(
+    "data-clip-text",
+    /^(前面排了.+個人，他排第幾個？|他排在第.+個，前面有幾個人？)$/,
+  );
+  const enough = at("enough");
+  await goToQuestion(page, enough);
+  await expect(header).toContainText("比大小");
+  await expect(page.locator(".math-enough-choices")).toContainText("不夠");
+  await stroke(page, page.getByLabel("圈出夠或不夠"), circle(25, 50));
+
+  await goToQuestion(page, 8);
+  await page.getByRole("button", { name: "寫完了，請家長檢查" }).click();
+  const cards = page.locator(".math-check-card");
+  await expect(cards).toHaveCount(9);
+  const toggle = (index: number) => cards.nth(index).locator(".math-check-toggle");
+  await expect(toggle(count)).toHaveAttribute("aria-pressed", "false");
+  await expect(toggle(at("fill"))).toHaveAttribute("aria-pressed", "true");
+  await expect(toggle(draw)).toHaveAttribute("aria-pressed", "false");
+  await expect(cards.nth(draw)).toContainText("畫了 2 格");
+  await expect(cards.nth(draw).locator(".math-frame.is-preview")).toHaveCount(3);
+  const { target, people } = questions[enough] as SavedQuestion & { people: number };
+  await expect(cards.nth(enough).locator(".math-check-key")).toContainText(
+    target >= people ? /^答案夠$/ : "不夠",
+  );
+  await page.getByRole("button", { name: "檢查完成" }).click();
+  await expect(page.getByRole("heading", { name: "這一課練完了！" })).toBeVisible();
+  const stored = await page.evaluate(() => ({
+    records: JSON.parse(localStorage.getItem("kid-math-records-v1") ?? "{}"),
+    round: localStorage.getItem("kid-math-round-v1-6"),
+  }));
+  expect(stored.records.rounds[0]).toMatchObject({ lessonId: 6, total: 9 });
+  expect(stored.round).toBeNull();
   expect(errors).toEqual([]);
 });

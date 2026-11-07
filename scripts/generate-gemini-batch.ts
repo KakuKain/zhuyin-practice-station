@@ -361,13 +361,25 @@ try {
       const text = prompt(batch);
       const id = nextId(batch[0].kind);
       let audio;
+      let hiccups = 0;
       // A 429 may be the per-minute limit: wait a minute, twice, before calling it a day.
       for (let attempt = 1; !audio; attempt++) {
         try {
           audio = await generate(text, apiKey);
         } catch (error) {
+          // A dropped connection (fetch failed) or a busy server (Gemini 503) is tried again after
+          // a pause, four times.
+          const busy = error instanceof Error && /^Gemini 5\d\d/.test(error.message);
+          if ((error instanceof TypeError || busy) && hiccups < 4) {
+            hiccups++;
+            attempt--;
+            console.log(`The request failed (${(error as Error).message}); trying again.`);
+            await new Promise((resolve) => setTimeout(resolve, 30_000 * hiccups));
+            continue;
+          }
           if (!(error instanceof QuotaError)) throw error;
-          if (attempt === 3) break;
+          // The daily limit names itself; only the per-minute one is worth waiting out.
+          if (attempt === 3 || /per day/.test(error.message)) break;
           console.log(`Quota reached (${error.message}); waiting a minute.`);
           await new Promise((resolve) => setTimeout(resolve, 65_000));
         }

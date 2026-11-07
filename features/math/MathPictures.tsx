@@ -35,7 +35,7 @@ export const icons: Record<CountIcon, { icon: Icon; color: string; name: string 
 };
 
 /** A picture a child can tap to mark as counted, so nothing is counted twice. */
-function Markable({
+export function Markable({
   picture: Picture,
   color,
   label,

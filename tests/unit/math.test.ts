@@ -7,7 +7,10 @@ import {
   buildAdditionRound,
   buildBondRound,
   buildCountingRound,
+  buildThirtyRound,
   countIcons,
+  drawFrames,
+  enoughThings,
   filledCells,
   frameCells,
   isAnswered,
@@ -15,6 +18,7 @@ import {
   workCells,
   mathRoundSize,
   newMathRound,
+  thirtyRoundSize,
   validateMathRound,
 } from "../../features/math/math-round";
 import {
@@ -381,6 +385,7 @@ test("the math course cards, lesson pages and practice screens show every word i
     sequenceRoundSize,
     bondRoundSize,
     shapeRoundSize,
+    thirtyRoundSize,
     additionRoundSize,
   ].map((size) =>
     typeof size === "number" ? size : Object.values(size).reduce((sum, n) => sum + n, 0),
@@ -743,6 +748,7 @@ test("a new round mixes the kinds of question and avoids the last round's number
     buildSequenceRound,
     buildBondRound,
     buildShapeRound,
+    buildThirtyRound,
     buildAdditionRound,
   ];
   for (const build of builders) {
@@ -776,4 +782,105 @@ test("a new round mixes the kinds of question and avoids the last round's number
     const group = round.findIndex((question) => question.kind === "group");
     assert.equal(round[group + 1].kind, "nth");
   }
+});
+
+test("a 第六課 round walks 數到20, 數到30, 表示數量, 排在第幾個 and 比大小, with numbers up to 30", () => {
+  const size = Object.values(thirtyRoundSize).reduce((sum, n) => sum + n, 0);
+  for (let run = 0; run < 300; run++) {
+    const round = buildThirtyRound();
+    assert.equal(round.length, size);
+    // The textbook's order, before a round mixes it.
+    assert.deepEqual(
+      round.map((question) => question.kind),
+      ["count", "count", "step", "bundle", "fill", "draw", "queue", "larger", "enough"],
+    );
+    const [low, high, step, bundle, fill, draw, queue, larger, enough] = round;
+    assert.ok(low.kind === "count" && low.target >= 11 && low.target <= 15);
+    assert.ok(high.kind === "count" && high.target >= 16 && high.target <= 20);
+    assert.notEqual(low.kind === "count" && low.icon, high.kind === "count" && high.icon);
+    // One more up to 30, or one fewer from 30; never below 10.
+    assert.ok(step.kind === "step" && Math.abs(step.target - step.from) === 1);
+    assert.ok(step.from >= 10 && step.target >= 10 && Math.max(step.from, step.target) <= 30);
+    assert.ok(bundle.kind === "bundle" && bundle.target >= 21 && bundle.target <= 30);
+    // Five numbers in order, up or down, all from 1 to 30; the first and one of the next two
+    // are shown, so the direction is clear.
+    assert.ok(fill.kind === "fill");
+    const by = fill.numbers[1] - fill.numbers[0];
+    assert.ok(Math.abs(by) === 1);
+    assert.ok(fill.numbers.every((value, index) => value === fill.numbers[0] + index * by));
+    assert.ok(fill.numbers.every((value) => value >= 1 && value <= 30));
+    assert.ok(!fill.blanks.includes(0) && !(fill.blanks.includes(1) && fill.blanks.includes(2)));
+    assert.ok(draw.kind === "draw" && draw.target >= 11 && draw.target <= 30);
+    assert.equal(workCells(draw), 3 * frameCells);
+    assert.ok(queue.kind === "queue");
+    assert.equal(queue.target, queue.given + (queue.ask === "place" ? 1 : -1));
+    assert.ok(queue.target >= 10 && queue.target <= 30);
+    assert.ok(larger.kind === "larger" && larger.numbers[0] !== larger.numbers[1]);
+    assert.ok(Math.abs(larger.numbers[0] - larger.numbers[1]) >= 2);
+    assert.equal(
+      larger.target,
+      larger.ask === "more" ? Math.max(...larger.numbers) : Math.min(...larger.numbers),
+    );
+    // 夠不夠 is never a tie, and never far off: 16 人 and 13 把剪刀.
+    assert.ok(enough.kind === "enough" && enough.target !== enough.people);
+    assert.ok(Math.abs(enough.target - enough.people) <= 4);
+    assert.ok(enoughThings.includes(enough.thing));
+    // Every question has its instruction, read aloud from a clip.
+    for (const question of round) {
+      const id = mathPromptId(question);
+      assert.ok(mathPrompts[id], id);
+      const path = mathPromptUrl(id).split("?")[0];
+      assert.ok(existsSync(`public/${path}`), path);
+    }
+  }
+  assert.equal(drawFrames(10), 1);
+  assert.equal(drawFrames(11), 3);
+  assert.equal(mathPrompts["queue-place-16"], "前面排了十六個人，他排第幾個？");
+  assert.equal(mathPrompts["queue-ahead-23"], "他排在第二十三個，前面有幾個人？");
+  assert.equal(mathPrompts["queue-ahead-30"], "他排在第三十個，前面有幾個人？");
+  assert.equal(mathPrompts["enough-scissors"], "一個人拿一把剪刀，剪刀夠不夠？圈出答案。");
+});
+
+test("a saved 第六課 round keeps three 十格框 and 填填看's two numbers, and checks what it reads", () => {
+  const fresh = newMathRound(6, 100);
+  const index = (kind: string) => fresh.questions.findIndex((question) => question.kind === kind);
+  const [draw, fill] = [index("draw"), index("fill")];
+  // Circles in all three frames count together; 填填看 needs both of its numbers.
+  const circles = Array.from({ length: 30 }, (_, cell) =>
+    cell === 0 || cell === 25 ? [[{ x: 50, y: 50 }]] : [],
+  );
+  const work = { [draw]: circles, [fill]: [[[{ x: 1, y: 1 }]], []] };
+  const restored = validateMathRound(JSON.parse(JSON.stringify({ ...fresh, work })))!;
+  assert.deepEqual(restored.questions, fresh.questions);
+  assert.deepEqual(restored.work, work);
+  assert.equal(filledCells(restored.work[draw], 0, 30), 2);
+  assert.ok(isAnswered(restored, draw));
+  assert.ok(!isAnswered(restored, fill));
+  const both = { ...work, [fill]: [[[{ x: 1, y: 1 }]], [[{ x: 2, y: 2 }]]] };
+  assert.ok(isAnswered({ ...restored, work: both }, fill));
+  // One frame's cells do not fit three frames.
+  assert.deepEqual(
+    validateMathRound({ ...fresh, work: { [draw]: circles.slice(0, 10) } })!.work,
+    {},
+  );
+  // A question whose numbers disagree is dropped with its round.
+  const broken = (change: object) =>
+    validateMathRound({
+      ...fresh,
+      questions: fresh.questions.map((question, at) =>
+        at === 0 ? { ...question, ...change } : question,
+      ),
+    });
+  const first = fresh.questions[0];
+  const damage: Record<string, object> = {
+    count: { target: 31 },
+    step: { target: first.kind === "step" ? first.from + 2 : 0 },
+    bundle: { target: 40 },
+    fill: { numbers: [1, 2, 4, 5, 6] },
+    draw: { target: 31 },
+    queue: { target: 40 },
+    larger: { ask: "most" },
+    enough: { thing: "pencil" },
+  };
+  assert.equal(broken(damage[first.kind]), null);
 });
