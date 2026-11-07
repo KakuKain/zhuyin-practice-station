@@ -32,10 +32,10 @@ const noOverflow = (page: Page) =>
     .poll(() => page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth))
     .toBeLessThanOrEqual(0);
 
-test("第一冊's 筆順 marks a stroke out of order and finishes a 生字 written in order", async ({
+test("第一冊 練習 picks a 生字 from the list, marks a stroke out of order, and goes on to the next", async ({
   page,
 }) => {
-  test.setTimeout(120_000);
+  test.setTimeout(150_000);
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("./");
@@ -44,14 +44,24 @@ test("第一冊's 筆順 marks a stroke out of order and finishes a 生字 writt
   await noOverflow(page);
   await page.getByRole("button", { name: /第一課，拍拍手/ }).click();
   await expect(page.locator(".hanzi-character-card")).toHaveCount(9);
-  await expect(page.getByRole("button", { name: /描一描，照著/ })).toBeVisible();
+  await expect(page.getByRole("button", { name: "聽寫，製作中" })).toBeDisabled();
   await noOverflow(page);
 
-  await page.getByRole("button", { name: /描一描「拍」/ }).click();
-  await expect(page.locator(".math-header")).toContainText("第 1 個字 / 1");
+  // 練習 opens on the list of the lesson's 生字.
+  await page.getByRole("button", { name: /^練習，9 個生字/ }).click();
+  const list = page.getByRole("dialog", { name: "選一個字" });
+  await expect(list.locator(".hanzi-character-card")).toHaveCount(9);
+  await list.getByRole("button", { name: /練習「拍」/ }).click();
+  await expect(list).toBeHidden();
+  const step = page.locator(".hanzi-steps .is-current");
+  await expect(step).toContainText("看一看");
   const canvas = page.locator(".hanzi-canvas");
   await canvas.scrollIntoViewIfNeeded();
   await noOverflow(page);
+  // A touch during the demonstration goes on to tracing.
+  await canvas.click({ position: { x: 4, y: 4 } });
+  await expect(step).toContainText("描一描");
+
   const medians = data["拍"].medians;
   // The second stroke first: a red ✗, and nothing is inked.
   await write(page, canvas, medians[1]);
@@ -61,10 +71,20 @@ test("第一冊's 筆順 marks a stroke out of order and finishes a 生字 writt
     await write(page, canvas, median);
     await expect(page.locator(".hanzi-ink")).toHaveCount(i + 1);
   }
-  await expect(page.locator(".hanzi-glyph.is-finished")).toBeVisible();
-  await expect(page.locator(".math-result")).toContainText("寫完了！");
-  await expect(page.locator(".math-result")).toContainText("沒有用提示");
-  await page.getByRole("button", { name: "回到這一課" }).click();
-  await expect(page.locator(".hanzi-character-card")).toHaveCount(9);
+  // Then the same 生字 in an empty square.
+  await expect(step).toContainText("寫一寫");
+  for (const median of medians) await write(page, canvas, median);
+  await expect(page.locator(".hanzi-feedback")).toContainText("寫對了");
+  await expect(page.getByRole("button", { name: "再寫一次" })).toBeVisible();
+  await page.getByRole("button", { name: "下一個字：手" }).click();
+  await expect(page.locator(".hanzi-character")).toContainText("手");
+  await expect(step).toContainText("看一看");
+
+  // The list marks 拍 as written.
+  await page.getByRole("button", { name: /生字清單/ }).click();
+  await expect(list.getByRole("button", { name: "練習「拍」，練過了" })).toBeVisible();
+  await list.getByRole("button", { name: "關閉" }).click();
+  await page.getByRole("button", { name: "返回" }).click();
+  await expect(page.getByRole("button", { name: /練習「拍」.*練過了/ })).toBeVisible();
   expect(errors).toEqual([]);
 });

@@ -1,23 +1,16 @@
 import { childKey } from "../../lib/storage/child-profiles";
 import { storageKeys } from "../../lib/storage/storage-keys";
-import { book1Lessons } from "./book1-characters";
 
-/**
- * How much of the model a child sees: 描一描 (the character in pale ink, the next stroke's start
- * numbered), 看著寫 (the character, fainter, without numbers) or 自己寫 (an empty square).
- */
-export type StrokeLevel = "trace" | "faint" | "blank";
-export const strokeLevels: StrokeLevel[] = ["trace", "faint", "blank"];
+/** A 生字 is written twice in 練習: traced over the model, then in an empty square. */
+export type StrokeStep = "trace" | "blank";
 
-/** 生字 per round: short enough to stay a game. */
-export const roundSize = 5;
-/** At most this many 生字 that were hard last time come back in one round. */
-const hardPerRound = 2;
+/** 生字 finished in one visit before the 集章卡 stamps it (fewer when the lesson has fewer). */
+export const stampAfter = 5;
 
 export type CharacterRecord = {
-  /** Finished in a round. */
+  /** Times written to the end in 練習. */
   practised: number;
-  /** Finished after at least one stroke needed a hint, the last few times. */
+  /** Raised when a stroke needed a hint, lowered by a clean finish (0–3). */
   hard: number;
   at: number;
 };
@@ -44,10 +37,7 @@ export function readHanziRecords(): HanziRecords {
 }
 
 /** Records each finished 生字: a hint makes it harder (up to 3), a clean round eases it by one. */
-export function recordHanziRound(
-  results: { character: string; hinted: boolean }[],
-  now = Date.now(),
-) {
+export function recordHanzi(results: { character: string; hinted: boolean }[], now = Date.now()) {
   const records = readHanziRecords();
   for (const { character, hinted } of results) {
     const before = records.characters[character] ?? { practised: 0, hard: 0, at: 0 };
@@ -63,31 +53,4 @@ export function recordHanziRound(
   } catch {
     return false;
   }
-}
-
-/**
- * A round of a lesson's 生字: up to two that were hard, then the least practised, in the book's
- * order so the round follows the lesson.
- */
-export function buildHanziRound(
-  lessonId: number,
-  records = readHanziRecords(),
-  random = Math.random,
-): string[] {
-  const lesson = book1Lessons.find((item) => item.id === lessonId) ?? book1Lessons[0];
-  const characters = [...lesson.characters];
-  const record = (character: string) =>
-    records.characters[character] ?? { practised: 0, hard: 0, at: 0 };
-  const hard = characters
-    .filter((character) => record(character).hard > 0)
-    .sort((a, b) => record(b).hard - record(a).hard || record(a).at - record(b).at)
-    .slice(0, hardPerRound);
-  const rest = characters
-    .filter((character) => !hard.includes(character))
-    .map((character) => ({ character, order: record(character).practised + random() }))
-    .sort((a, b) => a.order - b.order)
-    .slice(0, roundSize - hard.length)
-    .map((item) => item.character);
-  const chosen = new Set([...hard, ...rest]);
-  return characters.filter((character) => chosen.has(character));
 }

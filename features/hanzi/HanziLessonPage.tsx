@@ -1,24 +1,15 @@
-import { ArrowRight, Eye, PencilLine, PencilSimple } from "@phosphor-icons/react";
+import { useState } from "react";
+import { ArrowRight, CheckCircle, Ear, PencilSimple, TextAa } from "@phosphor-icons/react";
 import type { AppController } from "../usePracticeApp";
 import { book1Facts, book1Lessons } from "./book1-characters";
 import { HanziGlyph, HanziWords } from "./HanziChrome";
-import { roundSize, type StrokeLevel } from "./hanzi-round";
+import { readHanziRecords } from "./hanzi-round";
 import "../../styles/lazy/hanzi.css";
 
-const levels: { level: StrokeLevel; name: string; icon: typeof Eye; aria: string }[] = [
-  {
-    level: "trace",
-    name: "描一描",
-    icon: PencilSimple,
-    aria: "描一描，照著淡淡的字和起筆的號碼寫",
-  },
-  { level: "faint", name: "看著寫", icon: Eye, aria: "看著寫，字更淡，沒有號碼" },
-  { level: "blank", name: "自己寫", icon: PencilLine, aria: "自己寫，空白的格子" },
-];
-
 /**
- * A 第一冊 lesson's page: its number and title, the three ways to practise 筆順 (each a round of
- * the lesson's 生字), and every 生字 of the lesson, each a tap away from being practised alone.
+ * A 第一冊 lesson's page: its number and title, its three practices (練習, 聽寫 and 照樣造句;
+ * the last two are being made) and every 生字, each a tap away from 練習 on that 生字. A check
+ * marks the 生字 written to the end before.
  */
 export function HanziLessonPage({
   app,
@@ -26,7 +17,9 @@ export function HanziLessonPage({
   app: Pick<AppController, "hanziLessonId" | "startHanziPractice">;
 }) {
   const lesson = book1Lessons.find((item) => item.id === app.hanziLessonId) ?? book1Lessons[1];
-  const count = Math.min(roundSize, lesson.characters.length);
+  const [records] = useState(readHanziRecords);
+  const practised = (character: string) => (records.characters[character]?.practised ?? 0) > 0;
+  const characters = [...lesson.characters];
   return (
     <section className="page-section lesson-page math-lesson-page hanzi-lesson-page">
       <div className="lesson-heading">
@@ -40,27 +33,50 @@ export function HanziLessonPage({
         </div>
       </div>
       <div className="mode-grid hanzi-modes">
-        {levels.map(({ level, name, icon: Icon, aria }) => (
+        <button
+          className="mode-card listen-mode"
+          type="button"
+          aria-label={`練習，${characters.length} 個生字`}
+          onClick={() => app.startHanziPractice()}
+        >
+          <span className="mode-icon" aria-hidden="true">
+            <PencilSimple size={28} weight="duotone" />
+          </span>
+          <span className="lesson-mode-copy">
+            <small>
+              {characters.length} <HanziWords text="個生字" />
+            </small>
+            <strong>
+              <HanziWords text="練習" />
+            </strong>
+          </span>
+          <span className="lesson-mode-cta">
+            <HanziWords text="開始" /> <ArrowRight size={19} weight="bold" aria-hidden="true" />
+          </span>
+        </button>
+        {(
+          [
+            ["聽寫", Ear],
+            ["照樣造句", TextAa],
+          ] as const
+        ).map(([name, Icon]) => (
           <button
-            key={level}
-            className={`mode-card ${level === "trace" ? "listen-mode" : "fill-mode"}`}
+            key={name}
+            className="mode-card fill-mode is-coming"
             type="button"
-            aria-label={`${aria}，${count} 個字`}
-            onClick={() => app.startHanziPractice(level)}
+            disabled
+            aria-label={`${name}，製作中`}
           >
             <span className="mode-icon" aria-hidden="true">
               <Icon size={28} weight="duotone" />
             </span>
             <span className="lesson-mode-copy">
               <small>
-                {count} <HanziWords text="個字" />
+                <HanziWords text="製作中" />
               </small>
               <strong>
                 <HanziWords text={name} />
               </strong>
-            </span>
-            <span className="lesson-mode-cta">
-              <HanziWords text="開始" /> <ArrowRight size={19} weight="bold" aria-hidden="true" />
             </span>
           </button>
         ))}
@@ -73,13 +89,13 @@ export function HanziLessonPage({
           <HanziWords text="點一個字寫寫看" />
         </p>
         <ul className="hanzi-character-cards">
-          {[...lesson.characters].map((character) => (
+          {characters.map((character) => (
             <li key={character}>
               <button
                 type="button"
                 className="hanzi-character-card"
-                aria-label={`描一描「${character}」，${book1Facts[character]?.strokes} 畫`}
-                onClick={() => app.startHanziPractice("trace", character)}
+                aria-label={`練習「${character}」，${book1Facts[character]?.strokes} 畫${practised(character) ? "，練過了" : ""}`}
+                onClick={() => app.startHanziPractice(character)}
               >
                 <span className="hanzi-card-glyph">
                   <HanziGlyph
@@ -95,6 +111,14 @@ export function HanziLessonPage({
                 <span className="hanzi-card-reading">
                   <HanziWords text={character} />
                 </span>
+                {practised(character) && (
+                  <CheckCircle
+                    className="hanzi-card-done"
+                    size={24}
+                    weight="fill"
+                    aria-hidden="true"
+                  />
+                )}
               </button>
             </li>
           ))}

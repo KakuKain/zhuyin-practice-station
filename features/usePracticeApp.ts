@@ -30,7 +30,6 @@ import { useStampBook } from "./rewards/useStampBook";
 import { taskKeys, type AwardLessonStamp } from "./rewards/stamp-book";
 import { lessonPlace } from "./rewards/daily-tasks";
 import type { EnglishMode } from "./english/english-lessons";
-import type { StrokeLevel } from "./hanzi/hanzi-round";
 
 /**
  * Cross-feature coordinator: the current view and lesson, shared stores, audio, the course
@@ -224,19 +223,16 @@ export function usePracticeApp() {
     setView("english");
   };
 
-  // 第一冊's 生字: a page per lesson, then 筆順 practice at the level the child picks.
+  // 第一冊: a page per lesson, then 練習 (生字 written stroke by stroke), 聽寫 and 照樣造句.
   const [hanziLessonId, setHanziLessonId] = useState(1);
-  const [hanziPractice, setHanziPractice] = useState<{
-    level: StrokeLevel;
-    /** One 生字 tapped on the lesson page, or a round chosen from the lesson's. */
-    character?: string;
-  }>({ level: "trace" });
+  /** The 生字 practice starts on: one tapped on the lesson page, or none to pick from the list. */
+  const [hanziStart, setHanziStart] = useState<string | undefined>();
   const openHanziLesson = (id: number) => {
     setHanziLessonId(id);
     setView("hanzi-lesson");
   };
-  const startHanziPractice = (level: StrokeLevel, character?: string) => {
-    setHanziPractice({ level, character });
+  const startHanziPractice = (character?: string) => {
+    setHanziStart(character);
     setView("hanzi");
   };
 
@@ -363,7 +359,7 @@ export function usePracticeApp() {
     openEnglishLesson,
     startEnglishPractice,
     hanziLessonId,
-    hanziPractice,
+    hanziStart,
     openHanziLesson,
     startHanziPractice,
     subject,
