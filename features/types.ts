@@ -11,7 +11,9 @@ export type View =
   | "math-lesson"
   | "math"
   | "english-lesson"
-  | "english";
+  | "english"
+  | "hanzi-lesson"
+  | "hanzi";
 
 export type ListenPhase =
   | "ready"

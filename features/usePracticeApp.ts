@@ -223,6 +223,19 @@ export function usePracticeApp() {
     setView("english");
   };
 
+  // 第一冊: a page per lesson, then 練習 (生字 written stroke by stroke), 聽寫 and 照樣造句.
+  const [hanziLessonId, setHanziLessonId] = useState(1);
+  /** The 生字 practice starts on: one tapped on the lesson page, or none to pick from the list. */
+  const [hanziStart, setHanziStart] = useState<string | undefined>();
+  const openHanziLesson = (id: number) => {
+    setHanziLessonId(id);
+    setView("hanzi-lesson");
+  };
+  const startHanziPractice = (character?: string) => {
+    setHanziStart(character);
+    setView("hanzi");
+  };
+
   const openLesson = (index: number) => {
     const nextLesson = catalog.find((item) => item.index === index);
     setSelectedLesson(index);
@@ -276,6 +289,10 @@ export function usePracticeApp() {
       case "english":
         return navigate("english-lesson");
       case "english-lesson":
+        return navigate("courses");
+      case "hanzi":
+        return navigate("hanzi-lesson");
+      case "hanzi-lesson":
         return navigate("courses");
       default:
         return navigate("courses");
@@ -341,6 +358,10 @@ export function usePracticeApp() {
     englishPractice,
     openEnglishLesson,
     startEnglishPractice,
+    hanziLessonId,
+    hanziStart,
+    openHanziLesson,
+    startHanziPractice,
     subject,
     setSubject,
     morePanel,

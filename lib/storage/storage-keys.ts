@@ -30,6 +30,8 @@ export const storageKeys = {
   englishRecords: "kid-english-records-v1",
   /** What each English lesson's last round asked, so the next asks other letters and words. */
   englishRecent: "kid-english-recent-v1",
+  /** 第一冊's 生字: how often each was written and whether its strokes needed hints. */
+  hanziRecords: "kid-hanzi-records-v1",
   /** 集章卡: each child's stamps, the log of what earned them and the rewards chosen. */
   stamps: "kid-stamps-v1",
   /** 集章卡 settings the family shares: on or off, card size, daily stamps and rewards. */
@@ -54,6 +56,7 @@ export const childScopedKeys: ReadonlySet<string> = new Set([
   storageKeys.mathRecent,
   storageKeys.englishRecords,
   storageKeys.englishRecent,
+  storageKeys.hanziRecords,
   storageKeys.stamps,
 ]);
 const childSuffixPattern = /@([a-z0-9]{1,12})$/;

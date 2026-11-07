@@ -14,8 +14,9 @@ import {
 import type { AppController } from "../usePracticeApp";
 import {
   appendImportedMaterials,
-  builtinMaterialId,
-  builtinMaterialName,
+  activeMaterialName,
+  book1MaterialId,
+  builtinMaterials,
   parseMaterialFile,
   parseWordList,
   rowsToTerms,
@@ -208,7 +209,11 @@ export function MaterialsPanel({ app }: Props) {
                 change((current) => ({ ...current, activeId }), "已更換教材，首頁課次已更新");
               }}
             >
-              <option value={builtinMaterialId}>{builtinMaterialName}（9 課）</option>
+              {builtinMaterials.map((material) => (
+                <option key={material.id} value={material.id}>
+                  {material.name}（{material.lessons} 課）
+                </option>
+              ))}
               {state.materials
                 .filter((material) => !material.archived)
                 .map((material) => (
@@ -222,12 +227,14 @@ export function MaterialsPanel({ app }: Props) {
           <div className="material-course-summary">
             <BookOpenText size={26} aria-hidden="true" />
             <div>
-              <strong>{active?.name ?? builtinMaterialName}</strong>
+              <strong>{activeMaterialName(state)}</strong>
               <p>
                 {active
                   ? [active.publisher, active.grade, active.semester].filter(Boolean).join("・") ||
                     "自訂字詞教材"
-                  : "目前收錄第一至第九課"}
+                  : state.activeId === book1MaterialId
+                    ? "國字真簡單和第一至第六課的生字筆順"
+                    : "目前收錄第一至第九課"}
               </p>
             </div>
           </div>

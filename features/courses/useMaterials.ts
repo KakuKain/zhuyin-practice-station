@@ -5,7 +5,7 @@ import {
   readMaterials,
   validateMaterials,
   buildCatalog,
-  builtinMaterialId,
+  isBuiltinMaterial,
   type MaterialsState,
 } from "./materials";
 import { useCallback, useMemo, type SetStateAction } from "react";
@@ -19,7 +19,7 @@ import {
 /** A child's own material while it is still available, otherwise the family's choice. */
 export function withChildMaterial(state: MaterialsState, materialId?: string): MaterialsState {
   const available =
-    materialId === builtinMaterialId ||
+    isBuiltinMaterial(materialId) ||
     state.materials.some((item) => item.id === materialId && !item.archived);
   return materialId && available && materialId !== state.activeId
     ? { ...state, activeId: materialId }

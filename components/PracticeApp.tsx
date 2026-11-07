@@ -45,6 +45,9 @@ const screens = {
   english: () => import("../features/english/EnglishScreen"),
   englishLesson: () => import("../features/english/EnglishLessonPage"),
   englishCourses: () => import("../features/english/EnglishCourseList"),
+  hanzi: () => import("../features/hanzi/HanziScreen"),
+  hanziLesson: () => import("../features/hanzi/HanziLessonPage"),
+  hanziCourses: () => import("../features/hanzi/HanziCourseList"),
 };
 const FillBlank = lazy(() => screens.fillBlank().then((m) => ({ default: m.FillBlank })));
 const FillReview = lazy(() => screens.fillReview().then((m) => ({ default: m.FillReview })));
@@ -58,6 +61,10 @@ const MathLessonPage = lazy(() =>
 const EnglishScreen = lazy(() => screens.english().then((m) => ({ default: m.EnglishScreen })));
 const EnglishLessonPage = lazy(() =>
   screens.englishLesson().then((m) => ({ default: m.EnglishLessonPage })),
+);
+const HanziScreen = lazy(() => screens.hanzi().then((m) => ({ default: m.HanziScreen })));
+const HanziLessonPage = lazy(() =>
+  screens.hanziLesson().then((m) => ({ default: m.HanziLessonPage })),
 );
 const StampNewsToast = lazy(() => screens.stamps().then((m) => ({ default: m.StampNewsToast })));
 
@@ -186,6 +193,8 @@ function PracticeContent({ app }: { app: ReturnType<typeof usePracticeApp> }) {
         return <MathLessonPage app={app} />;
       case "english-lesson":
         return <EnglishLessonPage app={app} />;
+      case "hanzi-lesson":
+        return <HanziLessonPage app={app} />;
       default:
         return <CourseList app={app} />;
     }
@@ -201,6 +210,12 @@ function PracticeContent({ app }: { app: ReturnType<typeof usePracticeApp> }) {
     return (
       <FullScreen>
         <EnglishScreen app={app} />
+      </FullScreen>
+    );
+  if (view === "hanzi")
+    return (
+      <FullScreen>
+        <HanziScreen app={app} />
       </FullScreen>
     );
   if (isFocusMode)
@@ -233,15 +248,22 @@ function PracticeContent({ app }: { app: ReturnType<typeof usePracticeApp> }) {
   return (
     <HeaderBackSlot.Provider value={backSlot}>
       <div
-        className={`app-shell is-${view}${view === "math-lesson" || view === "english-lesson" ? " is-lesson" : ""}`}
+        className={`app-shell is-${view}${view === "math-lesson" || view === "english-lesson" || view === "hanzi-lesson" ? " is-lesson" : ""}`}
       >
         <AppHeader
           backSlotRef={setBackSlot}
           title={view === "practice" ? "練習" : undefined}
-          materialSelector={view === "courses" ? <MaterialSelector app={app} /> : undefined}
+          materialSelector={
+            view === "courses" && app.subject === "zhuyin" ? (
+              <MaterialSelector app={app} />
+            ) : undefined
+          }
           onCourses={() => navigate("courses")}
           onBack={
-            view === "lesson" || view === "math-lesson" || view === "english-lesson"
+            view === "lesson" ||
+            view === "math-lesson" ||
+            view === "english-lesson" ||
+            view === "hanzi-lesson"
               ? () => navigate("courses")
               : view === "fill"
                 ? () => navigate("lesson")
@@ -261,7 +283,8 @@ function PracticeContent({ app }: { app: ReturnType<typeof usePracticeApp> }) {
             view === "fill" ||
             view === "result" ||
             view === "math-lesson" ||
-            view === "english-lesson"
+            view === "english-lesson" ||
+            view === "hanzi-lesson"
               ? "courses"
               : view
           }
