@@ -14,7 +14,6 @@ export const characterStrokes = strokeData as Record<string, CharacterStrokes>;
 /** One reading per character of every 第一冊 word a child reads, for 國字注音. */
 export const hanziWordReadings: Record<string, string> = {
   國語: "ㄍㄨㄛˊ ㄩˇ",
-  第一冊: "ㄉㄧˋ ㄧ ㄘㄜˋ",
   國字真簡單: "ㄍㄨㄛˊ ㄗˋ ㄓㄣ ㄐㄧㄢˇ ㄉㄢ",
   一到十: "ㄧ ㄉㄠˋ ㄕˊ",
   第一課: "ㄉㄧˋ ㄧ ㄎㄜˋ",

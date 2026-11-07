@@ -191,8 +191,9 @@ function StrokePad({
       setMark({ ...last, key: Date.now() });
       chime("miss");
       // The wrong stroke stays a moment beside its ✗, then fades.
+      // Not while the next stroke is being written or waits to be judged: that judging clears it.
       window.setTimeout(() => {
-        if (!ink.activeStrokeRef.current) clearInk();
+        if (!ink.activeStrokeRef.current && latest.current.length === judged.current) clearInk();
       }, 450);
     } else {
       setMark(undefined);

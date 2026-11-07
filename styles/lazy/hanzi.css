@@ -44,19 +44,22 @@
   color: var(--ink-soft);
 }
 .hanzi-lesson-parts ul.hanzi-character-cards {
-  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   gap: 10px;
 }
 /* Each 生字 is its own card, on the lesson parts' washed background. */
 .hanzi-lesson-parts .hanzi-character-cards li {
   padding: 6px;
 }
+/* A square, like a 生字 box in the book. */
 .hanzi-character-card {
   display: grid;
+  align-content: center;
   justify-items: center;
-  gap: 6px;
+  gap: 2px;
   width: 100%;
-  padding: 10px 6px 8px;
+  aspect-ratio: 1;
+  padding: 6px;
   border: 1.5px dashed #e8b7af;
   border-radius: 14px;
   background: #fffdf7;
@@ -70,8 +73,8 @@
 }
 .hanzi-card-glyph {
   display: block;
-  width: 64px;
-  height: 64px;
+  width: 58%;
+  aspect-ratio: 1;
 }
 .hanzi-card-glyph .hanzi-glyph {
   position: static;

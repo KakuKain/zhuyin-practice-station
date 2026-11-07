@@ -32,7 +32,6 @@ export function HanziLessonPage({
       <div className="lesson-heading">
         <div>
           <span className="eyebrow">
-            <HanziWords text="第一冊" />
             <HanziWords text={lesson.number} />
           </span>
           <h1 className="lesson-title">

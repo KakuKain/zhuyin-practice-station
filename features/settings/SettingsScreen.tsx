@@ -502,6 +502,21 @@ export function SettingsScreen({
             </a>{" "}
             授權使用；網站已轉為 M4A，單個注音符號以正常速度播放。
           </p>
+          <p className="more-audio-credit">
+            第一冊生字的筆畫字形取自{" "}
+            <a
+              href="https://github.com/skishore/makemeahanzi"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Make Me a Hanzi
+            </a>
+            ，源自文鼎科技字型，依{" "}
+            <a href="licenses/ARPHICPL.txt" target="_blank" rel="noopener noreferrer">
+              文鼎公眾授權書（Arphic Public License）
+            </a>{" "}
+            使用；筆順已逐字對照康軒課本修正。
+          </p>
         </div>
       )}
     </section>
