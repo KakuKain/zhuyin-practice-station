@@ -399,8 +399,10 @@
 }
 .hanzi-list header {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
+  gap: 8px 12px;
   margin-bottom: 12px;
 }
 .hanzi-list h2 {
@@ -904,4 +906,20 @@
 .hanzi-cell-zhuyin-model .zhuyin-stack {
   color: #e3d7cb;
   font-size: inherit;
+}
+/* In the list's header the switch sits between the title and the close button. */
+.hanzi-list .hanzi-kind {
+  margin-left: auto;
+}
+.hanzi-list .hanzi-kind button {
+  padding: 4px 12px;
+}
+@media (max-width: 419px) {
+  .hanzi-list h2 {
+    font-size: 20px;
+  }
+  .hanzi-list .hanzi-kind button {
+    padding: 4px 8px;
+    font-size: 16px;
+  }
 }

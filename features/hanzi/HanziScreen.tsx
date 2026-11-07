@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState, type ReactNode } from "react";
 import {
   ArrowCounterClockwise,
   ArrowRight,
@@ -95,29 +95,32 @@ export function HanziScreen({ app }: { app: HanziApp }) {
     setAttempt((value) => value + 1);
     setListOpen(false);
   };
+  const kindSwitch = (
+    <div className="hanzi-kind" role="group" aria-label="練習的內容">
+      <button
+        type="button"
+        aria-pressed={kind === "characters"}
+        onClick={() => switchKind("characters")}
+      >
+        <HanziWords text="生字" />
+      </button>
+      <button
+        type="button"
+        aria-pressed={kind === "words"}
+        disabled={!words.length}
+        onClick={() => switchKind("words")}
+      >
+        <HanziWords text="語詞" />
+      </button>
+    </div>
+  );
   const shown = kind === "words" ? (currentWord ?? -1) + 1 : index + 1;
   const count = kind === "words" ? words.length : characters.length;
   return (
     <main className="math-shell hanzi-shell">
       <MathHeader title={`${label} · 練習`} onLeave={leave} />
       <div className="hanzi-toolbar">
-        <div className="hanzi-kind" role="group" aria-label="練習的內容">
-          <button
-            type="button"
-            aria-pressed={kind === "characters"}
-            onClick={() => switchKind("characters")}
-          >
-            <HanziWords text="生字" />
-          </button>
-          <button
-            type="button"
-            aria-pressed={kind === "words"}
-            disabled={!words.length}
-            onClick={() => switchKind("words")}
-          >
-            <HanziWords text="語詞" />
-          </button>
-        </div>
+        {kindSwitch}
         <button
           type="button"
           className="hanzi-list-button"
@@ -148,6 +151,7 @@ export function HanziScreen({ app }: { app: HanziApp }) {
       )}
       {kind === "words" && listOpen && (
         <WordList
+          kindSwitch={kindSwitch}
           words={words}
           lessonId={lesson.id}
           current={currentWord}
@@ -170,6 +174,7 @@ export function HanziScreen({ app }: { app: HanziApp }) {
       )}
       {kind === "characters" && listOpen && (
         <CharacterList
+          kindSwitch={kindSwitch}
           characters={characters}
           current={current}
           practised={(character) => (records.characters[character]?.practised ?? 0) > 0}
@@ -184,6 +189,7 @@ export function HanziScreen({ app }: { app: HanziApp }) {
 
 /** The lesson's 生字 to choose from; a check marks the ones written to the end before. */
 function CharacterList({
+  kindSwitch,
   characters,
   current,
   practised,
@@ -191,6 +197,8 @@ function CharacterList({
   onPick,
   onClose,
 }: {
+  /** 生字｜語詞, so the list can change to the other before anything is picked. */
+  kindSwitch: ReactNode;
   characters: string[];
   current?: string;
   practised: (character: string) => boolean;
@@ -212,6 +220,7 @@ function CharacterList({
           <h2>
             <HanziWords text="選一個字" />
           </h2>
+          {kindSwitch}
           <button type="button" className="hanzi-list-close" onClick={onClose} aria-label="關閉">
             <X size={24} weight="bold" aria-hidden="true" />
           </button>
@@ -561,6 +570,7 @@ function StrokeBox({
 
 /** The lesson's 語詞, as the sheet writes them; 練過了 and 再練 marked as for 生字. */
 function WordList({
+  kindSwitch,
   words,
   lessonId,
   current,
@@ -569,6 +579,7 @@ function WordList({
   onPick,
   onClose,
 }: {
+  kindSwitch: ReactNode;
   words: DictationWord[];
   lessonId: number;
   current?: number;
@@ -590,6 +601,7 @@ function WordList({
           <h2>
             <HanziWords text="選一個語詞" />
           </h2>
+          {kindSwitch}
           <button type="button" className="hanzi-list-close" onClick={onClose} aria-label="關閉">
             <X size={24} weight="bold" aria-hidden="true" />
           </button>
