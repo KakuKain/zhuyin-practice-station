@@ -15,8 +15,21 @@ import { taskKeys } from "../rewards/stamp-book";
 import { MathHeader } from "../math/MathChrome";
 import { book1Facts, book1LessonLabel, book1Lessons, book1Readings } from "./book1-characters";
 import { HanziGlyph, HanziWords, characterStrokes } from "./HanziChrome";
-import { callReadings, characterCalls } from "./book1-words";
-import { readHanziRecords, recordHanzi, stampAfter, type StrokeStep } from "./hanzi-round";
+import {
+  answerCells,
+  book1Words,
+  callReadings,
+  characterCalls,
+  type DictationWord,
+} from "./book1-words";
+import { WordAnswer, WordPractice } from "./WordPractice";
+import {
+  readHanziRecords,
+  recordHanzi,
+  recordWordPractice,
+  stampAfter,
+  type StrokeStep,
+} from "./hanzi-round";
 import { fromSquare, judgeStroke, screenMedian, type StrokeVerdict } from "./stroke-match";
 import { chime } from "./chime";
 import "../../styles/lazy/hanzi.css";
@@ -27,9 +40,9 @@ type HanziApp = Pick<
 >;
 
 /**
- * 練習: the lesson's 生字, one at a time, each watched, traced and then written alone. The list
- * button picks any 生字; a finished one offers 再寫一次 or 下一個字, so the child goes on without
- * leaving. 語詞 practice is listed beside 生字 until it is made.
+ * 練習: the lesson's 生字, one at a time, each watched, traced and then written alone, or its
+ * 語詞 (WordPractice). The list button picks any of them; a finished one offers 再寫一次 or the
+ * next, so the child goes on without leaving.
  */
 export function HanziScreen({ app }: { app: HanziApp }) {
   const lesson = book1Lessons.find((item) => item.id === app.hanziLessonId) ?? book1Lessons[1];
@@ -38,6 +51,9 @@ export function HanziScreen({ app }: { app: HanziApp }) {
   const [records, setRecords] = useState(readHanziRecords);
   const [current, setCurrent] = useState<string | undefined>(app.hanziStart);
   const [listOpen, setListOpen] = useState(!app.hanziStart);
+  const words = book1Words[lesson.id] ?? [];
+  const [kind, setKind] = useState<"characters" | "words">("characters");
+  const [currentWord, setCurrentWord] = useState<number | undefined>();
   // Writing the same 生字 again starts it over.
   const [attempt, setAttempt] = useState(0);
   const [finishedHere, setFinishedHere] = useState<string[]>([]);
@@ -69,35 +85,79 @@ export function HanziScreen({ app }: { app: HanziApp }) {
   };
   const index = current ? characters.indexOf(current) : -1;
   const next = characters[(index + 1) % characters.length];
+  const switchKind = (value: "characters" | "words") => {
+    if (value === kind) return;
+    setKind(value);
+    setListOpen(value === "words" ? currentWord === undefined : current === undefined);
+  };
+  const pickWord = (wordIndex: number) => {
+    setCurrentWord(wordIndex);
+    setAttempt((value) => value + 1);
+    setListOpen(false);
+  };
+  const shown = kind === "words" ? (currentWord ?? -1) + 1 : index + 1;
+  const count = kind === "words" ? words.length : characters.length;
   return (
     <main className="math-shell hanzi-shell">
       <MathHeader title={`${label} · 練習`} onLeave={leave} />
       <div className="hanzi-toolbar">
         <div className="hanzi-kind" role="group" aria-label="練習的內容">
-          <button type="button" aria-pressed="true">
+          <button
+            type="button"
+            aria-pressed={kind === "characters"}
+            onClick={() => switchKind("characters")}
+          >
             <HanziWords text="生字" />
           </button>
-          <button type="button" aria-pressed="false" disabled aria-label="語詞，製作中">
+          <button
+            type="button"
+            aria-pressed={kind === "words"}
+            disabled={!words.length}
+            onClick={() => switchKind("words")}
+          >
             <HanziWords text="語詞" />
-            <small>
-              <HanziWords text="製作中" />
-            </small>
           </button>
         </div>
         <button
           type="button"
           className="hanzi-list-button"
           onClick={() => setListOpen(true)}
-          aria-label={`生字清單，${characters.length} 個字`}
+          aria-label={kind === "words" ? `語詞清單，${count} 個` : `生字清單，${count} 個字`}
         >
           <ListBullets size={22} weight="bold" aria-hidden="true" />
-          <HanziWords text="生字" />
+          <HanziWords text={kind === "words" ? "語詞" : "生字"} />
           <span className="hanzi-list-count">
-            {index + 1 || "–"} / {characters.length}
+            {shown || "–"} / {count}
           </span>
         </button>
       </div>
-      {current && (
+      {kind === "words" && currentWord !== undefined && (
+        <WordPractice
+          key={`${currentWord}:${attempt}`}
+          word={words[currentWord]}
+          lessonId={lesson.id}
+          app={app}
+          onFinish={(hinted) => {
+            recordWordPractice(words[currentWord].text, hinted);
+            setRecords(readHanziRecords());
+          }}
+          onAgain={() => setAttempt((value) => value + 1)}
+          onNext={() => pickWord((currentWord + 1) % words.length)}
+          next={words[(currentWord + 1) % words.length].text}
+        />
+      )}
+      {kind === "words" && listOpen && (
+        <WordList
+          words={words}
+          lessonId={lesson.id}
+          current={currentWord}
+          practised={(text) => (records.words[text]?.practised ?? 0) > 0}
+          hard={(text) => (records.words[text]?.wrong ?? 0) > 0}
+          onPick={pickWord}
+          onClose={currentWord !== undefined ? () => setListOpen(false) : leave}
+        />
+      )}
+      {kind === "characters" && current && (
         <CharacterPractice
           key={`${current}:${attempt}`}
           character={current}
@@ -108,7 +168,7 @@ export function HanziScreen({ app }: { app: HanziApp }) {
           next={next}
         />
       )}
-      {listOpen && (
+      {kind === "characters" && listOpen && (
         <CharacterList
           characters={characters}
           current={current}
@@ -496,5 +556,72 @@ function StrokeBox({
         )}
       </p>
     </>
+  );
+}
+
+/** The lesson's 語詞, as the sheet writes them; 練過了 and 再練 marked as for 生字. */
+function WordList({
+  words,
+  lessonId,
+  current,
+  practised,
+  hard,
+  onPick,
+  onClose,
+}: {
+  words: DictationWord[];
+  lessonId: number;
+  current?: number;
+  practised: (text: string) => boolean;
+  hard: (text: string) => boolean;
+  onPick: (index: number) => void;
+  onClose: () => void;
+}) {
+  return (
+    <div className="hanzi-list-backdrop" onClick={onClose}>
+      <section
+        className="hanzi-list"
+        role="dialog"
+        aria-modal="true"
+        aria-label="選一個語詞"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <header>
+          <h2>
+            <HanziWords text="選一個語詞" />
+          </h2>
+          <button type="button" className="hanzi-list-close" onClick={onClose} aria-label="關閉">
+            <X size={24} weight="bold" aria-hidden="true" />
+          </button>
+        </header>
+        <ul className="hanzi-word-cards">
+          {words.map((word, index) => (
+            <li key={word.text}>
+              <button
+                type="button"
+                className={`hanzi-word-card${index === current ? " is-current" : ""}`}
+                onClick={() => onPick(index)}
+                aria-label={`練習「${word.text}」${practised(word.text) ? "，練過了" : ""}${hard(word.text) ? "，要再練" : ""}`}
+              >
+                <WordAnswer cells={answerCells(word, lessonId)} />
+                {practised(word.text) && (
+                  <CheckCircle
+                    className="hanzi-card-done"
+                    size={22}
+                    weight="fill"
+                    aria-hidden="true"
+                  />
+                )}
+                {hard(word.text) && (
+                  <span className="hanzi-card-hard">
+                    <HanziWords text="再練" />
+                  </span>
+                )}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </div>
   );
 }

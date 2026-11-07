@@ -614,17 +614,20 @@
   cursor: pointer;
 }
 .hanzi-dictation-cells {
+  container-type: inline-size;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 14px;
+  width: 100%;
 }
 /* The cell shows the top of its square canvas: the 田字格 and the 注音 strip (4 : 3). */
 .hanzi-cell {
+  container-type: inline-size;
   position: relative;
   overflow: hidden;
   /* As big as the row allows: one to three cells side by side. */
-  width: min(calc((100vw - 32px - (var(--cells, 2) - 1) * 14px) / var(--cells, 2)), 420px);
+  width: min(calc((100cqw - (var(--cells, 2) - 1) * 14px) / var(--cells, 2)), 420px);
   aspect-ratio: 4 / 3;
   border-radius: 10px;
   background: #fffdf7;
@@ -801,4 +804,104 @@
   background: #ffe3c2;
   color: #a2561a;
   font-size: 12px;
+}
+
+/* 語詞: the word as the sheet writes it, and its cells with pale models to trace. */
+.hanzi-word-answer {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.hanzi-word-zhuyin {
+  display: inline-flex;
+  color: #2f7fd6;
+}
+/* A 注音 answer as tall as the 國字 beside it (the stack is 4em high). */
+.hanzi-word-zhuyin .zhuyin-stack,
+.hanzi-check-zhuyin-answer .zhuyin-stack {
+  font-size: 0.3em;
+}
+.hanzi-cell-model {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 75%;
+  height: 100%;
+  pointer-events: none;
+}
+.hanzi-cell-zhuyin-model,
+.hanzi-cell-mark-model {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  color: #e3d7cb;
+  pointer-events: none;
+}
+.hanzi-cell-zhuyin-model {
+  top: 0;
+  left: 75%;
+  width: 25%;
+  height: 100%;
+  font-size: 8.5cqw;
+}
+.hanzi-cell-zhuyin-model.is-in-square {
+  left: 0;
+  width: 75%;
+  font-size: 10cqw;
+}
+.hanzi-cell-mark-model {
+  inset: 0 25% 0 0;
+  font-size: clamp(30px, 10vw, 90px);
+}
+.hanzi-cell.is-complete {
+  box-shadow:
+    0 0 0 3px #a8dcbf,
+    0 4px 14px rgb(110 82 52 / 0.12);
+}
+.hanzi-cell-done {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  color: #3a9a6a;
+  pointer-events: none;
+}
+.hanzi-word-practice .hanzi-character {
+  font-size: 36px;
+}
+.hanzi-practice.hanzi-word-practice {
+  width: min(100%, 1100px);
+}
+.hanzi-word-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.hanzi-word-card {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: 84px;
+  padding: 12px 8px;
+  border: 1.5px dashed #e8b7af;
+  border-radius: 14px;
+  background: #fffdf7;
+  color: var(--ink);
+  font: inherit;
+  font-size: 24px;
+  cursor: pointer;
+}
+.hanzi-word-card.is-current {
+  border-style: solid;
+  border-color: #2f7fd6;
+  box-shadow: 0 0 0 2px #2f7fd6;
+}
+
+/* The cell sets the size; the phone rule that fixes .zhuyin-stack at 22px does not apply here. */
+.hanzi-cell-zhuyin-model .zhuyin-stack {
+  color: #e3d7cb;
+  font-size: inherit;
 }

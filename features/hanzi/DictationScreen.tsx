@@ -12,6 +12,7 @@ import type { InkStroke } from "../types";
 import { useInkCanvas } from "../../lib/ink/useInkCanvas";
 import { registeredAudioUrl } from "../../lib/audio/audio-registry";
 import { InkTools } from "../../components/InkTools";
+import { ZhuyinStack } from "../../components/Zhuyin";
 import { InkPreview } from "../../components/AppChrome";
 import { taskKeys } from "../rewards/stamp-book";
 import { MathHeader, MathResult } from "../math/MathChrome";
@@ -442,7 +443,7 @@ function CheckCell({
           <HanziWords text={cell.character} />
         ) : cell.write === "注音" ? (
           <span className="hanzi-check-zhuyin-answer">
-            {cell.reading}
+            <ZhuyinStack text={cell.reading} />
             {alsoRight[cell.character] && <small>（寫「{cell.character}」也對）</small>}
           </span>
         ) : (

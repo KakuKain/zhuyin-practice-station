@@ -46,6 +46,10 @@ export const hanziWordReadings: Record<string, string> = {
   再寫一次: "ㄗㄞˋ ㄒㄧㄝˇ ㄧ ㄘˋ",
   只考生字: "ㄓˇ ㄎㄠˇ ㄕㄥ ㄗˋ",
   再練: "ㄗㄞˋ ㄌㄧㄢˋ",
+  選一個語詞: "ㄒㄩㄢˇ ㄧ ㄍㄜˋ ㄩˇ ㄘˊ",
+  下一個語詞: "ㄒㄧㄚˋ ㄧ ㄍㄜˋ ㄩˇ ㄘˊ",
+  開始描: "ㄎㄞ ㄕˇ ㄇㄧㄠˊ",
+  描好了: "ㄇㄧㄠˊ ㄏㄠˇ ˙ㄌㄜ",
   全部語詞: "ㄑㄩㄢˊ ㄅㄨˋ ㄩˇ ㄘˊ",
   繼續聽寫: "ㄐㄧˋ ㄒㄩˋ ㄊㄧㄥ ㄒㄧㄝˇ",
   再聽一次: "ㄗㄞˋ ㄊㄧㄥ ㄧ ㄘˋ",
@@ -90,6 +94,7 @@ export function HanziGlyph({
   demo,
   onDemoEnd,
   finished,
+  inked = true,
 }: {
   character: string;
   /** How the model shows: pale, fainter, or not at all. */
@@ -104,6 +109,8 @@ export function HanziGlyph({
   demo: number[] | null;
   onDemoEnd?: () => void;
   finished: boolean;
+  /** Draw the strokes written so far in ink; off where the child's own ink stays. */
+  inked?: boolean;
 }) {
   const data = characterStrokes[character];
   const id = useId().replace(/:/g, "");
@@ -155,7 +162,7 @@ export function HanziGlyph({
               className={`hanzi-model is-${model}${i === done && next && model === "trace" ? " is-next" : ""}`}
             />
           ))}
-        {data.strokes.slice(0, done).map((path, i) => (
+        {data.strokes.slice(0, inked ? done : 0).map((path, i) => (
           <path key={`done-${i}`} d={path} className="hanzi-ink" />
         ))}
         {hint && data.medians[done] && (
