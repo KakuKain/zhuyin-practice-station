@@ -10,3 +10,4 @@ test-results
 components/artwork-previews.json
 lib/audio/audio-index.json
 lib/audio/lesson-audio-index.json
+features/hanzi/strokes.json

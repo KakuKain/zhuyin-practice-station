@@ -1,0 +1,32 @@
+/** 康軒 一上 第一冊's 生字 in the order of 本冊生字 (pp. 80–81): the numbers, then each lesson's. */
+export const book1Lessons = [
+  { id: 0, title: "國字真簡單", characters: "一二三四五六七八九十" },
+  { id: 1, title: "拍拍手", characters: "拍手左右你他也上下" },
+  { id: 2, title: "這是誰的", characters: "這是誰的我分好了啊多個" },
+  { id: 3, title: "秋千", characters: "秋千和玩陪高山到大海朋友們起" },
+  { id: 4, title: "大個子小個子", characters: "子小課兩人拉看找隻青蛙開心" },
+  { id: 5, title: "比一比", characters: "比門裡外有什麼不同早晚王主又" },
+  { id: 6, title: "小路", characters: "路長白花紅走在向說朵從頭那" },
+] as const;
+
+/**
+ * Each 生字's 部首 and 總筆畫數 as 我會寫字 prints them (the numbers' from 全字庫, since
+ * 國字真簡單 prints none). Where 全字庫 differs, the book wins: it counts 裡 as 12 strokes.
+ */
+export const book1Facts: Record<string, { radical: string; strokes: number }> = Object.fromEntries(
+  [
+    "一一1 二二2 三一3 四囗5 五二4 六八4 七一2 八八2 九乙2 十十2",
+    "拍手8 手手4 左工5 右口5 你人7 他人5 也乙3 上一3 下一3",
+    "這辵11 是日9 誰言15 的白8 我戈7 分刀4 好女6 了亅2 啊口11 多夕6 個人10",
+    "秋禾9 千十3 和口8 玩玉8 陪阜11 高高10 山山3 到刀8 大大3 海水10 朋月8 友又4 們人10 起走10",
+    "子子3 小小3 課言15 兩入8 人人2 拉手8 看目9 找手7 隻隹10 青青8 蛙虫12 開門12 心心4",
+    "比比4 門門8 裡衣12 外夕5 有月6 什人4 麼麻14 不一4 同口6 早日6 晚日11 王玉4 主丶5 又又2",
+    "路足13 長長8 白白5 花艸8 紅糸9 走走7 在土6 向口6 說言14 朵木6 從彳11 頭頁16 那邑7",
+  ]
+    .join(" ")
+    .split(" ")
+    .map((entry) => {
+      const [character, radical, ...count] = [...entry];
+      return [character, { radical, strokes: Number(count.join("")) }];
+    }),
+);
