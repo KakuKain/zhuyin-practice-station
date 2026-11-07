@@ -88,10 +88,14 @@ export function DictationScreen({ app }: { app: DictationApp }) {
           key={round.id}
           round={round}
           app={app}
-          onChange={(next) => {
-            saveDictation(next);
-            setRound(next);
-          }}
+          onUpdate={(change) =>
+            setRound((current) => {
+              if (!current) return current;
+              const next = change(current);
+              saveDictation(next);
+              return next;
+            })
+          }
           onDone={() => setPhase("check")}
         />
       )}
@@ -185,12 +189,13 @@ function DictationChoice({
 function DictationWriting({
   round,
   app,
-  onChange,
+  onUpdate,
   onDone,
 }: {
   round: DictationRound;
   app: DictationApp;
-  onChange: (round: DictationRound) => void;
+  /** Changes the round from its latest state; every change is saved. */
+  onUpdate: (change: (round: DictationRound) => DictationRound) => void;
   onDone: () => void;
 }) {
   const item = round.items[round.index];
@@ -198,8 +203,13 @@ function DictationWriting({
   const [reveal, setReveal] = useState(false);
   const [active, setActive] = useState(0);
   const canvases = useRef<(HTMLCanvasElement | null)[]>([]);
-  const latest = useRef(round);
-  latest.current = round;
+  // A new question starts with the question hidden and its first cell chosen.
+  const [shownIndex, setShownIndex] = useState(round.index);
+  if (shownIndex !== round.index) {
+    setShownIndex(round.index);
+    setReveal(false);
+    setActive(0);
+  }
   const ink = useInkCanvas({
     scope: `${round.id}:${round.index}`,
     mounted: true,
@@ -207,12 +217,12 @@ function DictationWriting({
     count: cells.length,
     getCanvas: (i) => canvases.current[i] ?? null,
     readInitial: (i) => round.ink[round.index]?.[i] ?? [],
-    onChange: (i, strokes) => {
-      const current = latest.current;
-      const ink = current.ink.map((item) => [...item]);
-      ink[current.index][i] = strokes;
-      onChange({ ...current, ink });
-    },
+    onChange: (i, strokes) =>
+      onUpdate((current) => {
+        const ink = current.ink.map((item) => [...item]);
+        ink[current.index][i] = strokes;
+        return { ...current, ink };
+      }),
   });
   const play = () => {
     if (hasClip(item))
@@ -220,11 +230,9 @@ function DictationWriting({
   };
   const playOnce = useEffectEvent(play);
   useEffect(() => {
-    setReveal(false);
-    setActive(0);
     playOnce();
   }, [round.index]);
-  const go = (index: number) => onChange({ ...round, index });
+  const go = (index: number) => onUpdate((current) => ({ ...current, index }));
   const last = round.index === round.items.length - 1;
   return (
     <section className="hanzi-dictation">
