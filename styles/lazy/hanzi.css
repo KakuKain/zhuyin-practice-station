@@ -1,11 +1,13 @@
 /* 第一冊's 生字 (course list, lesson page and 筆順 practice), loaded with those screens. */
 
 /* Course cards: the lesson's first 生字 where the 注音 lessons have a picture. */
+.is-courses .hanzi-journey .journey-card {
+  grid-template-columns: minmax(0, 1fr) auto 36px;
+}
 .hanzi-card-characters {
   display: flex;
   flex: none;
-  gap: 2px;
-  margin-left: auto;
+  gap: 4px;
   color: #b4544b;
   font-size: 30px;
   font-weight: 700;
@@ -14,28 +16,40 @@
 .hanzi-card-characters span {
   display: grid;
   place-items: center;
-  width: 42px;
-  height: 42px;
+  width: 40px;
+  height: 40px;
   border: 1.5px dashed #e8b7af;
   border-radius: 8px;
   background: #fffdf7;
 }
 
+/* Phones keep the title on one line: one 生字 below 420px. */
+@media (max-width: 419px) {
+  .hanzi-card-characters span:not(:first-child) {
+    display: none;
+  }
+}
+
 /* Lesson page */
-.hanzi-modes {
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+.lesson-page .mode-grid.hanzi-modes {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+}
+@media (min-width: 700px) {
+  .lesson-page .mode-grid.hanzi-modes {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 .hanzi-parts-note {
   margin: -4px 0 12px;
   color: var(--ink-soft);
 }
-.hanzi-character-cards {
-  display: grid;
+.hanzi-lesson-parts ul.hanzi-character-cards {
   grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
   gap: 10px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
+}
+/* Each 生字 is its own card, on the lesson parts' washed background. */
+.hanzi-lesson-parts .hanzi-character-cards li {
+  padding: 6px;
 }
 .hanzi-character-card {
   display: grid;
@@ -43,8 +57,8 @@
   gap: 6px;
   width: 100%;
   padding: 10px 6px 8px;
-  border: 1.5px solid #ecd9c7;
-  border-radius: 16px;
+  border: 1.5px dashed #e8b7af;
+  border-radius: 14px;
   background: #fffdf7;
   color: var(--ink);
   font: inherit;

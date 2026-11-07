@@ -73,7 +73,9 @@ export function CourseList({
             ? "數一數、比一比，一起玩數學！"
             : subject === "english"
               ? "聽一聽、寫一寫，認識英文字母！"
-              : "跟著注音，一步一步探索吧！"
+              : app.materialsState.activeId === book1MaterialId
+                ? "照著筆順，一筆一筆寫生字！"
+                : "跟著注音，一步一步探索吧！"
         }
         artwork="course-art/course-journey-hero-v2.webp"
       />
