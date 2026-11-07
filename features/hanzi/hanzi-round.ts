@@ -14,7 +14,13 @@ export type CharacterRecord = {
   hard: number;
   at: number;
 };
-export type HanziRecords = { version: 1; characters: Record<string, CharacterRecord> };
+/** A 語詞 written wrong in 聽寫, for 語詞 practice to bring back. */
+export type WordRecord = { wrong: number; at: number };
+export type HanziRecords = {
+  version: 1;
+  characters: Record<string, CharacterRecord>;
+  words: Record<string, WordRecord>;
+};
 
 export function readHanziRecords(): HanziRecords {
   try {
@@ -30,9 +36,14 @@ export function readHanziRecords(): HanziRecords {
           Number.isFinite(record.at)
         )
           characters[character] = record;
-    return { version: 1, characters };
+    const words: Record<string, WordRecord> = {};
+    if (value?.words && typeof value.words === "object")
+      for (const [text, record] of Object.entries(value.words))
+        if (record && Number.isFinite(record.wrong) && Number.isFinite(record.at))
+          words[text] = record;
+    return { version: 1, characters, words };
   } catch {
-    return { version: 1, characters: {} };
+    return { version: 1, characters: {}, words: {} };
   }
 }
 
@@ -46,6 +57,33 @@ export function recordHanzi(results: { character: string; hinted: boolean }[], n
       hard: hinted ? Math.min(before.hard + 1, 3) : Math.max(before.hard - 1, 0),
       at: now,
     };
+  }
+  try {
+    window.localStorage.setItem(childKey(storageKeys.hanziRecords), JSON.stringify(records));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * 聽寫's results after the parent's check: a 生字 written wrong becomes harder (so 只考生字 asks
+ * it first and the list keeps it in view), a 語詞 written wrong is kept for 語詞 practice.
+ */
+export function recordDictation(
+  results: { text: string; right: boolean; character: boolean }[],
+  now = Date.now(),
+) {
+  const records = readHanziRecords();
+  for (const { text, right, character } of results) {
+    if (right) continue;
+    if (character) {
+      const before = records.characters[text] ?? { practised: 0, hard: 0, at: 0 };
+      records.characters[text] = { ...before, hard: Math.min(before.hard + 1, 3), at: now };
+    } else {
+      const before = records.words[text] ?? { wrong: 0, at: 0 };
+      records.words[text] = { wrong: before.wrong + 1, at: now };
+    }
   }
   try {
     window.localStorage.setItem(childKey(storageKeys.hanziRecords), JSON.stringify(records));

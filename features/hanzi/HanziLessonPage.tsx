@@ -7,14 +7,14 @@ import { readHanziRecords } from "./hanzi-round";
 import "../../styles/lazy/hanzi.css";
 
 /**
- * A 第一冊 lesson's page: its number and title, its three practices (練習, 聽寫 and 照樣造句;
- * the last two are being made) and every 生字, each a tap away from 練習 on that 生字. A check
+ * A 第一冊 lesson's page: its number and title, its three practices (練習, 聽寫 and 照樣造句,
+ * which is being made) and every 生字, each a tap away from 練習 on that 生字. A check
  * marks the 生字 written to the end before.
  */
 export function HanziLessonPage({
   app,
 }: {
-  app: Pick<AppController, "hanziLessonId" | "startHanziPractice">;
+  app: Pick<AppController, "hanziLessonId" | "startHanziPractice" | "startHanziDictation">;
 }) {
   const lesson = book1Lessons.find((item) => item.id === app.hanziLessonId) ?? book1Lessons[1];
   const [records] = useState(readHanziRecords);
@@ -54,32 +54,45 @@ export function HanziLessonPage({
             <HanziWords text="開始" /> <ArrowRight size={19} weight="bold" aria-hidden="true" />
           </span>
         </button>
-        {(
-          [
-            ["聽寫", Ear],
-            ["照樣造句", TextAa],
-          ] as const
-        ).map(([name, Icon]) => (
-          <button
-            key={name}
-            className="mode-card fill-mode is-coming"
-            type="button"
-            disabled
-            aria-label={`${name}，製作中`}
-          >
-            <span className="mode-icon" aria-hidden="true">
-              <Icon size={28} weight="duotone" />
-            </span>
-            <span className="lesson-mode-copy">
-              <small>
-                <HanziWords text="製作中" />
-              </small>
-              <strong>
-                <HanziWords text={name} />
-              </strong>
-            </span>
-          </button>
-        ))}
+        <button
+          className="mode-card fill-mode"
+          type="button"
+          aria-label="聽寫，只聽聲音寫國字注音"
+          onClick={() => app.startHanziDictation()}
+        >
+          <span className="mode-icon" aria-hidden="true">
+            <Ear size={28} weight="duotone" />
+          </span>
+          <span className="lesson-mode-copy">
+            <small>
+              <HanziWords text="只考生字" />・<HanziWords text="全部語詞" />
+            </small>
+            <strong>
+              <HanziWords text="聽寫" />
+            </strong>
+          </span>
+          <span className="lesson-mode-cta">
+            <HanziWords text="開始" /> <ArrowRight size={19} weight="bold" aria-hidden="true" />
+          </span>
+        </button>
+        <button
+          className="mode-card fill-mode is-coming"
+          type="button"
+          disabled
+          aria-label="照樣造句，製作中"
+        >
+          <span className="mode-icon" aria-hidden="true">
+            <TextAa size={28} weight="duotone" />
+          </span>
+          <span className="lesson-mode-copy">
+            <small>
+              <HanziWords text="製作中" />
+            </small>
+            <strong>
+              <HanziWords text="照樣造句" />
+            </strong>
+          </span>
+        </button>
       </div>
       <div className="math-lesson-parts hanzi-lesson-parts">
         <h2>

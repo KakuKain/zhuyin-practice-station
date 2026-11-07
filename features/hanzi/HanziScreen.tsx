@@ -15,6 +15,7 @@ import { taskKeys } from "../rewards/stamp-book";
 import { MathHeader } from "../math/MathChrome";
 import { book1Facts, book1LessonLabel, book1Lessons, book1Readings } from "./book1-characters";
 import { HanziGlyph, HanziWords, characterStrokes } from "./HanziChrome";
+import { callReadings, characterCalls } from "./book1-words";
 import { readHanziRecords, recordHanzi, stampAfter, type StrokeStep } from "./hanzi-round";
 import { fromSquare, judgeStroke, screenMedian, type StrokeVerdict } from "./stroke-match";
 import { chime } from "./chime";
@@ -112,6 +113,7 @@ export function HanziScreen({ app }: { app: HanziApp }) {
           characters={characters}
           current={current}
           practised={(character) => (records.characters[character]?.practised ?? 0) > 0}
+          hard={(character) => (records.characters[character]?.hard ?? 0) > 0}
           onPick={pick}
           onClose={current ? () => setListOpen(false) : leave}
         />
@@ -125,12 +127,15 @@ function CharacterList({
   characters,
   current,
   practised,
+  hard,
   onPick,
   onClose,
 }: {
   characters: string[];
   current?: string;
   practised: (character: string) => boolean;
+  /** Needed hints in 練習, or was written wrong in 聽寫. */
+  hard: (character: string) => boolean;
   onPick: (character: string) => void;
   onClose: () => void;
 }) {
@@ -158,7 +163,7 @@ function CharacterList({
                 type="button"
                 className={`hanzi-character-card${character === current ? " is-current" : ""}`}
                 onClick={() => onPick(character)}
-                aria-label={`練習「${character}」${practised(character) ? "，練過了" : ""}`}
+                aria-label={`練習「${character}」${practised(character) ? "，練過了" : ""}${hard(character) ? "，要再練" : ""}`}
               >
                 <span className="hanzi-card-glyph">
                   <HanziGlyph
@@ -181,6 +186,11 @@ function CharacterList({
                     weight="fill"
                     aria-hidden="true"
                   />
+                )}
+                {hard(character) && (
+                  <span className="hanzi-card-hard">
+                    <HanziWords text="再練" />
+                  </span>
                 )}
               </button>
             </li>
@@ -217,10 +227,18 @@ function CharacterPractice({
   const [stage, setStage] = useState<Stage>("watch");
   const [replay, setReplay] = useState(0);
   const hinted = useRef(false);
-  const hasClip = registeredAudioUrl(character, book1Readings[character]) !== null;
+  // The 生字's call (「拍手的拍」) says which character it is; the 生字 alone, if only that is voiced.
+  const call = characterCalls[character];
+  const callReading = callReadings(character).replaceAll(" ", "|");
+  const clip =
+    registeredAudioUrl(call, callReading) !== null
+      ? { text: call, pronunciation: callReading }
+      : registeredAudioUrl(character, book1Readings[character]) !== null
+        ? { text: character, pronunciation: book1Readings[character] }
+        : null;
+  const hasClip = clip !== null;
   const say = () => {
-    if (hasClip)
-      app.speak(character, { pronunciation: book1Readings[character], onError: () => {} });
+    if (clip) app.speak(clip.text, { pronunciation: clip.pronunciation, onError: () => {} });
   };
   const sayOnce = useEffectEvent(say);
   useEffect(() => {

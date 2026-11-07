@@ -88,8 +88,11 @@ export const book1Words: Record<number, DictationWord[]> = Object.fromEntries(
   ]),
 );
 
-/** 個數's 數 is written in 注音 at school, but a child who writes the 國字 is right too. */
-export const alsoRight: Record<string, string> = { 數: "ㄕㄨˋ" };
+/**
+ * Not 生字, but printed as 國字 on a sheet (個數, 白天): the answer is their 注音, and a child who
+ * writes the 國字 is right too.
+ */
+export const alsoRight: Record<string, string> = { 數: "ㄕㄨˋ", 天: "ㄊㄧㄢ" };
 
 /** The 生字 taught by the end of a lesson: 國字真簡單's numbers and every lesson up to it. */
 export const taughtBy = (lessonId: number) =>
