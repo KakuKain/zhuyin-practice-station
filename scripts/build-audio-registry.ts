@@ -8,6 +8,7 @@ import {
   legacyCircledVocabulary,
   legacyReviewVocabulary,
 } from "../features/courses/legacy-content";
+import { book1Words, callReadings, characterCalls } from "../features/hanzi/book1-words";
 const root = process.cwd();
 const audioDir = join(root, "public/listening-audio");
 const gemini = JSON.parse(readFileSync(join(audioDir, "gemini/manifest.json"), "utf8"));
@@ -31,6 +32,13 @@ Object.values(extraWordQuestions)
   .flat()
   .forEach((q) => add(q.audioText, q.answer));
 combinedRhymeExamples.forEach((x) => add(x.rhyme, x.rhyme));
+// 第一冊's 聽寫: the teacher's 語詞 and each 生字's call (「拍手的拍」).
+Object.values(book1Words)
+  .flat()
+  .forEach((word) => add(word.text, word.readings.replaceAll(" ", "|")));
+Object.keys(characterCalls).forEach((character) =>
+  add(characterCalls[character], callReadings(character).replaceAll(" ", "|")),
+);
 function duration(bytes: Buffer): number {
   const visit = (start: number, end: number): number => {
     for (let offset = start; offset + 8 <= end;) {
