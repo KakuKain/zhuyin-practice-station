@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 import {
   answerCells,
@@ -8,6 +9,12 @@ import {
 } from "../../features/hanzi/book1-words";
 import { book1Lessons } from "../../features/hanzi/book1-characters";
 import { checkWritten } from "../../features/hanzi/dictation";
+import {
+  partReadings,
+  patternParts,
+  sentenceLessons,
+} from "../../features/hanzi/sentence-patterns";
+import { isHan, readingVariants } from "../../features/lesson/reading-variants";
 import strokes from "../../features/hanzi/strokes.json";
 import type { InkStroke } from "../../features/types";
 
@@ -86,4 +93,32 @@ test("聽寫 judges a written 國字 by its strokes, wherever it sits in the squ
   const few = checkWritten("三", write("三").slice(1, 2));
   assert.equal(few.ok, false);
   assert.deepEqual([few.count, few.expected], [1, 3]);
+});
+
+test("照樣造句 examples and patterns have one reading per character, all in the font", () => {
+  const annotated = JSON.parse(
+    readFileSync("assets/font-sources/KidLessonYoSans-readings.json", "utf8"),
+  ) as Record<string, string>;
+  const check = (text: string, readings: string) => {
+    const syllables = readings ? readings.split(" ") : [];
+    const characters = [...text];
+    assert.equal(syllables.length, characters.filter(isHan).length, `${text}: one per character`);
+    const variants = readingVariants(text, readings);
+    let syllable = 0;
+    characters.forEach((character, index) => {
+      if (!isHan(character)) return;
+      const glyph = character + (variants[index] ?? "");
+      assert.ok(glyph in annotated, `${text}: ${character} is missing from the font`);
+      assert.equal(annotated[glyph], syllables[syllable++], `${text}: ${character}`);
+    });
+  };
+  for (const { questions } of Object.values(sentenceLessons))
+    for (const question of questions) {
+      check(question.example, question.exampleReadings);
+      const parts = patternParts(question.pattern);
+      partReadings(question).forEach((readings, i) => {
+        const part = parts[i];
+        check(part.kind === "text" ? part.text : (part.label ?? ""), readings);
+      });
+    }
 });

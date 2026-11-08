@@ -21,6 +21,11 @@ export const alternateReadings: Record<string, string> = {
   啊ㄚ: "\u{E01E1}",
   // 合起來: added to the fonts by scripts/build-yo-fonts.py, which the upstream fonts lack.
   "來˙ㄌㄞ": "\u{E01E1}",
+  // 照樣造句's 妹妹, 弟弟, 姐姐 and 漂亮; 姐 and 亮 are added to the fonts like 來.
+  "妹˙ㄇㄟ": "\u{E01E1}",
+  "弟˙ㄉㄧ": "\u{E01E1}",
+  "姐˙ㄐㄧㄝ": "\u{E01E1}",
+  "亮˙ㄌㄧㄤ": "\u{E01E1}",
 };
 
 export const isHan = (character: string) => /\p{Script=Han}/u.test(character);
