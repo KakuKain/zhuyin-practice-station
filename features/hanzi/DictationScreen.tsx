@@ -13,7 +13,6 @@ import { useInkCanvas } from "../../lib/ink/useInkCanvas";
 import { registeredAudioUrl } from "../../lib/audio/audio-registry";
 import { InkTools } from "../../components/InkTools";
 import { ZhuyinStack } from "../../components/Zhuyin";
-import { InkPreview } from "../../components/AppChrome";
 import { taskKeys } from "../rewards/stamp-book";
 import { MathHeader, MathResult } from "../math/MathChrome";
 import { book1LessonLabel, book1Lessons } from "./book1-characters";
@@ -33,6 +32,7 @@ import {
   type DictationRound,
   type WrittenCheck,
 } from "./dictation";
+import { CellGuides, InkReplay } from "./HanziCells";
 import "../../styles/lazy/hanzi.css";
 
 type DictationApp = Pick<
@@ -431,22 +431,6 @@ function DictationCheck({
   );
 }
 
-/** The 田字格 and its 注音 strip, drawn over a cell's canvas; a punctuation cell has no strip. */
-function CellGuides({ mark }: { mark: boolean }) {
-  return (
-    <svg
-      className="hanzi-cell-guides"
-      viewBox="0 0 100 75"
-      preserveAspectRatio="none"
-      aria-hidden="true"
-    >
-      {!mark && <rect x="75" y="0" width="25" height="75" className="is-strip" />}
-      <path d="M 37.5 0 V 75 M 0 37.5 H 75" className="is-dashed" />
-      {!mark && <path d="M 75 0 V 75" className="is-divider" />}
-    </svg>
-  );
-}
-
 function CheckCell({
   cell,
   strokes,
@@ -504,29 +488,5 @@ function CheckCell({
         </button>
       )}
     </div>
-  );
-}
-
-/** The child's writing; played, it appears stroke by stroke, each numbered where it starts. */
-function InkReplay({ strokes, play }: { strokes: InkStroke[]; play: boolean }) {
-  const [shown, setShown] = useState(play ? 0 : strokes.length);
-  useEffect(() => {
-    if (!play || shown >= strokes.length) return;
-    const timer = window.setTimeout(() => setShown(shown + 1), 450);
-    return () => window.clearTimeout(timer);
-  }, [play, shown, strokes.length]);
-  return (
-    <>
-      <InkPreview strokes={strokes.slice(0, shown)} />
-      {play && (
-        <svg className="hanzi-replay-numbers" viewBox="0 0 100 100" aria-hidden="true">
-          {strokes.slice(0, shown).map((stroke, i) => (
-            <text key={i} x={stroke[0].x} y={stroke[0].y}>
-              {i + 1}
-            </text>
-          ))}
-        </svg>
-      )}
-    </>
   );
 }
