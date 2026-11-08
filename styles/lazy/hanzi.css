@@ -744,10 +744,16 @@
   background: #f1ece5;
   font-weight: 700;
 }
+/* A word's characters 直書 here too, top to bottom as the child wrote them. */
 .hanzi-check-cells {
+  writing-mode: vertical-rl;
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+  max-height: 640px;
+}
+.hanzi-check-cell {
+  writing-mode: horizontal-tb;
 }
 .hanzi-check-cell {
   display: grid;
