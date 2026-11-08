@@ -47,6 +47,7 @@ const screens = {
   englishCourses: () => import("../features/english/EnglishCourseList"),
   hanzi: () => import("../features/hanzi/HanziScreen"),
   hanziLesson: () => import("../features/hanzi/HanziLessonPage"),
+  hanziDictation: () => import("../features/hanzi/DictationScreen"),
   hanziCourses: () => import("../features/hanzi/HanziCourseList"),
 };
 const FillBlank = lazy(() => screens.fillBlank().then((m) => ({ default: m.FillBlank })));
@@ -63,6 +64,9 @@ const EnglishLessonPage = lazy(() =>
   screens.englishLesson().then((m) => ({ default: m.EnglishLessonPage })),
 );
 const HanziScreen = lazy(() => screens.hanzi().then((m) => ({ default: m.HanziScreen })));
+const DictationScreen = lazy(() =>
+  screens.hanziDictation().then((m) => ({ default: m.DictationScreen })),
+);
 const HanziLessonPage = lazy(() =>
   screens.hanziLesson().then((m) => ({ default: m.HanziLessonPage })),
 );
@@ -215,7 +219,7 @@ function PracticeContent({ app }: { app: ReturnType<typeof usePracticeApp> }) {
   if (view === "hanzi")
     return (
       <FullScreen>
-        <HanziScreen app={app} />
+        {app.hanziMode === "dictation" ? <DictationScreen app={app} /> : <HanziScreen app={app} />}
       </FullScreen>
     );
   if (isFocusMode)
