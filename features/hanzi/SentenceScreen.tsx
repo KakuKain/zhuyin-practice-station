@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent, useRef, useState, type ReactNode } from "react";
+import { Fragment, useEffect, useEffectEvent, useRef, useState, type ReactNode } from "react";
 import { ArrowLeft, ArrowRight, SpeakerHigh } from "@phosphor-icons/react";
 import type { AppController } from "../usePracticeApp";
 import type { InkStroke } from "../types";
@@ -253,22 +253,19 @@ function Pattern({
               <Reading text={part.text} readings={readings[i]} />
             </span>
           );
+        // Flat, so a long blank can run on into the next column.
         const cells = Array.from({ length: part.cells }, () => cell++);
         return (
-          <span key={i} className="hanzi-pattern-blank">
+          <Fragment key={i}>
             {part.label && (
               <span className="hanzi-pattern-label">
                 <Reading text={part.label} readings={readings[i]} />
               </span>
             )}
-            <span className="hanzi-pattern-cells">
-              {cells.map((index) => (
-                <span key={index} className="hanzi-pattern-cell">
-                  {renderCell(index)}
-                </span>
-              ))}
-            </span>
-          </span>
+            {cells.map((index) => (
+              <Fragment key={index}>{renderCell(index)}</Fragment>
+            ))}
+          </Fragment>
         );
       })}
     </div>

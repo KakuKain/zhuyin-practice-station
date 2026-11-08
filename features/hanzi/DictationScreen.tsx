@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -257,7 +257,7 @@ function DictationWriting({
               : "還沒有錄音，請家長念題目"}
         </button>
       </div>
-      <div className="hanzi-dictation-cells" style={{ "--cells": cells.length } as CSSProperties}>
+      <div className="hanzi-dictation-cells">
         {cells.map((cell, k) => (
           <div className={`hanzi-cell${active === k ? " is-active" : ""}`} key={k}>
             <CellGuides mark={cell.write === "標點"} />

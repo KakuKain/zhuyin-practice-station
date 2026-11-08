@@ -151,8 +151,9 @@ export const sentenceLessons: Record<number, { name: string; questions: Sentence
         example: "我向小紅花說你早，也向小白花說你好。",
         exampleReadings:
           "ㄨㄛˇ ㄒㄧㄤˋ ㄒㄧㄠˇ ㄏㄨㄥˊ ㄏㄨㄚ ㄕㄨㄛ ㄋㄧˇ ㄗㄠˇ ㄧㄝˇ ㄒㄧㄤˋ ㄒㄧㄠˇ ㄅㄞˊ ㄏㄨㄚ ㄕㄨㄛ ㄋㄧˇ ㄏㄠˇ",
-        pattern: "我向{3}說你早，也向{3}說你好。",
-        patternReadings: "ㄨㄛˇ ㄒㄧㄤˋ ㄕㄨㄛ ㄋㄧˇ ㄗㄠˇ ㄧㄝˇ ㄒㄧㄤˋ ㄕㄨㄛ ㄋㄧˇ ㄏㄠˇ",
+        // The sentence is long; the example shows it whole, the pattern only its second half.
+        pattern: "也向{3}說你好。",
+        patternReadings: "ㄧㄝˇ ㄒㄧㄤˋ ㄕㄨㄛ ㄋㄧˇ ㄏㄠˇ",
       },
     ],
   },

@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import {
   ArrowCounterClockwise,
   ArrowRight,
@@ -292,10 +292,7 @@ function WordCells({
   }
 
   return (
-    <div
-      className="hanzi-dictation-cells hanzi-word-cells"
-      style={{ "--cells": cells.length } as CSSProperties}
-    >
+    <div className="hanzi-dictation-cells hanzi-word-cells">
       {cells.map((cell, i) => {
         const mark = marks[i];
         const complete = totals[i] > 0 && done[i] >= totals[i];

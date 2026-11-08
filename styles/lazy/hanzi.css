@@ -612,22 +612,46 @@
   font-size: 15px;
   cursor: pointer;
 }
-.hanzi-dictation-cells {
-  container-type: inline-size;
+/*
+ * 直書, as in the 作業簿: cells run top to bottom and columns right to left. A cell's 田字格 is
+ * about 3.5 cm on the tablet (192 px portrait, 188 px landscape); a column takes the height left.
+ */
+.hanzi-dictation-cells,
+.hanzi-sentence .hanzi-pattern {
+  --cell: min(32vw, 256px);
+  writing-mode: vertical-rl;
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
-  gap: 14px;
+  align-items: center;
+  align-content: safe center;
+  justify-content: flex-start;
+  gap: 10px 16px;
   width: 100%;
+  /* At least two cells a column (each 3/4 of its width high). */
+  max-height: max(calc(100dvh - 410px), calc(var(--cell) * 1.5 + 12px));
+  overflow-x: auto;
+}
+@media (min-width: 900px) and (orientation: landscape) {
+  .hanzi-dictation-cells,
+  .hanzi-sentence .hanzi-pattern {
+    --cell: 250px;
+  }
+}
+@media (max-width: 599px) {
+  .hanzi-dictation-cells,
+  .hanzi-sentence .hanzi-pattern {
+    --cell: min(70vw, 280px);
+  }
 }
 /* The cell shows the top of its square canvas: the 田字格 and the 注音 strip (4 : 3). */
 .hanzi-cell {
   container-type: inline-size;
+  writing-mode: horizontal-tb;
   position: relative;
+  flex: none;
   overflow: hidden;
   border: 1.5px solid #e3a49b;
-  /* As big as the row allows: one to three cells side by side. */
-  width: min(calc((100cqw - (var(--cells, 2) - 1) * 14px) / var(--cells, 2)), 420px);
+  width: var(--cell, 256px);
   aspect-ratio: 4 / 3;
   border-radius: 10px;
   background: #fffdf7;
@@ -976,45 +1000,92 @@
   font-size: 30px;
 }
 .hanzi-pattern {
-  container-type: inline-size;
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 10px 8px;
-  width: 100%;
+  align-items: center;
+  gap: 6px;
 }
 .hanzi-pattern-text {
-  padding-bottom: 6px;
   font-size: 34px;
 }
-.hanzi-pattern-blank {
-  display: grid;
-  justify-items: center;
-  gap: 4px;
+.hanzi-sentence .hanzi-pattern-text {
+  padding: 4px 0;
 }
 .hanzi-pattern-label {
-  padding: 0 8px;
+  padding: 6px 2px;
   border-radius: 999px;
   background: #e6f3ff;
   color: #2f6ab0;
   font-size: 15px;
 }
-.hanzi-pattern-cells {
-  display: flex;
-  gap: 4px;
-}
-.hanzi-pattern-cell .hanzi-cell {
-  width: clamp(84px, 17cqw, 160px);
-}
+/* The parent's check keeps the sentences across, with small previews. */
 .hanzi-sentence-check .hanzi-pattern {
   justify-content: flex-start;
   width: auto;
   flex: 1;
+}
+.hanzi-sentence-check .hanzi-pattern-label {
+  padding: 0 8px;
 }
 .hanzi-sentence-check .hanzi-check-ink {
   width: clamp(56px, 10cqw, 96px);
 }
 .hanzi-sentence-check .hanzi-pattern-text {
   font-size: 24px;
+}
+
+/* A sentence can need four columns; landscape tablets give it the whole width. */
+.hanzi-dictation.hanzi-sentence {
+  width: min(100%, 1240px);
+}
+
+/*
+ * Landscape tablets: the question, tools and buttons on the left, the cells on the right with the
+ * whole height, so a column holds three cells and a sentence fits across.
+ */
+@media (min-width: 900px) and (orientation: landscape) {
+  .hanzi-dictation {
+    grid-template-columns: minmax(260px, 330px) minmax(0, 1fr);
+    align-items: center;
+    column-gap: 28px;
+    width: min(100%, 1240px);
+  }
+  .hanzi-dictation > * {
+    grid-column: 1;
+  }
+  .hanzi-dictation > .hanzi-dictation-cells,
+  .hanzi-dictation > .hanzi-pattern {
+    grid-column: 2;
+    grid-row: 1 / span 4;
+  }
+  .hanzi-dictation-cells,
+  .hanzi-sentence .hanzi-pattern {
+    max-height: calc(100dvh - 110px);
+  }
+  .hanzi-dictation .hanzi-example {
+    flex-direction: column;
+  }
+  .hanzi-dictation .hanzi-example-text {
+    font-size: 26px;
+    text-align: center;
+  }
+  .hanzi-word-practice .hanzi-dictation-cells {
+    grid-column: 2;
+    grid-row: 1 / span 3;
+  }
+}
+
+/* 聽寫 and 語詞 have one to three characters, so their cells can be bigger (4.4 cm portrait). */
+.hanzi-dictation-cells {
+  --cell: min(40vw, 320px);
+}
+@media (min-width: 900px) and (orientation: landscape) {
+  .hanzi-dictation-cells {
+    --cell: 300px;
+  }
+}
+@media (max-width: 599px) {
+  .hanzi-dictation-cells {
+    --cell: min(70vw, 280px);
+  }
 }
