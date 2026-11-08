@@ -301,12 +301,17 @@ function WordCells({
         const complete = totals[i] > 0 && done[i] >= totals[i];
         return (
           <div className={`hanzi-cell${complete ? " is-complete" : ""}`} key={i}>
-            <svg className="hanzi-cell-guides" viewBox="0 0 100 75" aria-hidden="true">
-              <rect x="0.5" y="0.5" width="74" height="74" />
-              <path d="M 37.5 0 V 75 M 0 37.5 H 75" className="is-dashed" />
+            <svg
+              className="hanzi-cell-guides"
+              viewBox="0 0 100 75"
+              preserveAspectRatio="none"
+              aria-hidden="true"
+            >
               {cell.write !== "標點" && (
-                <rect x="75" y="0.5" width="24.5" height="74" className="is-strip" />
+                <rect x="75" y="0" width="25" height="75" className="is-strip" />
               )}
+              <path d="M 37.5 0 V 75 M 0 37.5 H 75" className="is-dashed" />
+              {cell.write !== "標點" && <path d="M 75 0 V 75" className="is-divider" />}
             </svg>
             {cell.write === "國字" && (
               <span className="hanzi-cell-model">
