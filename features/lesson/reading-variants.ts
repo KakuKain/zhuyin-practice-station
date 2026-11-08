@@ -13,6 +13,10 @@ export const alternateReadings: Record<string, string> = {
   "個˙ㄍㄜ": "\u{E01E1}",
   // 和 joining two things, as the lessons read it (河馬和河狸).
   和ㄏㄢˋ: "\u{E01E1}",
+  // 一 and 不 as the 聽寫 sheets mark them before another syllable (一ˊ個, 一ˋ起, 不ˊ是).
+  一ㄧˊ: "\u{E01E1}",
+  一ㄧˋ: "\u{E01E2}",
+  不ㄅㄨˊ: "\u{E01E1}",
   // 第一冊's 生字 啊, as 本冊生字 reads it alone.
   啊ㄚ: "\u{E01E1}",
   // 合起來: added to the fonts by scripts/build-yo-fonts.py, which the upstream fonts lack.

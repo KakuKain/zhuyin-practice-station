@@ -24,6 +24,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { builtinCatalog } from "../features/courses/materials";
+import { book1Words, callReadings, characterCalls } from "../features/hanzi/book1-words";
 import { isHan, mathPromptReadings, mathPrompts } from "../features/math/math-audio";
 import {
   type Audio,
@@ -102,9 +103,30 @@ const lessonText = builtinCatalog.flatMap((lesson) => [
   ...lesson.exercise.lines.flat().map((cell) => cell.character),
   ...lesson.exercise.questions.map((question) => question.audioText),
 ]);
+/** 第一冊's 聽寫 clips not voiced yet: the teacher's 語詞, then each 生字's call. */
+const voiced = new Set(
+  wordsManifest.words.map(
+    (word: { text: string; reading: string }) => `${word.text}|${word.reading}`,
+  ),
+);
+const book1Items = [
+  ...Object.values(book1Words)
+    .flat()
+    .map((word) => [word.text, word.readings] as const),
+  ...Object.keys(characterCalls).map((c) => [characterCalls[c], callReadings(c)] as const),
+]
+  .filter(([text], i, all) => all.findIndex(([other]) => other === text) === i)
+  .map(([text, readings]): Item => ({
+    kind: "words",
+    key: text,
+    text,
+    readings: readings.split(" "),
+  }))
+  .filter((item) => !voiced.has(`${item.text}|${item.readings.join("|")}`));
 const words = (texts: string[]) =>
   [...new Set(texts)].map(wordItem).filter((item): item is Item => Boolean(item));
 const groups: [string, Item[]][] = [
+  ["第一冊 聽寫", book1Items],
   ["math instructions", mathIds.filter((id) => !/\d/.test(id)).map(mathItem)],
   ["生字 and circled words", words(heard)],
   ["numbered math questions", mathIds.filter((id) => /\d/.test(id)).map(mathItem)],
@@ -220,7 +242,9 @@ function prompt(batch: Item[]) {
     ...(hints.length ? [`讀音照課本：${hints.join("、")}。`] : []),
     "",
     "## Transcript:",
-    batch.map((item) => (math ? item.text : `${item.text}。`)).join("\n[long pause]\n"),
+    batch
+      .map((item) => (math || /[。！？]$/.test(item.text) ? item.text : `${item.text}。`))
+      .join("\n[long pause]\n"),
   ].join("\n");
 }
 
