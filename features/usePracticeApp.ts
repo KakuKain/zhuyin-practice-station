@@ -227,7 +227,7 @@ export function usePracticeApp() {
   const [hanziLessonId, setHanziLessonId] = useState(1);
   /** The 生字 practice starts on: one tapped on the lesson page, or none to pick from the list. */
   const [hanziStart, setHanziStart] = useState<string | undefined>();
-  const [hanziMode, setHanziMode] = useState<"practice" | "dictation">("practice");
+  const [hanziMode, setHanziMode] = useState<"practice" | "dictation" | "sentences">("practice");
   const openHanziLesson = (id: number) => {
     setHanziLessonId(id);
     setView("hanzi-lesson");
@@ -239,6 +239,10 @@ export function usePracticeApp() {
   };
   const startHanziDictation = () => {
     setHanziMode("dictation");
+    setView("hanzi");
+  };
+  const startHanziSentences = () => {
+    setHanziMode("sentences");
     setView("hanzi");
   };
 
@@ -368,6 +372,7 @@ export function usePracticeApp() {
     hanziStart,
     hanziMode,
     startHanziDictation,
+    startHanziSentences,
     openHanziLesson,
     startHanziPractice,
     subject,

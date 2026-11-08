@@ -958,3 +958,63 @@
     font-size: 16px;
   }
 }
+
+/* 照樣造句: the book's example, then the pattern with blanks in 作業簿 cells. */
+.hanzi-example {
+  justify-content: flex-start;
+  width: min(100%, 860px);
+}
+.hanzi-example-label {
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: #fde4e1;
+  color: #9c4038;
+  font-size: 16px;
+}
+.hanzi-example-text {
+  margin: 0;
+  font-size: 30px;
+}
+.hanzi-pattern {
+  container-type: inline-size;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 10px 8px;
+  width: 100%;
+}
+.hanzi-pattern-text {
+  padding-bottom: 6px;
+  font-size: 34px;
+}
+.hanzi-pattern-blank {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+}
+.hanzi-pattern-label {
+  padding: 0 8px;
+  border-radius: 999px;
+  background: #e6f3ff;
+  color: #2f6ab0;
+  font-size: 15px;
+}
+.hanzi-pattern-cells {
+  display: flex;
+  gap: 4px;
+}
+.hanzi-pattern-cell .hanzi-cell {
+  width: clamp(84px, 17cqw, 160px);
+}
+.hanzi-sentence-check .hanzi-pattern {
+  justify-content: flex-start;
+  width: auto;
+  flex: 1;
+}
+.hanzi-sentence-check .hanzi-check-ink {
+  width: clamp(56px, 10cqw, 96px);
+}
+.hanzi-sentence-check .hanzi-pattern-text {
+  font-size: 24px;
+}

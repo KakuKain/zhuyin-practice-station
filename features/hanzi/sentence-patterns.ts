@@ -8,7 +8,10 @@
  * (labels included, in order).
  */
 export type SentenceQuestion = {
+  /** What is played (and shown, unless `shown` says otherwise). */
   example: string;
+  /** The example as shown, where it reads better than it sounds: 「比→比一比」. */
+  shown?: string;
   exampleReadings: string;
   pattern: string;
   patternReadings: string;
@@ -114,18 +117,21 @@ export const sentenceLessons: Record<number, { name: string; questions: Sentence
     questions: [
       {
         example: "比，比一比。",
+        shown: "比→比一比",
         exampleReadings: "ㄅㄧˇ ㄅㄧˇ ㄧ ㄅㄧˇ",
         pattern: "跑→{1}一{1}",
         patternReadings: "ㄆㄠˇ ㄧ",
       },
       {
         example: "比，比一比。",
+        shown: "比→比一比",
         exampleReadings: "ㄅㄧˇ ㄅㄧˇ ㄧ ㄅㄧˇ",
         pattern: "走→{1}一{1}",
         patternReadings: "ㄗㄡˇ ㄧ",
       },
       {
         example: "比，比一比。",
+        shown: "比→比一比",
         exampleReadings: "ㄅㄧˇ ㄅㄧˇ ㄧ ㄅㄧˇ",
         pattern: "拍→{1}一{1}",
         patternReadings: "ㄆㄞ ㄧ",

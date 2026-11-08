@@ -204,3 +204,40 @@ test("第一冊 語詞 practice traces a word's 國字 stroke by stroke and leav
   await expect(page.getByRole("button", { name: "下一個語詞：你好" })).toBeVisible();
   expect(errors).toEqual([]);
 });
+
+test("第一冊 照樣造句 shows the book's example, fills the pattern's blanks and ends with the parent's marks", async ({
+  page,
+}) => {
+  test.setTimeout(120_000);
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("./");
+  await page.getByRole("combobox", { name: "選擇教材" }).selectOption("kang-hsuan-grade1-book1");
+  await page.getByRole("button", { name: /第三課，秋千/ }).click();
+  await page.getByRole("button", { name: "照樣造句，看例句填空格" }).click();
+  await expect(page.locator(".math-header")).toContainText("第 1 題 / 3");
+  await expect(page.locator(".hanzi-example-text")).toContainText("一");
+  await noOverflow(page);
+  for (let index = 0; index < 3; index++) {
+    const cells = page.locator(".hanzi-cell-canvas");
+    await expect(cells.first()).toBeVisible();
+    // A short line in the first blank cell stands for a word.
+    const canvas = cells.first();
+    await canvas.scrollIntoViewIfNeeded();
+    const box = (await canvas.boundingBox())!;
+    await page.mouse.move(box.x + box.width * 0.2, box.y + box.width * 0.35);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width * 0.55, box.y + box.width * 0.35, { steps: 4 });
+    await page.mouse.up();
+    await page.getByRole("button", { name: index === 2 ? "寫好了" : "下一題" }).click();
+  }
+  await expect(page.locator(".hanzi-sentence-check")).toHaveCount(3);
+  await expect(page.locator(".hanzi-sentence-check .ink-preview path")).toHaveCount(3);
+  const finish = page.locator(".hanzi-check .hanzi-go-next");
+  await expect(finish).toBeDisabled();
+  for (const group of await page.getByRole("group", { name: /^第 \d 句$/ }).all())
+    await group.getByRole("button", { name: "對" }).click();
+  await finish.click();
+  await expect(page.locator(".math-result")).toContainText("照樣造句完成");
+  expect(errors).toEqual([]);
+});

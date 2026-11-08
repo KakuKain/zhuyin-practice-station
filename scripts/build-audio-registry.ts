@@ -9,6 +9,7 @@ import {
   legacyReviewVocabulary,
 } from "../features/courses/legacy-content";
 import { book1Words, callReadings, characterCalls } from "../features/hanzi/book1-words";
+import { sentenceLessons } from "../features/hanzi/sentence-patterns";
 const root = process.cwd();
 const audioDir = join(root, "public/listening-audio");
 const gemini = JSON.parse(readFileSync(join(audioDir, "gemini/manifest.json"), "utf8"));
@@ -38,6 +39,11 @@ Object.values(book1Words)
   .forEach((word) => add(word.text, word.readings.replaceAll(" ", "|")));
 Object.keys(characterCalls).forEach((character) =>
   add(characterCalls[character], callReadings(character).replaceAll(" ", "|")),
+);
+Object.values(sentenceLessons).forEach((lesson) =>
+  lesson.questions.forEach((question) =>
+    add(question.example, question.exampleReadings.replaceAll(" ", "|")),
+  ),
 );
 function duration(bytes: Buffer): number {
   const visit = (start: number, end: number): number => {

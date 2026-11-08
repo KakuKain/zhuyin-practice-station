@@ -4,17 +4,21 @@ import type { AppController } from "../usePracticeApp";
 import { book1Facts, book1Lessons } from "./book1-characters";
 import { HanziGlyph, HanziWords } from "./HanziChrome";
 import { readHanziRecords } from "./hanzi-round";
+import { sentenceLessons } from "./sentence-patterns";
 import "../../styles/lazy/hanzi.css";
 
 /**
- * A 第一冊 lesson's page: its number and title, its three practices (練習, 聽寫 and 照樣造句,
- * which is being made) and every 生字, each a tap away from 練習 on that 生字. A check
+ * A 第一冊 lesson's page: its number and title, its practices (練習, 聽寫 and, but for the
+ * numbers, 照樣造句) and every 生字, each a tap away from 練習 on that 生字. A check
  * marks the 生字 written to the end before.
  */
 export function HanziLessonPage({
   app,
 }: {
-  app: Pick<AppController, "hanziLessonId" | "startHanziPractice" | "startHanziDictation">;
+  app: Pick<
+    AppController,
+    "hanziLessonId" | "startHanziPractice" | "startHanziDictation" | "startHanziSentences"
+  >;
 }) {
   const lesson = book1Lessons.find((item) => item.id === app.hanziLessonId) ?? book1Lessons[1];
   const [records] = useState(readHanziRecords);
@@ -75,24 +79,29 @@ export function HanziLessonPage({
             <HanziWords text="開始" /> <ArrowRight size={19} weight="bold" aria-hidden="true" />
           </span>
         </button>
-        <button
-          className="mode-card fill-mode is-coming"
-          type="button"
-          disabled
-          aria-label="照樣造句，製作中"
-        >
-          <span className="mode-icon" aria-hidden="true">
-            <TextAa size={28} weight="duotone" />
-          </span>
-          <span className="lesson-mode-copy">
-            <small>
-              <HanziWords text="製作中" />
-            </small>
-            <strong>
-              <HanziWords text="照樣造句" />
-            </strong>
-          </span>
-        </button>
+        {sentenceLessons[lesson.id] && (
+          <button
+            className="mode-card fill-mode"
+            type="button"
+            aria-label="照樣造句，看例句填空格"
+            onClick={() => app.startHanziSentences()}
+          >
+            <span className="mode-icon" aria-hidden="true">
+              <TextAa size={28} weight="duotone" />
+            </span>
+            <span className="lesson-mode-copy">
+              <small>
+                {sentenceLessons[lesson.id].questions.length} <HanziWords text="題" />
+              </small>
+              <strong>
+                <HanziWords text="照樣造句" />
+              </strong>
+            </span>
+            <span className="lesson-mode-cta">
+              <HanziWords text="開始" /> <ArrowRight size={19} weight="bold" aria-hidden="true" />
+            </span>
+          </button>
+        )}
       </div>
       <div className="math-lesson-parts hanzi-lesson-parts">
         <h2>
