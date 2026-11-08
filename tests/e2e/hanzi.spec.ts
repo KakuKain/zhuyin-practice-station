@@ -105,38 +105,41 @@ test("第一冊 聽寫 is heard only, judges each 國字 by its strokes, and lea
   const cells = page.locator(".hanzi-cell-canvas");
   await expect(cells).toHaveCount(1);
 
-  // The question is heard; only the parent's peek shows it.
+  // The question is heard; only the parent's peek shows it. Three are written, the rest left.
   const peek = page.locator(".hanzi-parent-peek");
   for (let index = 0; index < 9; index++) {
-    await peek.click();
-    const character = (await peek.textContent())!.trim().at(-1)!;
-    const canvas = cells.first();
-    await canvas.scrollIntoViewIfNeeded();
-    const box = (await canvas.boundingBox())!;
-    const square = box.width * 0.75;
-    const medians = data[character].medians;
-    // The first 生字 is written with its first two strokes swapped.
-    const order = medians.map((_, i) => i);
-    if (index === 0) [order[0], order[1]] = [order[1], order[0]];
-    for (const i of order) {
-      const at = ([x, y]: number[]) =>
-        [box.x + (square * x) / 1024, box.y + (square * (900 - y)) / 1024] as const;
-      await page.mouse.move(...at(medians[i][0]));
-      await page.mouse.down();
-      for (const point of medians[i].slice(1)) await page.mouse.move(...at(point), { steps: 3 });
-      await page.mouse.up();
+    if (index < 3) {
+      await peek.click();
+      const character = (await peek.textContent())!.trim().at(-1)!;
+      const canvas = cells.first();
+      await canvas.scrollIntoViewIfNeeded();
+      const box = (await canvas.boundingBox())!;
+      const square = box.width * 0.75;
+      const medians = data[character].medians;
+      // The first 生字 is written with its first two strokes swapped.
+      const order = medians.map((_, i) => i);
+      if (index === 0) [order[0], order[1]] = [order[1], order[0]];
+      for (const i of order) {
+        const at = ([x, y]: number[]) =>
+          [box.x + (square * x) / 1024, box.y + (square * (900 - y)) / 1024] as const;
+        await page.mouse.move(...at(medians[i][0]));
+        await page.mouse.down();
+        for (const point of medians[i].slice(1)) await page.mouse.move(...at(point));
+        await page.mouse.up();
+      }
     }
     await page.getByRole("button", { name: index === 8 ? "寫好了" : "下一題" }).click();
   }
 
-  // The parent's check: eight 國字 judged right, the swapped one not.
+  // The parent's check: two 國字 judged right, the swapped one and the empty ones not.
   await expect(page.locator(".hanzi-check-item")).toHaveCount(9);
-  await expect(page.locator(".hanzi-check-verdict.is-right")).toHaveCount(8);
-  await expect(page.locator(".hanzi-check-verdict.is-wrong")).toHaveCount(1);
+  await expect(page.locator(".hanzi-check-verdict.is-right")).toHaveCount(2);
+  await expect(page.locator(".hanzi-check-verdict.is-wrong")).toHaveCount(7);
+  await expect(page.getByRole("button", { name: "看筆順" })).toHaveCount(3);
   const finish = page.locator(".hanzi-check .hanzi-go-next");
   await expect(finish).toBeDisabled();
-  for (const button of await page.locator(".hanzi-check-zhuyin .is-right").all())
-    await button.click();
+  for (const group of await page.getByRole("group", { name: /題的注音$/ }).all())
+    await group.getByRole("button", { name: "對" }).click();
   await expect(finish).toBeEnabled();
   await finish.click();
   await expect(page.locator(".math-result")).toContainText("要再練的");

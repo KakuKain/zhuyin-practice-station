@@ -12,6 +12,7 @@ import type { InkStroke } from "../types";
 import { useInkCanvas } from "../../lib/ink/useInkCanvas";
 import { registeredAudioUrl } from "../../lib/audio/audio-registry";
 import { InkTools } from "../../components/InkTools";
+import { ZhuyinStack } from "../../components/Zhuyin";
 import { InkPreview } from "../../components/AppChrome";
 import { taskKeys } from "../rewards/stamp-book";
 import { MathHeader, MathResult } from "../math/MathChrome";
@@ -30,6 +31,7 @@ import {
   type DictationItem,
   type DictationMode,
   type DictationRound,
+  type WrittenCheck,
 } from "./dictation";
 import "../../styles/lazy/hanzi.css";
 
@@ -312,8 +314,9 @@ function DictationWriting({
 type Results = { text: string; right: boolean; character: boolean }[];
 
 /**
- * The parent's check: each question's answer beside the child's writing. Every 國字 is judged
- * first (tap to change it); the 注音 is the parent's to mark right or wrong.
+ * The parent's check: each question's answer beside the child's writing, which can be replayed
+ * stroke by stroke. Every 國字 is judged first and the parent can change that; the 注音 is the
+ * parent's to mark. Both are 對／錯 buttons beside the question.
  */
 function DictationCheck({
   round,
@@ -324,7 +327,7 @@ function DictationCheck({
   onBack: () => void;
   onDone: (results: Results) => void;
 }) {
-  const [verdicts, setVerdicts] = useState(() =>
+  const [verdicts] = useState(() =>
     round.items.map((item, i) =>
       answerCells(item, round.lessonId).map((cell, k) =>
         cell.write === "國字"
@@ -333,12 +336,39 @@ function DictationCheck({
       ),
     ),
   );
+  // 國字 starts from the judging; questions without a 國字 have nothing to mark there.
+  const [hanzi, setHanzi] = useState<(boolean | null)[]>(() =>
+    verdicts.map((row) =>
+      row.some((value) => value) ? row.every((value) => !value || value.ok) : null,
+    ),
+  );
   const [zhuyin, setZhuyin] = useState<(boolean | null)[]>(() => round.items.map(() => null));
   const ready = zhuyin.every((value) => value !== null);
+  const mark = (
+    label: string,
+    value: boolean | null,
+    set: (value: boolean) => void,
+    question: number,
+  ) => (
+    <div className="hanzi-check-mark" role="group" aria-label={`第 ${question + 1} 題的${label}`}>
+      <span>{label}</span>
+      {[true, false].map((option) => (
+        <button
+          type="button"
+          key={String(option)}
+          aria-pressed={value === option}
+          className={option ? "is-right" : "is-wrong"}
+          onClick={() => set(option)}
+        >
+          {option ? "對" : "錯"}
+        </button>
+      ))}
+    </div>
+  );
   return (
     <section className="hanzi-check">
       <p className="hanzi-check-intro">
-        請家長對答案：國字已先依筆順判斷（點一下可以更改），注音請逐題勾選對或錯。
+        請家長對答案：國字已先依筆順判斷好（有疑問可以按「看筆順」再改），注音請逐題勾選對或錯。
       </p>
       <ol className="hanzi-check-list">
         {round.items.map((item, i) => {
@@ -353,35 +383,23 @@ function DictationCheck({
                     cell={cell}
                     strokes={round.ink[i]?.[k] ?? []}
                     verdict={verdicts[i][k]}
-                    onToggle={() =>
-                      setVerdicts((current) =>
-                        current.map((row, r) =>
-                          r === i
-                            ? row.map((value, c) =>
-                                c === k && value ? { ...value, ok: !value.ok } : value,
-                              )
-                            : row,
-                        ),
-                      )
-                    }
                   />
                 ))}
               </div>
-              <div className="hanzi-check-zhuyin" role="group" aria-label={`第 ${i + 1} 題的注音`}>
-                <span>注音</span>
-                {[true, false].map((value) => (
-                  <button
-                    type="button"
-                    key={String(value)}
-                    aria-pressed={zhuyin[i] === value}
-                    className={value ? "is-right" : "is-wrong"}
-                    onClick={() =>
-                      setZhuyin((current) => current.map((v, z) => (z === i ? value : v)))
-                    }
-                  >
-                    {value ? "對" : "錯"}
-                  </button>
-                ))}
+              <div className="hanzi-check-marks">
+                {hanzi[i] !== null &&
+                  mark(
+                    "國字",
+                    hanzi[i],
+                    (value) => setHanzi((current) => current.map((v, z) => (z === i ? value : v))),
+                    i,
+                  )}
+                {mark(
+                  "注音",
+                  zhuyin[i],
+                  (value) => setZhuyin((current) => current.map((v, z) => (z === i ? value : v))),
+                  i,
+                )}
               </div>
             </li>
           );
@@ -401,7 +419,7 @@ function DictationCheck({
               round.items.map((item, i) => ({
                 text: item.text,
                 character: round.mode === "characters",
-                right: Boolean(zhuyin[i]) && verdicts[i].every((value) => !value || value.ok),
+                right: Boolean(zhuyin[i]) && hanzi[i] !== false,
               })),
             )
           }
@@ -416,10 +434,15 @@ function DictationCheck({
 /** The 田字格 and its 注音 strip, drawn over a cell's canvas; a punctuation cell has no strip. */
 function CellGuides({ mark }: { mark: boolean }) {
   return (
-    <svg className="hanzi-cell-guides" viewBox="0 0 100 75" aria-hidden="true">
-      <rect x="0.5" y="0.5" width="74" height="74" />
+    <svg
+      className="hanzi-cell-guides"
+      viewBox="0 0 100 75"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      {!mark && <rect x="75" y="0" width="25" height="75" className="is-strip" />}
       <path d="M 37.5 0 V 75 M 0 37.5 H 75" className="is-dashed" />
-      {!mark && <rect x="75" y="0.5" width="24.5" height="74" className="is-strip" />}
+      {!mark && <path d="M 75 0 V 75" className="is-divider" />}
     </svg>
   );
 }
@@ -428,13 +451,12 @@ function CheckCell({
   cell,
   strokes,
   verdict,
-  onToggle,
 }: {
   cell: AnswerCell;
   strokes: InkStroke[];
-  verdict: { ok: boolean; at: number } | null;
-  onToggle: () => void;
+  verdict: WrittenCheck | null;
 }) {
+  const [replay, setReplay] = useState(0);
   return (
     <div className="hanzi-check-cell">
       <span className="hanzi-check-answer">
@@ -442,7 +464,7 @@ function CheckCell({
           <HanziWords text={cell.character} />
         ) : cell.write === "注音" ? (
           <span className="hanzi-check-zhuyin-answer">
-            {cell.reading}
+            <ZhuyinStack text={cell.reading} />
             {alsoRight[cell.character] && <small>（寫「{cell.character}」也對）</small>}
           </span>
         ) : (
@@ -451,27 +473,60 @@ function CheckCell({
       </span>
       <span className="hanzi-check-ink">
         <CellGuides mark={cell.write === "標點"} />
-        <InkPreview strokes={strokes} />
+        <InkReplay key={replay} strokes={strokes} play={replay > 0} />
       </span>
       {verdict && (
-        <button
-          type="button"
-          className={`hanzi-check-verdict${verdict.ok ? " is-right" : " is-wrong"}`}
-          onClick={onToggle}
-        >
+        <span className={`hanzi-check-verdict${verdict.ok ? " is-right" : " is-wrong"}`}>
           {verdict.ok ? (
             <>
               <CheckCircle size={18} weight="fill" aria-hidden="true" />
-              國字對
+              筆順對
             </>
           ) : (
             <>
               <WarningCircle size={18} weight="fill" aria-hidden="true" />
-              {cellParts(strokes).square.length ? `第 ${verdict.at} 筆不對` : "沒有寫國字"}
+              {!cellParts(strokes).square.length
+                ? "沒有寫國字"
+                : verdict.count !== verdict.expected
+                  ? `寫了 ${verdict.count} 筆，「${cell.character}」是 ${verdict.expected} 筆`
+                  : `第 ${verdict.at} 筆可能不對`}
             </>
           )}
+        </span>
+      )}
+      {strokes.length > 0 && (
+        <button
+          type="button"
+          className="hanzi-check-replay"
+          onClick={() => setReplay((value) => value + 1)}
+        >
+          看筆順
         </button>
       )}
     </div>
+  );
+}
+
+/** The child's writing; played, it appears stroke by stroke, each numbered where it starts. */
+function InkReplay({ strokes, play }: { strokes: InkStroke[]; play: boolean }) {
+  const [shown, setShown] = useState(play ? 0 : strokes.length);
+  useEffect(() => {
+    if (!play || shown >= strokes.length) return;
+    const timer = window.setTimeout(() => setShown(shown + 1), 450);
+    return () => window.clearTimeout(timer);
+  }, [play, shown, strokes.length]);
+  return (
+    <>
+      <InkPreview strokes={strokes.slice(0, shown)} />
+      {play && (
+        <svg className="hanzi-replay-numbers" viewBox="0 0 100 100" aria-hidden="true">
+          {strokes.slice(0, shown).map((stroke, i) => (
+            <text key={i} x={stroke[0].x} y={stroke[0].y}>
+              {i + 1}
+            </text>
+          ))}
+        </svg>
+      )}
+    </>
   );
 }

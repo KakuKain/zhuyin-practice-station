@@ -5,7 +5,7 @@ import { book1Lessons, book1Readings } from "./book1-characters";
 import { book1Words, callReadings, characterCalls, type DictationWord } from "./book1-words";
 import { readHanziRecords } from "./hanzi-round";
 import { characterStrokes } from "./HanziChrome";
-import { fromSquare, judgeStroke, screenMedian, type Point } from "./stroke-match";
+import { fromSquare, screenMedian, strokeDistance, type Point } from "./stroke-match";
 
 /** 只考生字 (each 生字 called as 「拍手的拍」) or 全部語詞 (the teacher's ten). */
 export type DictationMode = "characters" | "words";
@@ -127,36 +127,83 @@ export function cellParts(strokes: InkStroke[]) {
   return { square, strip };
 }
 
+type Box = { x0: number; y0: number; x1: number; y1: number };
+const boxOf = (points: Point[]): Box => {
+  const xs = points.map((p) => p.x);
+  const ys = points.map((p) => p.y);
+  return { x0: Math.min(...xs), y0: Math.min(...ys), x1: Math.max(...xs), y1: Math.max(...ys) };
+};
 /**
- * Whether a 生字 written freely in its square follows the book's strokes: the writing is moved
- * and scaled onto the model (a child writes small, or off to one side), then each stroke must
- * match the stroke of the same number. Returns the first stroke that does not, from 1, or 0.
+ * Moves and scales writing in `from` onto `to`, each axis on its own (a child's 生字 is often
+ * narrower or taller than the model); a flat side (一) takes the other side's scale.
  */
-export function checkWritten(character: string, strokes: InkStroke[]): { ok: boolean; at: number } {
-  const data = characterStrokes[character];
-  if (!data) return { ok: false, at: 1 };
-  const medians = data.medians.map(screenMedian);
-  const written = strokes.filter((stroke) => stroke.length).map((stroke) => stroke.map(fromSquare));
-  if (!written.length) return { ok: false, at: 1 };
-  const box = (points: Point[]) => {
-    const xs = points.map((p) => p.x);
-    const ys = points.map((p) => p.y);
-    return { x0: Math.min(...xs), y0: Math.min(...ys), x1: Math.max(...xs), y1: Math.max(...ys) };
-  };
-  const model = box(medians.flat());
-  const ink = box(written.flat());
-  const scale =
-    Math.max(model.x1 - model.x0, model.y1 - model.y0, 1) /
-    Math.max(ink.x1 - ink.x0, ink.y1 - ink.y0, 1);
-  const fit = ({ x, y }: Point): Point => ({
-    x: (model.x0 + model.x1) / 2 + (x - (ink.x0 + ink.x1) / 2) * scale,
-    y: (model.y0 + model.y1) / 2 + (y - (ink.y0 + ink.y1) / 2) * scale,
+function fitter(from: Box, to: Box) {
+  const w = from.x1 - from.x0;
+  const h = from.y1 - from.y0;
+  const big = Math.max(w, h, 1);
+  const sx = w > big * 0.2 ? (to.x1 - to.x0) / w : NaN;
+  const sy = h > big * 0.2 ? (to.y1 - to.y0) / h : NaN;
+  const scaleX = Number.isFinite(sx) ? sx : sy;
+  const scaleY = Number.isFinite(sy) ? sy : sx;
+  return ({ x, y }: Point): Point => ({
+    x: (to.x0 + to.x1) / 2 + (x - (from.x0 + from.x1) / 2) * scaleX,
+    y: (to.y0 + to.y1) / 2 + (y - (from.y0 + from.y1) / 2) * scaleY,
   });
-  for (let i = 0; i < medians.length; i++) {
-    if (!written[i] || judgeStroke(written[i].map(fit), medians, i, 1.4) !== "match")
-      return { ok: false, at: i + 1 };
+}
+
+/**
+ * Whether a 生字 written freely in its square follows the book's strokes: stroke n must match the
+ * book's stroke n. The writing is first moved and scaled onto the model (a child writes small, off
+ * to one side, or narrower); fitted three ways (on every stroke, on the strokes the 生字 has, or
+ * not at all), the best counts, so a stray mark such as a tone written near the square does not
+ * throw the whole 生字 off. Returns the first stroke that does not match, from 1, or 0.
+ */
+export type WrittenCheck = {
+  ok: boolean;
+  /** The first stroke that does not match, from 1, or 0. */
+  at: number;
+  /** Strokes written, not counting a short stray mark after the last. */
+  count: number;
+  /** Strokes the 生字 has. */
+  expected: number;
+};
+export function checkWritten(character: string, strokes: InkStroke[]): WrittenCheck {
+  const data = characterStrokes[character];
+  if (!data) return { ok: false, at: 1, count: 0, expected: 0 };
+  const medians = data.medians.map(screenMedian);
+  const expected = medians.length;
+  const written = strokes.filter((stroke) => stroke.length).map((stroke) => stroke.map(fromSquare));
+  if (!written.length) return { ok: false, at: 1, count: 0, expected };
+  // A short mark after the last stroke (a tone that strayed out of its strip) is not a stroke.
+  const length = (stroke: Point[]) =>
+    stroke.reduce(
+      (sum, p, i) => (i ? sum + Math.hypot(p.x - stroke[i - 1].x, p.y - stroke[i - 1].y) : 0),
+      0,
+    );
+  const count = expected + written.slice(expected).filter((stroke) => length(stroke) > 150).length;
+  const writtenCount = Math.min(written.length, count);
+  // With a different number of strokes, fitting the writing onto the model misplaces even the
+  // right ones, so the count is what is wrong.
+  if (writtenCount !== expected)
+    return { ok: false, at: Math.min(writtenCount, expected) + 1, count: writtenCount, expected };
+  const model = boxOf(medians.flat());
+  const fits = [
+    fitter(boxOf(written.flat()), model),
+    fitter(boxOf(written.slice(0, medians.length).flat()), model),
+    (point: Point) => point,
+  ];
+  let best = 0;
+  for (const fit of fits) {
+    let matched = 0;
+    while (
+      matched < medians.length &&
+      written[matched] &&
+      strokeDistance(written[matched].map(fit), medians[matched], 1.5) < Infinity
+    )
+      matched += 1;
+    best = Math.max(best, matched);
   }
-  return written.length === medians.length
-    ? { ok: true, at: 0 }
-    : { ok: false, at: medians.length + 1 };
+  return best < expected
+    ? { ok: false, at: best + 1, count: expected, expected }
+    : { ok: true, at: 0, count: expected, expected };
 }

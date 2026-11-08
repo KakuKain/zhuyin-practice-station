@@ -446,7 +446,6 @@ function StrokeBox({
     <>
       <div className={`hanzi-square is-${step}`}>
         <svg className="hanzi-grid" viewBox="0 0 100 100" aria-hidden="true">
-          <rect x="0.5" y="0.5" width="99" height="99" />
           <path d="M 50 0 V 100 M 0 50 H 100" />
         </svg>
         <HanziGlyph
