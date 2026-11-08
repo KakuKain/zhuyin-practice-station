@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useEffectEvent, useRef, useState, type ReactNode } from "react";
-import { ArrowLeft, ArrowRight, SpeakerHigh } from "@phosphor-icons/react";
+import { ArrowLeft, ArrowRight, Circle, SpeakerHigh, X } from "@phosphor-icons/react";
 import type { AppController } from "../usePracticeApp";
 import type { InkStroke } from "../types";
 import { useInkCanvas } from "../../lib/ink/useInkCanvas";
@@ -289,7 +289,7 @@ function SentenceCheck({
   return (
     <section className="hanzi-check">
       <p className="hanzi-check-intro">
-        請家長看看每一句：空格裡的詞通順、合理就算對（教過的字寫國字，其他寫注音）。
+        請家長看看每一句：空格裡的詞通順、合理就選 ○（教過的字寫國字，其他寫注音）。
       </p>
       <ol className="hanzi-check-list">
         {questions.map((question, i) => (
@@ -311,12 +311,17 @@ function SentenceCheck({
                     type="button"
                     key={String(option)}
                     aria-pressed={marks[i] === option}
+                    aria-label={option ? "對" : "錯"}
                     className={option ? "is-right" : "is-wrong"}
                     onClick={() =>
                       setMarks((current) => current.map((v, z) => (z === i ? option : v)))
                     }
                   >
-                    {option ? "對" : "錯"}
+                    {option ? (
+                      <Circle size={22} weight="bold" aria-hidden="true" />
+                    ) : (
+                      <X size={22} weight="bold" aria-hidden="true" />
+                    )}
                   </button>
                 ))}
               </div>

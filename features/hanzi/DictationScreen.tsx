@@ -3,9 +3,11 @@ import {
   ArrowLeft,
   ArrowRight,
   CheckCircle,
+  Circle,
   Eye,
   SpeakerHigh,
   WarningCircle,
+  X,
 } from "@phosphor-icons/react";
 import type { AppController } from "../usePracticeApp";
 import type { InkStroke } from "../types";
@@ -357,10 +359,15 @@ function DictationCheck({
           type="button"
           key={String(option)}
           aria-pressed={value === option}
+          aria-label={option ? "對" : "錯"}
           className={option ? "is-right" : "is-wrong"}
           onClick={() => set(option)}
         >
-          {option ? "對" : "錯"}
+          {option ? (
+            <Circle size={22} weight="bold" aria-hidden="true" />
+          ) : (
+            <X size={22} weight="bold" aria-hidden="true" />
+          )}
         </button>
       ))}
     </div>
@@ -368,7 +375,7 @@ function DictationCheck({
   return (
     <section className="hanzi-check">
       <p className="hanzi-check-intro">
-        請家長對答案：國字已先依筆順判斷好（有疑問可以按「看筆順」再改），注音請逐題勾選對或錯。
+        請家長對答案：國字已先依筆順判斷好（有疑問可以按「看筆順」再改），注音請逐題選 ○ 或 ✕。
       </p>
       <ol className="hanzi-check-list">
         {round.items.map((item, i) => {
