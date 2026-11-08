@@ -63,10 +63,27 @@ const write = (character: string, order?: number[]): InkStroke[] =>
   );
 
 test("聽寫 judges a written 國字 by its strokes, wherever it sits in the square", () => {
+  const verdict = (character: string, strokes: InkStroke[]) => {
+    const { ok, at } = checkWritten(character, strokes);
+    return { ok, at };
+  };
   for (const character of "拍你這海花")
-    assert.deepEqual(checkWritten(character, write(character)), { ok: true, at: 0 });
+    assert.deepEqual(verdict(character, write(character)), { ok: true, at: 0 });
+  // Narrower than the model, and with a tone mark that strayed into the square.
+  const narrow = write("拍").map((stroke) =>
+    stroke.map((p) => ({ ...p, x: 20 + (p.x - 12) * 0.7 })),
+  );
+  assert.deepEqual(verdict("拍", narrow), { ok: true, at: 0 });
+  const tone = [
+    { x: 70, y: 20 },
+    { x: 72, y: 24 },
+  ];
+  assert.deepEqual(verdict("拍", [...write("拍"), tone]), { ok: true, at: 0 });
   // The second stroke first, a stroke missing, or nothing at all.
-  assert.deepEqual(checkWritten("拍", write("拍", [1, 0, 2, 3, 4, 5, 6, 7])), { ok: false, at: 1 });
-  assert.equal(checkWritten("拍", write("拍").slice(0, 7)).ok, false);
-  assert.deepEqual(checkWritten("拍", []), { ok: false, at: 1 });
+  assert.deepEqual(verdict("拍", write("拍", [1, 0, 2, 3, 4, 5, 6, 7])), { ok: false, at: 1 });
+  assert.deepEqual(verdict("拍", []), { ok: false, at: 1 });
+  // Too few strokes is told as a count, not as a misplaced first stroke (三 written as one 橫).
+  const few = checkWritten("三", write("三").slice(1, 2));
+  assert.equal(few.ok, false);
+  assert.deepEqual([few.count, few.expected], [1, 3]);
 });
