@@ -6837,6 +6837,126 @@
       "voicedDuration": 2.61,
       "createdAt": "2026-11-10",
       "origin": "Gemini API"
+    },
+    {
+      "text": "青蛙大叫，跳走了",
+      "reading": "ㄑㄧㄥ|ㄨㄚ|ㄉㄚˋ|ㄐㄧㄠˋ|ㄊㄧㄠˋ|ㄗㄡˇ|˙ㄌㄜ",
+      "path": "/listening-audio/gemini/words/9752-86d9-5927-53eb-ff0c-8df3-8d70-4e86.m4a",
+      "batch": "2026-11-10-19-words",
+      "duration": 3.23,
+      "voicedDuration": 2.67,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "小象被刺到，痛得抬起腳",
+      "reading": "ㄒㄧㄠˇ|ㄒㄧㄤˋ|ㄅㄟˋ|ㄘˋ|ㄉㄠˋ|ㄊㄨㄥˋ|˙ㄉㄜ|ㄊㄞˊ|ㄑㄧˇ|ㄐㄧㄠˇ",
+      "path": "/listening-audio/gemini/words/5c0f-8c61-88ab-523a-5230-ff0c-75db-5f97-62ac-8d77-8173.m4a",
+      "batch": "2026-11-10-19-words",
+      "duration": 4.38,
+      "voicedDuration": 3.78,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "小女孩的氣球卡在樹上",
+      "reading": "ㄒㄧㄠˇ|ㄋㄩˇ|ㄏㄞˊ|˙ㄉㄜ|ㄑㄧˋ|ㄑㄧㄡˊ|ㄑㄧㄚˇ|ㄗㄞˋ|ㄕㄨˋ|ㄕㄤˋ",
+      "path": "/listening-audio/gemini/words/5c0f-5973-5b69-7684-6c23-7403-5361-5728-6a39-4e0a.m4a",
+      "batch": "2026-11-10-19-words",
+      "duration": 3.68,
+      "voicedDuration": 3.08,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "小刺蝟爬上樹，拿下氣球",
+      "reading": "ㄒㄧㄠˇ|ㄘˋ|ㄨㄟˋ|ㄆㄚˊ|ㄕㄤˋ|ㄕㄨˋ|ㄋㄚˊ|ㄒㄧㄚˋ|ㄑㄧˋ|ㄑㄧㄡˊ",
+      "path": "/listening-audio/gemini/words/5c0f-523a-875f-722c-4e0a-6a39-ff0c-62ff-4e0b-6c23-7403.m4a",
+      "batch": "2026-11-10-19-words",
+      "duration": 4.26,
+      "voicedDuration": 3.66,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "小熊抱住小刺蝟",
+      "reading": "ㄒㄧㄠˇ|ㄒㄩㄥˊ|ㄅㄠˋ|ㄓㄨˋ|ㄒㄧㄠˇ|ㄘˋ|ㄨㄟˋ",
+      "path": "/listening-audio/gemini/words/5c0f-718a-62b1-4f4f-5c0f-523a-875f.m4a",
+      "batch": "2026-11-10-19-words",
+      "duration": 2.74,
+      "voicedDuration": 2.14,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "小象",
+      "reading": "ㄒㄧㄠˇ|ㄒㄧㄤˋ",
+      "path": "/listening-audio/gemini/words/5c0f-8c61.m4a",
+      "batch": "2026-11-10-19-words",
+      "duration": 1.32,
+      "voicedDuration": 0.72,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "小熊",
+      "reading": "ㄒㄧㄠˇ|ㄒㄩㄥˊ",
+      "path": "/listening-audio/gemini/words/5c0f-718a.m4a",
+      "batch": "2026-11-10-19-words",
+      "duration": 1.4,
+      "voicedDuration": 0.8,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "誰被小刺蝟刺到，痛得抬起腳？",
+      "reading": "ㄕㄟˊ|ㄅㄟˋ|ㄒㄧㄠˇ|ㄘˋ|ㄨㄟˋ|ㄘˋ|ㄉㄠˋ|ㄊㄨㄥˋ|˙ㄉㄜ|ㄊㄞˊ|ㄑㄧˇ|ㄐㄧㄠˇ",
+      "path": "/listening-audio/gemini/words/8ab0-88ab-5c0f-523a-875f-523a-5230-ff0c-75db-5f97-62ac-8d77-8173-ff1f.m4a",
+      "batch": "2026-11-10-20-words",
+      "duration": 5.32,
+      "voicedDuration": 4.76,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "誰在樹下哭？",
+      "reading": "ㄕㄟˊ|ㄗㄞˋ|ㄕㄨˋ|ㄒㄧㄚˋ|ㄎㄨ",
+      "path": "/listening-audio/gemini/words/8ab0-5728-6a39-4e0b-54ed-ff1f.m4a",
+      "batch": "2026-11-10-20-words",
+      "duration": 2.29,
+      "voicedDuration": 1.69,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "什麼東西卡在樹上？",
+      "reading": "ㄕㄣˊ|˙ㄇㄜ|ㄉㄨㄥ|˙ㄒㄧ|ㄑㄧㄚˇ|ㄗㄞˋ|ㄕㄨˋ|ㄕㄤˋ",
+      "path": "/listening-audio/gemini/words/4ec0-9ebc-6771-897f-5361-5728-6a39-4e0a-ff1f.m4a",
+      "batch": "2026-11-10-20-words",
+      "duration": 2.81,
+      "voicedDuration": 2.21,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "小刺蝟拿下氣球以後，為什麼好開心？",
+      "reading": "ㄒㄧㄠˇ|ㄘˋ|ㄨㄟˋ|ㄋㄚˊ|ㄒㄧㄚˋ|ㄑㄧˋ|ㄑㄧㄡˊ|ㄧˇ|ㄏㄡˋ|ㄨㄟˋ|ㄕㄣˊ|˙ㄇㄜ|ㄏㄠˇ|ㄎㄞ|ㄒㄧㄣ",
+      "path": "/listening-audio/gemini/words/5c0f-523a-875f-62ff-4e0b-6c23-7403-4ee5-5f8c-ff0c-70ba-4ec0-9ebc-597d-958b-5fc3-ff1f.m4a",
+      "batch": "2026-11-10-20-words",
+      "duration": 4.53,
+      "voicedDuration": 3.93,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "他沒有把氣球刺破",
+      "reading": "ㄊㄚ|ㄇㄟˊ|ㄧㄡˇ|ㄅㄚˇ|ㄑㄧˋ|ㄑㄧㄡˊ|ㄘˋ|ㄆㄛˋ",
+      "path": "/listening-audio/gemini/words/4ed6-6c92-6709-628a-6c23-7403-523a-7834.m4a",
+      "batch": "2026-11-10-20-words",
+      "duration": 2.71,
+      "voicedDuration": 2.11,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
     }
   ]
 }
