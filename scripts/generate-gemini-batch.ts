@@ -27,6 +27,7 @@ import { builtinCatalog } from "../features/courses/materials";
 import { book1Words, callReadings, characterCalls } from "../features/hanzi/book1-words";
 import { sentenceLessons } from "../features/hanzi/sentence-patterns";
 import { strokeClips } from "../features/hanzi/basic-strokes";
+import { readingClips } from "../features/hanzi/reading-lesson";
 import { isHan, mathPromptReadings, mathPrompts } from "../features/math/math-audio";
 import {
   type Audio,
@@ -107,7 +108,7 @@ const lessonText = builtinCatalog.flatMap((lesson) => [
 ]);
 /**
  * 第一冊's clips not voiced yet: the teacher's 語詞, each 生字's call, 照樣造句's examples, and
- * 認識國字基本筆畫's stroke names and instructions.
+ * 認識國字基本筆畫's stroke names and instructions, and 閱讀階梯's questions and answers.
  */
 const voiced = new Set(
   wordsManifest.words.map(
@@ -122,7 +123,7 @@ const book1Items = [
   ...Object.values(sentenceLessons).flatMap((lesson) =>
     lesson.questions.map((question) => [question.example, question.exampleReadings] as const),
   ),
-  ...strokeClips.map((clip) => [clip.text, clip.readings] as const),
+  ...[...strokeClips, ...readingClips].map((clip) => [clip.text, clip.readings] as const),
 ]
   .filter(([text], i, all) => all.findIndex(([other]) => other === text) === i)
   .map(([text, readings]): Item => ({

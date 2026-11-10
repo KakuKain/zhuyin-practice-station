@@ -228,9 +228,9 @@ export function usePracticeApp() {
   const [hanziLessonId, setHanziLessonId] = useState(1);
   /** The 生字 practice starts on: one tapped on the lesson page, or none to pick from the list. */
   const [hanziStart, setHanziStart] = useState<string | undefined>();
-  const [hanziMode, setHanziMode] = useState<"practice" | "dictation" | "sentences" | "strokes">(
-    "practice",
-  );
+  const [hanziMode, setHanziMode] = useState<
+    "practice" | "dictation" | "sentences" | "strokes" | "reading"
+  >("practice");
   /** 認識國字基本筆畫's page being practised. */
   const [hanziStrokePage, setHanziStrokePage] = useState<StrokePage>(8);
   const openHanziLesson = (id: number) => {
@@ -248,6 +248,10 @@ export function usePracticeApp() {
   };
   const startHanziSentences = () => {
     setHanziMode("sentences");
+    setView("hanzi");
+  };
+  const startHanziReading = () => {
+    setHanziMode("reading");
     setView("hanzi");
   };
   const startHanziStrokes = (page: StrokePage) => {
@@ -385,6 +389,7 @@ export function usePracticeApp() {
     startHanziSentences,
     hanziStrokePage,
     startHanziStrokes,
+    startHanziReading,
     openHanziLesson,
     startHanziPractice,
     subject,

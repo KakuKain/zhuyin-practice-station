@@ -2,6 +2,7 @@ import { ArrowRight } from "@phosphor-icons/react";
 import { ProgressiveImage } from "../../components/ProgressiveImage";
 import { book1Lessons } from "./book1-characters";
 import { strokesLessonId } from "./basic-strokes";
+import { paintedReading, readingLessonId } from "./reading-lesson";
 import { HanziWords } from "./HanziChrome";
 import "../../styles/lazy/hanzi.css";
 
@@ -77,6 +78,35 @@ export function HanziCourseList({ onOpen }: { onOpen: (id: number) => void }) {
           </button>
         </div>
       ))}
+      <div className="journey-step journey-step-2">
+        <span className="journey-station" aria-hidden="true">
+          讀
+        </span>
+        <button
+          className="journey-card"
+          type="button"
+          onClick={() => onOpen(readingLessonId)}
+          aria-label="閱讀階梯，擁抱"
+        >
+          <span className="journey-card-copy">
+            <small>
+              <HanziWords text="閱讀階梯" />
+            </small>
+            <strong>
+              <HanziWords text="擁抱" />
+            </strong>
+          </span>
+          <ProgressiveImage
+            className="journey-art"
+            src={`course-art/${paintedReading.includes("hug") ? "reading/hug" : "book1-cover"}.webp`}
+            alt=""
+            aria-hidden="true"
+          />
+          <span className="journey-arrow" aria-hidden="true">
+            <ArrowRight size={23} weight="bold" />
+          </span>
+        </button>
+      </div>
     </div>
   );
 }
