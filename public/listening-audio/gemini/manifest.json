@@ -6227,6 +6227,616 @@
       "voicedDuration": 1.06,
       "createdAt": "2026-11-10",
       "origin": "Gemini API"
+    },
+    {
+      "text": "數字八",
+      "reading": "ㄕㄨˋ|ㄗˋ|ㄅㄚ",
+      "path": "/listening-audio/gemini/words/6578-5b57-516b.m4a",
+      "batch": "2026-11-10-10-words",
+      "duration": 2.06,
+      "voicedDuration": 1.46,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "數字九",
+      "reading": "ㄕㄨˋ|ㄗˋ|ㄐㄧㄡˇ",
+      "path": "/listening-audio/gemini/words/6578-5b57-4e5d.m4a",
+      "batch": "2026-11-10-10-words",
+      "duration": 2.32,
+      "voicedDuration": 1.72,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "數字十",
+      "reading": "ㄕㄨˋ|ㄗˋ|ㄕˊ",
+      "path": "/listening-audio/gemini/words/6578-5b57-5341.m4a",
+      "batch": "2026-11-10-10-words",
+      "duration": 2.35,
+      "voicedDuration": 1.75,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "妹妹溜滑梯。",
+      "reading": "ㄇㄟˋ|˙ㄇㄟ|ㄌㄧㄡ|ㄏㄨㄚˊ|ㄊㄧ",
+      "path": "/listening-audio/gemini/words/59b9-59b9-6e9c-6ed1-68af-3002.m4a",
+      "batch": "2026-11-10-10-words",
+      "duration": 2.31,
+      "voicedDuration": 1.71,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "姐姐寫功課。",
+      "reading": "ㄐㄧㄝˇ|˙ㄐㄧㄝ|ㄒㄧㄝˇ|ㄍㄨㄥ|ㄎㄜˋ",
+      "path": "/listening-audio/gemini/words/59d0-59d0-5beb-529f-8ab2-3002.m4a",
+      "batch": "2026-11-10-10-words",
+      "duration": 2.13,
+      "voicedDuration": 1.53,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "弟弟拍手。",
+      "reading": "ㄉㄧˋ|˙ㄉㄧ|ㄆㄞ|ㄕㄡˇ",
+      "path": "/listening-audio/gemini/words/5f1f-5f1f-62cd-624b-3002.m4a",
+      "batch": "2026-11-10-10-words",
+      "duration": 1.98,
+      "voicedDuration": 1.38,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "這是我的媽媽。",
+      "reading": "ㄓㄜˋ|ㄕˋ|ㄨㄛˇ|˙ㄉㄜ|ㄇㄚ|˙ㄇㄚ",
+      "path": "/listening-audio/gemini/words/9019-662f-6211-7684-5abd-5abd-3002.m4a",
+      "batch": "2026-11-10-10-words",
+      "duration": 2.03,
+      "voicedDuration": 1.43,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "這個是鉛筆盒。",
+      "reading": "ㄓㄜˋ|˙ㄍㄜ|ㄕˋ|ㄑㄧㄢ|ㄅㄧˇ|ㄏㄜˊ",
+      "path": "/listening-audio/gemini/words/9019-500b-662f-925b-7b46-76d2-3002.m4a",
+      "batch": "2026-11-10-10-words",
+      "duration": 2.62,
+      "voicedDuration": 2.02,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "那裡是學校的操場。",
+      "reading": "ㄋㄚˋ|ㄌㄧˇ|ㄕˋ|ㄒㄩㄝˊ|ㄒㄧㄠˋ|˙ㄉㄜ|ㄘㄠ|ㄔㄤˇ",
+      "path": "/listening-audio/gemini/words/90a3-88e1-662f-5b78-6821-7684-64cd-5834-3002.m4a",
+      "batch": "2026-11-10-10-words",
+      "duration": 2.57,
+      "voicedDuration": 1.97,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "爸爸和我一起跑步。",
+      "reading": "ㄅㄚˋ|˙ㄅㄚ|ㄏㄢˋ|ㄨㄛˇ|ㄧˋ|ㄑㄧˇ|ㄆㄠˇ|ㄅㄨˋ",
+      "path": "/listening-audio/gemini/words/7238-7238-548c-6211-4e00-8d77-8dd1-6b65-3002.m4a",
+      "batch": "2026-11-10-11-words",
+      "duration": 2.44,
+      "voicedDuration": 1.84,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "姐姐和我一起畫畫。",
+      "reading": "ㄐㄧㄝˇ|˙ㄐㄧㄝ|ㄏㄢˋ|ㄨㄛˇ|ㄧˋ|ㄑㄧˇ|ㄏㄨㄚˋ|ㄏㄨㄚˋ",
+      "path": "/listening-audio/gemini/words/59d0-59d0-548c-6211-4e00-8d77-756b-756b-3002.m4a",
+      "batch": "2026-11-10-11-words",
+      "duration": 2.56,
+      "voicedDuration": 1.96,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "我們一起玩。",
+      "reading": "ㄨㄛˇ|˙ㄇㄣ|ㄧˋ|ㄑㄧˇ|ㄨㄢˊ",
+      "path": "/listening-audio/gemini/words/6211-5011-4e00-8d77-73a9-3002.m4a",
+      "batch": "2026-11-10-11-words",
+      "duration": 2,
+      "voicedDuration": 1.4,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "大個子好開心。",
+      "reading": "ㄉㄚˋ|ㄍㄜˋ|˙ㄗ|ㄏㄠˇ|ㄎㄞ|ㄒㄧㄣ",
+      "path": "/listening-audio/gemini/words/5927-500b-5b50-597d-958b-5fc3-3002.m4a",
+      "batch": "2026-11-10-11-words",
+      "duration": 2.29,
+      "voicedDuration": 1.69,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "妹妹好可愛。",
+      "reading": "ㄇㄟˋ|˙ㄇㄟ|ㄏㄠˇ|ㄎㄜˇ|ㄞˋ",
+      "path": "/listening-audio/gemini/words/59b9-59b9-597d-53ef-611b-3002.m4a",
+      "batch": "2026-11-10-11-words",
+      "duration": 1.94,
+      "voicedDuration": 1.34,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "蝴蝶真漂亮。",
+      "reading": "ㄏㄨˊ|ㄉㄧㄝˊ|ㄓㄣ|ㄆㄧㄠˋ|˙ㄌㄧㄤ",
+      "path": "/listening-audio/gemini/words/8774-8776-771f-6f02-4eae-3002.m4a",
+      "batch": "2026-11-10-11-words",
+      "duration": 2.06,
+      "voicedDuration": 1.46,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "比，比一比。",
+      "reading": "ㄅㄧˇ|ㄅㄧˇ|ㄧ|ㄅㄧˇ",
+      "path": "/listening-audio/gemini/words/6bd4-ff0c-6bd4-4e00-6bd4-3002.m4a",
+      "batch": "2026-11-10-11-words",
+      "duration": 2.35,
+      "voicedDuration": 1.75,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "爸爸想喝茶，媽媽也想喝茶。",
+      "reading": "ㄅㄚˋ|˙ㄅㄚ|ㄒㄧㄤˇ|ㄏㄜ|ㄔㄚˊ|ㄇㄚ|˙ㄇㄚ|ㄧㄝˇ|ㄒㄧㄤˇ|ㄏㄜ|ㄔㄚˊ",
+      "path": "/listening-audio/gemini/words/7238-7238-60f3-559d-8336-ff0c-5abd-5abd-4e5f-60f3-559d-8336-3002.m4a",
+      "batch": "2026-11-10-12-words",
+      "duration": 4.45,
+      "voicedDuration": 3.85,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "我向小紅花說你早，也向小白花說你好。",
+      "reading": "ㄨㄛˇ|ㄒㄧㄤˋ|ㄒㄧㄠˇ|ㄏㄨㄥˊ|ㄏㄨㄚ|ㄕㄨㄛ|ㄋㄧˇ|ㄗㄠˇ|ㄧㄝˇ|ㄒㄧㄤˋ|ㄒㄧㄠˇ|ㄅㄞˊ|ㄏㄨㄚ|ㄕㄨㄛ|ㄋㄧˇ|ㄏㄠˇ",
+      "path": "/listening-audio/gemini/words/6211-5411-5c0f-7d05-82b1-8aaa-4f60-65e9-ff0c-4e5f-5411-5c0f-767d-82b1-8aaa-4f60-597d-3002.m4a",
+      "batch": "2026-11-10-12-words",
+      "duration": 6.63,
+      "voicedDuration": 6.03,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "照著箭頭描一描",
+      "reading": "ㄓㄠˋ|˙ㄓㄜ|ㄐㄧㄢˋ|ㄊㄡˊ|ㄇㄧㄠˊ|ㄧ|ㄇㄧㄠˊ",
+      "path": "/listening-audio/gemini/words/7167-8457-7bad-982d-63cf-4e00-63cf.m4a",
+      "batch": "2026-11-10-12-words",
+      "duration": 3.14,
+      "voicedDuration": 2.54,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "聽一聽，點出這個筆畫",
+      "reading": "ㄊㄧㄥ|ㄧ|ㄊㄧㄥ|ㄉㄧㄢˇ|ㄔㄨ|ㄓㄜˋ|˙ㄍㄜ|ㄅㄧˇ|ㄏㄨㄚˋ",
+      "path": "/listening-audio/gemini/words/807d-4e00-807d-ff0c-9ede-51fa-9019-500b-7b46-756b.m4a",
+      "batch": "2026-11-10-12-words",
+      "duration": 3.19,
+      "voicedDuration": 2.59,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "在這個字裡，找一找",
+      "reading": "ㄗㄞˋ|ㄓㄜˋ|˙ㄍㄜ|ㄗˋ|ㄌㄧˇ|ㄓㄠˇ|ㄧ|ㄓㄠˇ",
+      "path": "/listening-audio/gemini/words/5728-9019-500b-5b57-88e1-ff0c-627e-4e00-627e.m4a",
+      "batch": "2026-11-10-13-words",
+      "duration": 2.75,
+      "voicedDuration": 2.15,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "橫",
+      "reading": "ㄏㄥˊ",
+      "path": "/listening-audio/gemini/words/6a6b.m4a",
+      "batch": "2026-11-10-13-words",
+      "duration": 1.31,
+      "voicedDuration": 0.71,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "豎",
+      "reading": "ㄕㄨˋ",
+      "path": "/listening-audio/gemini/words/8c4e.m4a",
+      "batch": "2026-11-10-13-words",
+      "duration": 1.32,
+      "voicedDuration": 0.72,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "點",
+      "reading": "ㄉㄧㄢˇ",
+      "path": "/listening-audio/gemini/words/9ede.m4a",
+      "batch": "2026-11-10-13-words",
+      "duration": 1.33,
+      "voicedDuration": 0.73,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "撇",
+      "reading": "ㄆㄧㄝˇ",
+      "path": "/listening-audio/gemini/words/6487.m4a",
+      "batch": "2026-11-10-13-words",
+      "duration": 1.35,
+      "voicedDuration": 0.75,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "挑",
+      "reading": "ㄊㄧㄠˇ",
+      "path": "/listening-audio/gemini/words/6311.m4a",
+      "batch": "2026-11-10-13-words",
+      "duration": 1.25,
+      "voicedDuration": 0.65,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "捺",
+      "reading": "ㄋㄚˋ",
+      "path": "/listening-audio/gemini/words/637a.m4a",
+      "batch": "2026-11-10-13-words",
+      "duration": 1.09,
+      "voicedDuration": 0.49,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "橫折",
+      "reading": "ㄏㄥˊ|ㄓㄜˊ",
+      "path": "/listening-audio/gemini/words/6a6b-6298.m4a",
+      "batch": "2026-11-10-13-words",
+      "duration": 1.59,
+      "voicedDuration": 0.99,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "豎折",
+      "reading": "ㄕㄨˋ|ㄓㄜˊ",
+      "path": "/listening-audio/gemini/words/8c4e-6298.m4a",
+      "batch": "2026-11-10-13-words",
+      "duration": 1.65,
+      "voicedDuration": 1.05,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "橫撇",
+      "reading": "ㄏㄥˊ|ㄆㄧㄝˇ",
+      "path": "/listening-audio/gemini/words/6a6b-6487.m4a",
+      "batch": "2026-11-10-13-words",
+      "duration": 1.63,
+      "voicedDuration": 1.03,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "橫鉤",
+      "reading": "ㄏㄥˊ|ㄍㄡ",
+      "path": "/listening-audio/gemini/words/6a6b-9264.m4a",
+      "batch": "2026-11-10-13-words",
+      "duration": 1.46,
+      "voicedDuration": 0.86,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "豎鉤",
+      "reading": "ㄕㄨˋ|ㄍㄡ",
+      "path": "/listening-audio/gemini/words/8c4e-9264.m4a",
+      "batch": "2026-11-10-13-words",
+      "duration": 1.48,
+      "voicedDuration": 0.88,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "豎挑",
+      "reading": "ㄕㄨˋ|ㄊㄧㄠˇ",
+      "path": "/listening-audio/gemini/words/8c4e-6311.m4a",
+      "batch": "2026-11-10-13-words",
+      "duration": 1.37,
+      "voicedDuration": 0.77,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "斜鉤",
+      "reading": "ㄒㄧㄝˊ|ㄍㄡ",
+      "path": "/listening-audio/gemini/words/659c-9264.m4a",
+      "batch": "2026-11-10-13-words",
+      "duration": 1.44,
+      "voicedDuration": 0.84,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "臥鉤",
+      "reading": "ㄨㄛˋ|ㄍㄡ",
+      "path": "/listening-audio/gemini/words/81e5-9264.m4a",
+      "batch": "2026-11-10-13-words",
+      "duration": 1.29,
+      "voicedDuration": 0.69,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "彎鉤",
+      "reading": "ㄨㄢ|ㄍㄡ",
+      "path": "/listening-audio/gemini/words/5f4e-9264.m4a",
+      "batch": "2026-11-10-13-words",
+      "duration": 1.4,
+      "voicedDuration": 0.8,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "橫折鉤",
+      "reading": "ㄏㄥˊ|ㄓㄜˊ|ㄍㄡ",
+      "path": "/listening-audio/gemini/words/6a6b-6298-9264.m4a",
+      "batch": "2026-11-10-13-words",
+      "duration": 1.48,
+      "voicedDuration": 0.88,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "橫曲鉤",
+      "reading": "ㄏㄥˊ|ㄑㄩ|ㄍㄡ",
+      "path": "/listening-audio/gemini/words/6a6b-66f2-9264.m4a",
+      "batch": "2026-11-10-13-words",
+      "duration": 1.54,
+      "voicedDuration": 0.94,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "豎曲鉤",
+      "reading": "ㄕㄨˋ|ㄑㄩ|ㄍㄡ",
+      "path": "/listening-audio/gemini/words/8c4e-66f2-9264.m4a",
+      "batch": "2026-11-10-13-words",
+      "duration": 1.54,
+      "voicedDuration": 0.94,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "橫斜鉤",
+      "reading": "ㄏㄥˊ|ㄒㄧㄝˊ|ㄍㄡ",
+      "path": "/listening-audio/gemini/words/6a6b-659c-9264.m4a",
+      "batch": "2026-11-10-13-words",
+      "duration": 1.42,
+      "voicedDuration": 0.82,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "豎撇",
+      "reading": "ㄕㄨˋ|ㄆㄧㄝˇ",
+      "path": "/listening-audio/gemini/words/8c4e-6487.m4a",
+      "batch": "2026-11-10-13-words",
+      "duration": 1.4,
+      "voicedDuration": 0.8,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "撇橫",
+      "reading": "ㄆㄧㄝˇ|ㄏㄥˊ",
+      "path": "/listening-audio/gemini/words/6487-6a6b.m4a",
+      "batch": "2026-11-10-13-words",
+      "duration": 1.29,
+      "voicedDuration": 0.69,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "撇挑",
+      "reading": "ㄆㄧㄝˇ|ㄊㄧㄠˇ",
+      "path": "/listening-audio/gemini/words/6487-6311.m4a",
+      "batch": "2026-11-10-14-words",
+      "duration": 1.57,
+      "voicedDuration": 0.97,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "撇頓點",
+      "reading": "ㄆㄧㄝˇ|ㄉㄨㄣˋ|ㄉㄧㄢˇ",
+      "path": "/listening-audio/gemini/words/6487-9813-9ede.m4a",
+      "batch": "2026-11-10-14-words",
+      "duration": 1.81,
+      "voicedDuration": 1.21,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "長頓點",
+      "reading": "ㄔㄤˊ|ㄉㄨㄣˋ|ㄉㄧㄢˇ",
+      "path": "/listening-audio/gemini/words/9577-9813-9ede.m4a",
+      "batch": "2026-11-10-14-words",
+      "duration": 1.74,
+      "voicedDuration": 1.14,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "橫折橫",
+      "reading": "ㄏㄥˊ|ㄓㄜˊ|ㄏㄥˊ",
+      "path": "/listening-audio/gemini/words/6a6b-6298-6a6b.m4a",
+      "batch": "2026-11-10-14-words",
+      "duration": 1.82,
+      "voicedDuration": 1.22,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "豎橫折",
+      "reading": "ㄕㄨˋ|ㄏㄥˊ|ㄓㄜˊ",
+      "path": "/listening-audio/gemini/words/8c4e-6a6b-6298.m4a",
+      "batch": "2026-11-10-14-words",
+      "duration": 1.78,
+      "voicedDuration": 1.18,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "豎橫折鉤",
+      "reading": "ㄕㄨˋ|ㄏㄥˊ|ㄓㄜˊ|ㄍㄡ",
+      "path": "/listening-audio/gemini/words/8c4e-6a6b-6298-9264.m4a",
+      "batch": "2026-11-10-14-words",
+      "duration": 2.08,
+      "voicedDuration": 1.48,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "橫撇橫折鉤",
+      "reading": "ㄏㄥˊ|ㄆㄧㄝˇ|ㄏㄥˊ|ㄓㄜˊ|ㄍㄡ",
+      "path": "/listening-audio/gemini/words/6a6b-6487-6a6b-6298-9264.m4a",
+      "batch": "2026-11-10-14-words",
+      "duration": 2.43,
+      "voicedDuration": 1.83,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "照故事的順序，點一點",
+      "reading": "ㄓㄠˋ|ㄍㄨˋ|ㄕˋ|˙ㄉㄜ|ㄕㄨㄣˋ|ㄒㄩˋ|ㄉㄧㄢˇ|ㄧ|ㄉㄧㄢˇ",
+      "path": "/listening-audio/gemini/words/7167-6545-4e8b-7684-9806-5e8f-ff0c-9ede-4e00-9ede.m4a",
+      "batch": "2026-11-10-14-words",
+      "duration": 3.28,
+      "voicedDuration": 2.68,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "大家都不敢靠近小刺蝟",
+      "reading": "ㄉㄚˋ|ㄐㄧㄚ|ㄉㄡ|ㄅㄨˋ|ㄍㄢˇ|ㄎㄠˋ|ㄐㄧㄣˋ|ㄒㄧㄠˇ|ㄘˋ|ㄨㄟˋ",
+      "path": "/listening-audio/gemini/words/5927-5bb6-90fd-4e0d-6562-9760-8fd1-5c0f-523a-875f.m4a",
+      "batch": "2026-11-10-14-words",
+      "duration": 3.12,
+      "voicedDuration": 2.52,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "小女孩",
+      "reading": "ㄒㄧㄠˇ|ㄋㄩˇ|ㄏㄞˊ",
+      "path": "/listening-audio/gemini/words/5c0f-5973-5b69.m4a",
+      "batch": "2026-11-10-16-words",
+      "duration": 1.74,
+      "voicedDuration": 1.18,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "小刺蝟",
+      "reading": "ㄒㄧㄠˇ|ㄘˋ|ㄨㄟˋ",
+      "path": "/listening-audio/gemini/words/5c0f-523a-875f.m4a",
+      "batch": "2026-11-10-16-words",
+      "duration": 1.5,
+      "voicedDuration": 0.9,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "一開始，小刺蝟為什麼不快樂？",
+      "reading": "ㄧˋ|ㄎㄞ|ㄕˇ|ㄒㄧㄠˇ|ㄘˋ|ㄨㄟˋ|ㄨㄟˋ|ㄕㄣˊ|˙ㄇㄜ|ㄅㄨˊ|ㄎㄨㄞˋ|ㄌㄜˋ",
+      "path": "/listening-audio/gemini/words/4e00-958b-59cb-ff0c-5c0f-523a-875f-70ba-4ec0-9ebc-4e0d-5feb-6a02-ff1f.m4a",
+      "batch": "2026-11-10-16-words",
+      "duration": 3.46,
+      "voicedDuration": 2.86,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "大家都怕他的刺",
+      "reading": "ㄉㄚˋ|ㄐㄧㄚ|ㄉㄡ|ㄆㄚˋ|ㄊㄚ|˙ㄉㄜ|ㄘˋ",
+      "path": "/listening-audio/gemini/words/5927-5bb6-90fd-6015-4ed6-7684-523a.m4a",
+      "batch": "2026-11-10-16-words",
+      "duration": 2.14,
+      "voicedDuration": 1.54,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "他找不到家",
+      "reading": "ㄊㄚ|ㄓㄠˇ|ㄅㄨˊ|ㄉㄠˋ|ㄐㄧㄚ",
+      "path": "/listening-audio/gemini/words/4ed6-627e-4e0d-5230-5bb6.m4a",
+      "batch": "2026-11-10-16-words",
+      "duration": 1.9,
+      "voicedDuration": 1.3,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "他的肚子餓了",
+      "reading": "ㄊㄚ|˙ㄉㄜ|ㄉㄨˋ|˙ㄗ|ㄜˋ|˙ㄌㄜ",
+      "path": "/listening-audio/gemini/words/4ed6-7684-809a-5b50-9913-4e86.m4a",
+      "batch": "2026-11-10-16-words",
+      "duration": 1.8,
+      "voicedDuration": 1.2,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "誰看到小刺蝟，就大叫跳走了？",
+      "reading": "ㄕㄟˊ|ㄎㄢˋ|ㄉㄠˋ|ㄒㄧㄠˇ|ㄘˋ|ㄨㄟˋ|ㄐㄧㄡˋ|ㄉㄚˋ|ㄐㄧㄠˋ|ㄊㄧㄠˋ|ㄗㄡˇ|˙ㄌㄜ",
+      "path": "/listening-audio/gemini/words/8ab0-770b-5230-5c0f-523a-875f-ff0c-5c31-5927-53eb-8df3-8d70-4e86-ff1f.m4a",
+      "batch": "2026-11-10-16-words",
+      "duration": 3.43,
+      "voicedDuration": 2.84,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "小女孩送他氣球",
+      "reading": "ㄒㄧㄠˇ|ㄋㄩˇ|ㄏㄞˊ|ㄙㄨㄥˋ|ㄊㄚ|ㄑㄧˋ|ㄑㄧㄡˊ",
+      "path": "/listening-audio/gemini/words/5c0f-5973-5b69-9001-4ed6-6c23-7403.m4a",
+      "batch": "2026-11-10-18-words",
+      "duration": 3.14,
+      "voicedDuration": 2.54,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "他飛到天上",
+      "reading": "ㄊㄚ|ㄈㄟ|ㄉㄠˋ|ㄊㄧㄢ|ㄕㄤˋ",
+      "path": "/listening-audio/gemini/words/4ed6-98db-5230-5929-4e0a.m4a",
+      "batch": "2026-11-10-18-words",
+      "duration": 2.44,
+      "voicedDuration": 1.84,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
+    },
+    {
+      "text": "最後，誰抱了小刺蝟？",
+      "reading": "ㄗㄨㄟˋ|ㄏㄡˋ|ㄕㄟˊ|ㄅㄠˋ|˙ㄌㄜ|ㄒㄧㄠˇ|ㄘˋ|ㄨㄟˋ",
+      "path": "/listening-audio/gemini/words/6700-5f8c-ff0c-8ab0-62b1-4e86-5c0f-523a-875f-ff1f.m4a",
+      "batch": "2026-11-10-18-words",
+      "duration": 3.21,
+      "voicedDuration": 2.61,
+      "createdAt": "2026-11-10",
+      "origin": "Gemini API"
     }
   ]
 }
