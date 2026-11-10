@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ArrowRight, CheckCircle, Ear, PencilSimple, TextAa } from "@phosphor-icons/react";
 import type { AppController } from "../usePracticeApp";
+import { ProgressiveImage } from "../../components/ProgressiveImage";
 import { book1Facts, book1Lessons } from "./book1-characters";
 import { HanziGlyph, HanziWords } from "./HanziChrome";
 import { readHanziRecords } from "./hanzi-round";
@@ -35,6 +36,11 @@ export function HanziLessonPage({
             <HanziWords text={lesson.title} />
           </h1>
         </div>
+        <ProgressiveImage
+          className="lesson-heading-art"
+          src={`course-art/${lesson.art}.webp`}
+          alt=""
+        />
       </div>
       <div className="mode-grid hanzi-modes">
         <button

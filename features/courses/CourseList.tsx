@@ -77,7 +77,11 @@ export function CourseList({
                 ? "照著筆順，一筆一筆寫生字！"
                 : "跟著注音，一步一步探索吧！"
         }
-        artwork="course-art/course-journey-hero-v2.webp"
+        artwork={
+          subject === "zhuyin" && app.materialsState.activeId === book1MaterialId
+            ? "course-art/book1-cover.webp"
+            : "course-art/course-journey-hero-v2.webp"
+        }
       />
       <ChildGreeting />
       <div className="subject-switch" role="group" aria-label="科目">

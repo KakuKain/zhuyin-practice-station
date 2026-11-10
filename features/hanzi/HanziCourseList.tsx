@@ -5,8 +5,8 @@ import { HanziWords } from "./HanziChrome";
 import "../../styles/lazy/hanzi.css";
 
 /**
- * 第一冊's lessons, drawn like the 注音 journey: the lesson's number and title in 國字注音, and
- * its first 生字 where the 注音 lessons have a picture.
+ * 第一冊's lessons, drawn like the 注音 journey: the lesson's number and title in 國字注音 and
+ * its watercolor (about 400 px, cut from one sheet, so small enough to need no thumbnail).
  */
 export function HanziCourseList({ onOpen }: { onOpen: (id: number) => void }) {
   return (
@@ -37,11 +37,12 @@ export function HanziCourseList({ onOpen }: { onOpen: (id: number) => void }) {
                 <HanziWords text={lesson.title} />
               </strong>
             </span>
-            <span className="hanzi-card-characters" aria-hidden="true">
-              {[...lesson.characters].slice(0, 3).map((character) => (
-                <span key={character}>{character}</span>
-              ))}
-            </span>
+            <ProgressiveImage
+              className="journey-art"
+              src={`course-art/${lesson.art}.webp`}
+              alt=""
+              aria-hidden="true"
+            />
             <span className="journey-arrow" aria-hidden="true">
               <ArrowRight size={23} weight="bold" />
             </span>

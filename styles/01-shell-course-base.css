@@ -33,13 +33,8 @@ body {
 .logo-mark {
   width: 31px;
   height: 31px;
-  border-radius: 10px 10px 10px 3px;
-  background: var(--ref-blue);
-  box-shadow: none;
-}
-
-.logo-mark span {
-  font-size: 17px;
+  border-radius: 9px;
+  box-shadow: 0 0 0 1px #eadfca;
 }
 
 .brand-button strong {
