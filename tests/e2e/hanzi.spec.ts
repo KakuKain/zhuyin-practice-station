@@ -40,7 +40,7 @@ test("第一冊 練習 picks a 生字 from the list, marks a stroke out of order
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("./");
   await page.getByRole("combobox", { name: "選擇教材" }).selectOption("kang-hsuan-grade1-book1");
-  await expect(page.locator(".hanzi-journey .journey-card")).toHaveCount(7);
+  await expect(page.locator(".hanzi-journey .journey-card")).toHaveCount(8);
   await noOverflow(page);
   await page.getByRole("button", { name: /第一課，拍拍手/ }).click();
   await expect(page.locator(".hanzi-character-card")).toHaveCount(9);
@@ -239,5 +239,81 @@ test("第一冊 照樣造句 shows the book's example, fills the pattern's blank
     await group.getByRole("button", { name: "對" }).click();
   await finish.click();
   await expect(page.locator(".math-result")).toContainText("照樣造句完成");
+  expect(errors).toEqual([]);
+});
+
+/** Traces the stroke 描一描 shows, along its arrow (the hint path, in the 1024 box). */
+async function traceShown(page: Page) {
+  const canvas = page.locator(".stroke-trace .hanzi-canvas");
+  const d = (await page.locator(".stroke-trace .hanzi-hint-path").getAttribute("d"))!;
+  const numbers = (d.match(/-?\d+(?:\.\d+)?/g) ?? []).map(Number);
+  const median: number[][] = [];
+  // write() takes the data's y (up from 900); the hint path's y already points down.
+  for (let i = 0; i + 1 < numbers.length; i += 2) median.push([numbers[i], 900 - numbers[i + 1]]);
+  await write(page, canvas, median);
+}
+
+test("第一冊 認識國字基本筆畫 traces each stroke, then finds strokes by name and in a character", async ({
+  page,
+}) => {
+  test.setTimeout(150_000);
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("./");
+  await page.getByRole("combobox", { name: "選擇教材" }).selectOption("kang-hsuan-grade1-book1");
+  await page.getByRole("button", { name: /認識國字基本筆畫/ }).click();
+  await expect(page.locator(".stroke-chart-card")).toHaveCount(28);
+  await expect(page.locator(".stroke-page-card")).toHaveCount(4);
+  await noOverflow(page);
+
+  await page.getByRole("button", { name: /課本第 8 頁/ }).click();
+  await expect(page.locator(".math-header")).toContainText("第 1 題 / 12");
+  // Written backwards, the 橫 is not right.
+  const d = (await page.locator(".stroke-trace .hanzi-hint-path").getAttribute("d"))!;
+  const numbers = (d.match(/-?\d+(?:\.\d+)?/g) ?? []).map(Number);
+  const backwards: number[][] = [];
+  for (let i = 0; i + 1 < numbers.length; i += 2)
+    backwards.unshift([numbers[i], 900 - numbers[i + 1]]);
+  await write(page, page.locator(".stroke-trace .hanzi-canvas"), backwards);
+  await expect(page.locator(".hanzi-feedback")).toContainText("再試一次");
+  await page.waitForTimeout(800);
+  for (let i = 0; i < 6; i++) {
+    await traceShown(page);
+    await expect(page.locator(".hanzi-feedback")).toContainText("描對了");
+    await page.getByRole("button", { name: "下一題" }).click();
+  }
+  await noOverflow(page);
+
+  // 聽名稱找筆畫 and 在字裡找筆畫: retried until right.
+  for (let i = 0; i < 3; i++) {
+    await expect(page.locator(".stroke-question.is-pick")).toBeVisible();
+    for (const choice of await page.locator(".stroke-choice").all()) {
+      await choice.click();
+      if (await page.locator(".math-feedback.is-correct").isVisible()) break;
+      await expect(page.locator(".math-feedback")).toBeHidden();
+    }
+    await expect(page.locator(".math-feedback")).toBeHidden();
+  }
+  for (let i = 0; i < 3; i++) {
+    const glyph = page.locator(".stroke-find-glyph");
+    await expect(glyph).toBeVisible();
+    const count = await page.locator(".stroke-find-part").count();
+    for (let stroke = 0; stroke < count; stroke++) {
+      const point = await page
+        .locator(".stroke-find-part")
+        .nth(stroke)
+        .evaluate((path) => {
+          const element = path as SVGPathElement;
+          const at = element.getPointAtLength(element.getTotalLength() * 0.25);
+          const screen = new DOMPoint(at.x, at.y).matrixTransform(element.getScreenCTM()!);
+          return { x: screen.x, y: screen.y };
+        });
+      await page.mouse.click(point.x, point.y);
+      if (await page.locator(".math-feedback.is-correct").isVisible()) break;
+      await expect(page.locator(".math-feedback")).toBeHidden();
+    }
+    await expect(page.locator(".math-feedback")).toBeHidden();
+  }
+  await expect(page.locator(".math-result")).toContainText("筆畫練習完成");
   expect(errors).toEqual([]);
 });

@@ -28,6 +28,7 @@ import { fillLayout } from "./fill/fill-layout";
 import { useFillFlow } from "./fill/useFillFlow";
 import { useStampBook } from "./rewards/useStampBook";
 import { taskKeys, type AwardLessonStamp } from "./rewards/stamp-book";
+import type { StrokePage } from "./hanzi/basic-strokes";
 import { lessonPlace } from "./rewards/daily-tasks";
 import type { EnglishMode } from "./english/english-lessons";
 
@@ -227,7 +228,11 @@ export function usePracticeApp() {
   const [hanziLessonId, setHanziLessonId] = useState(1);
   /** The 生字 practice starts on: one tapped on the lesson page, or none to pick from the list. */
   const [hanziStart, setHanziStart] = useState<string | undefined>();
-  const [hanziMode, setHanziMode] = useState<"practice" | "dictation" | "sentences">("practice");
+  const [hanziMode, setHanziMode] = useState<"practice" | "dictation" | "sentences" | "strokes">(
+    "practice",
+  );
+  /** 認識國字基本筆畫's page being practised. */
+  const [hanziStrokePage, setHanziStrokePage] = useState<StrokePage>(8);
   const openHanziLesson = (id: number) => {
     setHanziLessonId(id);
     setView("hanzi-lesson");
@@ -243,6 +248,11 @@ export function usePracticeApp() {
   };
   const startHanziSentences = () => {
     setHanziMode("sentences");
+    setView("hanzi");
+  };
+  const startHanziStrokes = (page: StrokePage) => {
+    setHanziStrokePage(page);
+    setHanziMode("strokes");
     setView("hanzi");
   };
 
@@ -373,6 +383,8 @@ export function usePracticeApp() {
     hanziMode,
     startHanziDictation,
     startHanziSentences,
+    hanziStrokePage,
+    startHanziStrokes,
     openHanziLesson,
     startHanziPractice,
     subject,

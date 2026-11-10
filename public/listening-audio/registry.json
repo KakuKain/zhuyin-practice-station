@@ -2134,22 +2134,6 @@
       "review": "legacy; pronunciation not certified"
     },
     {
-      "text": "拉手",
-      "pronunciation": [
-        "ㄌㄚ|ㄕㄡˇ"
-      ],
-      "observedReadings": [
-        "ㄌㄚ|ㄕㄡˇ"
-      ],
-      "url": "/listening-audio/62c9-624b.m4a",
-      "source": "macOS Meijia (legacy synthesis)",
-      "duration": 0.836,
-      "bytes": 8696,
-      "sha256": "e9b84cc1ac352fbfae35ef83768959a1957994828c2e53fc195621d1821636b9",
-      "version": "e9b84cc1ac35",
-      "review": "legacy; pronunciation not certified"
-    },
-    {
       "text": "拔不動",
       "pronunciation": [
         "ㄅㄚˊ|ㄅㄨˊ|ㄉㄨㄥˋ"
@@ -3450,22 +3434,6 @@
       "review": "legacy; pronunciation not certified"
     },
     {
-      "text": "開心",
-      "pronunciation": [
-        "ㄎㄞ|ㄒㄧㄣ"
-      ],
-      "observedReadings": [
-        "ㄎㄞ|ㄒㄧㄣ"
-      ],
-      "url": "/listening-audio/958b-5fc3.m4a",
-      "source": "macOS Meijia (legacy synthesis)",
-      "duration": 0.882,
-      "bytes": 8960,
-      "sha256": "b4c46da8e6e07d9d776d3b94b9e32f78df5cb14b2fe5e33f2624535234c7c1c3",
-      "version": "b4c46da8e6e0",
-      "review": "legacy; pronunciation not certified"
-    },
-    {
       "text": "雞",
       "pronunciation": [],
       "observedReadings": [],
@@ -4584,6 +4552,40 @@
       "voicedDuration": 1.54
     },
     {
+      "text": "一個的個",
+      "pronunciation": [
+        "ㄧˊ|˙ㄍㄜ|˙ㄉㄜ|ㄍㄜˋ"
+      ],
+      "observedReadings": [
+        "ㄧˊ|˙ㄍㄜ|˙ㄉㄜ|ㄍㄜˋ"
+      ],
+      "url": "/listening-audio/gemini/words/4e00-500b-7684-500b.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.365,
+      "bytes": 15127,
+      "sha256": "61824a928a2152024ad4f7c52a83c3c0e3937074abf0aa6cf700be52a7908705",
+      "version": "61824a928a21",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.66
+    },
+    {
+      "text": "一個",
+      "pronunciation": [
+        "ㄧˊ|˙ㄍㄜ"
+      ],
+      "observedReadings": [
+        "ㄧˊ|˙ㄍㄜ"
+      ],
+      "url": "/listening-audio/gemini/words/4e00-500b.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.109,
+      "bytes": 12504,
+      "sha256": "3330712b84c1ae85342059534c9b195c492cf14374bcaaba76da1b1a8f20e0ba",
+      "version": "3330712b84c1",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.39
+    },
+    {
       "text": "一把尺",
       "pronunciation": [
         "ㄧˋ|ㄅㄚˇ|ㄔˇ"
@@ -4599,6 +4601,23 @@
       "version": "ba1e68f4b507",
       "review": "timing checked; human pronunciation review recommended",
       "voicedDuration": 0.85
+    },
+    {
+      "text": "一起的起",
+      "pronunciation": [
+        "ㄧˋ|ㄑㄧˇ|˙ㄉㄜ|ㄑㄧˇ"
+      ],
+      "observedReadings": [
+        "ㄧˋ|ㄑㄧˇ|˙ㄉㄜ|ㄑㄧˇ"
+      ],
+      "url": "/listening-audio/gemini/words/4e00-8d77-7684-8d77.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.835,
+      "bytes": 19119,
+      "sha256": "950ed399f4dbec366f8b84dce07191d54c16f75aa4a24d861e0530a74317be65",
+      "version": "950ed399f4db",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.16
     },
     {
       "text": "一起",
@@ -4653,6 +4672,40 @@
       "voicedDuration": 0.68
     },
     {
+      "text": "上學的上",
+      "pronunciation": [
+        "ㄕㄤˋ|ㄒㄩㄝˊ|˙ㄉㄜ|ㄕㄤˋ"
+      ],
+      "observedReadings": [
+        "ㄕㄤˋ|ㄒㄩㄝˊ|˙ㄉㄜ|ㄕㄤˋ"
+      ],
+      "url": "/listening-audio/gemini/words/4e0a-5b78-7684-4e0a.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.835,
+      "bytes": 19421,
+      "sha256": "d36dbfc16ea392973bc91f673fbd06534430a0e4ae5f7eb35e677005dadf74a2",
+      "version": "d36dbfc16ea3",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.13
+    },
+    {
+      "text": "上學",
+      "pronunciation": [
+        "ㄕㄤˋ|ㄒㄩㄝˊ"
+      ],
+      "observedReadings": [
+        "ㄕㄤˋ|ㄒㄩㄝˊ"
+      ],
+      "url": "/listening-audio/gemini/words/4e0a-5b78.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.579,
+      "bytes": 16648,
+      "sha256": "7055461087142c6c53a97bd42f282735e15bcca0e86b1aa40b11c466790d253e",
+      "version": "705546108714",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.89
+    },
+    {
       "text": "上街",
       "pronunciation": [
         "ㄕㄤˋ|ㄐㄧㄝ"
@@ -4668,6 +4721,40 @@
       "version": "c715f2cf03f5",
       "review": "timing checked; human pronunciation review recommended",
       "voicedDuration": 1.05
+    },
+    {
+      "text": "上課的課",
+      "pronunciation": [
+        "ㄕㄤˋ|ㄎㄜˋ|˙ㄉㄜ|ㄎㄜˋ"
+      ],
+      "observedReadings": [
+        "ㄕㄤˋ|ㄎㄜˋ|˙ㄉㄜ|ㄎㄜˋ"
+      ],
+      "url": "/listening-audio/gemini/words/4e0a-8ab2-7684-8ab2.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.92,
+      "bytes": 19814,
+      "sha256": "de8704acac39d4d4cf4064627c64d3fdb22ac30fdf55d7d06dbb92441e3b5507",
+      "version": "de8704acac39",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.23
+    },
+    {
+      "text": "上課",
+      "pronunciation": [
+        "ㄕㄤˋ|ㄎㄜˋ"
+      ],
+      "observedReadings": [
+        "ㄕㄤˋ|ㄎㄜˋ"
+      ],
+      "url": "/listening-audio/gemini/words/4e0a-8ab2.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.493,
+      "bytes": 16051,
+      "sha256": "d629b57a9e8482abec432746cc1d9bb20d5f2685b4f17607b3829ce9af9d6889",
+      "version": "d629b57a9e84",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.8
     },
     {
       "text": "上",
@@ -4687,6 +4774,40 @@
       "voicedDuration": 0.34
     },
     {
+      "text": "下課的下",
+      "pronunciation": [
+        "ㄒㄧㄚˋ|ㄎㄜˋ|˙ㄉㄜ|ㄒㄧㄚˋ"
+      ],
+      "observedReadings": [
+        "ㄒㄧㄚˋ|ㄎㄜˋ|˙ㄉㄜ|ㄒㄧㄚˋ"
+      ],
+      "url": "/listening-audio/gemini/words/4e0b-8ab2-7684-4e0b.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.792,
+      "bytes": 18795,
+      "sha256": "de2777846472c2b1c61335cf6887314051ffdfb3aa3e149c14ab95ff21289536",
+      "version": "de2777846472",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.09
+    },
+    {
+      "text": "下課",
+      "pronunciation": [
+        "ㄒㄧㄚˋ|ㄎㄜˋ"
+      ],
+      "observedReadings": [
+        "ㄒㄧㄚˋ|ㄎㄜˋ"
+      ],
+      "url": "/listening-audio/gemini/words/4e0b-8ab2.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.323,
+      "bytes": 14849,
+      "sha256": "8373012c38cd95c03fb3ee396200977073a9de81fc977ef94a36162905d7da57",
+      "version": "8373012c38cd",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.63
+    },
+    {
       "text": "下",
       "pronunciation": [
         "ㄒㄧㄚˋ"
@@ -4702,6 +4823,57 @@
       "version": "d6bb6ac175ed",
       "review": "timing checked; human pronunciation review recommended",
       "voicedDuration": 0.48
+    },
+    {
+      "text": "不同的不",
+      "pronunciation": [
+        "ㄅㄨˋ|ㄊㄨㄥˊ|˙ㄉㄜ|ㄅㄨˋ"
+      ],
+      "observedReadings": [
+        "ㄅㄨˋ|ㄊㄨㄥˊ|˙ㄉㄜ|ㄅㄨˋ"
+      ],
+      "url": "/listening-audio/gemini/words/4e0d-540c-7684-4e0d.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.621,
+      "bytes": 17132,
+      "sha256": "40a5b9924d224dac7d5d2f87e71573e7264ec411b101409b090a8990f0973008",
+      "version": "40a5b9924d22",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.9
+    },
+    {
+      "text": "不同的同",
+      "pronunciation": [
+        "ㄅㄨˋ|ㄊㄨㄥˊ|˙ㄉㄜ|ㄊㄨㄥˊ"
+      ],
+      "observedReadings": [
+        "ㄅㄨˋ|ㄊㄨㄥˊ|˙ㄉㄜ|ㄊㄨㄥˊ"
+      ],
+      "url": "/listening-audio/gemini/words/4e0d-540c-7684-540c.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.792,
+      "bytes": 18430,
+      "sha256": "24b1dda13e0aa11df4392bd1b6842136ce0768864faa4f1a415d383b1aaf61cc",
+      "version": "24b1dda13e0a",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.07
+    },
+    {
+      "text": "不同",
+      "pronunciation": [
+        "ㄅㄨˋ|ㄊㄨㄥˊ"
+      ],
+      "observedReadings": [
+        "ㄅㄨˋ|ㄊㄨㄥˊ"
+      ],
+      "url": "/listening-audio/gemini/words/4e0d-540c.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.408,
+      "bytes": 15193,
+      "sha256": "6f299f598116e26deaa76030506e0ee51c682283c9f18ebaa1c5ee8b0a2d5777",
+      "version": "6f299f598116",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.71
     },
     {
       "text": "不怕",
@@ -4770,6 +4942,108 @@
       "version": "bda1a9f0023a",
       "review": "timing checked; human pronunciation review recommended",
       "voicedDuration": 1.04
+    },
+    {
+      "text": "主人的主",
+      "pronunciation": [
+        "ㄓㄨˇ|ㄖㄣˊ|˙ㄉㄜ|ㄓㄨˇ"
+      ],
+      "observedReadings": [
+        "ㄓㄨˇ|ㄖㄣˊ|˙ㄉㄜ|ㄓㄨˇ"
+      ],
+      "url": "/listening-audio/gemini/words/4e3b-4eba-7684-4e3b.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.963,
+      "bytes": 20704,
+      "sha256": "97d0b2515d3929e799529c22a250459e1d54bd1e175d25753717bae9fd8dccc3",
+      "version": "97d0b2515d39",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.26
+    },
+    {
+      "text": "主人的人",
+      "pronunciation": [
+        "ㄓㄨˇ|ㄖㄣˊ|˙ㄉㄜ|ㄖㄣˊ"
+      ],
+      "observedReadings": [
+        "ㄓㄨˇ|ㄖㄣˊ|˙ㄉㄜ|ㄖㄣˊ"
+      ],
+      "url": "/listening-audio/gemini/words/4e3b-4eba-7684-4eba.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.92,
+      "bytes": 19666,
+      "sha256": "70fbaa5772375b053d48b64f617e7a0e75d65d39ef67a737657427d01e8b634f",
+      "version": "70fbaa577237",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.23
+    },
+    {
+      "text": "主人",
+      "pronunciation": [
+        "ㄓㄨˇ|ㄖㄣˊ"
+      ],
+      "observedReadings": [
+        "ㄓㄨˇ|ㄖㄣˊ"
+      ],
+      "url": "/listening-audio/gemini/words/4e3b-4eba.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.493,
+      "bytes": 15868,
+      "sha256": "08b517c2a8b759d73a59215ea7fb8e41f8622737ba7397216f97304a90c57cba",
+      "version": "08b517c2a8b7",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.8
+    },
+    {
+      "text": "也有的也",
+      "pronunciation": [
+        "ㄧㄝˇ|ㄧㄡˇ|˙ㄉㄜ|ㄧㄝˇ"
+      ],
+      "observedReadings": [
+        "ㄧㄝˇ|ㄧㄡˇ|˙ㄉㄜ|ㄧㄝˇ"
+      ],
+      "url": "/listening-audio/gemini/words/4e5f-6709-7684-4e5f.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.792,
+      "bytes": 18949,
+      "sha256": "67aa00c27377feb87906d014a1a68719ec135103db01b2602389a56fec1548dd",
+      "version": "67aa00c27377",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.08
+    },
+    {
+      "text": "也有的有",
+      "pronunciation": [
+        "ㄧㄝˇ|ㄧㄡˇ|˙ㄉㄜ|ㄧㄡˇ"
+      ],
+      "observedReadings": [
+        "ㄧㄝˇ|ㄧㄡˇ|˙ㄉㄜ|ㄧㄡˇ"
+      ],
+      "url": "/listening-audio/gemini/words/4e5f-6709-7684-6709.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.877,
+      "bytes": 20128,
+      "sha256": "e3ebd467b8bf8754cddba49f144aedf2e9329fc60d7e7549f188ecec361a3f06",
+      "version": "e3ebd467b8bf",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.18
+    },
+    {
+      "text": "也有",
+      "pronunciation": [
+        "ㄧㄝˇ|ㄧㄡˇ"
+      ],
+      "observedReadings": [
+        "ㄧㄝˇ|ㄧㄡˇ"
+      ],
+      "url": "/listening-audio/gemini/words/4e5f-6709.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.664,
+      "bytes": 17388,
+      "sha256": "40fc478f3ead41128cf9ad98afc14972af865f5afc5c3365185939d5b0a14b0f",
+      "version": "40fc478f3ead",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.96
     },
     {
       "text": "也",
@@ -4891,6 +5165,23 @@
       "voicedDuration": 0.47
     },
     {
+      "text": "人們",
+      "pronunciation": [
+        "ㄖㄣˊ|˙ㄇㄣ"
+      ],
+      "observedReadings": [
+        "ㄖㄣˊ|˙ㄇㄣ"
+      ],
+      "url": "/listening-audio/gemini/words/4eba-5011.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.323,
+      "bytes": 14826,
+      "sha256": "89d25ec6d71e0b29d43c0d6e430641ae952026b751aa9ae03b4f31d6ed34a9db",
+      "version": "89d25ec6d71e",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.61
+    },
+    {
       "text": "人",
       "pronunciation": [
         "ㄖㄣˊ"
@@ -4906,6 +5197,108 @@
       "version": "1ea29fa62322",
       "review": "timing checked; human pronunciation review recommended",
       "voicedDuration": 0.52
+    },
+    {
+      "text": "什麼的什",
+      "pronunciation": [
+        "ㄕㄣˊ|˙ㄇㄜ|˙ㄉㄜ|ㄕㄣˊ"
+      ],
+      "observedReadings": [
+        "ㄕㄣˊ|˙ㄇㄜ|˙ㄉㄜ|ㄕㄣˊ"
+      ],
+      "url": "/listening-audio/gemini/words/4ec0-9ebc-7684-4ec0.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.749,
+      "bytes": 18420,
+      "sha256": "bfd6c3c69795c845b0898d59ce3ceba768d056db21fd1232c60afe9c8c8b8d56",
+      "version": "bfd6c3c69795",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.04
+    },
+    {
+      "text": "什麼的麼",
+      "pronunciation": [
+        "ㄕㄣˊ|˙ㄇㄜ|˙ㄉㄜ|˙ㄇㄜ"
+      ],
+      "observedReadings": [
+        "ㄕㄣˊ|˙ㄇㄜ|˙ㄉㄜ|˙ㄇㄜ"
+      ],
+      "url": "/listening-audio/gemini/words/4ec0-9ebc-7684-9ebc.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.536,
+      "bytes": 16160,
+      "sha256": "fec2a3bfc5378c10ba097943a18c3f8f3b6ba4e694fcc95b5034a27d18d24a23",
+      "version": "fec2a3bfc537",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.81
+    },
+    {
+      "text": "什麼",
+      "pronunciation": [
+        "ㄕㄣˊ|˙ㄇㄜ"
+      ],
+      "observedReadings": [
+        "ㄕㄣˊ|˙ㄇㄜ"
+      ],
+      "url": "/listening-audio/gemini/words/4ec0-9ebc.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.323,
+      "bytes": 14584,
+      "sha256": "bfdd54bffb5c9c5468573d28c1d27c77e88459e26f6a1913b3efea2c00e2699b",
+      "version": "bfdd54bffb5c",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.61
+    },
+    {
+      "text": "他們的他",
+      "pronunciation": [
+        "ㄊㄚ|˙ㄇㄣ|˙ㄉㄜ|ㄊㄚ"
+      ],
+      "observedReadings": [
+        "ㄊㄚ|˙ㄇㄣ|˙ㄉㄜ|ㄊㄚ"
+      ],
+      "url": "/listening-audio/gemini/words/4ed6-5011-7684-4ed6.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.707,
+      "bytes": 17954,
+      "sha256": "cf4ff008a4dfd9ca7149ec74cdff9dc493869c09dec86a75a9c7c84ce305be2a",
+      "version": "cf4ff008a4df",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.01
+    },
+    {
+      "text": "他們的們",
+      "pronunciation": [
+        "ㄊㄚ|˙ㄇㄣ|˙ㄉㄜ|˙ㄇㄣ"
+      ],
+      "observedReadings": [
+        "ㄊㄚ|˙ㄇㄣ|˙ㄉㄜ|˙ㄇㄣ"
+      ],
+      "url": "/listening-audio/gemini/words/4ed6-5011-7684-5011.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.536,
+      "bytes": 16867,
+      "sha256": "4c57728fedf5dda000794981e8ddcb426443fa498c73e59000d67833700fc5bd",
+      "version": "4c57728fedf5",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.84
+    },
+    {
+      "text": "他們",
+      "pronunciation": [
+        "ㄊㄚ|˙ㄇㄣ"
+      ],
+      "observedReadings": [
+        "ㄊㄚ|˙ㄇㄣ"
+      ],
+      "url": "/listening-audio/gemini/words/4ed6-5011.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.28,
+      "bytes": 14212,
+      "sha256": "bbb8c13565a3dc215af05609acce696c739c7553ad9ddc47635f111e91de5e9e",
+      "version": "bbb8c13565a3",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.56
     },
     {
       "text": "企鵝",
@@ -4959,6 +5352,40 @@
       "voicedDuration": 0.48
     },
     {
+      "text": "你好的你",
+      "pronunciation": [
+        "ㄋㄧˇ|ㄏㄠˇ|˙ㄉㄜ|ㄋㄧˇ"
+      ],
+      "observedReadings": [
+        "ㄋㄧˇ|ㄏㄠˇ|˙ㄉㄜ|ㄋㄧˇ"
+      ],
+      "url": "/listening-audio/gemini/words/4f60-597d-7684-4f60.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.749,
+      "bytes": 18049,
+      "sha256": "eeed44ccb2fd9a6e832fa51821caf88dfa06f37b232590552748bfd6aee450ad",
+      "version": "eeed44ccb2fd",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.03
+    },
+    {
+      "text": "你好的好",
+      "pronunciation": [
+        "ㄋㄧˇ|ㄏㄠˇ|˙ㄉㄜ|ㄏㄠˇ"
+      ],
+      "observedReadings": [
+        "ㄋㄧˇ|ㄏㄠˇ|˙ㄉㄜ|ㄏㄠˇ"
+      ],
+      "url": "/listening-audio/gemini/words/4f60-597d-7684-597d.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.536,
+      "bytes": 16356,
+      "sha256": "604af0987cb5c4dab99c8a089890200a989f84e4e0624e0b0b69d89307b4cc06",
+      "version": "604af0987cb5",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.84
+    },
+    {
       "text": "你好",
       "pronunciation": [
         "ㄋㄧˇ|ㄏㄠˇ"
@@ -4991,6 +5418,57 @@
       "version": "a91e9d1d30fc",
       "review": "timing checked; human pronunciation review recommended",
       "voicedDuration": 0.46
+    },
+    {
+      "text": "個子的子",
+      "pronunciation": [
+        "ㄍㄜˋ|˙ㄗ|˙ㄉㄜ|˙ㄗ"
+      ],
+      "observedReadings": [
+        "ㄍㄜˋ|˙ㄗ|˙ㄉㄜ|˙ㄗ"
+      ],
+      "url": "/listening-audio/gemini/words/500b-5b50-7684-5b50.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.707,
+      "bytes": 18487,
+      "sha256": "22abed463982fedc1eedacb403b930058d0e5b8404e4ef7acb15b94bd40fea38",
+      "version": "22abed463982",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1
+    },
+    {
+      "text": "個子",
+      "pronunciation": [
+        "ㄍㄜˋ|˙ㄗ"
+      ],
+      "observedReadings": [
+        "ㄍㄜˋ|˙ㄗ"
+      ],
+      "url": "/listening-audio/gemini/words/500b-5b50.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.28,
+      "bytes": 14142,
+      "sha256": "55aa12a33392acb541ebfb18c6c709b929096bd4866dc913c8c657b78d42547e",
+      "version": "55aa12a33392",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.56
+    },
+    {
+      "text": "個數",
+      "pronunciation": [
+        "ㄍㄜˋ|ㄕㄨˋ"
+      ],
+      "observedReadings": [
+        "ㄍㄜˋ|ㄕㄨˋ"
+      ],
+      "url": "/listening-audio/gemini/words/500b-6578.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.323,
+      "bytes": 14375,
+      "sha256": "a78fc73c3f773d24a99032c12c842b05db876ac9c86ce784c608a02856e6e85b",
+      "version": "a78fc73c3f77",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.61
     },
     {
       "text": "做工",
@@ -5146,6 +5624,57 @@
       "voicedDuration": 0.37
     },
     {
+      "text": "兩隻的兩",
+      "pronunciation": [
+        "ㄌㄧㄤˇ|ㄓ|˙ㄉㄜ|ㄌㄧㄤˇ"
+      ],
+      "observedReadings": [
+        "ㄌㄧㄤˇ|ㄓ|˙ㄉㄜ|ㄌㄧㄤˇ"
+      ],
+      "url": "/listening-audio/gemini/words/5169-96bb-7684-5169.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.92,
+      "bytes": 20221,
+      "sha256": "6efe5c5eb0d19e9cdc39b15bd15c7ae6f9eef2f7c07be0f5cf2a536718c84c49",
+      "version": "6efe5c5eb0d1",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.23
+    },
+    {
+      "text": "兩隻的隻",
+      "pronunciation": [
+        "ㄌㄧㄤˇ|ㄓ|˙ㄉㄜ|ㄓ"
+      ],
+      "observedReadings": [
+        "ㄌㄧㄤˇ|ㄓ|˙ㄉㄜ|ㄓ"
+      ],
+      "url": "/listening-audio/gemini/words/5169-96bb-7684-96bb.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.877,
+      "bytes": 19325,
+      "sha256": "08af87b9b02b3bf003e69524ab5e291e43473120a03049bcff4530c880b4e3d6",
+      "version": "08af87b9b02b",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.18
+    },
+    {
+      "text": "兩隻",
+      "pronunciation": [
+        "ㄌㄧㄤˇ|ㄓ"
+      ],
+      "observedReadings": [
+        "ㄌㄧㄤˇ|ㄓ"
+      ],
+      "url": "/listening-audio/gemini/words/5169-96bb.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.536,
+      "bytes": 16223,
+      "sha256": "82fa79479371f5fd33d4bd7cbd549acd3c8e1bed374d1a185a040efd9c8ce45b",
+      "version": "82fa79479371",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.82
+    },
+    {
       "text": "冬瓜",
       "pronunciation": [
         "ㄉㄨㄥ|ㄍㄨㄚ"
@@ -5214,6 +5743,40 @@
       "voicedDuration": 0.45
     },
     {
+      "text": "分開的分",
+      "pronunciation": [
+        "ㄈㄣ|ㄎㄞ|˙ㄉㄜ|ㄈㄣ"
+      ],
+      "observedReadings": [
+        "ㄈㄣ|ㄎㄞ|˙ㄉㄜ|ㄈㄣ"
+      ],
+      "url": "/listening-audio/gemini/words/5206-958b-7684-5206.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.621,
+      "bytes": 17679,
+      "sha256": "570cf869bbc95c370991236f1e08087201b2bc6db790a5aef9e084a3e31ccfa3",
+      "version": "570cf869bbc9",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.91
+    },
+    {
+      "text": "分開",
+      "pronunciation": [
+        "ㄈㄣ|ㄎㄞ"
+      ],
+      "observedReadings": [
+        "ㄈㄣ|ㄎㄞ"
+      ],
+      "url": "/listening-audio/gemini/words/5206-958b.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.408,
+      "bytes": 15196,
+      "sha256": "4a674721ab4b7856e0f11c9e900dcee09a448e080347ec908833c5f9d389a14a",
+      "version": "4a674721ab4b",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.7
+    },
+    {
       "text": "切",
       "pronunciation": [
         "ㄑㄧㄝ"
@@ -5229,6 +5792,40 @@
       "version": "b61f5cf5ef63",
       "review": "timing checked; human pronunciation review recommended",
       "voicedDuration": 0.7
+    },
+    {
+      "text": "到處的到",
+      "pronunciation": [
+        "ㄉㄠˋ|ㄔㄨˋ|˙ㄉㄜ|ㄉㄠˋ"
+      ],
+      "observedReadings": [
+        "ㄉㄠˋ|ㄔㄨˋ|˙ㄉㄜ|ㄉㄠˋ"
+      ],
+      "url": "/listening-audio/gemini/words/5230-8655-7684-5230.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.664,
+      "bytes": 17539,
+      "sha256": "a78d1dd2aa63d729d016aa3a7f0acfc0e412d38d1b5a55d9c4f7fbf7ee06c044",
+      "version": "a78d1dd2aa63",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.96
+    },
+    {
+      "text": "到處",
+      "pronunciation": [
+        "ㄉㄠˋ|ㄔㄨˋ"
+      ],
+      "observedReadings": [
+        "ㄉㄠˋ|ㄔㄨˋ"
+      ],
+      "url": "/listening-audio/gemini/words/5230-8655.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.28,
+      "bytes": 13813,
+      "sha256": "964b0f071f601ae4ba1936d4103e5ff7047babe425028f7ed36816156ef7239c",
+      "version": "964b0f071f60",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.56
     },
     {
       "text": "到",
@@ -5418,6 +6015,40 @@
       "voicedDuration": 0.35
     },
     {
+      "text": "又是的又",
+      "pronunciation": [
+        "ㄧㄡˋ|ㄕˋ|˙ㄉㄜ|ㄧㄡˋ"
+      ],
+      "observedReadings": [
+        "ㄧㄡˋ|ㄕˋ|˙ㄉㄜ|ㄧㄡˋ"
+      ],
+      "url": "/listening-audio/gemini/words/53c8-662f-7684-53c8.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.792,
+      "bytes": 19538,
+      "sha256": "2c8abc85eba7d7f926cf23c6a012516d0f9f0629499b5e51706619250d0d260d",
+      "version": "2c8abc85eba7",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.09
+    },
+    {
+      "text": "又是",
+      "pronunciation": [
+        "ㄧㄡˋ|ㄕˋ"
+      ],
+      "observedReadings": [
+        "ㄧㄡˋ|ㄕˋ"
+      ],
+      "url": "/listening-audio/gemini/words/53c8-662f.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.365,
+      "bytes": 14899,
+      "sha256": "44bbb070fca9e652381ee5c2d14e1e41b0b0aef40d193efdba8d72cc023c244b",
+      "version": "44bbb070fca9",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.67
+    },
+    {
       "text": "叉子",
       "pronunciation": [
         "ㄔㄚ|˙ㄗ"
@@ -5452,6 +6083,108 @@
       "voicedDuration": 0.71
     },
     {
+      "text": "可是的是",
+      "pronunciation": [
+        "ㄎㄜˇ|ㄕˋ|˙ㄉㄜ|ㄕˋ"
+      ],
+      "observedReadings": [
+        "ㄎㄜˇ|ㄕˋ|˙ㄉㄜ|ㄕˋ"
+      ],
+      "url": "/listening-audio/gemini/words/53ef-662f-7684-662f.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.835,
+      "bytes": 18589,
+      "sha256": "a289938ee294fe9fbfb58cf6d4fc89fb4182fc0c46967d5715c3aebaefaeaaae",
+      "version": "a289938ee294",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.13
+    },
+    {
+      "text": "可是",
+      "pronunciation": [
+        "ㄎㄜˇ|ㄕˋ"
+      ],
+      "observedReadings": [
+        "ㄎㄜˇ|ㄕˋ"
+      ],
+      "url": "/listening-audio/gemini/words/53ef-662f.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.451,
+      "bytes": 15381,
+      "sha256": "ee106a2652ca92ded5c87fa4110d93245d3a4862e7b1c5210186e08c87f69274",
+      "version": "ee106a2652ca",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.73
+    },
+    {
+      "text": "右手的右",
+      "pronunciation": [
+        "ㄧㄡˋ|ㄕㄡˇ|˙ㄉㄜ|ㄧㄡˋ"
+      ],
+      "observedReadings": [
+        "ㄧㄡˋ|ㄕㄡˇ|˙ㄉㄜ|ㄧㄡˋ"
+      ],
+      "url": "/listening-audio/gemini/words/53f3-624b-7684-53f3.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.792,
+      "bytes": 19031,
+      "sha256": "d3aa3f7f1da563fe603defae8421dad860c63197c7a0518fdb49bdac8e4aaf98",
+      "version": "d3aa3f7f1da5",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.07
+    },
+    {
+      "text": "右找的找",
+      "pronunciation": [
+        "ㄧㄡˋ|ㄓㄠˇ|˙ㄉㄜ|ㄓㄠˇ"
+      ],
+      "observedReadings": [
+        "ㄧㄡˋ|ㄓㄠˇ|˙ㄉㄜ|ㄓㄠˇ"
+      ],
+      "url": "/listening-audio/gemini/words/53f3-627e-7684-627e.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.707,
+      "bytes": 19277,
+      "sha256": "509412968daac8ba2989f5260da0d5e8e52f5a2c0d807e0024785a7f00ba463a",
+      "version": "509412968daa",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.01
+    },
+    {
+      "text": "右找",
+      "pronunciation": [
+        "ㄧㄡˋ|ㄓㄠˇ"
+      ],
+      "observedReadings": [
+        "ㄧㄡˋ|ㄓㄠˇ"
+      ],
+      "url": "/listening-audio/gemini/words/53f3-627e.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.664,
+      "bytes": 17366,
+      "sha256": "3ee305e83eadd6e975b9ab2d47a1b83a07ac03c3693ec4072e79ba23014cc99c",
+      "version": "3ee305e83ead",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.95
+    },
+    {
+      "text": "右腳",
+      "pronunciation": [
+        "ㄧㄡˋ|ㄐㄧㄠˇ"
+      ],
+      "observedReadings": [
+        "ㄧㄡˋ|ㄐㄧㄠˇ"
+      ],
+      "url": "/listening-audio/gemini/words/53f3-8173.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.365,
+      "bytes": 15068,
+      "sha256": "441479fe574faae2bb62c2f6b6bf0226c2af2e8c4db6c8b717d5133cc648e840",
+      "version": "441479fe574f",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.64
+    },
+    {
       "text": "合唱",
       "pronunciation": [
         "ㄏㄜˊ|ㄔㄤˋ"
@@ -5484,6 +6217,40 @@
       "version": "64b0d427b8a0",
       "review": "timing checked; human pronunciation review recommended",
       "voicedDuration": 0.61
+    },
+    {
+      "text": "向你說的向",
+      "pronunciation": [
+        "ㄒㄧㄤˋ|ㄋㄧˇ|ㄕㄨㄛ|˙ㄉㄜ|ㄒㄧㄤˋ"
+      ],
+      "observedReadings": [
+        "ㄒㄧㄤˋ|ㄋㄧˇ|ㄕㄨㄛ|˙ㄉㄜ|ㄒㄧㄤˋ"
+      ],
+      "url": "/listening-audio/gemini/words/5411-4f60-8aaa-7684-5411.m4a",
+      "source": "Gemini Fola",
+      "duration": 2.261,
+      "bytes": 23153,
+      "sha256": "71f28474fe94caf246be89733717f1a443b32325f2c75c2c8a26408a7919fc7d",
+      "version": "71f28474fe94",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.56
+    },
+    {
+      "text": "向你說",
+      "pronunciation": [
+        "ㄒㄧㄤˋ|ㄋㄧˇ|ㄕㄨㄛ"
+      ],
+      "observedReadings": [
+        "ㄒㄧㄤˋ|ㄋㄧˇ|ㄕㄨㄛ"
+      ],
+      "url": "/listening-audio/gemini/words/5411-4f60-8aaa.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.664,
+      "bytes": 17853,
+      "sha256": "300e119ec98afcf21371c9b05b03034be6d6bbb5506693d81461af1424ab1cc6",
+      "version": "300e119ec98a",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.03
     },
     {
       "text": "吱吱喳喳",
@@ -5671,6 +6438,40 @@
       "version": "ec6c8688aec7",
       "review": "timing checked; human pronunciation review recommended",
       "voicedDuration": 0.36
+    },
+    {
+      "text": "啊！",
+      "pronunciation": [
+        "ㄚ"
+      ],
+      "observedReadings": [
+        "ㄚ"
+      ],
+      "url": "/listening-audio/gemini/words/554a-ff01.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.152,
+      "bytes": 12646,
+      "sha256": "3318d27fd28fbe3dbcd865b1a5e741a5e41a316449017406d180f5ccdc234fe5",
+      "version": "3318d27fd28f",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.45
+    },
+    {
+      "text": "啊，好美啊！",
+      "pronunciation": [
+        "ㄚ|ㄏㄠˇ|ㄇㄟˇ|˙ㄚ"
+      ],
+      "observedReadings": [
+        "ㄚ|ㄏㄠˇ|ㄇㄟˇ|˙ㄚ"
+      ],
+      "url": "/listening-audio/gemini/words/554a-ff0c-597d-7f8e-554a-ff01.m4a",
+      "source": "Gemini Fola",
+      "duration": 2.645,
+      "bytes": 25004,
+      "sha256": "550d515b55f35f4a85fca476aa0656cdd0709c9f47ffe5b1745f04b66d9c47f4",
+      "version": "550d515b55f3",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.92
     },
     {
       "text": "喔",
@@ -6064,6 +6865,40 @@
       "voicedDuration": 0.49
     },
     {
+      "text": "多少的多",
+      "pronunciation": [
+        "ㄉㄨㄛ|ㄕㄠˇ|˙ㄉㄜ|ㄉㄨㄛ"
+      ],
+      "observedReadings": [
+        "ㄉㄨㄛ|ㄕㄠˇ|˙ㄉㄜ|ㄉㄨㄛ"
+      ],
+      "url": "/listening-audio/gemini/words/591a-5c11-7684-591a.m4a",
+      "source": "Gemini Fola",
+      "duration": 2.048,
+      "bytes": 20657,
+      "sha256": "0598128ed9423a43ea2a34cc85ccf529cde286176df545458951ba765150a84d",
+      "version": "0598128ed942",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.34
+    },
+    {
+      "text": "多少",
+      "pronunciation": [
+        "ㄉㄨㄛ|ㄕㄠˇ"
+      ],
+      "observedReadings": [
+        "ㄉㄨㄛ|ㄕㄠˇ"
+      ],
+      "url": "/listening-audio/gemini/words/591a-5c11.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.28,
+      "bytes": 13852,
+      "sha256": "bfde95b37decb29f4b55fa0123cde25db45a1caf420cfe71acb90c804daddeac",
+      "version": "bfde95b37dec",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.56
+    },
+    {
       "text": "大家",
       "pronunciation": [
         "ㄉㄚˋ|ㄐㄧㄚ"
@@ -6079,6 +6914,125 @@
       "version": "364d74382417",
       "review": "timing checked; human pronunciation review recommended",
       "voicedDuration": 0.63
+    },
+    {
+      "text": "大小的小",
+      "pronunciation": [
+        "ㄉㄚˋ|ㄒㄧㄠˇ|˙ㄉㄜ|ㄒㄧㄠˇ"
+      ],
+      "observedReadings": [
+        "ㄉㄚˋ|ㄒㄧㄠˇ|˙ㄉㄜ|ㄒㄧㄠˇ"
+      ],
+      "url": "/listening-audio/gemini/words/5927-5c0f-7684-5c0f.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.707,
+      "bytes": 18314,
+      "sha256": "5c9fe865d75dfeb23dc96c987eba58a357efc95af358cc03852f240212fcf31d",
+      "version": "5c9fe865d75d",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.98
+    },
+    {
+      "text": "大小",
+      "pronunciation": [
+        "ㄉㄚˋ|ㄒㄧㄠˇ"
+      ],
+      "observedReadings": [
+        "ㄉㄚˋ|ㄒㄧㄠˇ"
+      ],
+      "url": "/listening-audio/gemini/words/5927-5c0f.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.707,
+      "bytes": 17391,
+      "sha256": "93a5f8c1f2a73c8b7d172486915cf0922dd6289b97c9f3c656588a1de4908eb4",
+      "version": "93a5f8c1f2a7",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.05
+    },
+    {
+      "text": "大海的大",
+      "pronunciation": [
+        "ㄉㄚˋ|ㄏㄞˇ|˙ㄉㄜ|ㄉㄚˋ"
+      ],
+      "observedReadings": [
+        "ㄉㄚˋ|ㄏㄞˇ|˙ㄉㄜ|ㄉㄚˋ"
+      ],
+      "url": "/listening-audio/gemini/words/5927-6d77-7684-5927.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.792,
+      "bytes": 18446,
+      "sha256": "4659405061d1dae2b361fa337b27e120ef56d569f6c80306332239466f006dfd",
+      "version": "4659405061d1",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.09
+    },
+    {
+      "text": "大海的海",
+      "pronunciation": [
+        "ㄉㄚˋ|ㄏㄞˇ|˙ㄉㄜ|ㄏㄞˇ"
+      ],
+      "observedReadings": [
+        "ㄉㄚˋ|ㄏㄞˇ|˙ㄉㄜ|ㄏㄞˇ"
+      ],
+      "url": "/listening-audio/gemini/words/5927-6d77-7684-6d77.m4a",
+      "source": "Gemini Fola",
+      "duration": 2.048,
+      "bytes": 19991,
+      "sha256": "386a2815e86256104777db86601673e4b6cd795f4217e88cde57f1a1580b0697",
+      "version": "386a2815e862",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.34
+    },
+    {
+      "text": "大海",
+      "pronunciation": [
+        "ㄉㄚˋ|ㄏㄞˇ"
+      ],
+      "observedReadings": [
+        "ㄉㄚˋ|ㄏㄞˇ"
+      ],
+      "url": "/listening-audio/gemini/words/5927-6d77.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.28,
+      "bytes": 13794,
+      "sha256": "6ad33d9ce8b27f0fef52a4ed94001252c896a3023ee177434e151c57f7c5eb76",
+      "version": "6ad33d9ce8b2",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.55
+    },
+    {
+      "text": "大門的門",
+      "pronunciation": [
+        "ㄉㄚˋ|ㄇㄣˊ|˙ㄉㄜ|ㄇㄣˊ"
+      ],
+      "observedReadings": [
+        "ㄉㄚˋ|ㄇㄣˊ|˙ㄉㄜ|ㄇㄣˊ"
+      ],
+      "url": "/listening-audio/gemini/words/5927-9580-7684-9580.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.963,
+      "bytes": 20400,
+      "sha256": "b0a30765eb7066e95861870c80302b4c513f00cf9cf4c8b03ca2b65de7830dba",
+      "version": "b0a30765eb70",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.25
+    },
+    {
+      "text": "大門",
+      "pronunciation": [
+        "ㄉㄚˋ|ㄇㄣˊ"
+      ],
+      "observedReadings": [
+        "ㄉㄚˋ|ㄇㄣˊ"
+      ],
+      "url": "/listening-audio/gemini/words/5927-9580.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.408,
+      "bytes": 15379,
+      "sha256": "80e282c3ff6fcf8384b110af3bd6dab570097669af720f375c29c42d6e986aaa",
+      "version": "80e282c3ff6f",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.71
     },
     {
       "text": "大",
@@ -6147,6 +7101,40 @@
       "version": "86371cdbe109",
       "review": "timing checked; human pronunciation review recommended",
       "voicedDuration": 0.71
+    },
+    {
+      "text": "好了的了",
+      "pronunciation": [
+        "ㄏㄠˇ|˙ㄌㄜ|˙ㄉㄜ|˙ㄌㄜ"
+      ],
+      "observedReadings": [
+        "ㄏㄠˇ|˙ㄌㄜ|˙ㄉㄜ|˙ㄌㄜ"
+      ],
+      "url": "/listening-audio/gemini/words/597d-4e86-7684-4e86.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.877,
+      "bytes": 19399,
+      "sha256": "ac6d1dd7d52a155608dd5ef6ce9b34faa17f527712b14554979052cc35e0129c",
+      "version": "ac6d1dd7d52a",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.15
+    },
+    {
+      "text": "好了",
+      "pronunciation": [
+        "ㄏㄠˇ|˙ㄌㄜ"
+      ],
+      "observedReadings": [
+        "ㄏㄠˇ|˙ㄌㄜ"
+      ],
+      "url": "/listening-audio/gemini/words/597d-4e86.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.28,
+      "bytes": 14390,
+      "sha256": "348d7c7b35e1dce946828af1e9d6808fcc910ead4ab0c442fa9afac50ff1035f",
+      "version": "348d7c7b35e1",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.55
     },
     {
       "text": "好怕",
@@ -6745,6 +7733,23 @@
       "voicedDuration": 0.55
     },
     {
+      "text": "左手的左",
+      "pronunciation": [
+        "ㄗㄨㄛˇ|ㄕㄡˇ|˙ㄉㄜ|ㄗㄨㄛˇ"
+      ],
+      "observedReadings": [
+        "ㄗㄨㄛˇ|ㄕㄡˇ|˙ㄉㄜ|ㄗㄨㄛˇ"
+      ],
+      "url": "/listening-audio/gemini/words/5de6-624b-7684-5de6.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.749,
+      "bytes": 19010,
+      "sha256": "6897c83c0674ae3d1e259507bc4b98a2f3d583fe4b957a23626c8b0de64e858b",
+      "version": "6897c83c0674",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.06
+    },
+    {
       "text": "左手",
       "pronunciation": [
         "ㄗㄨㄛˇ|ㄕㄡˇ"
@@ -6760,6 +7765,23 @@
       "version": "e2e8f180ce26",
       "review": "timing checked; human pronunciation review recommended",
       "voicedDuration": 0.86
+    },
+    {
+      "text": "左看",
+      "pronunciation": [
+        "ㄗㄨㄛˇ|ㄎㄢˋ"
+      ],
+      "observedReadings": [
+        "ㄗㄨㄛˇ|ㄎㄢˋ"
+      ],
+      "url": "/listening-audio/gemini/words/5de6-770b.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.451,
+      "bytes": 15650,
+      "sha256": "a47d0ff6c6ce4bb56b8e1d4c8ee6801a66f8cfb09bd4766094f7d91970fc209a",
+      "version": "a47d0ff6c6ce",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.74
     },
     {
       "text": "巨人",
@@ -7019,6 +8041,40 @@
       "voicedDuration": 0.42
     },
     {
+      "text": "從前的從",
+      "pronunciation": [
+        "ㄘㄨㄥˊ|ㄑㄧㄢˊ|˙ㄉㄜ|ㄘㄨㄥˊ"
+      ],
+      "observedReadings": [
+        "ㄘㄨㄥˊ|ㄑㄧㄢˊ|˙ㄉㄜ|ㄘㄨㄥˊ"
+      ],
+      "url": "/listening-audio/gemini/words/5f9e-524d-7684-5f9e.m4a",
+      "source": "Gemini Fola",
+      "duration": 2.347,
+      "bytes": 23737,
+      "sha256": "a8a004b410e3526b180a4d06f549f649d26c12e89cdd749607ad110a08dbd3a6",
+      "version": "a8a004b410e3",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.63
+    },
+    {
+      "text": "從前",
+      "pronunciation": [
+        "ㄘㄨㄥˊ|ㄑㄧㄢˊ"
+      ],
+      "observedReadings": [
+        "ㄘㄨㄥˊ|ㄑㄧㄢˊ"
+      ],
+      "url": "/listening-audio/gemini/words/5f9e-524d.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.707,
+      "bytes": 17942,
+      "sha256": "d72028d04d90f75e2b13c8939f99c1f1e6ef97783502de3c7754c62fe6a8742c",
+      "version": "d72028d04d90",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1
+    },
+    {
       "text": "心",
       "pronunciation": [
         "ㄒㄧㄣ"
@@ -7206,6 +8262,74 @@
       "voicedDuration": 1.11
     },
     {
+      "text": "我們的我",
+      "pronunciation": [
+        "ㄨㄛˇ|˙ㄇㄣ|˙ㄉㄜ|ㄨㄛˇ"
+      ],
+      "observedReadings": [
+        "ㄨㄛˇ|˙ㄇㄣ|˙ㄉㄜ|ㄨㄛˇ"
+      ],
+      "url": "/listening-audio/gemini/words/6211-5011-7684-6211.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.621,
+      "bytes": 17727,
+      "sha256": "913819c15df2a0f35c6f1f3f4eca34460c25596e3877b95700d03970b46a7f18",
+      "version": "913819c15df2",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.9
+    },
+    {
+      "text": "我們",
+      "pronunciation": [
+        "ㄨㄛˇ|˙ㄇㄣ"
+      ],
+      "observedReadings": [
+        "ㄨㄛˇ|˙ㄇㄣ"
+      ],
+      "url": "/listening-audio/gemini/words/6211-5011.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.323,
+      "bytes": 14860,
+      "sha256": "87936d3c0bae33b6b9ecd6b9f8b9cc47fd5bd988e4730ff0db33303f51e00748",
+      "version": "87936d3c0bae",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.63
+    },
+    {
+      "text": "我和你的和",
+      "pronunciation": [
+        "ㄨㄛˇ|ㄏㄢˋ|ㄋㄧˇ|˙ㄉㄜ|ㄏㄢˋ"
+      ],
+      "observedReadings": [
+        "ㄨㄛˇ|ㄏㄢˋ|ㄋㄧˇ|˙ㄉㄜ|ㄏㄢˋ"
+      ],
+      "url": "/listening-audio/gemini/words/6211-548c-4f60-7684-548c.m4a",
+      "source": "Gemini Fola",
+      "duration": 2.475,
+      "bytes": 24618,
+      "sha256": "fc9db77445601747eaa3b2e95c3decf691a201558bf627e1bf289ba29dc31190",
+      "version": "fc9db7744560",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.83
+    },
+    {
+      "text": "我和你",
+      "pronunciation": [
+        "ㄨㄛˇ|ㄏㄢˋ|ㄋㄧˇ"
+      ],
+      "observedReadings": [
+        "ㄨㄛˇ|ㄏㄢˋ|ㄋㄧˇ"
+      ],
+      "url": "/listening-audio/gemini/words/6211-548c-4f60.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.493,
+      "bytes": 16584,
+      "sha256": "14c7493b5ade0aa16fd5c142a3e55a6e44f3444bbf89ff0e4a0eb8f6e4a9a583",
+      "version": "14c7493b5ade",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.77
+    },
+    {
       "text": "我",
       "pronunciation": [
         "ㄨㄛˇ"
@@ -7272,6 +8396,23 @@
       "version": "929af3a56bd6",
       "review": "timing checked; human pronunciation review recommended",
       "voicedDuration": 0.37
+    },
+    {
+      "text": "打球",
+      "pronunciation": [
+        "ㄉㄚˇ|ㄑㄧㄡˊ"
+      ],
+      "observedReadings": [
+        "ㄉㄚˇ|ㄑㄧㄡˊ"
+      ],
+      "url": "/listening-audio/gemini/words/6253-7403.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.579,
+      "bytes": 17051,
+      "sha256": "afefaa67a2d4c478d428eb3f902128338aa326652d1e9ecf8aec62c52a7eae43",
+      "version": "afefaa67a2d4",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.89
     },
     {
       "text": "打翻",
@@ -7359,6 +8500,40 @@
       "voicedDuration": 0.86
     },
     {
+      "text": "拉手的拉",
+      "pronunciation": [
+        "ㄌㄚ|ㄕㄡˇ|˙ㄉㄜ|ㄌㄚ"
+      ],
+      "observedReadings": [
+        "ㄌㄚ|ㄕㄡˇ|˙ㄉㄜ|ㄌㄚ"
+      ],
+      "url": "/listening-audio/gemini/words/62c9-624b-7684-62c9.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.963,
+      "bytes": 20477,
+      "sha256": "012ca3a42ee10d7de541c91e8b2f53c70e018affca596ec54a0b06d3da2746c8",
+      "version": "012ca3a42ee1",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.25
+    },
+    {
+      "text": "拉手",
+      "pronunciation": [
+        "ㄌㄚ|ㄕㄡˇ"
+      ],
+      "observedReadings": [
+        "ㄌㄚ|ㄕㄡˇ"
+      ],
+      "url": "/listening-audio/gemini/words/62c9-624b.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.707,
+      "bytes": 17374,
+      "sha256": "54afbb7aaa7d44d6825eccd53c632eecda06e08dfe69a17106eaf5a36d46ba03",
+      "version": "54afbb7aaa7d",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.98
+    },
+    {
       "text": "拉",
       "pronunciation": [
         "ㄌㄚ"
@@ -7376,6 +8551,40 @@
       "voicedDuration": 0.36
     },
     {
+      "text": "拍手的手",
+      "pronunciation": [
+        "ㄆㄞ|ㄕㄡˇ|˙ㄉㄜ|ㄕㄡˇ"
+      ],
+      "observedReadings": [
+        "ㄆㄞ|ㄕㄡˇ|˙ㄉㄜ|ㄕㄡˇ"
+      ],
+      "url": "/listening-audio/gemini/words/62cd-624b-7684-624b.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.92,
+      "bytes": 20337,
+      "sha256": "a7f06d8c2863b0d9a5c0dc6883c788cecedf4111d5e3a12ec4c56a551f7c78a4",
+      "version": "a7f06d8c2863",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.22
+    },
+    {
+      "text": "拍手的拍",
+      "pronunciation": [
+        "ㄆㄞ|ㄕㄡˇ|˙ㄉㄜ|ㄆㄞ"
+      ],
+      "observedReadings": [
+        "ㄆㄞ|ㄕㄡˇ|˙ㄉㄜ|ㄆㄞ"
+      ],
+      "url": "/listening-audio/gemini/words/62cd-624b-7684-62cd.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.92,
+      "bytes": 19696,
+      "sha256": "2d69706fe9de2468d2dd7b25847ad98e6cc6fd03a92a5b0b3bb2c441d2f5e184",
+      "version": "2d69706fe9de",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.23
+    },
+    {
       "text": "拍手",
       "pronunciation": [
         "ㄆㄞ|ㄕㄡˇ"
@@ -7391,6 +8600,23 @@
       "version": "3e5146892a2f",
       "review": "timing checked; human pronunciation review recommended",
       "voicedDuration": 0.88
+    },
+    {
+      "text": "拍照",
+      "pronunciation": [
+        "ㄆㄞ|ㄓㄠˋ"
+      ],
+      "observedReadings": [
+        "ㄆㄞ|ㄓㄠˋ"
+      ],
+      "url": "/listening-audio/gemini/words/62cd-7167.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.28,
+      "bytes": 14203,
+      "sha256": "ec3c72fa0d895e6c42c1d5274febf564343592331bda13a3f241813dd129918e",
+      "version": "ec3c72fa0d89",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.56
     },
     {
       "text": "拍",
@@ -7580,6 +8806,176 @@
       "voicedDuration": 1.03
     },
     {
+      "text": "數字一",
+      "pronunciation": [
+        "ㄕㄨˋ|ㄗˋ|ㄧ"
+      ],
+      "observedReadings": [
+        "ㄕㄨˋ|ㄗˋ|ㄧ"
+      ],
+      "url": "/listening-audio/gemini/words/6578-5b57-4e00.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.835,
+      "bytes": 19340,
+      "sha256": "3cb727cb9879a1dc06e385ce1a16d9bc55c7fca54cd5f3cef700fda8ad7f5893",
+      "version": "3cb727cb9879",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.14
+    },
+    {
+      "text": "數字七",
+      "pronunciation": [
+        "ㄕㄨˋ|ㄗˋ|ㄑㄧ"
+      ],
+      "observedReadings": [
+        "ㄕㄨˋ|ㄗˋ|ㄑㄧ"
+      ],
+      "url": "/listening-audio/gemini/words/6578-5b57-4e03.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.749,
+      "bytes": 18615,
+      "sha256": "a6cf95f246298aad0e28b39c9f1fa39172a56173331b0f88ab56eb30ba666377",
+      "version": "a6cf95f24629",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.06
+    },
+    {
+      "text": "數字三",
+      "pronunciation": [
+        "ㄕㄨˋ|ㄗˋ|ㄙㄢ"
+      ],
+      "observedReadings": [
+        "ㄕㄨˋ|ㄗˋ|ㄙㄢ"
+      ],
+      "url": "/listening-audio/gemini/words/6578-5b57-4e09.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.792,
+      "bytes": 18748,
+      "sha256": "67f0cafb5cb72c6f9a9d5ed923efc5a5c0ff0f8507863742d778063a31fe9613",
+      "version": "67f0cafb5cb7",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.09
+    },
+    {
+      "text": "數字二",
+      "pronunciation": [
+        "ㄕㄨˋ|ㄗˋ|ㄦˋ"
+      ],
+      "observedReadings": [
+        "ㄕㄨˋ|ㄗˋ|ㄦˋ"
+      ],
+      "url": "/listening-audio/gemini/words/6578-5b57-4e8c.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.792,
+      "bytes": 18998,
+      "sha256": "23f2e3f1ee048245d5ddc3118fb1a04106d4c95a4cd9c0ed11bb2f864d376b01",
+      "version": "23f2e3f1ee04",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.07
+    },
+    {
+      "text": "數字五",
+      "pronunciation": [
+        "ㄕㄨˋ|ㄗˋ|ㄨˇ"
+      ],
+      "observedReadings": [
+        "ㄕㄨˋ|ㄗˋ|ㄨˇ"
+      ],
+      "url": "/listening-audio/gemini/words/6578-5b57-4e94.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.963,
+      "bytes": 20407,
+      "sha256": "701cc9bf99622bda81b06521dac4cd3954451f1ed796aea9865b9e1ca94a3de3",
+      "version": "701cc9bf9962",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.27
+    },
+    {
+      "text": "數字六",
+      "pronunciation": [
+        "ㄕㄨˋ|ㄗˋ|ㄌㄧㄡˋ"
+      ],
+      "observedReadings": [
+        "ㄕㄨˋ|ㄗˋ|ㄌㄧㄡˋ"
+      ],
+      "url": "/listening-audio/gemini/words/6578-5b57-516d.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.707,
+      "bytes": 18002,
+      "sha256": "5606010eb83b3ee8dfa54aab25c6fc8dcb400c87989addf076a01c1ecdad18ac",
+      "version": "5606010eb83b",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1
+    },
+    {
+      "text": "數字四",
+      "pronunciation": [
+        "ㄕㄨˋ|ㄗˋ|ㄙˋ"
+      ],
+      "observedReadings": [
+        "ㄕㄨˋ|ㄗˋ|ㄙˋ"
+      ],
+      "url": "/listening-audio/gemini/words/6578-5b57-56db.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.749,
+      "bytes": 18582,
+      "sha256": "01612d8c126249edff0dd64cf537482545eb125818ffb5c390d33589c5553519",
+      "version": "01612d8c1262",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.02
+    },
+    {
+      "text": "早晚的早",
+      "pronunciation": [
+        "ㄗㄠˇ|ㄨㄢˇ|˙ㄉㄜ|ㄗㄠˇ"
+      ],
+      "observedReadings": [
+        "ㄗㄠˇ|ㄨㄢˇ|˙ㄉㄜ|ㄗㄠˇ"
+      ],
+      "url": "/listening-audio/gemini/words/65e9-665a-7684-65e9.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.963,
+      "bytes": 20915,
+      "sha256": "7d26a8a20c52fc8b71d01c4365f52a491da97e01157fdfec48f651feff6c5748",
+      "version": "7d26a8a20c52",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.24
+    },
+    {
+      "text": "早晚的晚",
+      "pronunciation": [
+        "ㄗㄠˇ|ㄨㄢˇ|˙ㄉㄜ|ㄨㄢˇ"
+      ],
+      "observedReadings": [
+        "ㄗㄠˇ|ㄨㄢˇ|˙ㄉㄜ|ㄨㄢˇ"
+      ],
+      "url": "/listening-audio/gemini/words/65e9-665a-7684-665a.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.621,
+      "bytes": 17866,
+      "sha256": "6b1fa6aa2f2fd63d8ac72d70512bac3367d44364216a7d610c6c979d8ab3c298",
+      "version": "6b1fa6aa2f2f",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.9
+    },
+    {
+      "text": "早晚",
+      "pronunciation": [
+        "ㄗㄠˇ|ㄨㄢˇ"
+      ],
+      "observedReadings": [
+        "ㄗㄠˇ|ㄨㄢˇ"
+      ],
+      "url": "/listening-audio/gemini/words/65e9-665a.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.664,
+      "bytes": 17161,
+      "sha256": "163337972bc593ed8d21cbd9682c6c60306c055502f23deeb315da6b230bbff1",
+      "version": "163337972bc5",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.95
+    },
+    {
       "text": "書包",
       "pronunciation": [
         "ㄕㄨ|ㄅㄠ"
@@ -7663,6 +9059,40 @@
       "version": "4b09158e73a8",
       "review": "timing checked; human pronunciation review recommended",
       "voicedDuration": 0.42
+    },
+    {
+      "text": "朋友的友",
+      "pronunciation": [
+        "ㄆㄥˊ|ㄧㄡˇ|˙ㄉㄜ|ㄧㄡˇ"
+      ],
+      "observedReadings": [
+        "ㄆㄥˊ|ㄧㄡˇ|˙ㄉㄜ|ㄧㄡˇ"
+      ],
+      "url": "/listening-audio/gemini/words/670b-53cb-7684-53cb.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.877,
+      "bytes": 19176,
+      "sha256": "176b7108118dc881a4d63e72b127ccd3723a02c13a7114f4b09f91db63ac1592",
+      "version": "176b7108118d",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.16
+    },
+    {
+      "text": "朋友的朋",
+      "pronunciation": [
+        "ㄆㄥˊ|ㄧㄡˇ|˙ㄉㄜ|ㄆㄥˊ"
+      ],
+      "observedReadings": [
+        "ㄆㄥˊ|ㄧㄡˇ|˙ㄉㄜ|ㄆㄥˊ"
+      ],
+      "url": "/listening-audio/gemini/words/670b-53cb-7684-670b.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.92,
+      "bytes": 20031,
+      "sha256": "da0b856fd6fabbf452a433b975366535de3b44a5abdaa3ca1eff4908a309eaed",
+      "version": "da0b856fd6fa",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.23
     },
     {
       "text": "朋友",
@@ -8156,6 +9586,23 @@
       "version": "d1e182e8a177",
       "review": "timing checked; human pronunciation review recommended",
       "voicedDuration": 0.31
+    },
+    {
+      "text": "比賽的比",
+      "pronunciation": [
+        "ㄅㄧˇ|ㄙㄞˋ|˙ㄉㄜ|ㄅㄧˇ"
+      ],
+      "observedReadings": [
+        "ㄅㄧˇ|ㄙㄞˋ|˙ㄉㄜ|ㄅㄧˇ"
+      ],
+      "url": "/listening-audio/gemini/words/6bd4-8cfd-7684-6bd4.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.877,
+      "bytes": 19883,
+      "sha256": "0d1286b2377295dd744993e1fb96b2153a8534a8d922cfd61a644106aefbf603",
+      "version": "0d1286b23772",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.16
     },
     {
       "text": "比賽",
@@ -9076,6 +10523,23 @@
       "voicedDuration": 0.45
     },
     {
+      "text": "王子的王",
+      "pronunciation": [
+        "ㄨㄤˊ|ㄗˇ|˙ㄉㄜ|ㄨㄤˊ"
+      ],
+      "observedReadings": [
+        "ㄨㄤˊ|ㄗˇ|˙ㄉㄜ|ㄨㄤˊ"
+      ],
+      "url": "/listening-audio/gemini/words/738b-5b50-7684-738b.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.835,
+      "bytes": 19956,
+      "sha256": "210dc3e15da7adb27c463ba9b3dd1d8cd5a0b3d3acd75f9202a35e18081789bf",
+      "version": "210dc3e15da7",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.14
+    },
+    {
       "text": "王子",
       "pronunciation": [
         "ㄨㄤˊ|ㄗˇ"
@@ -9125,6 +10589,40 @@
       "version": "80721c47ff51",
       "review": "timing checked; human pronunciation review recommended",
       "voicedDuration": 0.91
+    },
+    {
+      "text": "玩耍的玩",
+      "pronunciation": [
+        "ㄨㄢˊ|ㄕㄨㄚˇ|˙ㄉㄜ|ㄨㄢˊ"
+      ],
+      "observedReadings": [
+        "ㄨㄢˊ|ㄕㄨㄚˇ|˙ㄉㄜ|ㄨㄢˊ"
+      ],
+      "url": "/listening-audio/gemini/words/73a9-800d-7684-73a9.m4a",
+      "source": "Gemini Fola",
+      "duration": 2.005,
+      "bytes": 20987,
+      "sha256": "488de7c443048eb79f7fcb9ec2b92129a371723eb269145952b4b40e19e295eb",
+      "version": "488de7c44304",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.28
+    },
+    {
+      "text": "玩耍",
+      "pronunciation": [
+        "ㄨㄢˊ|ㄕㄨㄚˇ"
+      ],
+      "observedReadings": [
+        "ㄨㄢˊ|ㄕㄨㄚˇ"
+      ],
+      "url": "/listening-audio/gemini/words/73a9-800d.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.28,
+      "bytes": 14432,
+      "sha256": "f5cfa0beddfb41ba03b3f681febcdbdd634ad0095094ca5884b57132f2d3605f",
+      "version": "f5cfa0beddfb",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.59
     },
     {
       "text": "玩",
@@ -9210,6 +10708,40 @@
       "version": "aa5e50fa9cd9",
       "review": "timing checked; human pronunciation review recommended",
       "voicedDuration": 0.46
+    },
+    {
+      "text": "現在的在",
+      "pronunciation": [
+        "ㄒㄧㄢˋ|ㄗㄞˋ|˙ㄉㄜ|ㄗㄞˋ"
+      ],
+      "observedReadings": [
+        "ㄒㄧㄢˋ|ㄗㄞˋ|˙ㄉㄜ|ㄗㄞˋ"
+      ],
+      "url": "/listening-audio/gemini/words/73fe-5728-7684-5728.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.664,
+      "bytes": 18457,
+      "sha256": "4f7727bae243a88c441e89889fb30595b9f6336ad3fe682005de1d6814843e4e",
+      "version": "4f7727bae243",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.94
+    },
+    {
+      "text": "現在",
+      "pronunciation": [
+        "ㄒㄧㄢˋ|ㄗㄞˋ"
+      ],
+      "observedReadings": [
+        "ㄒㄧㄢˋ|ㄗㄞˋ"
+      ],
+      "url": "/listening-audio/gemini/words/73fe-5728.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.451,
+      "bytes": 15623,
+      "sha256": "6c82e3b11e9ea51d4af7458497c574408aaa5742224fa714f382b3c0a8af9fac",
+      "version": "6c82e3b11e9e",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.73
     },
     {
       "text": "球鞋",
@@ -9331,6 +10863,57 @@
       "voicedDuration": 0.49
     },
     {
+      "text": "白天的白",
+      "pronunciation": [
+        "ㄅㄞˊ|ㄊㄧㄢ|˙ㄉㄜ|ㄅㄞˊ"
+      ],
+      "observedReadings": [
+        "ㄅㄞˊ|ㄊㄧㄢ|˙ㄉㄜ|ㄅㄞˊ"
+      ],
+      "url": "/listening-audio/gemini/words/767d-5929-7684-767d.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.749,
+      "bytes": 18509,
+      "sha256": "2fc71b0ccfb5575c6ab803a899679f59e14f3ea3bcf14446eba679533c4d65fe",
+      "version": "2fc71b0ccfb5",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.05
+    },
+    {
+      "text": "白天",
+      "pronunciation": [
+        "ㄅㄞˊ|ㄊㄧㄢ"
+      ],
+      "observedReadings": [
+        "ㄅㄞˊ|ㄊㄧㄢ"
+      ],
+      "url": "/listening-audio/gemini/words/767d-5929.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.493,
+      "bytes": 15711,
+      "sha256": "46c6d885f6ea757bb9eef0170a9c78019cafa3a55a65d335365dc639f9f36a2f",
+      "version": "46c6d885f6ea",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.78
+    },
+    {
+      "text": "的，我的書。",
+      "pronunciation": [
+        "˙ㄉㄜ|ㄨㄛˇ|˙ㄉㄜ|ㄕㄨ"
+      ],
+      "observedReadings": [
+        "˙ㄉㄜ|ㄨㄛˇ|˙ㄉㄜ|ㄕㄨ"
+      ],
+      "url": "/listening-audio/gemini/words/7684-ff0c-6211-7684-66f8-3002.m4a",
+      "source": "Gemini Fola",
+      "duration": 2.048,
+      "bytes": 21119,
+      "sha256": "5436b29edb5d84d15db6acaa04a64f4b970b0e240041ffbf92dc8a1681116a4e",
+      "version": "5436b29edb5d",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.35
+    },
+    {
       "text": "的",
       "pronunciation": [
         "˙ㄉㄜ"
@@ -9414,6 +10997,40 @@
       "version": "57908b563618",
       "review": "timing checked; human pronunciation review recommended",
       "voicedDuration": 0.62
+    },
+    {
+      "text": "看書的看",
+      "pronunciation": [
+        "ㄎㄢˋ|ㄕㄨ|˙ㄉㄜ|ㄎㄢˋ"
+      ],
+      "observedReadings": [
+        "ㄎㄢˋ|ㄕㄨ|˙ㄉㄜ|ㄎㄢˋ"
+      ],
+      "url": "/listening-audio/gemini/words/770b-66f8-7684-770b.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.835,
+      "bytes": 19840,
+      "sha256": "9c80850f8c912dd46e395ebf56b9d553401b4ef0e4a21300bd3d21791b6274b2",
+      "version": "9c80850f8c91",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.13
+    },
+    {
+      "text": "看書",
+      "pronunciation": [
+        "ㄎㄢˋ|ㄕㄨ"
+      ],
+      "observedReadings": [
+        "ㄎㄢˋ|ㄕㄨ"
+      ],
+      "url": "/listening-audio/gemini/words/770b-66f8.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.493,
+      "bytes": 15715,
+      "sha256": "ae5d4a8dccc022e5b1ad295eef8940195bf794487c3e2fb4c1fd9e21cb76afb8",
+      "version": "ae5d4a8dccc0",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.88
     },
     {
       "text": "看",
@@ -9567,6 +11184,57 @@
       "version": "a981175b08e4",
       "review": "timing checked; human pronunciation review recommended",
       "voicedDuration": 0.68
+    },
+    {
+      "text": "秋千的千",
+      "pronunciation": [
+        "ㄑㄧㄡ|ㄑㄧㄢ|˙ㄉㄜ|ㄑㄧㄢ"
+      ],
+      "observedReadings": [
+        "ㄑㄧㄡ|ㄑㄧㄢ|˙ㄉㄜ|ㄑㄧㄢ"
+      ],
+      "url": "/listening-audio/gemini/words/79cb-5343-7684-5343.m4a",
+      "source": "Gemini Fola",
+      "duration": 2.005,
+      "bytes": 20919,
+      "sha256": "8d10a73601e849f633dd6a4ec520a707beaafc1a710ea2ab30e5fd11b223c6c3",
+      "version": "8d10a73601e8",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.31
+    },
+    {
+      "text": "秋天的秋",
+      "pronunciation": [
+        "ㄑㄧㄡ|ㄊㄧㄢ|˙ㄉㄜ|ㄑㄧㄡ"
+      ],
+      "observedReadings": [
+        "ㄑㄧㄡ|ㄊㄧㄢ|˙ㄉㄜ|ㄑㄧㄡ"
+      ],
+      "url": "/listening-audio/gemini/words/79cb-5929-7684-79cb.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.749,
+      "bytes": 18755,
+      "sha256": "e9ee2e3c2e54e4205b26a7fa1874b4d2ad828288e12e99a3d7b8d2921e84fc69",
+      "version": "e9ee2e3c2e54",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.06
+    },
+    {
+      "text": "秋天",
+      "pronunciation": [
+        "ㄑㄧㄡ|ㄊㄧㄢ"
+      ],
+      "observedReadings": [
+        "ㄑㄧㄡ|ㄊㄧㄢ"
+      ],
+      "url": "/listening-audio/gemini/words/79cb-5929.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.536,
+      "bytes": 15816,
+      "sha256": "11b1e364e2a398b41d8572ac8dd017caa78c2dd92d239d7179b6fa82d781e25e",
+      "version": "11b1e364e2a3",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.81
     },
     {
       "text": "稻米",
@@ -9873,6 +11541,40 @@
       "version": "855e8c0a7889",
       "review": "timing checked; human pronunciation review recommended",
       "voicedDuration": 0.92
+    },
+    {
+      "text": "紅花的紅",
+      "pronunciation": [
+        "ㄏㄨㄥˊ|ㄏㄨㄚ|˙ㄉㄜ|ㄏㄨㄥˊ"
+      ],
+      "observedReadings": [
+        "ㄏㄨㄥˊ|ㄏㄨㄚ|˙ㄉㄜ|ㄏㄨㄥˊ"
+      ],
+      "url": "/listening-audio/gemini/words/7d05-82b1-7684-7d05.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.749,
+      "bytes": 18683,
+      "sha256": "d314af3e0670d868b9b5c1a3af008bddbe4c8c75372a423b2eae9e6512cfff59",
+      "version": "d314af3e0670",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.03
+    },
+    {
+      "text": "紅花的花",
+      "pronunciation": [
+        "ㄏㄨㄥˊ|ㄏㄨㄚ|˙ㄉㄜ|ㄏㄨㄚ"
+      ],
+      "observedReadings": [
+        "ㄏㄨㄥˊ|ㄏㄨㄚ|˙ㄉㄜ|ㄏㄨㄚ"
+      ],
+      "url": "/listening-audio/gemini/words/7d05-82b1-7684-82b1.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.792,
+      "bytes": 19026,
+      "sha256": "6288013a8dddb5661b69de95d784d72b1fe2cd19ad8b88165085237ed50f0e45",
+      "version": "6288013a8ddd",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.07
     },
     {
       "text": "紅花",
@@ -10878,6 +12580,57 @@
       "voicedDuration": 0.67
     },
     {
+      "text": "裡外的外",
+      "pronunciation": [
+        "ㄌㄧˇ|ㄨㄞˋ|˙ㄉㄜ|ㄨㄞˋ"
+      ],
+      "observedReadings": [
+        "ㄌㄧˇ|ㄨㄞˋ|˙ㄉㄜ|ㄨㄞˋ"
+      ],
+      "url": "/listening-audio/gemini/words/88e1-5916-7684-5916.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.707,
+      "bytes": 18621,
+      "sha256": "8ef8c70cdb967a39da5cae408e3bb5a578f60695baffd34704b3defa68d7dd63",
+      "version": "8ef8c70cdb96",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.98
+    },
+    {
+      "text": "裡外的裡",
+      "pronunciation": [
+        "ㄌㄧˇ|ㄨㄞˋ|˙ㄉㄜ|ㄌㄧˇ"
+      ],
+      "observedReadings": [
+        "ㄌㄧˇ|ㄨㄞˋ|˙ㄉㄜ|ㄌㄧˇ"
+      ],
+      "url": "/listening-audio/gemini/words/88e1-5916-7684-88e1.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.835,
+      "bytes": 20192,
+      "sha256": "3ddab19b4b94c260a07031a39425311a5f89fa60a25309800a95c59375cd36cc",
+      "version": "3ddab19b4b94",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.14
+    },
+    {
+      "text": "裡外",
+      "pronunciation": [
+        "ㄌㄧˇ|ㄨㄞˋ"
+      ],
+      "observedReadings": [
+        "ㄌㄧˇ|ㄨㄞˋ"
+      ],
+      "url": "/listening-audio/gemini/words/88e1-5916.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.451,
+      "bytes": 15783,
+      "sha256": "0a25fc9b93678fd2a13688a836a093b12c6428cb98d9ef4102ea5862fef7f644",
+      "version": "0a25fc9b9367",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.73
+    },
+    {
       "text": "裡",
       "pronunciation": [
         "ㄌㄧˇ"
@@ -10961,6 +12714,74 @@
       "version": "1b3943123542",
       "review": "timing checked; human pronunciation review recommended",
       "voicedDuration": 0.38
+    },
+    {
+      "text": "說話的說",
+      "pronunciation": [
+        "ㄕㄨㄛ|ㄏㄨㄚˋ|˙ㄉㄜ|ㄕㄨㄛ"
+      ],
+      "observedReadings": [
+        "ㄕㄨㄛ|ㄏㄨㄚˋ|˙ㄉㄜ|ㄕㄨㄛ"
+      ],
+      "url": "/listening-audio/gemini/words/8aaa-8a71-7684-8aaa.m4a",
+      "source": "Gemini Fola",
+      "duration": 2.005,
+      "bytes": 20137,
+      "sha256": "12b8ccb0b2da2c40c0fcbfd2f625ee104efb4676f32aebd08e54a1d88332b745",
+      "version": "12b8ccb0b2da",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.29
+    },
+    {
+      "text": "說話",
+      "pronunciation": [
+        "ㄕㄨㄛ|ㄏㄨㄚˋ"
+      ],
+      "observedReadings": [
+        "ㄕㄨㄛ|ㄏㄨㄚˋ"
+      ],
+      "url": "/listening-audio/gemini/words/8aaa-8a71.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.493,
+      "bytes": 15655,
+      "sha256": "ebe673694f147acbd78771aafe3eae026e7d1f0f708a94f45b7fbf2119ac0430",
+      "version": "ebe673694f14",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.77
+    },
+    {
+      "text": "誰的",
+      "pronunciation": [
+        "ㄕㄟˊ|˙ㄉㄜ"
+      ],
+      "observedReadings": [
+        "ㄕㄟˊ|˙ㄉㄜ"
+      ],
+      "url": "/listening-audio/gemini/words/8ab0-7684.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.323,
+      "bytes": 14474,
+      "sha256": "1d2fb07fb9ebc435a7a11d87fbb35864127ad0368820495876b5550a1885547d",
+      "version": "1d2fb07fb9eb",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.6
+    },
+    {
+      "text": "誰，你是誰？",
+      "pronunciation": [
+        "ㄕㄟˊ|ㄋㄧˇ|ㄕˋ|ㄕㄟˊ"
+      ],
+      "observedReadings": [
+        "ㄕㄟˊ|ㄋㄧˇ|ㄕˋ|ㄕㄟˊ"
+      ],
+      "url": "/listening-audio/gemini/words/8ab0-ff0c-4f60-662f-8ab0-ff1f.m4a",
+      "source": "Gemini Fola",
+      "duration": 2.475,
+      "bytes": 24349,
+      "sha256": "a0ec8277c2e5d78046ef030ad3e7745a342afc984a57e7acd2836e5316addb8b",
+      "version": "a0ec8277c2e5",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.86
     },
     {
       "text": "誰",
@@ -11183,6 +13004,40 @@
       "version": "8fdccd5c1bbb",
       "review": "timing checked; human pronunciation review recommended",
       "voicedDuration": 0.99
+    },
+    {
+      "text": "走路的走",
+      "pronunciation": [
+        "ㄗㄡˇ|ㄌㄨˋ|˙ㄉㄜ|ㄗㄡˇ"
+      ],
+      "observedReadings": [
+        "ㄗㄡˇ|ㄌㄨˋ|˙ㄉㄜ|ㄗㄡˇ"
+      ],
+      "url": "/listening-audio/gemini/words/8d70-8def-7684-8d70.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.621,
+      "bytes": 17804,
+      "sha256": "0a7330450d8dffcdb72a6f0c4cbca7e8e670202b6bdb5a32e00c707acfb1dc88",
+      "version": "0a7330450d8d",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.9
+    },
+    {
+      "text": "走路的路",
+      "pronunciation": [
+        "ㄗㄡˇ|ㄌㄨˋ|˙ㄉㄜ|ㄌㄨˋ"
+      ],
+      "observedReadings": [
+        "ㄗㄡˇ|ㄌㄨˋ|˙ㄉㄜ|ㄌㄨˋ"
+      ],
+      "url": "/listening-audio/gemini/words/8d70-8def-7684-8def.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.707,
+      "bytes": 17833,
+      "sha256": "f5a26a54321130e35a81f1f40bcaf23077c87d5de3a6edd1f8b06b8b98747c5f",
+      "version": "f5a26a543211",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.98
     },
     {
       "text": "走路",
@@ -11440,6 +13295,40 @@
       "voicedDuration": 0.47
     },
     {
+      "text": "這裡的這",
+      "pronunciation": [
+        "ㄓㄜˋ|ㄌㄧˇ|˙ㄉㄜ|ㄓㄜˋ"
+      ],
+      "observedReadings": [
+        "ㄓㄜˋ|ㄌㄧˇ|˙ㄉㄜ|ㄓㄜˋ"
+      ],
+      "url": "/listening-audio/gemini/words/9019-88e1-7684-9019.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.621,
+      "bytes": 17549,
+      "sha256": "a06ecb2bd2404cb7b4b14d251c21c2512d38dd302c2c3f6488176c7bd514a90e",
+      "version": "a06ecb2bd240",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.92
+    },
+    {
+      "text": "這裡",
+      "pronunciation": [
+        "ㄓㄜˋ|ㄌㄧˇ"
+      ],
+      "observedReadings": [
+        "ㄓㄜˋ|ㄌㄧˇ"
+      ],
+      "url": "/listening-audio/gemini/words/9019-88e1.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.365,
+      "bytes": 14757,
+      "sha256": "ca5e52d4f29d30006b8a6a531896c23a9c5b0cf3bdde2231a426029402884fc0",
+      "version": "ca5e52d4f29d",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.67
+    },
+    {
       "text": "逼",
       "pronunciation": [
         "ㄅㄧ"
@@ -11525,6 +13414,57 @@
       "voicedDuration": 0.98
     },
     {
+      "text": "那頭的那",
+      "pronunciation": [
+        "ㄋㄚˋ|ㄊㄡˊ|˙ㄉㄜ|ㄋㄚˋ"
+      ],
+      "observedReadings": [
+        "ㄋㄚˋ|ㄊㄡˊ|˙ㄉㄜ|ㄋㄚˋ"
+      ],
+      "url": "/listening-audio/gemini/words/90a3-982d-7684-90a3.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.92,
+      "bytes": 19567,
+      "sha256": "6282c8683db70d6e20e52e522973b8f2fb764420a49231656629de9f86e7de5c",
+      "version": "6282c8683db7",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.21
+    },
+    {
+      "text": "那頭的頭",
+      "pronunciation": [
+        "ㄋㄚˋ|ㄊㄡˊ|˙ㄉㄜ|ㄊㄡˊ"
+      ],
+      "observedReadings": [
+        "ㄋㄚˋ|ㄊㄡˊ|˙ㄉㄜ|ㄊㄡˊ"
+      ],
+      "url": "/listening-audio/gemini/words/90a3-982d-7684-982d.m4a",
+      "source": "Gemini Fola",
+      "duration": 2.176,
+      "bytes": 21846,
+      "sha256": "1634dece17eb4a3471df6866bc473712cd8bad4264e959d1931accd0e874ee37",
+      "version": "1634dece17eb",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.45
+    },
+    {
+      "text": "那頭",
+      "pronunciation": [
+        "ㄋㄚˋ|ㄊㄡˊ"
+      ],
+      "observedReadings": [
+        "ㄋㄚˋ|ㄊㄡˊ"
+      ],
+      "url": "/listening-audio/gemini/words/90a3-982d.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.451,
+      "bytes": 15710,
+      "sha256": "13c8ce49bcd542264c4ccbf63e56fc49316317486b763f182e4ccd407e704236",
+      "version": "13c8ce49bcd5",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.74
+    },
+    {
       "text": "金魚",
       "pronunciation": [
         "ㄐㄧㄣ|ㄩˊ"
@@ -11576,6 +13516,40 @@
       "voicedDuration": 0.39
     },
     {
+      "text": "長短的長",
+      "pronunciation": [
+        "ㄔㄤˊ|ㄉㄨㄢˇ|˙ㄉㄜ|ㄔㄤˊ"
+      ],
+      "observedReadings": [
+        "ㄔㄤˊ|ㄉㄨㄢˇ|˙ㄉㄜ|ㄔㄤˊ"
+      ],
+      "url": "/listening-audio/gemini/words/9577-77ed-7684-9577.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.963,
+      "bytes": 20493,
+      "sha256": "3ebc534e9b2765877dc420f6a6c67e9f9c3c2941a9f40822cf4ee43deeb973d1",
+      "version": "3ebc534e9b27",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.27
+    },
+    {
+      "text": "長短",
+      "pronunciation": [
+        "ㄔㄤˊ|ㄉㄨㄢˇ"
+      ],
+      "observedReadings": [
+        "ㄔㄤˊ|ㄉㄨㄢˇ"
+      ],
+      "url": "/listening-audio/gemini/words/9577-77ed.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.749,
+      "bytes": 17719,
+      "sha256": "82c45118e408104a903fbbc1b4b20c685a888d41a3d890954286e9d6269486b3",
+      "version": "82c45118e408",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.02
+    },
+    {
       "text": "長髮",
       "pronunciation": [
         "ㄔㄤˊ|ㄈㄚˇ"
@@ -11610,6 +13584,57 @@
       "voicedDuration": 0.62
     },
     {
+      "text": "開心的心",
+      "pronunciation": [
+        "ㄎㄞ|ㄒㄧㄣ|˙ㄉㄜ|ㄒㄧㄣ"
+      ],
+      "observedReadings": [
+        "ㄎㄞ|ㄒㄧㄣ|˙ㄉㄜ|ㄒㄧㄣ"
+      ],
+      "url": "/listening-audio/gemini/words/958b-5fc3-7684-5fc3.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.707,
+      "bytes": 18397,
+      "sha256": "ffad8aa38b6d4ba090490697e3a3fbea909a5ef2be754f94440d5647ffdf5b51",
+      "version": "ffad8aa38b6d",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.99
+    },
+    {
+      "text": "開心的開",
+      "pronunciation": [
+        "ㄎㄞ|ㄒㄧㄣ|˙ㄉㄜ|ㄎㄞ"
+      ],
+      "observedReadings": [
+        "ㄎㄞ|ㄒㄧㄣ|˙ㄉㄜ|ㄎㄞ"
+      ],
+      "url": "/listening-audio/gemini/words/958b-5fc3-7684-958b.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.835,
+      "bytes": 19269,
+      "sha256": "3b1ff8b77dfdd90911c4b4dcd26e7479ec8d75fbdaa0804b3d074da36125f0ae",
+      "version": "3b1ff8b77dfd",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.11
+    },
+    {
+      "text": "開心",
+      "pronunciation": [
+        "ㄎㄞ|ㄒㄧㄣ"
+      ],
+      "observedReadings": [
+        "ㄎㄞ|ㄒㄧㄣ"
+      ],
+      "url": "/listening-audio/gemini/words/958b-5fc3.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.493,
+      "bytes": 15959,
+      "sha256": "0ec0a6a50fb380931bc1721a18300ca80a658c0dc6c5339b9815eb8b50732c75",
+      "version": "0ec0a6a50fb3",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.8
+    },
+    {
       "text": "開車",
       "pronunciation": [
         "ㄎㄞ|ㄔㄜ"
@@ -11642,6 +13667,40 @@
       "version": "7fd0f074dffd",
       "review": "timing checked; human pronunciation review recommended",
       "voicedDuration": 0.41
+    },
+    {
+      "text": "陪伴的陪",
+      "pronunciation": [
+        "ㄆㄟˊ|ㄅㄢˋ|˙ㄉㄜ|ㄆㄟˊ"
+      ],
+      "observedReadings": [
+        "ㄆㄟˊ|ㄅㄢˋ|˙ㄉㄜ|ㄆㄟˊ"
+      ],
+      "url": "/listening-audio/gemini/words/966a-4f34-7684-966a.m4a",
+      "source": "Gemini Fola",
+      "duration": 2.005,
+      "bytes": 20395,
+      "sha256": "f05118078441c913291776199301a0329fcf5f2f0c13a4647805484e6aef802e",
+      "version": "f05118078441",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.3
+    },
+    {
+      "text": "陪伴",
+      "pronunciation": [
+        "ㄆㄟˊ|ㄅㄢˋ"
+      ],
+      "observedReadings": [
+        "ㄆㄟˊ|ㄅㄢˋ"
+      ],
+      "url": "/listening-audio/gemini/words/966a-4f34.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.28,
+      "bytes": 13727,
+      "sha256": "b80c289cbebe256480a0ca0ab657722caf8dab4ca46588fab6e50d9865569c97",
+      "version": "b80c289cbebe",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.56
     },
     {
       "text": "隻",
@@ -11710,6 +13769,74 @@
       "version": "24e778a29da6",
       "review": "timing checked; human pronunciation review recommended",
       "voicedDuration": 1.03
+    },
+    {
+      "text": "雲朵的朵",
+      "pronunciation": [
+        "ㄩㄣˊ|ㄉㄨㄛˇ|˙ㄉㄜ|ㄉㄨㄛˇ"
+      ],
+      "observedReadings": [
+        "ㄩㄣˊ|ㄉㄨㄛˇ|˙ㄉㄜ|ㄉㄨㄛˇ"
+      ],
+      "url": "/listening-audio/gemini/words/96f2-6735-7684-6735.m4a",
+      "source": "Gemini Fola",
+      "duration": 2.091,
+      "bytes": 22087,
+      "sha256": "6ad3c0eec6a61fa949929a1f5c0ad4f356b315e8ca8669ad1d6c99c630393e52",
+      "version": "6ad3c0eec6a6",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.4
+    },
+    {
+      "text": "雲朵",
+      "pronunciation": [
+        "ㄩㄣˊ|ㄉㄨㄛˇ"
+      ],
+      "observedReadings": [
+        "ㄩㄣˊ|ㄉㄨㄛˇ"
+      ],
+      "url": "/listening-audio/gemini/words/96f2-6735.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.621,
+      "bytes": 16813,
+      "sha256": "54fb71d7a3af54f22a3fcbf1c45b9ce5d2a505628a2e05bdea66b43bce3a3d64",
+      "version": "54fb71d7a3af",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.9
+    },
+    {
+      "text": "青蛙的蛙",
+      "pronunciation": [
+        "ㄑㄧㄥ|ㄨㄚ|˙ㄉㄜ|ㄨㄚ"
+      ],
+      "observedReadings": [
+        "ㄑㄧㄥ|ㄨㄚ|˙ㄉㄜ|ㄨㄚ"
+      ],
+      "url": "/listening-audio/gemini/words/9752-86d9-7684-86d9.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.835,
+      "bytes": 19127,
+      "sha256": "5a4372f54e49c2ea89e5082dba964a6a746ed46f371419559b42a0f5f89ad65a",
+      "version": "5a4372f54e49",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.13
+    },
+    {
+      "text": "青蛙的青",
+      "pronunciation": [
+        "ㄑㄧㄥ|ㄨㄚ|˙ㄉㄜ|ㄑㄧㄥ"
+      ],
+      "observedReadings": [
+        "ㄑㄧㄥ|ㄨㄚ|˙ㄉㄜ|ㄑㄧㄥ"
+      ],
+      "url": "/listening-audio/gemini/words/9752-86d9-7684-9752.m4a",
+      "source": "Gemini Fola",
+      "duration": 2.005,
+      "bytes": 20705,
+      "sha256": "b69f6dc60d25a11fa0b20dc6ba76d2a43d6bd6d6cbef49e764b4c32dc9c32826",
+      "version": "b69f6dc60d25",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.29
     },
     {
       "text": "青蛙",
@@ -11999,6 +14126,57 @@
       "version": "a66ece242784",
       "review": "timing checked; human pronunciation review recommended",
       "voicedDuration": 0.56
+    },
+    {
+      "text": "高山的山",
+      "pronunciation": [
+        "ㄍㄠ|ㄕㄢ|˙ㄉㄜ|ㄕㄢ"
+      ],
+      "observedReadings": [
+        "ㄍㄠ|ㄕㄢ|˙ㄉㄜ|ㄕㄢ"
+      ],
+      "url": "/listening-audio/gemini/words/9ad8-5c71-7684-5c71.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.877,
+      "bytes": 19071,
+      "sha256": "ed133d3095702a7892c40123b6a34463a58ea8926f1051fe2d302106aba07b40",
+      "version": "ed133d309570",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.17
+    },
+    {
+      "text": "高山的高",
+      "pronunciation": [
+        "ㄍㄠ|ㄕㄢ|˙ㄉㄜ|ㄍㄠ"
+      ],
+      "observedReadings": [
+        "ㄍㄠ|ㄕㄢ|˙ㄉㄜ|ㄍㄠ"
+      ],
+      "url": "/listening-audio/gemini/words/9ad8-5c71-7684-9ad8.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.877,
+      "bytes": 19414,
+      "sha256": "1ee17df5d4007e97b73c30794b0d55a5b59622ae262c3996d4f1e747e5ee247a",
+      "version": "1ee17df5d400",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 1.18
+    },
+    {
+      "text": "高山",
+      "pronunciation": [
+        "ㄍㄠ|ㄕㄢ"
+      ],
+      "observedReadings": [
+        "ㄍㄠ|ㄕㄢ"
+      ],
+      "url": "/listening-audio/gemini/words/9ad8-5c71.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.365,
+      "bytes": 14458,
+      "sha256": "8ff962f66d677f923c996f1a9c349802e9e1dc65eecbe948f4623ffd29fa8382",
+      "version": "8ff962f66d67",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.66
     },
     {
       "text": "高高",

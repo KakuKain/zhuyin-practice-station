@@ -6,14 +6,33 @@ import { book1Facts, book1Lessons } from "./book1-characters";
 import { HanziGlyph, HanziWords } from "./HanziChrome";
 import { readHanziRecords } from "./hanzi-round";
 import { sentenceLessons } from "./sentence-patterns";
+import { strokesLessonId } from "./basic-strokes";
+import { StrokeLessonPage } from "./StrokeLesson";
 import "../../styles/lazy/hanzi.css";
 
 /**
  * A 第一冊 lesson's page: its number and title, its practices (練習, 聽寫 and, but for the
  * numbers, 照樣造句) and every 生字, each a tap away from 練習 on that 生字. A check
- * marks the 生字 written to the end before.
+ * marks the 生字 written to the end before. 認識國字基本筆畫 has its own page.
  */
 export function HanziLessonPage({
+  app,
+}: {
+  app: Pick<
+    AppController,
+    | "hanziLessonId"
+    | "startHanziPractice"
+    | "startHanziDictation"
+    | "startHanziSentences"
+    | "startHanziStrokes"
+    | "speak"
+  >;
+}) {
+  if (app.hanziLessonId === strokesLessonId) return <StrokeLessonPage app={app} />;
+  return <CharacterLessonPage app={app} />;
+}
+
+function CharacterLessonPage({
   app,
 }: {
   app: Pick<
