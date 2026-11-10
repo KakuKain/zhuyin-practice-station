@@ -4213,23 +4213,6 @@
       "voicedDuration": 1.01
     },
     {
-      "text": "ㄧㄞ",
-      "pronunciation": [
-        "ㄧㄞ"
-      ],
-      "observedReadings": [
-        "ㄧㄞ"
-      ],
-      "url": "/listening-audio/gemini/rhymes/3127-311e.m4a",
-      "source": "Gemini Fola",
-      "duration": 1.664,
-      "bytes": 17665,
-      "sha256": "c1d25e9966631eb10c77cf7fc75a29183476404fe3b37317aff0ce584753b843",
-      "version": "c1d25e996663",
-      "review": "timing checked; human pronunciation review recommended",
-      "voicedDuration": 0.96
-    },
-    {
       "text": "ㄧㄠ",
       "pronunciation": [
         "ㄧㄠ"
@@ -8072,23 +8055,6 @@
       "version": "a1cf5196e6fc",
       "review": "timing checked; human pronunciation review recommended",
       "voicedDuration": 0.5
-    },
-    {
-      "text": "崖",
-      "pronunciation": [
-        "ㄧㄞˊ"
-      ],
-      "observedReadings": [
-        "ㄧㄞˊ"
-      ],
-      "url": "/listening-audio/gemini/words/5d16.m4a",
-      "source": "Gemini Fola",
-      "duration": 1.152,
-      "bytes": 12669,
-      "sha256": "adfa5389c141fc4e7c841f8a4aebac4164a8b6c9750839f8b385b640a8da8c8b",
-      "version": "adfa5389c141",
-      "review": "timing checked; human pronunciation review recommended",
-      "voicedDuration": 0.46
     },
     {
       "text": "巢",

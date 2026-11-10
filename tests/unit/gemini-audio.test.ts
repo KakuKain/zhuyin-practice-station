@@ -6,14 +6,15 @@ import { mathPromptUrl } from "../../features/math/math-audio";
 
 const manifest = JSON.parse(readFileSync("public/listening-audio/gemini/manifest.json", "utf8"));
 
-test("all nine lesson readings and 21 complete rhyme clips are shipped (ㄧㄤ retired)", () => {
+test("all nine lesson readings and 20 complete rhyme clips are shipped (ㄧㄤ and ㄧㄞ retired)", () => {
   assert.equal(manifest.lessons.length, 9);
-  assert.equal(manifest.rhymes.length, 21);
-  assert.equal(new Set(manifest.rhymes.map((clip: { text: string }) => clip.text)).size, 21);
-  // ㄧㄤ was heard as ㄧㄤˊ; it now plays the dictionary's 「央」 (see audio-registry.ts).
+  assert.equal(manifest.rhymes.length, 20);
+  assert.equal(new Set(manifest.rhymes.map((clip: { text: string }) => clip.text)).size, 20);
+  // ㄧㄤ was heard as ㄧㄤˊ and ㄧㄞ as ㄧㄚ; they now play the dictionary's 「央」 and 「崖」, and so
+  // does the 生字 崖 (see audio-registry.ts).
   assert.deepEqual(
     manifest.retired.map((clip: { text: string }) => clip.text),
-    ["ㄧㄤ"],
+    ["ㄧㄤ", "ㄧㄞ", "崖"],
   );
   for (const clip of [...manifest.lessons, ...manifest.rhymes]) {
     assert.ok(statSync(`public${clip.path}`).size > 4000);
@@ -28,10 +29,11 @@ test("every combined rhyme uses its Gemini clip, or the dictionary's character, 
     assert.ok(clip.voicedDuration >= 0.7);
     assert.ok(clip.duration - clip.voicedDuration >= 0.5);
   }
-  // The dictionary's 「央」 stops before the recording reads its radical and strokes.
+  // The dictionary's 「央」 and 「崖」 stop before the recording reads its radical and strokes.
   assert.equal(dictationAudioUrl("ㄧㄤ"), "listening-audio/moe-examples/6160.mp3#t=0,0.7");
+  assert.equal(dictationAudioUrl("ㄧㄞ"), "listening-audio/moe-examples/5993.mp3#t=0,0.7");
   assert.equal(
-    manifest.rhymes.find((clip: { text: string }) => clip.text === "ㄧㄞ").tone,
+    manifest.retired.find((clip: { text: string }) => clip.text === "ㄧㄞ").tone,
     "第二聲",
   );
 });

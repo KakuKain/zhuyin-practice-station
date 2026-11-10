@@ -61,7 +61,7 @@ test("all 22 combined rhymes have a unique playable local clip", () => {
   }
 });
 
-test("combined-rhyme playback uses Gemini syllable recordings (ㄧㄤ the dictionary's 央) with explicit tones", () => {
+test("combined-rhyme playback uses Gemini syllable recordings (ㄧㄤ and ㄧㄞ the dictionary's 央 and 崖) with explicit tones", () => {
   const manifest = JSON.parse(
     readFileSync(
       new URL("../../public/listening-audio/moe-examples/manifest.json", import.meta.url),
@@ -72,8 +72,9 @@ test("combined-rhyme playback uses Gemini syllable recordings (ㄧㄤ the dictio
   assert.equal(combinedRhymeExamples.length, 22);
   assert.equal(manifest.clips.length, 22);
   for (const example of combinedRhymeExamples) {
-    // ㄧㄤ plays the dictionary's own 「央」 instead, unchanged and stopped after the character.
-    if (example.rhyme === "ㄧㄤ")
+    // ㄧㄤ and ㄧㄞ play the dictionary's own 「央」 and 「崖」 instead, unchanged and stopped after
+    // the character.
+    if (example.rhyme === "ㄧㄤ" || example.rhyme === "ㄧㄞ")
       assert.equal(listeningAudioUrl(example.rhyme), `${example.audioUrl}#t=0,0.7`);
     else assert.ok(listeningAudioUrl(example.rhyme).startsWith("listening-audio/gemini/rhymes/"));
     assert.ok(

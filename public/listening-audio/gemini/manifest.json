@@ -40,18 +40,6 @@
       ]
     },
     {
-      "text": "ㄧㄞ",
-      "prompt": "崖",
-      "tone": "第二聲",
-      "path": "/listening-audio/gemini/rhymes/3127-311e.m4a",
-      "duration": 1.56,
-      "voicedDuration": 0.96,
-      "sourceRange": [
-        8.11,
-        9.67
-      ]
-    },
-    {
       "text": "ㄧㄠ",
       "prompt": "腰",
       "tone": "第一聲",
@@ -325,6 +313,30 @@
         24.01
       ],
       "retired": "2026-10-19：家長聽起來像 ㄧㄤˊ，改播教育部《國語辭典簡編本》「央」原始錄音（listening-audio/moe-examples/6160.mp3），播到 0.7 秒、部首旁白之前就停。"
+    },
+    {
+      "text": "ㄧㄞ",
+      "prompt": "崖",
+      "tone": "第二聲",
+      "path": "/listening-audio/gemini/rhymes/3127-311e.m4a",
+      "duration": 1.56,
+      "voicedDuration": 0.96,
+      "sourceRange": [
+        8.11,
+        9.67
+      ],
+      "retired": "2026-11-11：家長聽起來像 ㄧㄚ，改播教育部《國語辭典簡編本》「崖」(ㄧㄞˊ) 原始錄音（listening-audio/moe-examples/5993.mp3），播到 0.7 秒、部首旁白之前就停。"
+    },
+    {
+      "text": "崖",
+      "reading": "ㄧㄞˊ",
+      "path": "/listening-audio/gemini/words/5d16.m4a",
+      "batch": "2026-10-21-01-words",
+      "duration": 1.06,
+      "voicedDuration": 0.46,
+      "createdAt": "2026-10-21",
+      "origin": "Gemini API",
+      "retired": "2026-11-11：與 ㄧㄞ 同一個 Gemini 讀法，可能念成 ㄧㄚˊ；生字「崖」改播同一段教育部「崖」錄音（5993.mp3，播到 0.7 秒）。"
     }
   ],
   "words": [
@@ -2685,16 +2697,6 @@
       "batch": "2026-10-21-01-words",
       "duration": 1.23,
       "voicedDuration": 0.63,
-      "createdAt": "2026-10-21",
-      "origin": "Gemini API"
-    },
-    {
-      "text": "崖",
-      "reading": "ㄧㄞˊ",
-      "path": "/listening-audio/gemini/words/5d16.m4a",
-      "batch": "2026-10-21-01-words",
-      "duration": 1.06,
-      "voicedDuration": 0.46,
       "createdAt": "2026-10-21",
       "origin": "Gemini API"
     },

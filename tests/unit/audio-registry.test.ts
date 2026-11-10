@@ -60,3 +60,14 @@ test("ㄧㄤ plays the dictionary's 「央」 unchanged, stopping after the char
   assert.equal(clipEnd(url), 0.7);
   assert.equal(clipEnd(registeredAudioUrl("ㄧㄢ")!), null);
 });
+
+test("ㄧㄞ and the 生字 崖 play the dictionary's 「崖」 unchanged, stopping after the character", () => {
+  // The parent heard the Gemini ㄧㄞ as ㄧㄚ; 「崖」 is said by 0.45 s, its radical starts at 1.25 s.
+  const url = "listening-audio/moe-examples/5993.mp3#t=0,0.7";
+  assert.equal(registeredAudioUrl("ㄧㄞ"), url);
+  assert.equal(registeredAudioUrl("ㄧㄞ", "ㄧㄞ"), url);
+  assert.equal(registeredAudioUrl("崖", "ㄧㄞˊ"), url);
+  assert.equal(registeredAudioUrl("崖"), url);
+  // Another reading of 崖 never borrows it.
+  assert.equal(registeredAudioUrl("崖", "ㄧㄚˊ"), null);
+});

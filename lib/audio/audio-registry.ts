@@ -8,10 +8,15 @@ const clips = index as unknown as Record<string, [string[], string, string]>;
  * recordings are CC BY-ND (no adaptations), so the file stays byte-identical to the official MP3,
  * and playback stops in the silence after the character, before the recording goes on to read
  * its radical and strokes. ㄧㄤ: the parent heard the Gemini clip as ㄧㄤˊ and chose 「央」; the
- * character ends by 0.45 s and the radical starts at 1.2 s.
+ * character ends by 0.45 s and the radical starts at 1.2 s. ㄧㄞ: the parent heard the Gemini clip
+ * as ㄧㄚ; it and the 生字 崖 play the dictionary's 「崖」 (ㄧㄞˊ, the chart's 第二聲 example), which
+ * also ends by 0.45 s with its radical at 1.25 s. `reading` is the reading the clip says, where it
+ * is not the text itself.
  */
-const partialClips: Record<string, { url: string; end: number }> = {
+const partialClips: Record<string, { url: string; end: number; reading?: string }> = {
   ㄧㄤ: { url: "listening-audio/moe-examples/6160.mp3", end: 0.7 },
+  ㄧㄞ: { url: "listening-audio/moe-examples/5993.mp3", end: 0.7 },
+  崖: { url: "listening-audio/moe-examples/5993.mp3", end: 0.7, reading: "ㄧㄞˊ" },
 };
 
 /** Where a clip's playback stops early (`#t=0,0.7`), or null to play it to the end. */
@@ -23,7 +28,7 @@ export function clipEnd(url: string): number | null {
 /** Refuse a known pronunciation mismatch instead of silently reading another tone. */
 export function registeredAudioUrl(text: string, pronunciation?: string): string | null {
   const partial = partialClips[text];
-  if (partial && (!pronunciation || pronunciation === text))
+  if (partial && (!pronunciation || pronunciation === (partial.reading ?? text)))
     return `${partial.url}#t=0,${partial.end}`;
   const entry = clips[text];
   if (!entry) return null;
