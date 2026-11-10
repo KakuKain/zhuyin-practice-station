@@ -1338,7 +1338,7 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
-  width: min(100%, 640px);
+  width: min(100%, 760px);
 }
 .reading-scene,
 .reading-choice {
@@ -1354,6 +1354,13 @@
   font: inherit;
   cursor: pointer;
   touch-action: manipulation;
+}
+/* A painted picture fits inside its card, so cards keep one shape whatever the picture's. */
+:is(.reading-scene, .reading-choice) > img.reading-picture {
+  position: absolute;
+  inset: 8px;
+  width: calc(100% - 16px);
+  height: calc(100% - 16px);
 }
 .reading-scene.is-placed {
   border-color: #6cc28e;

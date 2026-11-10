@@ -68,15 +68,14 @@ def pictures(mask: Image.Image, columns: int, rows: int) -> list[Image.Image]:
     return masks
 
 
-def main() -> None:
-    folder = ROOT / "assets" / "artwork" / "book1"
-    out = ROOT / "public" / "course-art"
-    sheet = Image.open(folder / "sheet.png").convert("RGBA")
+def cut_sheet(sheet_path: Path, columns: int, rows: int, names: list[str], folder: Path, out: Path) -> None:
+    """Cuts a sheet's pictures, row by row, into folder/<name>.png and out/<name>.webp."""
+    sheet = Image.open(sheet_path).convert("RGBA")
     mask = slicer.paint_mask(sheet)
     alpha = mask.filter(ImageFilter.GaussianBlur(0.8))
     cut = sheet.copy()
     cut.putalpha(ImageChops.multiply(alpha, sheet.getchannel("A")))
-    for name, area in zip(NAMES, pictures(mask, 4, 2)):
+    for name, area in zip(names, pictures(mask, columns, rows)):
         only = cut.copy()
         only.putalpha(ImageChops.multiply(cut.getchannel("A"), area))
         painted = ImageChops.multiply(mask, area).getbbox()
@@ -89,9 +88,19 @@ def main() -> None:
         page.save(folder / f"{name}.png")
         scale = min(1, LONGEST / max(page.size))
         page.resize((round(page.width * scale), round(page.height * scale)), Image.LANCZOS).save(
-            out / f"book1-{name}.webp", "WEBP", quality=QUALITY, method=6
+            out / f"{name}.webp", "WEBP", quality=QUALITY, method=6
         )
         print(f"{name}: {piece.width}×{piece.height}")
+
+
+def main() -> None:
+    folder = ROOT / "assets" / "artwork" / "book1"
+    out = ROOT / "public" / "course-art"
+    names = [f"book1-{name}" for name in NAMES]
+    cut_sheet(folder / "sheet.png", 4, 2, names, folder, out)
+    # The originals keep their short names.
+    for name in NAMES:
+        (folder / f"book1-{name}.png").replace(folder / f"{name}.png")
 
 
 if __name__ == "__main__":

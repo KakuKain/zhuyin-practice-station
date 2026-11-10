@@ -1,8 +1,9 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
 import {
   buildReadingRound,
+  paintedReading,
   readingClips,
   readingQuestions,
   readingScenes,
@@ -60,4 +61,14 @@ test("a round orders four scenes, then asks five questions in the story's order"
     for (const step of questions)
       if (step.kind === "question") assert.deepEqual([...step.order].sort(), [0, 1, 2]);
   }
+});
+
+test("every painted picture is on disk, and every scene and thing is painted", () => {
+  for (const art of paintedReading)
+    assert.ok(existsSync(`public/course-art/reading/${art}.webp`), `${art}.webp`);
+  for (const scene of readingScenes) assert.ok(paintedReading.includes(scene.art), scene.art);
+  // Scenes and things share a folder, so their names differ.
+  const things = Object.keys(readingThings);
+  for (const scene of readingScenes) assert.ok(!things.includes(scene.art), scene.art);
+  for (const thing of Object.keys(readingThings)) assert.ok(paintedReading.includes(thing), thing);
 });

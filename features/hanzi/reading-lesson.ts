@@ -8,7 +8,10 @@
 export const readingLessonId = -2;
 
 /** Pictures painted so far (`public/course-art/reading/<art>.webp`); the rest show words. */
-export const paintedReading: string[] = [];
+export const paintedReading: string[] = [
+  ...["alone", "frog-runs", "elephant-hurt", "stuck", "climb", "hug"],
+  ...["frog", "elephant", "bear", "girl", "hedgehog", "balloon", "bag", "hat"],
+];
 
 import type { Said } from "./clip-voice";
 export type { Said };
@@ -21,12 +24,12 @@ export const readingScenes: (Said & { art: string })[] = [
     readings: "ㄉㄚˋ ㄐㄧㄚ ㄉㄡ ㄅㄨˋ ㄍㄢˇ ㄎㄠˋ ㄐㄧㄣˋ ㄒㄧㄠˇ ㄘˋ ㄨㄟˋ",
   },
   {
-    art: "frog",
+    art: "frog-runs",
     text: "青蛙大叫，跳走了",
     readings: "ㄑㄧㄥ ㄨㄚ ㄉㄚˋ ㄐㄧㄠˋ ㄊㄧㄠˋ ㄗㄡˇ ˙ㄌㄜ",
   },
   {
-    art: "elephant",
+    art: "elephant-hurt",
     text: "小象被刺到，痛得抬起腳",
     readings: "ㄒㄧㄠˇ ㄒㄧㄤˋ ㄅㄟˋ ㄘˋ ㄉㄠˋ ㄊㄨㄥˋ ˙ㄉㄜ ㄊㄞˊ ㄑㄧˇ ㄐㄧㄠˇ",
   },
