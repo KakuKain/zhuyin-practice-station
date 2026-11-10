@@ -42,6 +42,13 @@
 }
 
 /* A math lesson's page: the 注音 lesson page's heading and cards, then what the lesson practises. */
+/*
+ * 數學, 英語 and 第一冊's lesson pages scroll the whole page under the fixed bottom bar, so they
+ * end with its height to spare; without it their last row stayed hidden behind the bar.
+ */
+.lesson-page.math-lesson-page {
+  padding-bottom: calc(67px + 24px + env(safe-area-inset-bottom, 0px));
+}
 /* Math titles are short; 認識 1～10 stays on one line instead of breaking before ～. */
 .math-lesson-page .lesson-heading .lesson-title {
   text-wrap: nowrap;
