@@ -99,7 +99,7 @@ export function AppHeader({
       <button className="brand-button" type="button" onClick={onCourses} aria-label="前往課程">
         <Logo />
         <span>
-          <strong>注音小練習</strong>
+          <strong>小書包</strong>
           <small>一年級學習站</small>
         </span>
       </button>
