@@ -44,7 +44,7 @@ test("第一冊 練習 picks a 生字 from the list, marks a stroke out of order
   await noOverflow(page);
   await page.getByRole("button", { name: /第一課，拍拍手/ }).click();
   await expect(page.locator(".hanzi-character-card")).toHaveCount(9);
-  await expect(page.getByRole("button", { name: "照樣造句，製作中" })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "照樣造句，看例句填空格" })).toBeEnabled();
   await noOverflow(page);
 
   // 練習 opens on the list of the lesson's 生字.
