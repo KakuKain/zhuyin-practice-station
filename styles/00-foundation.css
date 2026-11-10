@@ -91,34 +91,12 @@ button:focus-visible {
   letter-spacing: 0.1em;
 }
 
+/* The 小書包 backpack on its cream paper (AppChrome's Logo). */
 .logo-mark {
-  position: relative;
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-  color: white;
-}
-
-.logo-mark span {
-  position: relative;
-  z-index: 1;
-  font-weight: 850;
-  transform: translateY(-1px);
-}
-
-/* The logo's ㄅ is a path (AppChrome's Logo), sized by the span's font size. */
-.logo-mark svg {
   display: block;
-}
-
-.logo-mark i {
-  position: absolute;
-  right: -5px;
-  bottom: -9px;
-  width: 25px;
-  height: 25px;
-  border-radius: 50%;
-  background: #f5b36d;
+  flex: none;
+  object-fit: cover;
+  background: #f9f6ed;
 }
 
 .header-chip {

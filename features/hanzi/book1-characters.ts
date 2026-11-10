@@ -1,12 +1,49 @@
-/** 康軒 一上 第一冊's 生字 in the order of 本冊生字 (pp. 80–81): the numbers, then each lesson's. */
+/** 康軒 一上 第一冊's 生字 in the order of 本冊生字 (pp. 80–81): the numbers, then each lesson's.
+ * `art` is the lesson's watercolor in course-art/ (scripts/slice-book1.py). */
 export const book1Lessons = [
-  { id: 0, number: "一到十", title: "國字真簡單", characters: "一二三四五六七八九十" },
-  { id: 1, number: "第一課", title: "拍拍手", characters: "拍手左右你他也上下" },
-  { id: 2, number: "第二課", title: "這是誰的", characters: "這是誰的我分好了啊多個" },
-  { id: 3, number: "第三課", title: "秋千", characters: "秋千和玩陪高山到大海朋友們起" },
-  { id: 4, number: "第四課", title: "大個子小個子", characters: "子小課兩人拉看找隻青蛙開心" },
-  { id: 5, number: "第五課", title: "比一比", characters: "比門裡外有什麼不同早晚王主又" },
-  { id: 6, number: "第六課", title: "小路", characters: "路長白花紅走在向說朵從頭那" },
+  {
+    id: 0,
+    number: "一到十",
+    title: "國字真簡單",
+    art: "book1-numbers",
+    characters: "一二三四五六七八九十",
+  },
+  { id: 1, number: "第一課", title: "拍拍手", art: "book1-clap", characters: "拍手左右你他也上下" },
+  {
+    id: 2,
+    number: "第二課",
+    title: "這是誰的",
+    art: "book1-whose",
+    characters: "這是誰的我分好了啊多個",
+  },
+  {
+    id: 3,
+    number: "第三課",
+    title: "秋千",
+    art: "book1-swing",
+    characters: "秋千和玩陪高山到大海朋友們起",
+  },
+  {
+    id: 4,
+    number: "第四課",
+    title: "大個子小個子",
+    art: "book1-frogs",
+    characters: "子小課兩人拉看找隻青蛙開心",
+  },
+  {
+    id: 5,
+    number: "第五課",
+    title: "比一比",
+    art: "book1-door",
+    characters: "比門裡外有什麼不同早晚王主又",
+  },
+  {
+    id: 6,
+    number: "第六課",
+    title: "小路",
+    art: "book1-path",
+    characters: "路長白花紅走在向說朵從頭那",
+  },
 ] as const;
 export type Book1Lesson = (typeof book1Lessons)[number];
 /** 「第一課 拍拍手」, or 「國字真簡單」 for the numbers. */

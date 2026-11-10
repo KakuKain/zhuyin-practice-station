@@ -6,7 +6,7 @@ const base = process.env.PAGES_BASE_PATH ?? "/zhuyin-practice-station/";
 const output = "dist-pages";
 const html = readFileSync(join(output, "index.html"), "utf8");
 assert(html.includes(`${base}assets/`), "HTML must load the bundle from the base path");
-assert(html.includes(`${base}favicon.svg`), "Favicon must use the base path");
+assert(html.includes(`${base}favicon.png`), "Favicon must use the base path");
 
 function files(directory) {
   return readdirSync(directory).flatMap((name) => {

@@ -10,7 +10,7 @@ import {
   type PreparedBackup,
 } from "../../lib/storage/device-backup";
 
-function download(backup: DeviceBackup, prefix = "注音小練習備份") {
+function download(backup: DeviceBackup, prefix = "小書包備份") {
   const blob = new Blob([JSON.stringify(backup)], { type: "application/json" });
   if (blob.size > maxBackupBytes) throw new Error("備份超過 64 MB，請先移除不需要的錄音。");
   const url = URL.createObjectURL(blob),

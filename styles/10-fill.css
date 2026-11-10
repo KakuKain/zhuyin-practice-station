@@ -22,11 +22,6 @@
 .is-fill .app-header .logo-mark {
   width: 29px;
   height: 29px;
-  border-radius: 9px 9px 9px 3px;
-}
-
-.is-fill .app-header .logo-mark span {
-  font-size: 16px;
 }
 
 .is-fill .app-header .brand-button {
@@ -249,11 +244,6 @@
 .is-lesson .app-header .logo-mark {
   width: 29px;
   height: 29px;
-  border-radius: 9px 9px 9px 3px;
-}
-
-.is-lesson .app-header .logo-mark span {
-  font-size: 16px;
 }
 
 .is-lesson .app-header .brand-button {

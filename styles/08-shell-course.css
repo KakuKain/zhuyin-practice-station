@@ -129,11 +129,6 @@
 .app-shell:is(.is-courses, .is-symbols, .is-practice, .is-more) .logo-mark {
   width: 29px;
   height: 29px;
-  border-radius: 9px 9px 9px 3px;
-}
-
-.app-shell:is(.is-courses, .is-symbols, .is-practice, .is-more) .logo-mark span {
-  font-size: 16px;
 }
 
 .app-shell:is(.is-courses, .is-symbols, .is-practice, .is-more) .brand-button {
