@@ -10,10 +10,11 @@ test("all nine lesson readings and 21 complete rhyme clips are shipped (ㄧㄤ r
   assert.equal(manifest.lessons.length, 9);
   assert.equal(manifest.rhymes.length, 21);
   assert.equal(new Set(manifest.rhymes.map((clip: { text: string }) => clip.text)).size, 21);
-  // ㄧㄤ was heard as ㄧㄤˊ; it now plays the dictionary's 「央」 (see audio-registry.ts).
+  // ㄧㄤ was heard as ㄧㄤˊ; it now plays the dictionary's 「央」, and the 生字 崖 its 「崖」 (see
+  // audio-registry.ts).
   assert.deepEqual(
     manifest.retired.map((clip: { text: string }) => clip.text),
-    ["ㄧㄤ"],
+    ["ㄧㄤ", "崖"],
   );
   for (const clip of [...manifest.lessons, ...manifest.rhymes]) {
     assert.ok(statSync(`public${clip.path}`).size > 4000);

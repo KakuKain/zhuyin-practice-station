@@ -155,11 +155,11 @@ export function SymbolChart({
         >
           教育部《國語注音符號手冊》
         </a>
-        。結合韻：台灣中文合成語音；「ㄧㄤ」：
+        。結合韻：台灣中文合成語音；「ㄧㄤ」與生字「崖」：
         <a href="https://dict.concised.moe.edu.tw/" target="_blank" rel="noreferrer noopener">
           教育部《國語辭典簡編本》
         </a>
-        「央」字音，
+        「央」、「崖」字音，
         <a
           href="https://creativecommons.org/licenses/by-nd/3.0/tw/"
           target="_blank"
