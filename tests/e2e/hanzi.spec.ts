@@ -218,6 +218,16 @@ test("第一冊 照樣造句 shows the book's example, fills the pattern's blank
   await expect(page.locator(".math-header")).toContainText("第 1 題 / 3");
   await expect(page.locator(".hanzi-example-text")).toContainText("一");
   await noOverflow(page);
+  if ((page.viewportSize()?.width ?? 1000) < 600) {
+    // Phones: one column of cells that never scrolls sideways, with blank paper beside it to
+    // scroll the page, and the buttons kept on the screen.
+    const pattern = page.locator(".hanzi-pattern");
+    expect(await pattern.evaluate((el) => el.scrollWidth - el.clientWidth)).toBeLessThanOrEqual(0);
+    const cell = (await page.locator(".hanzi-cell").first().boundingBox())!;
+    expect(cell.x).toBeGreaterThan(40);
+    const next = (await page.getByRole("button", { name: "下一題" }).boundingBox())!;
+    expect(next.y + next.height).toBeLessThanOrEqual(page.viewportSize()!.height);
+  }
   for (let index = 0; index < 3; index++) {
     const cells = page.locator(".hanzi-cell-canvas");
     await expect(cells.first()).toBeVisible();

@@ -1076,6 +1076,62 @@
   }
 }
 
+/*
+ * Phones: a finger on a cell writes, so the cells cannot scroll a row of columns sideways.
+ * They run down the page in one column instead, narrower than the screen so blank paper on
+ * both sides scrolls the page, and the tools and buttons stay at the bottom of the screen.
+ */
+@media (max-width: 599px) {
+  .hanzi-dictation-cells,
+  .hanzi-sentence .hanzi-pattern {
+    --cell: min(62vw, 250px);
+    flex-wrap: nowrap;
+    align-content: normal;
+    max-height: none;
+    overflow-x: visible;
+  }
+  .hanzi-dictation,
+  .hanzi-word-practice {
+    padding-bottom: 8px;
+  }
+  .hanzi-dictation > .ink-tools,
+  .hanzi-dictation > .hanzi-dictation-nav,
+  .hanzi-word-practice > .hanzi-next {
+    position: sticky;
+    z-index: 4;
+    width: calc(100% + 32px);
+    margin-inline: -16px;
+    background: rgb(254 253 247 / 0.96);
+  }
+  .hanzi-dictation > .ink-tools {
+    bottom: 68px;
+    justify-content: space-around;
+    padding-top: 6px;
+    box-shadow: 0 -8px 14px rgb(110 82 52 / 0.08);
+  }
+  .hanzi-dictation > .hanzi-dictation-nav {
+    bottom: 0;
+    flex-wrap: nowrap;
+    margin-top: -16px;
+    padding: 4px 16px 8px;
+  }
+  /* Side by side even at 320 px, so the bar keeps one height under the tools. */
+  .hanzi-dictation > .hanzi-dictation-nav > button {
+    flex: 1 1 0;
+    justify-content: center;
+    gap: 4px;
+    min-width: 0;
+    padding-inline: 8px;
+    font-size: 18px;
+    white-space: nowrap;
+  }
+  .hanzi-word-practice > .hanzi-next {
+    bottom: 0;
+    padding: 8px 16px;
+    box-shadow: 0 -8px 14px rgb(110 82 52 / 0.08);
+  }
+}
+
 /* 認識國字基本筆畫: the page's four groups, the stroke chart, and its practice. */
 .stroke-shape {
   display: block;
