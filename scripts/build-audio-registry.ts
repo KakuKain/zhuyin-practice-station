@@ -11,6 +11,7 @@ import {
 import { book1Words, callReadings, characterCalls } from "../features/hanzi/book1-words";
 import { sentenceLessons } from "../features/hanzi/sentence-patterns";
 import { strokeClips } from "../features/hanzi/basic-strokes";
+import { readingClips } from "../features/hanzi/reading-lesson";
 const root = process.cwd();
 const audioDir = join(root, "public/listening-audio");
 const gemini = JSON.parse(readFileSync(join(audioDir, "gemini/manifest.json"), "utf8"));
@@ -41,7 +42,9 @@ Object.values(book1Words)
 Object.keys(characterCalls).forEach((character) =>
   add(characterCalls[character], callReadings(character).replaceAll(" ", "|")),
 );
-strokeClips.forEach((clip) => add(clip.text, clip.readings.replaceAll(" ", "|")));
+[...strokeClips, ...readingClips].forEach((clip) =>
+  add(clip.text, clip.readings.replaceAll(" ", "|")),
+);
 Object.values(sentenceLessons).forEach((lesson) =>
   lesson.questions.forEach((question) =>
     add(question.example, question.exampleReadings.replaceAll(" ", "|")),

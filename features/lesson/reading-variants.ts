@@ -26,6 +26,11 @@ export const alternateReadings: Record<string, string> = {
   "弟˙ㄉㄧ": "\u{E01E1}",
   "姐˙ㄐㄧㄝ": "\u{E01E1}",
   "亮˙ㄌㄧㄤ": "\u{E01E1}",
+  // 閱讀階梯「擁抱」's questions and answers (痛得, 東西, 卡在樹上, 為什麼).
+  "得˙ㄉㄜ": "\u{E01E1}",
+  "西˙ㄒㄧ": "\u{E01E1}",
+  卡ㄑㄧㄚˇ: "\u{E01E1}",
+  為ㄨㄟˋ: "\u{E01E1}",
 };
 
 export const isHan = (character: string) => /\p{Script=Han}/u.test(character);

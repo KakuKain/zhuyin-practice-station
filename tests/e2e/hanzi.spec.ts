@@ -40,7 +40,7 @@ test("第一冊 練習 picks a 生字 from the list, marks a stroke out of order
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("./");
   await page.getByRole("combobox", { name: "選擇教材" }).selectOption("kang-hsuan-grade1-book1");
-  await expect(page.locator(".hanzi-journey .journey-card")).toHaveCount(8);
+  await expect(page.locator(".hanzi-journey .journey-card")).toHaveCount(9);
   await noOverflow(page);
   await page.getByRole("button", { name: /第一課，拍拍手/ }).click();
   await expect(page.locator(".hanzi-character-card")).toHaveCount(9);
@@ -325,5 +325,53 @@ test("第一冊 認識國字基本筆畫 traces each stroke, then finds strokes 
     await expect(page.locator(".math-feedback")).toBeHidden();
   }
   await expect(page.locator(".math-result")).toContainText("筆畫練習完成");
+  expect(errors).toEqual([]);
+});
+
+test("第一冊 閱讀階梯 orders the story's scenes, then answers questions by a tap", async ({
+  page,
+}) => {
+  test.setTimeout(120_000);
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("./");
+  await page.getByRole("combobox", { name: "選擇教材" }).selectOption("kang-hsuan-grade1-book1");
+  await page.getByRole("button", { name: "閱讀階梯，擁抱" }).click();
+  await expect(page.locator(".reading-first")).toBeVisible();
+  await noOverflow(page);
+  await page.getByRole("button", { name: /開始練習/ }).click();
+  await expect(page.locator(".math-header")).toContainText("第 1 題 / 6");
+
+  // 排一排: a scene out of the story's order is retried, then the four in order are numbered.
+  const story = [
+    "大家都不敢靠近小刺蝟",
+    "青蛙大叫，跳走了",
+    "小象被刺到，痛得抬起腳",
+    "小女孩的氣球卡在樹上",
+    "小刺蝟爬上樹，拿下氣球",
+    "小熊抱住小刺蝟",
+  ];
+  const shown = await page
+    .locator(".reading-scene")
+    .evaluateAll((scenes) => scenes.map((scene) => scene.getAttribute("aria-label")!));
+  shown.sort((a, b) => story.indexOf(a) - story.indexOf(b));
+  await page.getByRole("button", { name: shown[3], exact: true }).click();
+  await expect(page.locator(".math-feedback.is-retry")).toBeVisible();
+  await expect(page.locator(".math-feedback")).toBeHidden();
+  for (const scene of shown) await page.getByRole("button", { name: scene, exact: true }).click();
+  await expect(page.locator(".reading-scene-number")).toHaveCount(4);
+  await noOverflow(page);
+
+  for (let i = 0; i < 5; i++) {
+    await expect(page.locator(".reading-choices")).toBeVisible();
+    await noOverflow(page);
+    for (const choice of await page.locator(".reading-choice, .reading-sentence-pick").all()) {
+      await choice.click();
+      if (await page.locator(".math-feedback.is-correct").isVisible()) break;
+      await expect(page.locator(".math-feedback")).toBeHidden();
+    }
+    await expect(page.locator(".math-feedback")).toBeHidden();
+  }
+  await expect(page.locator(".math-result")).toContainText("閱讀練習完成");
   expect(errors).toEqual([]);
 });

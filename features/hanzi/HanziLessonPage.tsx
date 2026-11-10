@@ -8,12 +8,14 @@ import { readHanziRecords } from "./hanzi-round";
 import { sentenceLessons } from "./sentence-patterns";
 import { strokesLessonId } from "./basic-strokes";
 import { StrokeLessonPage } from "./StrokeLesson";
+import { ReadingLessonPage } from "./ReadingLesson";
+import { readingLessonId } from "./reading-lesson";
 import "../../styles/lazy/hanzi.css";
 
 /**
  * A 第一冊 lesson's page: its number and title, its practices (練習, 聽寫 and, but for the
  * numbers, 照樣造句) and every 生字, each a tap away from 練習 on that 生字. A check
- * marks the 生字 written to the end before. 認識國字基本筆畫 has its own page.
+ * marks the 生字 written to the end before. 認識國字基本筆畫 and 閱讀階梯 have their own pages.
  */
 export function HanziLessonPage({
   app,
@@ -25,10 +27,12 @@ export function HanziLessonPage({
     | "startHanziDictation"
     | "startHanziSentences"
     | "startHanziStrokes"
+    | "startHanziReading"
     | "speak"
   >;
 }) {
   if (app.hanziLessonId === strokesLessonId) return <StrokeLessonPage app={app} />;
+  if (app.hanziLessonId === readingLessonId) return <ReadingLessonPage app={app} />;
   return <CharacterLessonPage app={app} />;
 }
 

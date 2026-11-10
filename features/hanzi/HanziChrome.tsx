@@ -18,6 +18,13 @@ export const hanziWordReadings: Record<string, string> = {
   ...Object.fromEntries(basicStrokes.map((stroke) => [stroke.name, strokeReading(stroke.name)])),
   ...Object.fromEntries(Object.values(strokePrompts).map((p) => [p.text, p.readings])),
   先學筆畫: "ㄒㄧㄢ ㄒㄩㄝˊ ㄅㄧˇ ㄏㄨㄚˋ",
+  // 閱讀階梯「擁抱」's page.
+  閱讀階梯: "ㄩㄝˋ ㄉㄨˊ ㄐㄧㄝ ㄊㄧ",
+  擁抱: "ㄩㄥˇ ㄅㄠˋ",
+  先讀課本的故事: "ㄒㄧㄢ ㄉㄨˊ ㄎㄜˋ ㄅㄣˇ ˙ㄉㄜ ㄍㄨˋ ㄕˋ",
+  排一排: "ㄆㄞˊ ㄧ ㄆㄞˊ",
+  回答問題: "ㄏㄨㄟˊ ㄉㄚˊ ㄨㄣˋ ㄊㄧˊ",
+  開始練習: "ㄎㄞ ㄕˇ ㄌㄧㄢˋ ㄒㄧˊ",
   認識國字基本筆畫: "ㄖㄣˋ ㄕˋ ㄍㄨㄛˊ ㄗˋ ㄐㄧ ㄅㄣˇ ㄅㄧˇ ㄏㄨㄚˋ",
   課本第: "ㄎㄜˋ ㄅㄣˇ ㄉㄧˋ",
   頁: "ㄧㄝˋ",

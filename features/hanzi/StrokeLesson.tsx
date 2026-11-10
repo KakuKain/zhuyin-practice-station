@@ -10,7 +10,7 @@ import {
 import type { AppController } from "../usePracticeApp";
 import type { InkStroke } from "../types";
 import { useInkCanvas } from "../../lib/ink/useInkCanvas";
-import { registeredAudioUrl } from "../../lib/audio/audio-registry";
+import { clipOf, useSay } from "./clip-voice";
 import { MathHeader, MathResult } from "../math/MathChrome";
 import { mathPromptUrl, mathPrompts } from "../math/math-audio";
 import { HanziWords } from "./HanziChrome";
@@ -80,28 +80,6 @@ function StrokeShape({ name, className }: { name: string; className?: string }) 
 /** A stroke's name in 國字注音. */
 function StrokeName({ name }: { name: string }) {
   return <HanziWords text={name} />;
-}
-
-const clipOf = (text: string, readings: string) => {
-  const pronunciation = readings.replaceAll(" ", "|");
-  return registeredAudioUrl(text, pronunciation) ? { text, pronunciation } : null;
-};
-
-/** Plays the clips that are voiced, one after another. */
-function useSay(app: Pick<AppController, "speak">) {
-  return (parts: { text: string; readings: string }[]) => {
-    const clips = parts.flatMap((part) => clipOf(part.text, part.readings) ?? []);
-    const play = (i: number) => {
-      const clip = clips[i];
-      if (!clip) return;
-      app.speak(clip.text, {
-        pronunciation: clip.pronunciation,
-        onEnded: () => play(i + 1),
-        onError: () => {},
-      });
-    };
-    play(0);
-  };
 }
 
 const nameClip = (name: string) => ({ text: name, readings: strokeReading(name) });
@@ -268,9 +246,7 @@ function StrokeQuestionView({
   const prompt = strokePrompts[question.kind];
   const ask = () => say([prompt, nameClip(question.stroke)]);
   // Until the clips are recorded, the parent reads the question.
-  const voiced = Boolean(
-    clipOf(prompt.text, prompt.readings) ?? clipOf(question.stroke, strokeReading(question.stroke)),
-  );
+  const voiced = Boolean(clipOf(prompt) ?? clipOf(nameClip(question.stroke)));
   const askOnce = useEffectEvent(ask);
   useEffect(() => {
     askOnce();
