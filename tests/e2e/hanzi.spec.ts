@@ -275,6 +275,11 @@ test("第一冊 認識國字基本筆畫 traces each stroke, then finds strokes 
   await expect(page.locator(".stroke-chart-card")).toHaveCount(28);
   await expect(page.locator(".stroke-page-card")).toHaveCount(4);
   await noOverflow(page);
+  // Scrolled to the end, the chart's last card clears the bottom bar instead of hiding under it.
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  const lastCard = (await page.locator(".stroke-chart-card").last().boundingBox())!;
+  const bar = await page.locator(".bottom-nav").boundingBox();
+  if (bar) expect(lastCard.y + lastCard.height).toBeLessThanOrEqual(bar.y);
 
   await page.getByRole("button", { name: /課本第 8 頁/ }).click();
   await expect(page.locator(".math-header")).toContainText("第 1 題 / 12");
