@@ -3,6 +3,7 @@ import { AnnotatedText } from "../../components/AnnotatedText";
 import { readingVariants } from "../lesson/reading-variants";
 import { book1Readings } from "./book1-characters";
 import strokeData from "./strokes.json";
+import { basicStrokes, strokePrompts, strokeReading } from "./basic-strokes";
 
 export type CharacterStrokes = {
   strokes: string[];
@@ -13,6 +14,18 @@ export const characterStrokes = strokeData as Record<string, CharacterStrokes>;
 
 /** One reading per character of every 第一冊 word a child reads, for 國字注音. */
 export const hanziWordReadings: Record<string, string> = {
+  // 認識國字基本筆畫: the stroke names, what each question says, and the page's words.
+  ...Object.fromEntries(basicStrokes.map((stroke) => [stroke.name, strokeReading(stroke.name)])),
+  ...Object.fromEntries(Object.values(strokePrompts).map((p) => [p.text, p.readings])),
+  先學筆畫: "ㄒㄧㄢ ㄒㄩㄝˊ ㄅㄧˇ ㄏㄨㄚˋ",
+  認識國字基本筆畫: "ㄖㄣˋ ㄕˋ ㄍㄨㄛˊ ㄗˋ ㄐㄧ ㄅㄣˇ ㄅㄧˇ ㄏㄨㄚˋ",
+  課本第: "ㄎㄜˋ ㄅㄣˇ ㄉㄧˋ",
+  頁: "ㄧㄝˋ",
+  種筆畫: "ㄓㄨㄥˇ ㄅㄧˇ ㄏㄨㄚˋ",
+  筆畫表: "ㄅㄧˇ ㄏㄨㄚˋ ㄅㄧㄠˇ",
+  "點一點，聽一聽": "ㄉㄧㄢˇ ㄧ ㄉㄧㄢˇ ㄊㄧㄥ ㄧ ㄊㄧㄥ",
+  描對了: "ㄇㄧㄠˊ ㄉㄨㄟˋ ˙ㄌㄜ",
+  再描一次: "ㄗㄞˋ ㄇㄧㄠˊ ㄧˊ ㄘˋ",
   國語: "ㄍㄨㄛˊ ㄩˇ",
   國字真簡單: "ㄍㄨㄛˊ ㄗˋ ㄓㄣ ㄐㄧㄢˇ ㄉㄢ",
   一到十: "ㄧ ㄉㄠˋ ㄕˊ",

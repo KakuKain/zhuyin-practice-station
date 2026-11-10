@@ -9,6 +9,7 @@
 // https://cdn.jsdelivr.net/npm/hanzi-writer-data@2.0.1/<character>.json.
 import { readFileSync, writeFileSync } from "node:fs";
 import { book1Lessons } from "../features/hanzi/book1-characters";
+import { basicStrokes } from "../features/hanzi/basic-strokes";
 
 type Point = [number, number];
 type Source = { strokes: string[]; medians: Point[][]; radStrokes?: number[] };
@@ -216,16 +217,28 @@ const corrections: Record<string, (strokes: Stroke[]) => Stroke[]> = {
   起: (s) => borrow(s, [8, 9, 10], "巳", [1, 2, 3]),
 };
 
-const characters = book1Lessons.flatMap((lesson) => [...lesson.characters]);
-const out: Record<string, { strokes: string[]; medians: Point[][]; radStrokes: number[] }> = {};
-for (const character of characters) {
-  const fix = corrections[character];
-  const strokes = fix ? fix(load(character)) : load(character);
-  out[character] = {
-    strokes: strokes.map((stroke) => stroke.path),
-    medians: strokes.map((stroke) => stroke.median),
-    radStrokes: strokes.flatMap((stroke, i) => (stroke.radical ? [i] : [])),
-  };
+function write(file: string, characters: string[]) {
+  const out: Record<string, { strokes: string[]; medians: Point[][]; radStrokes: number[] }> = {};
+  for (const character of characters) {
+    const fix = corrections[character];
+    const strokes = fix ? fix(load(character)) : load(character);
+    out[character] = {
+      strokes: strokes.map((stroke) => stroke.path),
+      medians: strokes.map((stroke) => stroke.median),
+      radStrokes: strokes.flatMap((stroke, i) => (stroke.radical ? [i] : [])),
+    };
+  }
+  writeFileSync(file, JSON.stringify(out) + "\n");
 }
-writeFileSync("features/hanzi/strokes.json", JSON.stringify(out) + "\n");
-console.log(`Wrote ${characters.length} characters, ${Object.keys(corrections).length} corrected.`);
+
+const characters = book1Lessons.flatMap((lesson) => [...lesson.characters]);
+write("features/hanzi/strokes.json", characters);
+// 認識國字基本筆畫's examples of the six strokes no 第一冊 生字 has (basic-strokes.ts). Only
+// one stroke of each is shown, so their order is not checked.
+const extra = [...new Set(basicStrokes.flatMap((stroke) => stroke.find.character))].filter(
+  (character) => !characters.includes(character),
+);
+write("features/hanzi/stroke-examples.json", extra);
+console.log(
+  `Wrote ${characters.length} characters (${Object.keys(corrections).length} corrected) and ${extra.length} stroke examples.`,
+);

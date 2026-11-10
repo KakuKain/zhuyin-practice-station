@@ -1075,3 +1075,168 @@
     --cell: min(70vw, 280px);
   }
 }
+
+/* 認識國字基本筆畫: the page's four groups, the stroke chart, and its practice. */
+.stroke-shape {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+}
+.stroke-shape path {
+  fill: #3b3f58;
+}
+.lesson-page .mode-grid.stroke-pages {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+}
+.lesson-page .mode-card.stroke-page-card {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto auto;
+}
+.stroke-page-card .lesson-mode-copy {
+  grid-column: 1;
+  grid-row: 2;
+}
+.stroke-page-card .lesson-mode-cta {
+  grid-row: 3;
+}
+.stroke-page-shapes {
+  grid-row: 1;
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 4px;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 14px;
+  background: #fffdf7;
+}
+.stroke-chart-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+  gap: 10px;
+}
+.stroke-chart-card {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding: 10px 6px 12px;
+  border: 1.5px solid #ead9c4;
+  border-radius: 16px;
+  background: #fffdf7;
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+.stroke-chart-card .stroke-shape {
+  width: 64px;
+}
+.stroke-chart-card:focus-visible {
+  outline: 3px solid #2868b9;
+  outline-offset: 2px;
+}
+.stroke-chart-name {
+  font-size: 19px;
+  line-height: 1.2;
+}
+
+.stroke-prompt-text {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.5;
+  text-align: center;
+}
+/* The instruction, then the stroke's name on a line of its own. */
+.stroke-prompt-text strong {
+  display: block;
+  color: #c4473d;
+  font-size: 30px;
+}
+.stroke-trace .hanzi-glyph path.hanzi-ink {
+  fill: #2f7d5b;
+}
+.stroke-stage {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  width: 100%;
+}
+.stroke-choices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  width: min(100%, calc(100dvh - 330px), 560px);
+  min-width: 260px;
+}
+.stroke-choice {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  padding: 14%;
+  border: 2px solid #e3a49b;
+  border-radius: 20px;
+  background: #fffdf7;
+  box-shadow: 0 4px 16px rgb(110 82 52 / 0.12);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.stroke-choice.is-correct {
+  outline: 5px solid #6cc28e;
+  outline-offset: 3px;
+}
+.stroke-choice.is-wrong {
+  outline: 5px solid #e5b46b;
+  outline-offset: 3px;
+}
+.stroke-find-glyph {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.stroke-find-part {
+  fill: #3b3f58;
+  transition: fill 0.2s;
+}
+.stroke-find-part.is-correct {
+  fill: #2f9a55;
+}
+.stroke-find-part.is-wrong {
+  fill: #e5b46b;
+}
+.stroke-stage .math-feedback {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 20px;
+  /* Light enough that the stroke turned green shows through. */
+  background: rgb(255 253 246 / 0.25);
+  color: #2f9a55;
+  pointer-events: none;
+}
+.stroke-stage .math-feedback.is-retry {
+  color: #dc806d;
+}
+.stroke-stage .math-feedback span {
+  font-size: 26px;
+  font-weight: 800;
+}
+
+@media (min-width: 900px) and (orientation: landscape) {
+  .stroke-question .stroke-stage {
+    grid-column: 2;
+    grid-row: 1 / span 3;
+  }
+  .stroke-choices {
+    width: min(calc(100dvh - 190px), 600px);
+  }
+  .stroke-question .stroke-stage .hanzi-square {
+    width: min(calc(100dvh - 190px), 640px);
+  }
+  .stroke-question .hanzi-next {
+    grid-column: 1;
+  }
+}

@@ -49,6 +49,7 @@ const screens = {
   hanziLesson: () => import("../features/hanzi/HanziLessonPage"),
   hanziDictation: () => import("../features/hanzi/DictationScreen"),
   hanziSentences: () => import("../features/hanzi/SentenceScreen"),
+  hanziStrokes: () => import("../features/hanzi/StrokeLesson"),
   hanziCourses: () => import("../features/hanzi/HanziCourseList"),
 };
 const FillBlank = lazy(() => screens.fillBlank().then((m) => ({ default: m.FillBlank })));
@@ -71,6 +72,7 @@ const DictationScreen = lazy(() =>
 const SentenceScreen = lazy(() =>
   screens.hanziSentences().then((m) => ({ default: m.SentenceScreen })),
 );
+const StrokeScreen = lazy(() => screens.hanziStrokes().then((m) => ({ default: m.StrokeScreen })));
 const HanziLessonPage = lazy(() =>
   screens.hanziLesson().then((m) => ({ default: m.HanziLessonPage })),
 );
@@ -227,6 +229,8 @@ function PracticeContent({ app }: { app: ReturnType<typeof usePracticeApp> }) {
           <DictationScreen app={app} />
         ) : app.hanziMode === "sentences" ? (
           <SentenceScreen app={app} />
+        ) : app.hanziMode === "strokes" ? (
+          <StrokeScreen app={app} />
         ) : (
           <HanziScreen app={app} />
         )}
