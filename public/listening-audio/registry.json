@@ -4213,6 +4213,23 @@
       "voicedDuration": 1.01
     },
     {
+      "text": "ㄧㄞ",
+      "pronunciation": [
+        "ㄧㄞ"
+      ],
+      "observedReadings": [
+        "ㄧㄞ"
+      ],
+      "url": "/listening-audio/gemini/rhymes/3127-311e.m4a",
+      "source": "Gemini Fola",
+      "duration": 1.664,
+      "bytes": 17665,
+      "sha256": "c1d25e9966631eb10c77cf7fc75a29183476404fe3b37317aff0ce584753b843",
+      "version": "c1d25e996663",
+      "review": "timing checked; human pronunciation review recommended",
+      "voicedDuration": 0.96
+    },
+    {
       "text": "ㄧㄠ",
       "pronunciation": [
         "ㄧㄠ"

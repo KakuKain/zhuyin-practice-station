@@ -8,14 +8,13 @@ const clips = index as unknown as Record<string, [string[], string, string]>;
  * recordings are CC BY-ND (no adaptations), so the file stays byte-identical to the official MP3,
  * and playback stops in the silence after the character, before the recording goes on to read
  * its radical and strokes. ㄧㄤ: the parent heard the Gemini clip as ㄧㄤˊ and chose 「央」; the
- * character ends by 0.45 s and the radical starts at 1.2 s. ㄧㄞ: the parent heard the Gemini clip
- * as ㄧㄚ; it and the 生字 崖 play the dictionary's 「崖」 (ㄧㄞˊ, the chart's 第二聲 example), which
- * also ends by 0.45 s with its radical at 1.25 s. `reading` is the reading the clip says, where it
- * is not the text itself.
+ * character ends by 0.45 s and the radical starts at 1.2 s. The 生字 崖 (ㄧㄞˊ) plays the
+ * dictionary's 「崖」, which ends by 0.45 s with its radical at 1.25 s: its Gemini clip came from
+ * the reading the parent heard as ㄧㄚ. `reading` is the reading the clip says, where it is not
+ * the text itself. (The symbol ㄧㄞ is read in the first tone, which no dictionary entry has.)
  */
 const partialClips: Record<string, { url: string; end: number; reading?: string }> = {
   ㄧㄤ: { url: "listening-audio/moe-examples/6160.mp3", end: 0.7 },
-  ㄧㄞ: { url: "listening-audio/moe-examples/5993.mp3", end: 0.7 },
   崖: { url: "listening-audio/moe-examples/5993.mp3", end: 0.7, reading: "ㄧㄞˊ" },
 };
 

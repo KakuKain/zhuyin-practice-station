@@ -61,11 +61,11 @@ test("ㄧㄤ plays the dictionary's 「央」 unchanged, stopping after the char
   assert.equal(clipEnd(registeredAudioUrl("ㄧㄢ")!), null);
 });
 
-test("ㄧㄞ and the 生字 崖 play the dictionary's 「崖」 unchanged, stopping after the character", () => {
-  // The parent heard the Gemini ㄧㄞ as ㄧㄚ; 「崖」 is said by 0.45 s, its radical starts at 1.25 s.
+test("the 生字 崖 plays the dictionary's 「崖」 unchanged, stopping after the character", () => {
+  // Its Gemini clip had the reading the parent heard as ㄧㄚ; 「崖」 is said by 0.45 s, and its
+  // radical starts at 1.25 s. The symbol ㄧㄞ is read in the first tone, so it does not borrow it.
   const url = "listening-audio/moe-examples/5993.mp3#t=0,0.7";
-  assert.equal(registeredAudioUrl("ㄧㄞ"), url);
-  assert.equal(registeredAudioUrl("ㄧㄞ", "ㄧㄞ"), url);
+  assert.ok(registeredAudioUrl("ㄧㄞ")!.startsWith("listening-audio/gemini/rhymes/"));
   assert.equal(registeredAudioUrl("崖", "ㄧㄞˊ"), url);
   assert.equal(registeredAudioUrl("崖"), url);
   // Another reading of 崖 never borrows it.

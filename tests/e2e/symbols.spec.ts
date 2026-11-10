@@ -211,29 +211,3 @@ test("ㄧㄤ plays the dictionary's 「央」 and stops before its radical is re
   await expect(page.getByText("音檔無法播放", { exact: false })).toHaveCount(0);
   expect(errors).toEqual([]);
 });
-
-test("ㄧㄞ plays the dictionary's 「崖」 and stops before its radical is read", async ({
-  page,
-}) => {
-  const errors: string[] = [];
-  page.on("pageerror", (error) => errors.push(error.message));
-  await page.goto("./");
-  await page.getByRole("button", { name: "注音", exact: true }).click();
-  const rhyme = page.getByRole("button", { name: "播放結合韻 ㄧㄞ", exact: true });
-  await rhyme.scrollIntoViewIfNeeded();
-  await rhyme.click();
-  const audio = page.locator("audio");
-  // The official MP3, unchanged (or its cached copy), with where to stop.
-  await expect(audio).toHaveAttribute("src", /(5993\.mp3|^blob:.*)#t=0,0\.7$/);
-  await expect
-    .poll(() => audio.evaluate((element: HTMLAudioElement) => !element.paused))
-    .toBe(true);
-  // It ends after the character: long before the recording reads its radical at 1.25 s.
-  await expect(rhyme).toHaveAttribute("aria-pressed", "false", { timeout: 5_000 });
-  const stoppedAt = await audio.evaluate((element: HTMLAudioElement) => element.currentTime);
-  expect(stoppedAt).toBeGreaterThan(0.5);
-  expect(stoppedAt).toBeLessThan(1.1);
-  expect(await audio.evaluate((element: HTMLAudioElement) => element.paused)).toBe(true);
-  await expect(page.getByText("音檔無法播放", { exact: false })).toHaveCount(0);
-  expect(errors).toEqual([]);
-});
