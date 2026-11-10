@@ -396,8 +396,10 @@
 }
 .hanzi-list header {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
+  gap: 8px 12px;
   margin-bottom: 12px;
 }
 .hanzi-list h2 {
@@ -610,19 +612,46 @@
   font-size: 15px;
   cursor: pointer;
 }
-.hanzi-dictation-cells {
+/*
+ * 直書, as in the 作業簿: cells run top to bottom and columns right to left. A cell's 田字格 is
+ * about 3.5 cm on the tablet (192 px portrait, 188 px landscape); a column takes the height left.
+ */
+.hanzi-dictation-cells,
+.hanzi-sentence .hanzi-pattern {
+  --cell: min(32vw, 256px);
+  writing-mode: vertical-rl;
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
-  gap: 14px;
+  align-items: center;
+  align-content: safe center;
+  justify-content: flex-start;
+  gap: 10px 16px;
+  width: 100%;
+  /* At least two cells a column (each 3/4 of its width high). */
+  max-height: max(calc(100dvh - 410px), calc(var(--cell) * 1.5 + 12px));
+  overflow-x: auto;
+}
+@media (min-width: 900px) and (orientation: landscape) {
+  .hanzi-dictation-cells,
+  .hanzi-sentence .hanzi-pattern {
+    --cell: 250px;
+  }
+}
+@media (max-width: 599px) {
+  .hanzi-dictation-cells,
+  .hanzi-sentence .hanzi-pattern {
+    --cell: min(70vw, 280px);
+  }
 }
 /* The cell shows the top of its square canvas: the 田字格 and the 注音 strip (4 : 3). */
 .hanzi-cell {
+  container-type: inline-size;
+  writing-mode: horizontal-tb;
   position: relative;
+  flex: none;
   overflow: hidden;
   border: 1.5px solid #e3a49b;
-  /* As big as the row allows: one to three cells side by side. */
-  width: min(calc((100vw - 32px - (var(--cells, 2) - 1) * 14px) / var(--cells, 2)), 420px);
+  width: var(--cell, 256px);
   aspect-ratio: 4 / 3;
   border-radius: 10px;
   background: #fffdf7;
@@ -715,10 +744,16 @@
   background: #f1ece5;
   font-weight: 700;
 }
+/* A word's characters 直書 here too, top to bottom as the child wrote them. */
 .hanzi-check-cells {
+  writing-mode: vertical-rl;
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+  max-height: 640px;
+}
+.hanzi-check-cell {
+  writing-mode: horizontal-tb;
 }
 .hanzi-check-cell {
   display: grid;
@@ -818,6 +853,16 @@
   font-size: 18px;
   cursor: pointer;
 }
+.hanzi-check-mark button {
+  display: inline-grid;
+  place-items: center;
+}
+.hanzi-check-mark button.is-right {
+  color: #2f7d5b;
+}
+.hanzi-check-mark button.is-wrong {
+  color: #b23a30;
+}
 .hanzi-check-mark button.is-right[aria-pressed="true"] {
   border-color: #3a9a6a;
   background: #dff1e6;
@@ -836,4 +881,227 @@
   background: #ffe3c2;
   color: #a2561a;
   font-size: 12px;
+}
+
+/* 語詞: the word as the sheet writes it, and its cells with pale models to trace. */
+.hanzi-word-answer {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.hanzi-word-zhuyin {
+  display: inline-flex;
+  color: #2f7fd6;
+}
+/* A 注音 answer as tall as the 國字 beside it (the stack is 4em high). */
+.hanzi-word-zhuyin .zhuyin-stack,
+.hanzi-check-zhuyin-answer .zhuyin-stack {
+  font-size: 0.3em;
+}
+.hanzi-cell-model {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 75%;
+  height: 100%;
+  pointer-events: none;
+}
+.hanzi-cell-zhuyin-model,
+.hanzi-cell-mark-model {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  color: #e3d7cb;
+  pointer-events: none;
+}
+.hanzi-cell-zhuyin-model {
+  top: 0;
+  left: 75%;
+  width: 25%;
+  height: 100%;
+  font-size: 8.5cqw;
+}
+.hanzi-cell-zhuyin-model.is-in-square {
+  left: 0;
+  width: 75%;
+  font-size: 10cqw;
+}
+.hanzi-cell-mark-model {
+  inset: 0 25% 0 0;
+  font-size: clamp(30px, 10vw, 90px);
+}
+.hanzi-cell.is-complete {
+  box-shadow:
+    0 0 0 3px #a8dcbf,
+    0 4px 14px rgb(110 82 52 / 0.12);
+}
+.hanzi-cell-done {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  color: #3a9a6a;
+  pointer-events: none;
+}
+.hanzi-word-practice .hanzi-character {
+  font-size: 36px;
+}
+.hanzi-practice.hanzi-word-practice {
+  width: min(100%, 1100px);
+}
+.hanzi-word-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.hanzi-word-card {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: 84px;
+  padding: 12px 8px;
+  border: 1.5px dashed #e8b7af;
+  border-radius: 14px;
+  background: #fffdf7;
+  color: var(--ink);
+  font: inherit;
+  font-size: 24px;
+  cursor: pointer;
+}
+.hanzi-word-card.is-current {
+  border-style: solid;
+  border-color: #2f7fd6;
+  box-shadow: 0 0 0 2px #2f7fd6;
+}
+
+/* The cell sets the size; the phone rule that fixes .zhuyin-stack at 22px does not apply here. */
+.hanzi-cell-zhuyin-model .zhuyin-stack {
+  color: #e3d7cb;
+  font-size: inherit;
+}
+/* In the list's header the switch sits between the title and the close button. */
+.hanzi-list .hanzi-kind {
+  margin-left: auto;
+}
+.hanzi-list .hanzi-kind button {
+  padding: 4px 12px;
+}
+@media (max-width: 419px) {
+  .hanzi-list h2 {
+    font-size: 20px;
+  }
+  .hanzi-list .hanzi-kind button {
+    padding: 4px 8px;
+    font-size: 16px;
+  }
+}
+
+/* 照樣造句: the book's example, then the pattern with blanks in 作業簿 cells. */
+.hanzi-example {
+  justify-content: flex-start;
+  width: min(100%, 860px);
+}
+.hanzi-example-label {
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: #fde4e1;
+  color: #9c4038;
+  font-size: 16px;
+}
+.hanzi-example-text {
+  margin: 0;
+  font-size: 30px;
+}
+.hanzi-pattern {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.hanzi-pattern-text {
+  font-size: 34px;
+}
+.hanzi-sentence .hanzi-pattern-text {
+  padding: 4px 0;
+}
+.hanzi-pattern-label {
+  padding: 6px 2px;
+  border-radius: 999px;
+  background: #e6f3ff;
+  color: #2f6ab0;
+  font-size: 15px;
+}
+/* The parent's check keeps the sentences across, with small previews. */
+.hanzi-sentence-check .hanzi-pattern {
+  justify-content: flex-start;
+  width: auto;
+  flex: 1;
+}
+.hanzi-sentence-check .hanzi-pattern-label {
+  padding: 0 8px;
+}
+.hanzi-sentence-check .hanzi-check-ink {
+  width: clamp(56px, 10cqw, 96px);
+}
+.hanzi-sentence-check .hanzi-pattern-text {
+  font-size: 24px;
+}
+
+/* A sentence can need four columns; landscape tablets give it the whole width. */
+.hanzi-dictation.hanzi-sentence {
+  width: min(100%, 1240px);
+}
+
+/*
+ * Landscape tablets: the question, tools and buttons on the left, the cells on the right with the
+ * whole height, so a column holds three cells and a sentence fits across.
+ */
+@media (min-width: 900px) and (orientation: landscape) {
+  .hanzi-dictation {
+    grid-template-columns: minmax(260px, 330px) minmax(0, 1fr);
+    align-items: center;
+    column-gap: 28px;
+    width: min(100%, 1240px);
+  }
+  .hanzi-dictation > * {
+    grid-column: 1;
+  }
+  .hanzi-dictation > .hanzi-dictation-cells,
+  .hanzi-dictation > .hanzi-pattern {
+    grid-column: 2;
+    grid-row: 1 / span 4;
+  }
+  .hanzi-dictation-cells,
+  .hanzi-sentence .hanzi-pattern {
+    max-height: calc(100dvh - 110px);
+  }
+  .hanzi-dictation .hanzi-example {
+    flex-direction: column;
+  }
+  .hanzi-dictation .hanzi-example-text {
+    font-size: 26px;
+    text-align: center;
+  }
+  .hanzi-word-practice .hanzi-dictation-cells {
+    grid-column: 2;
+    grid-row: 1 / span 3;
+  }
+}
+
+/* 聽寫 and 語詞 have one to three characters, so their cells can be bigger (4.4 cm portrait). */
+.hanzi-dictation-cells {
+  --cell: min(40vw, 320px);
+}
+@media (min-width: 900px) and (orientation: landscape) {
+  .hanzi-dictation-cells {
+    --cell: 300px;
+  }
+}
+@media (max-width: 599px) {
+  .hanzi-dictation-cells {
+    --cell: min(70vw, 280px);
+  }
 }

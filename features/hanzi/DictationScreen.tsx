@@ -1,11 +1,13 @@
-import { useEffect, useEffectEvent, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
   CheckCircle,
+  Circle,
   Eye,
   SpeakerHigh,
   WarningCircle,
+  X,
 } from "@phosphor-icons/react";
 import type { AppController } from "../usePracticeApp";
 import type { InkStroke } from "../types";
@@ -13,7 +15,6 @@ import { useInkCanvas } from "../../lib/ink/useInkCanvas";
 import { registeredAudioUrl } from "../../lib/audio/audio-registry";
 import { InkTools } from "../../components/InkTools";
 import { ZhuyinStack } from "../../components/Zhuyin";
-import { InkPreview } from "../../components/AppChrome";
 import { taskKeys } from "../rewards/stamp-book";
 import { MathHeader, MathResult } from "../math/MathChrome";
 import { book1LessonLabel, book1Lessons } from "./book1-characters";
@@ -33,6 +34,7 @@ import {
   type DictationRound,
   type WrittenCheck,
 } from "./dictation";
+import { CellGuides, InkReplay } from "./HanziCells";
 import "../../styles/lazy/hanzi.css";
 
 type DictationApp = Pick<
@@ -257,7 +259,7 @@ function DictationWriting({
               : "還沒有錄音，請家長念題目"}
         </button>
       </div>
-      <div className="hanzi-dictation-cells" style={{ "--cells": cells.length } as CSSProperties}>
+      <div className="hanzi-dictation-cells">
         {cells.map((cell, k) => (
           <div className={`hanzi-cell${active === k ? " is-active" : ""}`} key={k}>
             <CellGuides mark={cell.write === "標點"} />
@@ -357,10 +359,15 @@ function DictationCheck({
           type="button"
           key={String(option)}
           aria-pressed={value === option}
+          aria-label={option ? "對" : "錯"}
           className={option ? "is-right" : "is-wrong"}
           onClick={() => set(option)}
         >
-          {option ? "對" : "錯"}
+          {option ? (
+            <Circle size={22} weight="bold" aria-hidden="true" />
+          ) : (
+            <X size={22} weight="bold" aria-hidden="true" />
+          )}
         </button>
       ))}
     </div>
@@ -368,7 +375,7 @@ function DictationCheck({
   return (
     <section className="hanzi-check">
       <p className="hanzi-check-intro">
-        請家長對答案：國字已先依筆順判斷好（有疑問可以按「看筆順」再改），注音請逐題勾選對或錯。
+        請家長對答案：國字已先依筆順判斷好（有疑問可以按「看筆順」再改），注音請逐題選 ○ 或 ✕。
       </p>
       <ol className="hanzi-check-list">
         {round.items.map((item, i) => {
@@ -431,22 +438,6 @@ function DictationCheck({
   );
 }
 
-/** The 田字格 and its 注音 strip, drawn over a cell's canvas; a punctuation cell has no strip. */
-function CellGuides({ mark }: { mark: boolean }) {
-  return (
-    <svg
-      className="hanzi-cell-guides"
-      viewBox="0 0 100 75"
-      preserveAspectRatio="none"
-      aria-hidden="true"
-    >
-      {!mark && <rect x="75" y="0" width="25" height="75" className="is-strip" />}
-      <path d="M 37.5 0 V 75 M 0 37.5 H 75" className="is-dashed" />
-      {!mark && <path d="M 75 0 V 75" className="is-divider" />}
-    </svg>
-  );
-}
-
 function CheckCell({
   cell,
   strokes,
@@ -504,29 +495,5 @@ function CheckCell({
         </button>
       )}
     </div>
-  );
-}
-
-/** The child's writing; played, it appears stroke by stroke, each numbered where it starts. */
-function InkReplay({ strokes, play }: { strokes: InkStroke[]; play: boolean }) {
-  const [shown, setShown] = useState(play ? 0 : strokes.length);
-  useEffect(() => {
-    if (!play || shown >= strokes.length) return;
-    const timer = window.setTimeout(() => setShown(shown + 1), 450);
-    return () => window.clearTimeout(timer);
-  }, [play, shown, strokes.length]);
-  return (
-    <>
-      <InkPreview strokes={strokes.slice(0, shown)} />
-      {play && (
-        <svg className="hanzi-replay-numbers" viewBox="0 0 100 100" aria-hidden="true">
-          {strokes.slice(0, shown).map((stroke, i) => (
-            <text key={i} x={stroke[0].x} y={stroke[0].y}>
-              {i + 1}
-            </text>
-          ))}
-        </svg>
-      )}
-    </>
   );
 }

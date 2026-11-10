@@ -25,6 +25,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { builtinCatalog } from "../features/courses/materials";
 import { book1Words, callReadings, characterCalls } from "../features/hanzi/book1-words";
+import { sentenceLessons } from "../features/hanzi/sentence-patterns";
 import { isHan, mathPromptReadings, mathPrompts } from "../features/math/math-audio";
 import {
   type Audio,
@@ -103,7 +104,7 @@ const lessonText = builtinCatalog.flatMap((lesson) => [
   ...lesson.exercise.lines.flat().map((cell) => cell.character),
   ...lesson.exercise.questions.map((question) => question.audioText),
 ]);
-/** 第一冊's 聽寫 clips not voiced yet: the teacher's 語詞, then each 生字's call. */
+/** 第一冊's clips not voiced yet: the teacher's 語詞, each 生字's call, 照樣造句's examples. */
 const voiced = new Set(
   wordsManifest.words.map(
     (word: { text: string; reading: string }) => `${word.text}|${word.reading}`,
@@ -114,6 +115,9 @@ const book1Items = [
     .flat()
     .map((word) => [word.text, word.readings] as const),
   ...Object.keys(characterCalls).map((c) => [characterCalls[c], callReadings(c)] as const),
+  ...Object.values(sentenceLessons).flatMap((lesson) =>
+    lesson.questions.map((question) => [question.example, question.exampleReadings] as const),
+  ),
 ]
   .filter(([text], i, all) => all.findIndex(([other]) => other === text) === i)
   .map(([text, readings]): Item => ({

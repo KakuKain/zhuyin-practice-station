@@ -44,7 +44,7 @@ test("第一冊 練習 picks a 生字 from the list, marks a stroke out of order
   await noOverflow(page);
   await page.getByRole("button", { name: /第一課，拍拍手/ }).click();
   await expect(page.locator(".hanzi-character-card")).toHaveCount(9);
-  await expect(page.getByRole("button", { name: "照樣造句，製作中" })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "照樣造句，看例句填空格" })).toBeEnabled();
   await noOverflow(page);
 
   // 練習 opens on the list of the lesson's 生字.
@@ -144,5 +144,100 @@ test("第一冊 聽寫 is heard only, judges each 國字 by its strokes, and lea
   await finish.click();
   await expect(page.locator(".math-result")).toContainText("要再練的");
   await noOverflow(page);
+  expect(errors).toEqual([]);
+});
+
+test("第一冊 語詞 practice traces a word's 國字 stroke by stroke and leaves its 注音 to the child", async ({
+  page,
+}) => {
+  test.setTimeout(150_000);
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("./");
+  await page.getByRole("combobox", { name: "選擇教材" }).selectOption("kang-hsuan-grade1-book1");
+  await page.getByRole("button", { name: /第一課，拍拍手/ }).click();
+  await page.getByRole("button", { name: /^練習，9 個生字/ }).click();
+  // The list opens first; its own 生字｜語詞 switch changes to the 語詞.
+  await page
+    .getByRole("dialog", { name: "選一個字" })
+    .locator(".hanzi-kind button", { hasText: "語詞" })
+    .click();
+  const list = page.getByRole("dialog", { name: "選一個語詞" });
+  await expect(list.locator(".hanzi-word-card")).toHaveCount(10);
+  await list.getByRole("button", { name: /練習「拍手」/ }).click();
+  await expect(page.locator(".hanzi-steps .is-current")).toContainText("看一看");
+  await page.getByRole("button", { name: "開始描" }).click();
+  const next = page.getByRole("button", { name: "描好了" });
+  await expect(next).toBeDisabled();
+  await noOverflow(page);
+
+  const cells = page.locator(".hanzi-cell-canvas");
+  await expect(cells).toHaveCount(2);
+  const writeIn = async (cell: number, character: string, order?: number[]) => {
+    const canvas = cells.nth(cell);
+    await canvas.scrollIntoViewIfNeeded();
+    const box = (await canvas.boundingBox())!;
+    const square = box.width * 0.75;
+    const medians = data[character].medians;
+    for (const i of order ?? medians.map((_, k) => k)) {
+      const at = ([x, y]: number[]) =>
+        [box.x + (square * x) / 1024, box.y + (square * (900 - y)) / 1024] as const;
+      await page.mouse.move(...at(medians[i][0]));
+      await page.mouse.down();
+      for (const point of medians[i].slice(1)) await page.mouse.move(...at(point), { steps: 3 });
+      await page.mouse.up();
+      await page.waitForTimeout(260);
+    }
+  };
+  // 拍's second stroke first gets a ✗; then both 生字 in order.
+  await writeIn(0, "拍", [1]);
+  await expect(page.locator(".hanzi-mark")).toHaveCount(1);
+  await page.waitForTimeout(600);
+  await writeIn(0, "拍");
+  await writeIn(1, "手");
+  await expect(page.locator(".hanzi-cell.is-complete")).toHaveCount(2);
+  await next.click();
+  await expect(page.locator(".hanzi-steps .is-current")).toContainText("寫一寫");
+  await writeIn(0, "拍");
+  await writeIn(1, "手");
+  await page.getByRole("button", { name: "寫好了" }).click();
+  await expect(page.getByRole("button", { name: "下一個語詞：你好" })).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test("第一冊 照樣造句 shows the book's example, fills the pattern's blanks and ends with the parent's marks", async ({
+  page,
+}) => {
+  test.setTimeout(120_000);
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("./");
+  await page.getByRole("combobox", { name: "選擇教材" }).selectOption("kang-hsuan-grade1-book1");
+  await page.getByRole("button", { name: /第三課，秋千/ }).click();
+  await page.getByRole("button", { name: "照樣造句，看例句填空格" }).click();
+  await expect(page.locator(".math-header")).toContainText("第 1 題 / 3");
+  await expect(page.locator(".hanzi-example-text")).toContainText("一");
+  await noOverflow(page);
+  for (let index = 0; index < 3; index++) {
+    const cells = page.locator(".hanzi-cell-canvas");
+    await expect(cells.first()).toBeVisible();
+    // A short line in the first blank cell stands for a word.
+    const canvas = cells.first();
+    await canvas.scrollIntoViewIfNeeded();
+    const box = (await canvas.boundingBox())!;
+    await page.mouse.move(box.x + box.width * 0.2, box.y + box.width * 0.35);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width * 0.55, box.y + box.width * 0.35, { steps: 4 });
+    await page.mouse.up();
+    await page.getByRole("button", { name: index === 2 ? "寫好了" : "下一題" }).click();
+  }
+  await expect(page.locator(".hanzi-sentence-check")).toHaveCount(3);
+  await expect(page.locator(".hanzi-sentence-check .ink-preview path")).toHaveCount(3);
+  const finish = page.locator(".hanzi-check .hanzi-go-next");
+  await expect(finish).toBeDisabled();
+  for (const group of await page.getByRole("group", { name: /^第 \d 句$/ }).all())
+    await group.getByRole("button", { name: "對" }).click();
+  await finish.click();
+  await expect(page.locator(".math-result")).toContainText("照樣造句完成");
   expect(errors).toEqual([]);
 });

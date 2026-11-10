@@ -14,8 +14,8 @@ export type CharacterRecord = {
   hard: number;
   at: number;
 };
-/** A 語詞 written wrong in 聽寫, for 語詞 practice to bring back. */
-export type WordRecord = { wrong: number; at: number };
+/** A 語詞: how often it was written wrong in 聽寫 (eased by clean practice) and practised. */
+export type WordRecord = { wrong: number; at: number; practised?: number };
 export type HanziRecords = {
   version: 1;
   characters: Record<string, CharacterRecord>;
@@ -40,7 +40,11 @@ export function readHanziRecords(): HanziRecords {
     if (value?.words && typeof value.words === "object")
       for (const [text, record] of Object.entries(value.words))
         if (record && Number.isFinite(record.wrong) && Number.isFinite(record.at))
-          words[text] = record;
+          words[text] = {
+            wrong: record.wrong,
+            at: record.at,
+            ...(Number.isFinite(record.practised) ? { practised: record.practised } : {}),
+          };
     return { version: 1, characters, words };
   } catch {
     return { version: 1, characters: {}, words: {} };
@@ -85,6 +89,23 @@ export function recordDictation(
       records.words[text] = { wrong: before.wrong + 1, at: now };
     }
   }
+  try {
+    window.localStorage.setItem(childKey(storageKeys.hanziRecords), JSON.stringify(records));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** A 語詞 written to the end in 練習: a clean one eases its 再練 by one. */
+export function recordWordPractice(text: string, hinted: boolean, now = Date.now()) {
+  const records = readHanziRecords();
+  const before = records.words[text] ?? { wrong: 0, at: 0 };
+  records.words[text] = {
+    wrong: hinted ? before.wrong : Math.max(before.wrong - 1, 0),
+    practised: (before.practised ?? 0) + 1,
+    at: now,
+  };
   try {
     window.localStorage.setItem(childKey(storageKeys.hanziRecords), JSON.stringify(records));
     return true;
